@@ -1,6 +1,7 @@
 #include "gpk_galaxy_hell_deco.h"
 #include "gpk_galaxy_hell_ships.h"
 
+#include "gpk_input.h"
 #include "gpk_sysevent.h"
 
 #include <mutex>
@@ -85,7 +86,7 @@ namespace ghg
 	int													solarSystemSetup				(::ghg::SGalaxyHell & solarSystem, const ::gpk::SCoord2<uint16_t> & windowSize);
 	int													solarSystemReset				(::ghg::SGalaxyHell & solarSystem); 
 	int													solarSystemDraw					(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
-	int													solarSystemUpdate				(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::view_array<::gpk::SSysEvent> & frameEvents);
+	int													solarSystemUpdate				(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, const ::gpk::view_array<::gpk::SSysEvent> & frameEvents);
 }
 
 #endif // GPK_GALAXY_HELL_H_293874239874

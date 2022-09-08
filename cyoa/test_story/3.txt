@@ -1,0 +1,16 @@
+Painfully you crawl on, around a bend to the right and then one to the left. 
+Somewhere up ahead a voice is chanting--or is it many voices singing in unison? 
+It's an eerie tune with only three or four notes. A moment later you reach a dimly lighted chamber. 
+A thin, ghostlike figure abruptly stops singing and look at you intently. 
+You can hardly find words, but, as if to answer your question before you ask it, this strange man-if he is a man-says, "You have found the oracle of time."
+You are amazed to meet anyone in the cave, much less an oracle. 
+For a moment you are afraid, but as you look more carefully at the oracle, you can't help but smile. 
+His expression is kindly and wise, but there is also a playful, impish look in his eyes. 
+You realize he may be able to tell you some things you've wondered about.
+"What is time?" you ask. The oracle is silent for a moment but then answers in a firm voice, "Time is what keeps everything from happening at once."
+"When did time start?" you ask. "And when will it end?"
+"Would you like to see?"
+You gulp in amazement. "Sure."
+"What then--the beginning or the end?"
+11 You say you want to see the beginning of time.
+17 You say you want to see the end of time.

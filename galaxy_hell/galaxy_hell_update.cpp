@@ -255,58 +255,31 @@ int													shipsUpdate				(::ghg::SGalaxyHell & solarSystem, double seconds
 }
 
 
-static int											processInput			(::ghg::SGalaxyHell & solarSystem, double actualSecondsLastFrame, double secondsLastFrame) {
+static int											processInput			(::ghg::SGalaxyHell & solarSystem, double actualSecondsLastFrame, double secondsLastFrame, const ::gpk::SInput & input, const ::gpk::view_array<::gpk::SSysEvent> & frameEvents) {
+	(void)frameEvents;
+	const bool												key_up					= input.KeyboardCurrent.KeyState['W'] || input.KeyboardCurrent.KeyState[VK_UP		];
+	const bool												key_down				= input.KeyboardCurrent.KeyState['S'] || input.KeyboardCurrent.KeyState[VK_DOWN		];
+	const bool												key_left				= input.KeyboardCurrent.KeyState['A'] || input.KeyboardCurrent.KeyState[VK_LEFT		];
+	const bool												key_right				= input.KeyboardCurrent.KeyState['D'] || input.KeyboardCurrent.KeyState[VK_RIGHT	];
+	const bool												key_turbo				= input.KeyboardCurrent.KeyState[VK_SHIFT	];
+	const bool												key_rotate_left			= input.KeyboardCurrent.KeyState[VK_NUMPAD8	];
+	const bool												key_rotate_right		= input.KeyboardCurrent.KeyState[VK_NUMPAD2	];
+	const bool												key_rotate_front		= input.KeyboardCurrent.KeyState[VK_NUMPAD6	];
+	const bool												key_rotate_back			= input.KeyboardCurrent.KeyState[VK_NUMPAD4	];
+	const bool												key_rotate_reset		= input.KeyboardCurrent.KeyState[VK_NUMPAD5	];
+	const bool												key_camera_switch		= input.KeyboardCurrent.KeyState['C'		];
+	const bool												key_camera_move_front	= input.KeyboardCurrent.KeyState[VK_HOME	];
+	const bool												key_camera_move_back	= input.KeyboardCurrent.KeyState[VK_END		];
+	const bool												key_camera_move_up		= input.KeyboardCurrent.KeyState['E'		];
+	const bool												key_camera_move_down	= input.KeyboardCurrent.KeyState['Q'		];
 
-#if defined(GPK_WINDOWS)
-	const bool												key_up					= GetAsyncKeyState('W') || GetAsyncKeyState(VK_UP	);
-	const bool												key_down				= GetAsyncKeyState('S') || GetAsyncKeyState(VK_DOWN	);
-	const bool												key_left				= GetAsyncKeyState('A') || GetAsyncKeyState(VK_LEFT	);
-	const bool												key_right				= GetAsyncKeyState('D') || GetAsyncKeyState(VK_RIGHT);
-	const bool												key_turbo				= GetAsyncKeyState(VK_SHIFT);
-	const bool												key_rotate_left			= GetAsyncKeyState(VK_NUMPAD8);
-	const bool												key_rotate_right		= GetAsyncKeyState(VK_NUMPAD2);
-	const bool												key_rotate_front		= GetAsyncKeyState(VK_NUMPAD6);
-	const bool												key_rotate_back			= GetAsyncKeyState(VK_NUMPAD4);
-	const bool												key_rotate_reset		= GetAsyncKeyState(VK_NUMPAD5);
-	const bool												key_camera_switch		= GetAsyncKeyState('C');
-	const bool												key_camera_move_front	= GetAsyncKeyState(VK_HOME);
-	const bool												key_camera_move_back	= GetAsyncKeyState(VK_END);
-	const bool												key_camera_move_up		= GetAsyncKeyState('E');
-	const bool												key_camera_move_down	= GetAsyncKeyState('Q');
-#else
-	const bool												key_up					= false;
-	const bool												key_down				= false;
-	const bool												key_left				= false;
-	const bool												key_right				= false;
-	const bool												key_turbo				= false;
-	const bool												key_rotate_left			= false;
-	const bool												key_rotate_right		= false;
-	const bool												key_rotate_front		= false;
-	const bool												key_rotate_back			= false;
-	const bool												key_rotate_reset		= false;
-	const bool												key_camera_switch		= false;
-	const bool												key_camera_move_up		= false;
-	const bool												key_camera_move_down	= false;
-	const bool												key_camera_move_front	= false;
-	const bool												key_camera_move_back	= false;
-#endif
 	//------------------------------------------- Handle input
-
 	::gpk::SCamera											& camera				= solarSystem.ShipState.Scene.Camera[solarSystem.ShipState.Scene.CameraMode];
-	if(key_camera_move_up	) camera.Position.y	+= (float)secondsLastFrame * (key_turbo ? 8 : 2);
-	if(key_camera_move_down	) camera.Position.y	-= (float)secondsLastFrame * (key_turbo ? 8 : 2);
+	if(key_camera_move_up	) camera.Position.y	+= (float)secondsLastFrame * (key_turbo ? 20 : 10);
+	if(key_camera_move_down	) camera.Position.y	-= (float)secondsLastFrame * (key_turbo ? 20 : 10);
 	solarSystem.PlayState.CameraSwitchDelay							+= actualSecondsLastFrame;
 	if(key_camera_switch && solarSystem.PlayState.CameraSwitchDelay > .2) {
 		solarSystem.PlayState.CameraSwitchDelay								= 0;
-
-		solarSystem.ShipState.Scene.Camera[::ghg::CAMERA_MODE_SKY].Target				= {};
-		solarSystem.ShipState.Scene.Camera[::ghg::CAMERA_MODE_SKY].Position			= {-0.000001f, 250, 0};
-		solarSystem.ShipState.Scene.Camera[::ghg::CAMERA_MODE_SKY].Up					= {0, 1, 0};
-
-		solarSystem.ShipState.Scene.Camera[::ghg::CAMERA_MODE_PERSPECTIVE].Target		= {};
-		solarSystem.ShipState.Scene.Camera[::ghg::CAMERA_MODE_PERSPECTIVE].Position	= {-0.000001f, 135, 0};
-		solarSystem.ShipState.Scene.Camera[::ghg::CAMERA_MODE_PERSPECTIVE].Up			= {0, 1, 0};
-		solarSystem.ShipState.Scene.Camera[::ghg::CAMERA_MODE_PERSPECTIVE].Position.RotateZ(::gpk::math_pi * .25);
 
 		solarSystem.ShipState.Scene.CameraMode = (::ghg::CAMERA_MODE)((solarSystem.ShipState.Scene.CameraMode + 1) % ::ghg::CAMERA_MODE_COUNT);
 	}
@@ -323,9 +296,9 @@ static int											processInput			(::ghg::SGalaxyHell & solarSystem, double ac
 			if(key_right) { playerBody.Position.z			-= (float)(secondsLastFrame * speed * (key_turbo ? 2 : 8)); }
 		}
 		if(solarSystem.ShipState.Scene.CameraMode == ::ghg::CAMERA_MODE_FOLLOW) {
-			solarSystem.ShipState.Scene.Camera[::ghg::CAMERA_MODE_FOLLOW].Position			= playerBody.Position + ::gpk::SCoord3<float>{-80.f, 25, 0};
-			solarSystem.ShipState.Scene.Camera[::ghg::CAMERA_MODE_FOLLOW].Target				= playerBody.Position + ::gpk::SCoord3<float>{1000.f, 0, 0};
-			solarSystem.ShipState.Scene.Camera[::ghg::CAMERA_MODE_FOLLOW].Up					= {0, 1, 0};
+			solarSystem.ShipState.Scene.Camera[::ghg::CAMERA_MODE_FOLLOW].Position	= playerBody.Position + ::gpk::SCoord3<float>{-80.f, 25, 0};
+			solarSystem.ShipState.Scene.Camera[::ghg::CAMERA_MODE_FOLLOW].Target	= playerBody.Position + ::gpk::SCoord3<float>{1000.f, 0, 0};
+			solarSystem.ShipState.Scene.Camera[::ghg::CAMERA_MODE_FOLLOW].Up		= {0, 1, 0};
 		}
 		if(key_rotate_reset)
 			playerBody.Orientation.MakeFromEulerTaitBryan({0, 0, (float)-::gpk::math_pi_2});
@@ -352,7 +325,7 @@ static int											processInput			(::ghg::SGalaxyHell & solarSystem, double ac
 	return 0;
 }
 
-int													ghg::solarSystemUpdate				(::ghg::SGalaxyHell & solarSystem, double actualSecondsLastFrame, const ::gpk::view_array<::gpk::SSysEvent> & frameEvents)	{
+int													ghg::solarSystemUpdate				(::ghg::SGalaxyHell & solarSystem, double actualSecondsLastFrame, const ::gpk::SInput & input, const ::gpk::view_array<::gpk::SSysEvent> & frameEvents)	{
 	(void)frameEvents;
 	if(solarSystem.Paused) 
 		return 0;
@@ -385,7 +358,7 @@ int													ghg::solarSystemUpdate				(::ghg::SGalaxyHell & solarSystem, dou
 		::ghg::decoUpdate(solarSystem.DecoState, secondsToProcess, solarSystem.PlayState.RelativeSpeedCurrent, targetMetrics);
 	}
 
-	::processInput(solarSystem, actualSecondsLastFrame, secondsToProcess);
+	::processInput(solarSystem, actualSecondsLastFrame, secondsToProcess, input, frameEvents);
 	if(solarSystem.PlayState.Slowing) {
 		solarSystem.PlayState.TimeScale						-= secondsToProcess * .35;
 		if(solarSystem.PlayState.TimeScale < .1)

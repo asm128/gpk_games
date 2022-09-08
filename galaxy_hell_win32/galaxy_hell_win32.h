@@ -1,6 +1,9 @@
+#include "audio.h"
+
 #include "gpk_galaxy_hell_app.h"
 
 #include "gpk_framework.h"
+
 
 #ifndef CED_DEMO_08_H_298837492837
 #define CED_DEMO_08_H_298837492837
@@ -13,6 +16,10 @@ struct SApplication {
 
 	::std::mutex														LockGUI;
 	::std::mutex														LockRender;
+
+	bool																DebugUIEnabled				= true;
+	::gpk::SGUI															DebugUI						= {};
+	AUDIO_STATE															AudioState;
 
 	::ghg::SGalaxyHellApp												GalaxyHellApp;
 

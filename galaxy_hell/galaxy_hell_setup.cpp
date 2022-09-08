@@ -175,16 +175,6 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 	static constexpr	const uint32_t						partHealth								= 10;
 
 	solarSystem.PlayState.TimeStage									= 0;
-	solarSystem.PlayState.CameraSwitchDelay							= 0;
-	solarSystem.ShipState.Scene.Camera[CAMERA_MODE_SKY].Target				= {};
-	solarSystem.ShipState.Scene.Camera[CAMERA_MODE_SKY].Position				= {-0.000001f, 250, 0};
-	solarSystem.ShipState.Scene.Camera[CAMERA_MODE_SKY].Up					= {0, 1, 0};
-
-	solarSystem.ShipState.Scene.Camera[CAMERA_MODE_PERSPECTIVE].Target		= {};
-	solarSystem.ShipState.Scene.Camera[CAMERA_MODE_PERSPECTIVE].Position		= {-0.000001f, 135, 0};
-	solarSystem.ShipState.Scene.Camera[CAMERA_MODE_PERSPECTIVE].Up			= {0, 1, 0};
-	solarSystem.ShipState.Scene.Camera[CAMERA_MODE_PERSPECTIVE].Position.RotateZ(::gpk::math_pi * .25);
-
 	if(0 == solarSystem.PlayState.Stage) {
 		::gpk::mutex_guard										rtGuard	(solarSystem.DrawCache.RenderTargetQueueMutex);
 		solarSystem.DecoState.Stars.Reset(solarSystem.DrawCache.RenderTargetMetrics);
@@ -219,6 +209,16 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 	} 
 	else {
 		if(0 == solarSystem.ShipState.Ships.size()) { // Create player ship
+			solarSystem.PlayState.CameraSwitchDelay							= 0;
+			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_SKY].Target				= {};
+			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_SKY].Position			= {-0.000001f, 250, 0};
+			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_SKY].Up					= {0, 1, 0};
+
+			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_PERSPECTIVE].Target		= {};
+			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_PERSPECTIVE].Position	= {-0.000001f, 135, 0};
+			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_PERSPECTIVE].Up			= {0, 1, 0};
+			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_PERSPECTIVE].Position.RotateZ(::gpk::math_pi * .25);
+
 			const int32_t											indexShip						= ::shipCreate(solarSystem.ShipState, 0, 0, 0);
 			::ghg::SShip											& playerShip					= solarSystem.ShipState.Ships[indexShip];
 			::gpk::STransform3										& shipPivot						= solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[playerShip.Entity].Body];

@@ -1,4 +1,7 @@
 #include "galaxy_hell_win32.h"
+
+#include "audio.h"
+
 #include "gpk_png.h"
 #include "gpk_grid_copy.h"
 #include "gpk_raster_lh.h"
@@ -10,7 +13,7 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "PNG Test");
 
-::gpk::error_t							cleanup							(::SApplication & app)						{ return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); }
+::gpk::error_t							cleanup							(::SApplication & app)						{ app.AudioState.CleanupAudio(); return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); }
 ::gpk::error_t							setup							(::SApplication & app)						{
 	::gpk::SFramework							& framework						= app.Framework;
 	::gpk::SWindow								& mainWindow					= framework.MainDisplay;
@@ -24,6 +27,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "PNG Test");
 	::ghg::SGalaxyHellDrawCache	& drawCache = app.GalaxyHellApp.World.DrawCache;
 	::gpk::resize(4096 * 1024, drawCache.PixelCoords, drawCache.PixelVertexWeights, drawCache.LightColorsModel, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightPointsWorld);
 	app.SwapOffscreen->resize(mainWindow.Size);
+	app.AudioState.InitAudio();
+	app.AudioState.PrepareAudio("heli.wav");
 	return 0;
 }
 
@@ -39,7 +44,24 @@ int										update				(SApplication & app, bool exitSignal)	{
 	if(1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, *framework.Input, framework.MainDisplay.EventQueue, framework.MainDisplay.Size.Cast<uint16_t>()))
 		return ::gpk::APPLICATION_STATE_EXIT;
 
-	::gpk::sleep(1);
+	app.AudioState.vListenerPos = app.GalaxyHellApp.World.ShipState.Scene.Camera[app.GalaxyHellApp.World.ShipState.Scene.CameraMode].Position * .05; app.AudioState.vListenerPos.y = 0; app.AudioState.listener.OrientTop = {0, 1, 0}; app.AudioState.listener.OrientFront = {1, 0, 0};  
+	
+	if(app.GalaxyHellApp.World.ShipState.Ships.size())
+		app.AudioState.vEmitterPos					= app.GalaxyHellApp.World.ShipState.ShipPhysics.Transforms[app.GalaxyHellApp.World.ShipState.EntitySystem.Entities[app.GalaxyHellApp.World.ShipState.Ships[0].Entity].Body].Position;
+	
+	app.AudioState.vEmitterPos.y				=  0;//{app.AudioState.vEmitterPos.x, 0, app.AudioState.vEmitterPos.z};
+	app.AudioState.vEmitterPos					*= .1;
+
+	if(::ghg::CAMERA_MODE_SKY == app.GalaxyHellApp.World.ShipState.Scene.CameraMode) {
+		app.AudioState.vEmitterPos .x				=  0;
+		app.AudioState.vListenerPos.x				=  0;
+		app.AudioState.vEmitterPos .z				*= .75f;
+		app.AudioState.vListenerPos.z				*= .75f;
+	}
+
+	app.AudioState.emitter.DopplerScaler		= 4.0f; //float(app.GalaxyHellApp.World.PlayState.TimeScale);
+	app.AudioState.FrequencyRatio				= (float)app.GalaxyHellApp.World.PlayState.TimeScale;
+	app.AudioState.UpdateAudio(framework.FrameInfo.Seconds.LastFrame);// / (app.GalaxyHellApp.World.ShipState.Ships.size() - 1));
 	return 0;
 }
 

@@ -1,6 +1,6 @@
 #include "gpk_galaxy_hell_app.h"
 #include "gpk_grid_copy.h"
-#include <gpk_raster_lh.h>
+#include "gpk_raster_lh.h"
 
 ::gpk::error_t					ghg::galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::SInput & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents, const ::gpk::SCoord2<uint16_t> & windowSize) {
 	if(app.ActiveState == ::ghg::APP_STATE_Quit)
@@ -11,8 +11,8 @@
 		case gpk::SYSEVENT_RESIZE: {
 			app.World.DrawCache.RenderTargetMetrics = *(const ::gpk::SCoord2<uint16_t>*)systemEvents[iEvent].Data.begin();
 
-			if(app.World.DrawCache.RenderTargetMetrics.x > 1280) app.World.DrawCache.RenderTargetMetrics.x = 1600;
-			if(app.World.DrawCache.RenderTargetMetrics.y >  720) app.World.DrawCache.RenderTargetMetrics.y = 900;
+			if(app.World.DrawCache.RenderTargetMetrics.x > 1600) app.World.DrawCache.RenderTargetMetrics.x = 1600;
+			if(app.World.DrawCache.RenderTargetMetrics.y >  900) app.World.DrawCache.RenderTargetMetrics.y = 900;
 
 			double								currentRatio					= app.World.DrawCache.RenderTargetMetrics.y / (double)app.World.DrawCache.RenderTargetMetrics.x;
 			double								targetRatioY					=  9 / 16.0;
@@ -33,7 +33,7 @@
 	case  APP_STATE_Play	: 
 		break;
 	}	 
-	::ghg::solarSystemUpdate(app.World	, (app.ActiveState != ::ghg::APP_STATE_Play) ? 0.000001 : lastTimeSeconds, systemEvents);
+	::ghg::solarSystemUpdate(app.World	, (app.ActiveState != ::ghg::APP_STATE_Play) ? 0.000001 : lastTimeSeconds, inputState, systemEvents);
 	::ghg::overlayUpdate	(app.Overlay, app.World.PlayState.Stage, app.World.Score, app.World.PlayState.TimePlayed);
 	app.ActiveState = (::ghg::APP_STATE)::ghg::guiUpdate(app.UI, app.World, app.ActiveState, inputState, systemEvents, windowSize.Cast<uint16_t>());
 	return 0;
@@ -58,8 +58,8 @@
 		::gpk::view_grid<::gpk::SColorBGRA>			cameraView			= sourceRT->Color.View;
 		::gpk::SCoord2<int16_t>						cameraViewMetrics	= cameraView.metrics().Cast<int16_t>();
 		::gpk::grid_copy(targetPixels, cameraView, ::gpk::SCoord2<uint32_t>
-				{ targetPixels.metrics().x / 2 - cameraView.metrics().x / 2
-				, targetPixels.metrics().y / 2 - cameraView.metrics().y / 2
+				{ (targetPixels.metrics().x >> 1) - (cameraView.metrics().x >> 1)
+				, (targetPixels.metrics().y >> 1) - (cameraView.metrics().y >> 1)
 				}
 			);
 

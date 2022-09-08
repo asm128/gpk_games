@@ -1,0 +1,9 @@
+.vs/
+x64/
+Win32/
+x86/
+Debug/
+Release/
+
+/smart
+/dryer

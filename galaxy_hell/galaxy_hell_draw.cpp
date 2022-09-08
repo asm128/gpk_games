@@ -325,8 +325,8 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 	renderTarget->resize(drawCache.RenderTargetMetrics);
 	::gpk::view_grid<::gpk::SColorBGRA>						targetPixels			= renderTarget->Color			; 
 	::gpk::view_grid<uint32_t>								depthBuffer				= renderTarget->DepthStencil	;
-	memset(targetPixels.begin(), 0, targetPixels.size_in_bytes());
-	memset(depthBuffer.begin(), -1, depthBuffer.size_in_bytes());
+	memset(targetPixels.begin(), 0, targetPixels.byte_count());
+	memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
 
 
 	constexpr ::gpk::SColorBGRA								debrisColors[4]			=

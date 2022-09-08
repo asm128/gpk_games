@@ -35,41 +35,42 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(UI_HOME, Profile			, 4);
 	GDEFINE_ENUM_VALUE(UI_HOME, Leaderboards	, 5);
 	GDEFINE_ENUM_VALUE(UI_HOME, Credits			, 6);
-	GDEFINE_ENUM_VALUE(UI_HOME, Exit			, 7);
+	GDEFINE_ENUM_VALUE(UI_HOME, Settings		, 7);
+	GDEFINE_ENUM_VALUE(UI_HOME, Exit			, 8);
 
 	GDEFINE_ENUM_TYPE (UI_PLAY, uint8_t	);
 	GDEFINE_ENUM_VALUE(UI_PLAY, Menu			, 0);
 
 	struct SShipUI {
-		int32_t								IdControl;	// Root control of the ship UI
+		int32_t														IdControl;	// Root control of the ship UI
 
-		::gpk::array_pod<int32_t>			IdShipCameras; // These belong to the root control, which in turn may contain child controls not stored in this array. Indices are 0 for the center of gravity and the rest for each module of the ship.
-		::gpk::array_pod<int32_t>			IdShipWeapons; // These belong to the root control, which in turn may contain child controls not stored in this array. Indices are 0 for the center of gravity and the rest for each module of the ship.
-		::gpk::array_pod<int32_t>			IdShipHealth ; // These belong to the root control, which in turn may contain child controls not stored in this array. Indices are 0 for the center of gravity and the rest for each module of the ship.
+		::gpk::array_pod<int32_t>									IdShipCameras; // These belong to the root control, which in turn may contain child controls not stored in this array. Indices are 0 for the center of gravity and the rest for each module of the ship.
+		::gpk::array_pod<int32_t>									IdShipWeapons; // These belong to the root control, which in turn may contain child controls not stored in this array. Indices are 0 for the center of gravity and the rest for each module of the ship.
+		::gpk::array_pod<int32_t>									IdShipHealth ; // These belong to the root control, which in turn may contain child controls not stored in this array. Indices are 0 for the center of gravity and the rest for each module of the ship.
 	};
 
 	struct SGameUI {
-		::gpk::array_obj<::ghg::SShipUI>	Ships;
+		::gpk::array_obj<::ghg::SShipUI>							Ships;
 
-		bool								Exit						= false;
-		::gpk::SGUI							GUIPerState[::ghg::APP_STATE_COUNT];
+		bool														Exit						= false;
+		::gpk::array_static<::gpk::SGUI, ::ghg::APP_STATE_COUNT>	GUIPerState;
 
 	};
 
-	::gpk::error_t						guiSetup				(::ghg::SGameUI & gameui);
-	::gpk::error_t						guiUpdate				(::ghg::SGameUI & gameui, ::ghg::SGalaxyHell & game, ::ghg::APP_STATE appState, const ::gpk::SInput & input, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents, const ::gpk::SCoord2<uint16_t> & screenMetrics);
+	::gpk::error_t												guiSetup				(::ghg::SGameUI & gameui);
+	::gpk::error_t												guiUpdate				(::ghg::SGameUI & gameui, ::ghg::SGalaxyHell & game, ::ghg::APP_STATE appState, const ::gpk::SInput & input, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents, const ::gpk::SCoord2<uint16_t> & screenMetrics);
 	
 	struct SGalaxyHellApp {
-		::gpk::ptr_obj<TRenderTarget>		RenderTarget[16]			= {};
-		volatile uint64_t					CurrentRenderTarget			= 0;
+		::gpk::ptr_obj<TRenderTarget>								RenderTarget[16]			= {};
+		volatile uint64_t											CurrentRenderTarget			= 0;
 
-		::ghg::SGalaxyHell					World;
-		::ghg::SGameUI						UI;
-		::ghg::STextOverlay					Overlay;
+		::ghg::SGalaxyHell											World;
+		::ghg::SGameUI												UI;
+		::ghg::STextOverlay											Overlay;
 
-		APP_STATE							ActiveState					= APP_STATE_Load;
+		APP_STATE													ActiveState					= APP_STATE_Load;
 	};
 
-	::gpk::error_t						galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::SInput & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents, const ::gpk::SCoord2<uint16_t> & windowSize);
-	::gpk::error_t						galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::SCoord2<uint16_t> renderTargetSize);
+	::gpk::error_t												galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::SInput & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents, const ::gpk::SCoord2<uint16_t> & windowSize);
+	::gpk::error_t												galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::SCoord2<uint16_t> renderTargetSize);
 }
