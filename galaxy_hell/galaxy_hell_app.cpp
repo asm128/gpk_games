@@ -1,8 +1,9 @@
 #include "gpk_galaxy_hell_app.h"
 #include "gpk_grid_copy.h"
 #include "gpk_raster_lh.h"
+#include "gpk_storage.h"
 
-::gpk::error_t					ghg::galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::SInput & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents, const ::gpk::SCoord2<uint16_t> & windowSize) {
+::gpk::error_t					ghg::galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents, const ::gpk::SCoord2<uint16_t> & windowSize) {
 	if(app.ActiveState == ::ghg::APP_STATE_Quit)
 		return 1;
 
@@ -20,28 +21,58 @@
 				app.World.DrawCache.RenderTargetMetrics.y = (uint16_t)(app.World.DrawCache.RenderTargetMetrics.x * targetRatioY + .1f);
 			else 
 				app.World.DrawCache.RenderTargetMetrics.x = (uint16_t)(app.World.DrawCache.RenderTargetMetrics.y / targetRatioY + .1f);
-			}
+			break;
+		}
+		case ::gpk::SYSEVENT_DEACTIVATE: {
+			::gpk::array_pod<byte_t>			serialized;
+			app.World.Save(serialized);
+			char								fileName[4096] = {};
+			sprintf_s(fileName, "./%llu.autosave.ghs", 0ULL); //::gpk::timeCurrentInMs());
+			::gpk::fileFromMemory(fileName, serialized);
+
+			app.World.PlayState.Paused			= true;
+			app.ActiveState						= ::ghg::APP_STATE_Home;
+		}
 		}
 	}
 	switch(app.ActiveState) {
-	case APP_STATE_Load		: 
+	case APP_STATE_Load		: {
 		::ghg::solarSystemSetup(app.World, app.World.DrawCache.RenderTargetMetrics);
 		::ghg::overlaySetup(app.Overlay);
-		::ghg::guiSetup(app.UI);
-		app.ActiveState = APP_STATE_Home;
+		::ghg::guiSetup(app, inputState);
+
+		::gpk::array_pod<byte_t>			serialized;
+		//char								fileName[4096]		= {};
+		::gpk::array_obj<::gpk::array_pod<char>>	pathFiles;
+		::gpk::pathList(::gpk::vcs{"./"}, pathFiles);
+		for(uint32_t iFile = 0; iFile < pathFiles.size(); ++iFile)  {
+			if(pathFiles[iFile].size() < strlen(".autosave.ghs"))
+				continue;
+			if(0 == strcmp(&pathFiles[iFile][pathFiles[iFile].size() - (uint32_t)strlen(".autosave.ghs")], ".autosave.ghs")) {
+				::gpk::fileToMemory(pathFiles[iFile], serialized);
+				::gpk::view_array<const byte_t>		viewSerialized		= {(const byte_t*)serialized.begin(), serialized.size()};
+				app.World.Load(viewSerialized);
+				break;
+			}
+		}
+
+		app.ActiveState						= APP_STATE_Home;
 		break;
+	}
 	case  APP_STATE_Play	: 
 		break;
 	}	 
-	::ghg::solarSystemUpdate(app.World	, (app.ActiveState != ::ghg::APP_STATE_Play) ? 0.000001 : lastTimeSeconds, inputState, systemEvents);
-	::ghg::overlayUpdate	(app.Overlay, app.World.PlayState.Stage, app.World.Score, app.World.PlayState.TimePlayed);
-	app.ActiveState = (::ghg::APP_STATE)::ghg::guiUpdate(app.UI, app.World, app.ActiveState, inputState, systemEvents, windowSize.Cast<uint16_t>());
+	::ghg::solarSystemUpdate(app.World, (app.ActiveState != ::ghg::APP_STATE_Play) ? 0.000001 : lastTimeSeconds, *inputState, systemEvents);
+
+	::ghg::overlayUpdate	(app.Overlay, app.World.PlayState.Stage, app.World.ShipState.ShipCores.size() ? app.World.ShipState.ShipCores[0].Score : 0, app.World.PlayState.TimeWorld);
+
+	app.ActiveState						= (::ghg::APP_STATE)::ghg::guiUpdate(app, systemEvents, windowSize.Cast<uint16_t>());
 	return 0;
 }
 
 ::gpk::error_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::SCoord2<uint16_t> renderTargetSize) {
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	target			= app.RenderTarget[0];
-	target->resize(renderTargetSize.Cast<uint32_t>(), {}, 0xFFFFFFFFU);
+	target->resize(renderTargetSize.Cast<uint32_t>(), {0, 0, 0, 1}, 0xFFFFFFFFU);
 	::gpk::view_grid<::gpk::SColorBGRA>							targetPixels			= target->Color.View;
 	::gpk::view_grid<uint32_t>									depthBuffer				= target->DepthStencil.View;
 	switch(app.ActiveState) {
@@ -89,11 +120,11 @@
 		}
 
 
-		::ghg::overlayDraw		(app.Overlay, app.World.DrawCache, app.World.PlayState.TimePlayed, depthBuffer, targetPixels);
+		::ghg::overlayDraw		(app.Overlay, app.World.DrawCache, app.World.PlayState.TimeWorld, depthBuffer, targetPixels);
 		break;
 	}
 
-	::gpk::guiDraw(app.UI.GUIPerState[app.ActiveState], targetPixels);
+	::gpk::guiDraw(*app.DialogPerState[app.ActiveState].GUI, targetPixels);
 	app.RenderTarget[0] = target;
 	return 0;
 }

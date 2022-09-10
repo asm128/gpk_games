@@ -1,6 +1,7 @@
 #include "gpk_galaxy_hell.h"
 #include "gpk_storage.h"
 #include "gpk_json.h"
+#include "gpk_noise.h"
 
 #include <windows.h>
 #include <mmsystem.h>
@@ -11,7 +12,7 @@ static	int											shipCreate			(::ghg::SShipState & shipState, int32_t teamId
 	::ghg::SShipScene										& scene				= shipState.Scene;
 	const uint32_t											countParts			= 6;
 
-	::ghg::SShip											ship				= {};
+	::ghg::SShipCore											ship				= {};
 	{	// Create main ship entity
 		::ghg::SEntity											entity				= {-1};
 		entity												= {-1};
@@ -23,7 +24,8 @@ static	int											shipCreate			(::ghg::SShipState & shipState, int32_t teamId
 		ship.Team											= teamId;
 		const int32_t											indexBody			= shipState.ShipPhysics.Create(); (void)indexBody;
 	}
-	const int32_t											indexShip			= shipState.Ships.push_back(ship);
+	const int32_t											indexShip			= shipState.ShipCores.push_back(ship);
+	shipState.ShipCoresParts.push_back({});
 	//ship.Parts.reserve(countParts);
 	::ghg::SEntity											entityOrbit				= {ship.Entity};
 	for(uint32_t iPart = 0; iPart < countParts; ++iPart) {	// Create child parts
@@ -48,7 +50,7 @@ static	int											shipCreate			(::ghg::SShipState & shipState, int32_t teamId
 		entityPart.Parent									= shipState.EntitySystem.Create(entityOrbit, {});
 		entityPart.Geometry									= 1 + ((iGeometry + (iPart % 2)) % 5);
 		entityPart.Transform								= scene.Transforms.push_back(shipState.ShipPhysics.MatrixIdentity4);
-		entityPart.Image									= (4 + iImage - (iPart % 2)) % 32;
+		entityPart.Image									= iImage % shipState.Scene.Image.size();
 		entityPart.Body										= entityOrbit.Body + 1;
 		int32_t													indexEntityPart				= shipState.EntitySystem.Create(entityPart, {});
 		shipState.EntitySystem.EntityChildren[entityPart.Parent].push_back(indexEntityPart);
@@ -59,8 +61,7 @@ static	int											shipCreate			(::ghg::SShipState & shipState, int32_t teamId
 		::gpk::array_pod<uint32_t>								& parentEntityChildren	= shipState.EntitySystem.EntityChildren[ship.Entity];
  		parentEntityChildren.push_back(shipPart.Entity);
 
-		::ghg::SShip											& parentShip			= shipState.Ships[indexShip];
-		parentShip.Parts.push_back(shipPart);
+		shipState.ShipCoresParts[indexShip].push_back(shipState.ShipParts.push_back(shipPart));
 	}
 	return indexShip;
 }
@@ -123,23 +124,12 @@ static	int											modelsSetup				(::ghg::SShipScene & scene)			{
 	::gpk::geometryBuildSphere	(scene.Geometry[5], 6U, 2U, 1, {0, 0});
 
 	{
-		::gpk::SColorFloat										baseColor	[]			=
-			{ ::gpk::LIGHTGREEN
-			, ::gpk::LIGHTBLUE
-			, ::gpk::LIGHTRED
-			, ::gpk::LIGHTCYAN
-			, ::gpk::LIGHTORANGE
-			, ::gpk::LIGHTYELLOW
-			, ::gpk::YELLOW
-			, ::gpk::RED
-			, ::gpk::BLUE
-			, ::gpk::BROWN
-			, ::gpk::GRAY
-			, ::gpk::PANOCHE
-			, ::gpk::TURQUOISE
-			};
 
-		scene.Image.resize(32);
+		::gpk::array_pod<::gpk::SColorFloat>	baseColors;
+		for(uint32_t i = 0; i < 4096; ++i)
+			baseColors.push_back({(float)::gpk::noiseNormal1D(rand()), (float)::gpk::noiseNormal1D(rand()), (float)::gpk::noiseNormal1D(rand()), 1});
+
+		scene.Image.resize(256);
 		for(uint32_t iImage = 0; iImage < scene.Image.size(); ++iImage) {
 			::gpk::SImage<::gpk::SColorBGRA>						& image							= scene.Image[iImage];
 			if(image.Texels.size())
@@ -147,7 +137,7 @@ static	int											modelsSetup				(::ghg::SShipScene & scene)			{
 			image.resize(32, 5);
 			for(uint32_t y = 0; y < image.metrics().y; ++y) {// Generate noise color for planet texture
 				bool													xAffect						= (y % 2);
-				::gpk::SColorFloat										lineColor					= baseColor[(iImage + (rand() % 4)) % (::gpk::size(baseColor) - 4)];
+				::gpk::SColorFloat										lineColor					= baseColors[(iImage + (rand() % 4)) % (baseColors.size() - 4)];
 				for(uint32_t x = 0; x < image.metrics().x; ++x) {
 					image.Texels[y * image.metrics().x + x]				= (lineColor * (xAffect ? ::gpk::max(.25, ::gpk::sin(x * (1.0 / image.metrics().x * ::gpk::math_pi))) : 1)).Clamp();
 				}
@@ -158,21 +148,18 @@ static	int											modelsSetup				(::ghg::SShipScene & scene)			{
 }
 
 int													ghg::solarSystemReset					(::ghg::SGalaxyHell & solarSystem)	{	// Set up enemy ships
-	solarSystem.ShipState.Scene.Transforms.clear();
-	solarSystem.ShipState.Ships							= {};
+	::gpk::clear(solarSystem.ShipState.Scene.Transforms, solarSystem.ShipState.ShipParts, solarSystem.ShipState.Weapons, solarSystem.ShipState.ShipCores);
+	solarSystem.ShipState.ShipCoresParts				= {};
 	solarSystem.ShipState.ShipPhysics					= {};
-	solarSystem.ShipState.ShipScores					= {};
 	solarSystem.ShipState.ShipActionQueue				= {};
 	solarSystem.ShipState.EntitySystem.Entities			= {};
 	solarSystem.ShipState.EntitySystem.EntityChildren	= {};
 	solarSystem.PlayState								= {};
-	solarSystem.Score									= 0;
-	solarSystem.Seed									= 0;
 	return 0;
 }
 
 int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Set up enemy ships
-	static constexpr	const uint32_t						partHealth								= 10;
+	static constexpr	const uint32_t						partHealth								= 100;
 
 	solarSystem.PlayState.TimeStage									= 0;
 	if(0 == solarSystem.PlayState.Stage) {
@@ -181,26 +168,24 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 	}
 
 	struct SShipPartSetup {
-		::ghg::SHIP_PART_TYPE	Type	;
-		::ghg::WEAPON_TYPE		Weapon	;
-		::ghg::WEAPON_LOAD		Munition;
-		double					MaxDelay;
-		int32_t					Damage	;
+		::ghg::SHIP_PART_TYPE	Type		;
+		::ghg::WEAPON_TYPE		Weapon		;
+		::ghg::WEAPON_LOAD		Munition	;
+		double					MaxDelay	;
+		int32_t					Damage		;
+		uint32_t				MaxHealth	;
 	};
 
 	::gpk::SJSONFile										stageFile;
 	char													stageFileName[256]							= "./%s.json";
 	static constexpr const SShipPartSetup					weaponDefinitions		[]				=
-		{ {::ghg::SHIP_PART_TYPE_GUN	, ::ghg::WEAPON_TYPE_GUN		, ::ghg::WEAPON_LOAD_BULLET		, .1,  1}
-		, {::ghg::SHIP_PART_TYPE_GUN	, ::ghg::WEAPON_TYPE_SHOTGUN	, ::ghg::WEAPON_LOAD_BULLET		, .3,  1}
-		, {::ghg::SHIP_PART_TYPE_WAFER	, ::ghg::WEAPON_TYPE_GUN		, ::ghg::WEAPON_LOAD_RAY		, .3,  3}
-		, {::ghg::SHIP_PART_TYPE_WAFER	, ::ghg::WEAPON_TYPE_SHOTGUN	, ::ghg::WEAPON_LOAD_RAY		, .6,  3}
-		, {::ghg::SHIP_PART_TYPE_CANNON	, ::ghg::WEAPON_TYPE_CANNON		, ::ghg::WEAPON_LOAD_SHELL		,  2, 10}
-		, {::ghg::SHIP_PART_TYPE_CANNON	, ::ghg::WEAPON_TYPE_CANNON		, ::ghg::WEAPON_LOAD_WAVE		,  2,  1}
-		, {::ghg::SHIP_PART_TYPE_CANNON	, ::ghg::WEAPON_TYPE_CANNON		, ::ghg::WEAPON_LOAD_FLARE		,  2,  1}
-		, {::ghg::SHIP_PART_TYPE_SILO	, ::ghg::WEAPON_TYPE_ROCKET		, ::ghg::WEAPON_LOAD_FLARE		,  2,  3}
-		, {::ghg::SHIP_PART_TYPE_SHIELD	, ::ghg::WEAPON_TYPE_SHIELD		, ::ghg::WEAPON_LOAD_FLARE		,  2,  3}
-		, {::ghg::SHIP_PART_TYPE_SILO	, ::ghg::WEAPON_TYPE_CANNON		, ::ghg::WEAPON_LOAD_RAY		,  2,  3}
+		{ {::ghg::SHIP_PART_TYPE_Gun	, ::ghg::WEAPON_TYPE_Gun		, ::ghg::WEAPON_LOAD_Bullet		, .1,  10, 100}
+		, {::ghg::SHIP_PART_TYPE_Gun	, ::ghg::WEAPON_TYPE_Shotgun	, ::ghg::WEAPON_LOAD_Bullet		, .3,  10, 100}
+		, {::ghg::SHIP_PART_TYPE_Wafer	, ::ghg::WEAPON_TYPE_Gun		, ::ghg::WEAPON_LOAD_Ray		, .3,  30, 100}
+		, {::ghg::SHIP_PART_TYPE_Wafer	, ::ghg::WEAPON_TYPE_Shotgun	, ::ghg::WEAPON_LOAD_Ray		, .6,  30, 100}
+		, {::ghg::SHIP_PART_TYPE_Cannon	, ::ghg::WEAPON_TYPE_Cannon		, ::ghg::WEAPON_LOAD_Shell		,  2, 100, 100}
+		, {::ghg::SHIP_PART_TYPE_Cannon	, ::ghg::WEAPON_TYPE_Cannon		, ::ghg::WEAPON_LOAD_Rocket		,  2,  50, 100}
+		, {::ghg::SHIP_PART_TYPE_Cannon	, ::ghg::WEAPON_TYPE_Cannon		, ::ghg::WEAPON_LOAD_Missile	,  2,  30, 100}
 		};
 
 	sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage);
@@ -208,63 +193,82 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 		gpk_necall(-1 == ::gpk::jsonParse(stageFile.Reader, stageFile.Bytes), "%s", stageFileName);
 	} 
 	else {
-		if(0 == solarSystem.ShipState.Ships.size()) { // Create player ship
+		// Set up player ships
+		if(0 == solarSystem.ShipState.ShipCores.size()) { // Create player ship
 			solarSystem.PlayState.CameraSwitchDelay							= 0;
-			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_SKY].Target				= {};
-			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_SKY].Position			= {-0.000001f, 250, 0};
-			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_SKY].Up					= {0, 1, 0};
+			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_SKY].Target				= {};
+			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_SKY].Position			= {-0.000001f, 250, 0};
+			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_SKY].Up					= {0, 1, 0};
 
-			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_PERSPECTIVE].Target		= {};
-			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_PERSPECTIVE].Position	= {-0.000001f, 135, 0};
-			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_PERSPECTIVE].Up			= {0, 1, 0};
-			solarSystem.ShipState.Scene.Camera[CAMERA_MODE_PERSPECTIVE].Position.RotateZ(::gpk::math_pi * .25);
+			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_PERSPECTIVE].Target		= {};
+			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_PERSPECTIVE].Position	= {-0.000001f, 135, 0};
+			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_PERSPECTIVE].Up			= {0, 1, 0};
+			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_PERSPECTIVE].Position.RotateZ(::gpk::math_pi * .25);
 
 			const int32_t											indexShip						= ::shipCreate(solarSystem.ShipState, 0, 0, 0);
-			::ghg::SShip											& playerShip					= solarSystem.ShipState.Ships[indexShip];
+			::ghg::SShipCore										& playerShip					= solarSystem.ShipState.ShipCores[indexShip];
 			::gpk::STransform3										& shipPivot						= solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[playerShip.Entity].Body];
 			shipPivot.Orientation.MakeFromEulerTaitBryan({0, 0, (float)(-::gpk::math_pi_2)});
 			shipPivot.Position									= {-30};
 		}
-		while(((int)solarSystem.ShipState.Ships.size() - 2) < (int)(solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage)) {	// Create enemy ships depending on stage.
-			int32_t													indexShip						= ::shipCreate(solarSystem.ShipState, 1, solarSystem.PlayState.Stage + solarSystem.ShipState.Ships.size(), solarSystem.PlayState.Stage + solarSystem.ShipState.Ships.size());
-			::ghg::SShip											& enemyShip						= solarSystem.ShipState.Ships[indexShip];
+		// Set up enemy ships
+		while(((int)solarSystem.ShipState.ShipCores.size() - 2) < (int)(solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage)) {	// Create enemy ships depending on stage.
+			int32_t													indexShip						= ::shipCreate(solarSystem.ShipState, 1, solarSystem.PlayState.Stage + solarSystem.ShipState.ShipCores.size(), solarSystem.PlayState.Stage + solarSystem.ShipState.ShipCores.size());
+			::ghg::SShipCore										& enemyShip						= solarSystem.ShipState.ShipCores[indexShip];
+			::gpk::array_pod<uint32_t>								& enemyShipParts				= solarSystem.ShipState.ShipCoresParts[indexShip];
 			::gpk::STransform3										& shipTransform					= solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[enemyShip.Entity].Body];
 			shipTransform.Orientation.MakeFromEulerTaitBryan({0, 0, (float)(::gpk::math_pi_2)});
-			shipTransform.Position								= {5.0f + 5 * solarSystem.ShipState.Ships.size()};
-			for(uint32_t iPart = 0; iPart < enemyShip.Parts.size(); ++iPart)
-				solarSystem.ShipState.ShipPhysics.Forces[solarSystem.ShipState.EntitySystem.Entities[enemyShip.Parts[iPart].Entity].Body].Rotation.y	*= float(1 + indexShip * .35);
+			shipTransform.Position								= {5.0f + 5 * solarSystem.ShipState.ShipCores.size()};
+			for(uint32_t iPart = 0; iPart < enemyShipParts.size(); ++iPart) {
+				const ::ghg::SShipPart								& shipPart					= solarSystem.ShipState.ShipParts[enemyShipParts[iPart]];
+				solarSystem.ShipState.ShipPhysics.Forces[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body].Rotation.y	*= float(1 + indexShip * .35);
+			}
 		}
-
-		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.Ships.size(); ++iShip) {
-			::ghg::SShip										& ship							= solarSystem.ShipState.Ships[iShip];
+		// set up weapons
+		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
+			::ghg::SShipCore										& ship							= solarSystem.ShipState.ShipCores[iShip];
+			::gpk::array_pod<uint32_t>								& shipParts						= solarSystem.ShipState.ShipCoresParts[iShip];
 			ship.Health										= 0;
-			for(uint32_t iPart = 0; iPart < ship.Parts.size(); ++iPart) {
-				::ghg::SShipPart									& shipPart						= ship.Parts[iPart];
-				shipPart.Health									= partHealth;
+			for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
+				::ghg::SShipPart									& shipPart						= solarSystem.ShipState.ShipParts[shipParts[iPart]];
 				//ship.Team										= iShip ? 1 : 0;
 				int32_t												weapon							= 0;
-				if(0 == ship.Team)
-					weapon											= (iPart % 5) % (solarSystem.ShipState.Ships.size() / 2);
+				if(0 == ship.Team) {
+					weapon											= (iPart % 5) % (solarSystem.ShipState.ShipCores.size() / 2);
+					weapon											= ::gpk::min(::gpk::max(weapon, (int32_t)(solarSystem.PlayState.Stage / ::gpk::size(weaponDefinitions))), 3);
+				}
 				else {
-					if(solarSystem.ShipState.Ships.size() < 5 || 0 != ((iShip - 2 - solarSystem.PlayState.OffsetStage) % 4) || 0 != iPart) 
+					if(iShip < 4 || 0 != ((iShip - 1 - solarSystem.PlayState.PlayerCount - solarSystem.PlayState.OffsetStage) % 3) || 0 != iPart) 
 						weapon											= 4;
 					else {
-						weapon											= (iShip / 5) % 5;
+						weapon											= (iShip - 5) / 3;
 					}
 				}
-				shipPart.Type									= weaponDefinitions[weapon].Type;
-				shipPart.Weapon.MaxDelay						= weaponDefinitions[weapon].MaxDelay;
-				if(0 != ship.Team)
-					shipPart.Weapon.MaxDelay							*= 1 + (2 * iPart);
-				shipPart.Weapon.Type							= weaponDefinitions[weapon].Weapon;
-				shipPart.Weapon.Load							= weaponDefinitions[weapon].Munition;
-				shipPart.Weapon.Damage							= weaponDefinitions[weapon].Damage;
-				shipPart.Weapon.Delay							= shipPart.Weapon.MaxDelay / ship.Parts.size() * iPart;
+				weapon											%= ::gpk::size(weaponDefinitions);
 
-					 if(shipPart.Type == ::ghg::SHIP_PART_TYPE_GUN		) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = 1; }
-				else if(shipPart.Type == ::ghg::SHIP_PART_TYPE_WAFER	) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = 2; }
- 				else if(shipPart.Type == ::ghg::SHIP_PART_TYPE_CANNON	) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = 3; }
+				SShipPartSetup										partCreationData	= weaponDefinitions[weapon];
+				::ghg::SWeapon										newWeapon			= {};
+				shipPart.Health	= (int32_t)(shipPart.MaxHealth	= partCreationData.MaxHealth);
+				shipPart.Type									= partCreationData.Type;
+				newWeapon.MaxDelay						= partCreationData.MaxDelay;
+				if(0 != ship.Team)
+					newWeapon.MaxDelay						*= 1 + (2 * iPart);
+				newWeapon.Type							= partCreationData.Weapon;
+				newWeapon.Load							= partCreationData.Munition;
+				newWeapon.Damage						= partCreationData.Damage;
+				newWeapon.Delay							= newWeapon.MaxDelay / shipParts.size() * iPart;
+				shipPart.Weapon							= solarSystem.ShipState.Weapons.push_back(newWeapon);
+				solarSystem.ShipState.Shots.push_back({});
+
+					 if(shipPart.Type == ::ghg::SHIP_PART_TYPE_Gun		) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = 1; }
+				else if(shipPart.Type == ::ghg::SHIP_PART_TYPE_Wafer	) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = 2; }
+ 				else if(shipPart.Type == ::ghg::SHIP_PART_TYPE_Cannon	) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = 3; }
 				ship.Health										+= shipPart.Health;
+				const uint32_t										width		= ::gpk::get_value_count<::ghg::WEAPON_LOAD>();
+				const uint32_t										height		= ::gpk::get_value_count<::ghg::WEAPON_TYPE>();
+				const uint32_t										depth		= ::gpk::get_value_count<::ghg::SHIP_PART_TYPE>();
+				solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Image	= iShip * width * height * depth + shipPart.Type * width * height + newWeapon.Type * width + newWeapon.Load;
+				solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Image	%= solarSystem.ShipState.Scene.Image.size();
 			}
 		}
 	}
@@ -277,16 +281,16 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 	return 0;
 }
 
-int													ghg::solarSystemSetup	(::ghg::SGalaxyHell & solarSystem, const ::gpk::SCoord2<uint16_t> & windowSize)	{
-	::ghg::SShipScene										& scene				= solarSystem.ShipState.Scene;
+int										ghg::solarSystemSetup			(::ghg::SGalaxyHell & solarSystem, const ::gpk::SCoord2<uint16_t> & windowSize)	{
+	::ghg::SShipScene							& scene							= solarSystem.ShipState.Scene;
 	::modelsSetup(scene);
+
 	::ghg::stageSetup(solarSystem);
 
-	::gpk::SMatrix4<float>						& matrixProjection				= solarSystem.ShipState.Scene.MatrixProjection;
+	::gpk::SMatrix4<float>						& matrixProjection				= solarSystem.ShipState.Scene.Global.MatrixProjection;
 	matrixProjection.FieldOfView(::gpk::math_pi * .25, windowSize.x / (double)windowSize.y, 0.01, 500);
 	::gpk::SMatrix4<float>						matrixViewport					= {};
 	matrixViewport.ViewportLH(windowSize.Cast<uint32_t>());
 	matrixProjection						*= matrixViewport;
-
 	return 0;
 }

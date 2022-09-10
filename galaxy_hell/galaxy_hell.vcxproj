@@ -183,6 +183,7 @@
   <ItemGroup>
     <ClInclude Include="gpk_galaxy_hell_app.h" />
     <ClInclude Include="gpk_galaxy_hell_deco.h" />
+    <ClInclude Include="gpk_galaxy_hell_draw.h" />
     <ClInclude Include="gpk_galaxy_hell_entity.h" />
     <ClInclude Include="gpk_galaxy_hell_physics.h" />
     <ClInclude Include="gpk_galaxy_hell.h" />

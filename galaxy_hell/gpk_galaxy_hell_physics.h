@@ -33,6 +33,19 @@ namespace ghg
 			Direction	.push_back(direction);
 			return Speed.push_back(speed);
 		}
+		::gpk::error_t										Save(::gpk::array_pod<byte_t> & output) const { 
+			::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>	>{Position	}, output);
+			::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>	>{Direction	}, output);
+			::gpk::viewWrite(::gpk::view_array<const float					>{Speed		}, output);
+			return 0; 
+		}
+		::gpk::error_t										Load(::gpk::view_array<const byte_t> & input) { 
+			uint32_t												bytesRead				= 0;
+			::gpk::view_array<const ::gpk::SCoord3<float>	>	readPosition	= {}; bytesRead	= ::gpk::viewRead(readPosition	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Position	= readPosition	;
+			::gpk::view_array<const ::gpk::SCoord3<float>	>	readDirection	= {}; bytesRead	= ::gpk::viewRead(readDirection	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Direction	= readDirection	;
+			::gpk::view_array<const float					>	readSpeed		= {}; bytesRead	= ::gpk::viewRead(readSpeed		, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Speed		= readSpeed		;
+			return 0;
+		}
 	};
 } // namespace 
 

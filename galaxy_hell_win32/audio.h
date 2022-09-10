@@ -36,15 +36,11 @@ static constexpr int32_t           ZMAX                 = 10;
 //--------------------------------------------------------------------------------------
 struct AudioDevice
 {
-    ::gpk::array_pod<wchar_t> deviceId;
-    ::gpk::array_pod<wchar_t> description;
+    std::wstring deviceId;
+    std::wstring description;
 };
 
-HRESULT EnumerateAudio( _In_ IXAudio2* pXaudio2, _Inout_ gpk::array_obj<AudioDevice>& list );
-
-
-using Microsoft::WRL::ComPtr;
-
+HRESULT EnumerateAudio(_In_ IXAudio2* pXaudio2, _Inout_ ::gpk::array_obj<AudioDevice> & list);
 
 //-----------------------------------------------------------------------------
 // Struct to hold audio game state
@@ -58,7 +54,7 @@ struct AUDIO_STATE
     HMODULE                             mXAudioDLL;
 #endif
     Microsoft::WRL::ComPtr<IXAudio2>    pXAudio2;
-    IXAudio2MasteringVoice              * pMasterVoice       = 0;
+    IXAudio2MasteringVoice              * pMasterVoice          = 0;
     IXAudio2SourceVoice                 * pSourceVoice          = 0;
     IXAudio2SubmixVoice                 * pSubmixVoice          = 0;
     Microsoft::WRL::ComPtr<IUnknown>    pVolumeLimiter;

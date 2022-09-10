@@ -1,7 +1,7 @@
 #include "gpk_galaxy_hell.h"
 #include "gpk_galaxy_hell_overlay.h"
 
-#include "gpk_ptr.h"
+#include "gpk_dialog_controls.h"
 
 namespace ghg
 {
@@ -17,8 +17,9 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(APP_STATE, Store		, 8);
 	GDEFINE_ENUM_VALUE(APP_STATE, Score		, 9);
 	GDEFINE_ENUM_VALUE(APP_STATE, About		, 10);
-	GDEFINE_ENUM_VALUE(APP_STATE, Quit		, 11);
-	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 12);
+	GDEFINE_ENUM_VALUE(APP_STATE, Setup		, 11);
+	GDEFINE_ENUM_VALUE(APP_STATE, Quit		, 12);
+	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 13);
 
 	// Start New Game
 	// Continue Game
@@ -27,50 +28,62 @@ namespace ghg
 	// High Scores
 	// Credits
 	// Exit
-	GDEFINE_ENUM_TYPE (UI_HOME, uint8_t	);
+	GDEFINE_ENUM_TYPE (UI_HOME, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_HOME, Start			, 0);
 	GDEFINE_ENUM_VALUE(UI_HOME, Continue		, 1);
-	GDEFINE_ENUM_VALUE(UI_HOME, Load			, 2);
-	GDEFINE_ENUM_VALUE(UI_HOME, Save			, 3);
-	GDEFINE_ENUM_VALUE(UI_HOME, Profile			, 4);
-	GDEFINE_ENUM_VALUE(UI_HOME, Leaderboards	, 5);
-	GDEFINE_ENUM_VALUE(UI_HOME, Credits			, 6);
-	GDEFINE_ENUM_VALUE(UI_HOME, Settings		, 7);
-	GDEFINE_ENUM_VALUE(UI_HOME, Exit			, 8);
+	GDEFINE_ENUM_VALUE(UI_HOME, Shop			, 2);
+	GDEFINE_ENUM_VALUE(UI_HOME, Load			, 3);
+	GDEFINE_ENUM_VALUE(UI_HOME, Save			, 4);
+	GDEFINE_ENUM_VALUE(UI_HOME, Profile			, 5);
+	GDEFINE_ENUM_VALUE(UI_HOME, Leaderboards	, 6);
+	GDEFINE_ENUM_VALUE(UI_HOME, Credits			, 7);
+	GDEFINE_ENUM_VALUE(UI_HOME, Settings		, 8);
+	GDEFINE_ENUM_VALUE(UI_HOME, Exit			, 9);
 
 	GDEFINE_ENUM_TYPE (UI_PLAY, uint8_t	);
 	GDEFINE_ENUM_VALUE(UI_PLAY, Menu			, 0);
 
-	struct SShipUI {
-		int32_t														IdControl;	// Root control of the ship UI
+	GDEFINE_ENUM_TYPE (UI_SETTINGS, uint8_t);
+	GDEFINE_ENUM_VALUE(UI_SETTINGS, Graphics	, 0x0);
+	GDEFINE_ENUM_VALUE(UI_SETTINGS, Audio		, 0x1);
+	GDEFINE_ENUM_VALUE(UI_SETTINGS, Controller	, 0x2);
+	GDEFINE_ENUM_VALUE(UI_SETTINGS, Back		, 0x3);
 
-		::gpk::array_pod<int32_t>									IdShipCameras; // These belong to the root control, which in turn may contain child controls not stored in this array. Indices are 0 for the center of gravity and the rest for each module of the ship.
-		::gpk::array_pod<int32_t>									IdShipWeapons; // These belong to the root control, which in turn may contain child controls not stored in this array. Indices are 0 for the center of gravity and the rest for each module of the ship.
-		::gpk::array_pod<int32_t>									IdShipHealth ; // These belong to the root control, which in turn may contain child controls not stored in this array. Indices are 0 for the center of gravity and the rest for each module of the ship.
+	GDEFINE_ENUM_TYPE (UI_SHOP, uint8_t);
+	GDEFINE_ENUM_VALUE(UI_SHOP, Back			, 0x0);
+
+	struct SUIPlayModuleViewport {
+		::gpk::SMatrix4	<float>								MatrixProjection			;
+		::gpk::SCamera										Camera						;
+		::ghg::TRenderTarget								RenderTarget				;
+		int32_t												Viewport					;
 	};
 
-	struct SGameUI {
-		::gpk::array_obj<::ghg::SShipUI>							Ships;
-
-		bool														Exit						= false;
-		::gpk::array_static<::gpk::SGUI, ::ghg::APP_STATE_COUNT>	GUIPerState;
-
+	struct SUIPlay {
+		::gpk::array_pobj<::ghg::SUIPlayModuleViewport>		ModuleViewports					;
+		::ghg::SGalaxyHellDrawCache							DrawCache						;
 	};
 
-	::gpk::error_t												guiSetup				(::ghg::SGameUI & gameui);
-	::gpk::error_t												guiUpdate				(::ghg::SGameUI & gameui, ::ghg::SGalaxyHell & game, ::ghg::APP_STATE appState, const ::gpk::SInput & input, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents, const ::gpk::SCoord2<uint16_t> & screenMetrics);
-	
 	struct SGalaxyHellApp {
 		::gpk::ptr_obj<TRenderTarget>								RenderTarget[16]			= {};
 		volatile uint64_t											CurrentRenderTarget			= 0;
 
+		bool														Exit						= false;
+		::gpk::array_static<::gpk::SDialog, ::ghg::APP_STATE_COUNT>	DialogPerState				= {};
+
 		::ghg::SGalaxyHell											World;
-		::ghg::SGameUI												UI;
 		::ghg::STextOverlay											Overlay;
+
+		::gpk::array_pod<::gpk::vcc>								SavegameList				= {};
+		::gpk::vcs													SavegameFolder				= "./";
+		::ghg::SUIPlay												UIPlay;
 
 		APP_STATE													ActiveState					= APP_STATE_Load;
 	};
 
-	::gpk::error_t												galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::SInput & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents, const ::gpk::SCoord2<uint16_t> & windowSize);
+	::gpk::error_t												guiSetup					(::ghg::SGalaxyHellApp & gameui, const ::gpk::ptr_obj<::gpk::SInput> & inputState);
+	::gpk::error_t												guiUpdate					(::ghg::SGalaxyHellApp & gameui, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents, const ::gpk::SCoord2<uint16_t> & screenMetrics);
+	
+	::gpk::error_t												galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents, const ::gpk::SCoord2<uint16_t> & windowSize);
 	::gpk::error_t												galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::SCoord2<uint16_t> renderTargetSize);
 }
