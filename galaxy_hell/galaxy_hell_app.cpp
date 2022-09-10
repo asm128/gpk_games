@@ -52,6 +52,7 @@
 				::gpk::fileToMemory(pathFiles[iFile], serialized);
 				::gpk::view_array<const byte_t>		viewSerialized		= {(const byte_t*)serialized.begin(), serialized.size()};
 				app.World.Load(viewSerialized);
+				app.World.PlayState.Paused								= true;
 				break;
 			}
 		}
@@ -62,7 +63,7 @@
 	case  APP_STATE_Play	: 
 		break;
 	}	 
-	::ghg::solarSystemUpdate(app.World, (app.ActiveState != ::ghg::APP_STATE_Play) ? 0.000001 : lastTimeSeconds, *inputState, systemEvents);
+	::ghg::solarSystemUpdate(app.World, (app.ActiveState != ::ghg::APP_STATE_Play) ? 0 : lastTimeSeconds, *inputState, systemEvents);
 
 	::ghg::overlayUpdate	(app.Overlay, app.World.PlayState.Stage, app.World.ShipState.ShipCores.size() ? app.World.ShipState.ShipCores[0].Score : 0, app.World.PlayState.TimeWorld);
 
