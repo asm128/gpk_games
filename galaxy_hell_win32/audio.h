@@ -80,6 +80,7 @@ struct AUDIO_STATE
     bool                                fUseListenerCone        = true;
     bool                                fUseInnerRadius         = true;
     bool                                fUseRedirectToLFE       = 0;
+    bool                                Playing                 = false;
     float                               FrequencyRatio          = 1.0f;
 #ifdef USING_XAUDIO2_7_DIRECTX
     uint32_t                            SampleRateOriginal      = 0;

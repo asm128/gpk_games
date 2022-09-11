@@ -357,6 +357,7 @@ HRESULT AUDIO_STATE::PrepareAudio( const char* wavname ) {
 
     gpk_hrcall(pSourceVoice->SubmitSourceBuffer(&buffer));
     gpk_hrcall(pSourceVoice->Start(0));
+	Playing = true;
 
     nFrameToApply3DAudio = 0;
 	return S_OK;
@@ -461,9 +462,12 @@ HRESULT AUDIO_STATE::SetReverb( int nReverb ) {
 // Pause audio playback
 //-----------------------------------------------------------------------------
 HRESULT AUDIO_STATE::PauseAudio( bool resume ) { 
-	if(resume)
-		return pXAudio2->StartEngine();
-	pXAudio2->StopEngine();
+	if(resume && false == Playing) 
+		pXAudio2->StartEngine();
+	else if(Playing && false == resume) 
+		pXAudio2->StopEngine();
+
+	Playing = resume;
 	return 0; 
 }
 

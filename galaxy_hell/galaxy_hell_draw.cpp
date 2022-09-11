@@ -174,7 +174,7 @@ int													ghg::getLightArrays
 			const ::ghg::SShipPart									& shipPart				= shipState.ShipParts[shipState.ShipCoresParts[iShip][iPart]];
 			const ::gpk::SColorFloat								colorShot
 				= (::ghg::WEAPON_LOAD_Ray		== shipState.Weapons[shipPart.Weapon].Load) ? ::gpk::SColorFloat{1.0f, 0.1f, 0.0f}
-				: (::ghg::WEAPON_LOAD_Shell		== shipState.Weapons[shipPart.Weapon].Load) ? ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE
+				: (::ghg::WEAPON_LOAD_Cannonball		== shipState.Weapons[shipPart.Weapon].Load) ? ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE
 				: (::ghg::WEAPON_LOAD_Bullet	== shipState.Weapons[shipPart.Weapon].Load) ? ::gpk::GRAY
 				: ::gpk::SColorFloat{::gpk::SColorBGRA{0xFF, 0xFF, 0xFF}}
 				;
@@ -394,21 +394,51 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 	::gpk::array_pod<::gpk::SCoord3<float>>					pixelCoordsCache;
 	pixelCoordsCache.reserve(512);
 	for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
-		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
-		const ::ghg::SShipCore										& ship					= solarSystem.ShipState.ShipCores[iShip];
-		for(uint32_t iPart = 0; iPart < solarSystem.ShipState.ShipCoresParts[iShip].size(); ++iPart) {
-			const ::ghg::SShipPart								& shipPart				= solarSystem.ShipState.ShipParts[solarSystem.ShipState.ShipCoresParts[iShip][iPart]];
+		::std::lock_guard<::std::mutex>							lockUpdate			(mutexUpdate);
+		const ::ghg::SShipCore									& ship				= solarSystem.ShipState.ShipCores[iShip];
+		const ::gpk::array_pod<uint32_t>						& shipParts			= solarSystem.ShipState.ShipCoresParts[iShip];
+		for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
+			const ::ghg::SShipPart								& shipPart				= solarSystem.ShipState.ShipParts[shipParts[iPart]];
+			const ::ghg::SWeapon								& weapon				= solarSystem.ShipState.Weapons[shipPart.Weapon];
 			::gpk::SColorFloat									colorShot				= ::gpk::WHITE;
 			double												brightRadius			= 1;
 			double												intensity				= 1;
 			bool												line					= true;
-				 if(::ghg::WEAPON_LOAD_Ray		== solarSystem.ShipState.Weapons[shipPart.Weapon].Load) { colorShot = ::gpk::SColorFloat{1.0f, 0.1f, 0.0f}		; brightRadius =  2.0; intensity =  1; line = true ;}
-			else if(::ghg::WEAPON_LOAD_Bullet	== solarSystem.ShipState.Weapons[shipPart.Weapon].Load) { colorShot = ::gpk::DARKGRAY							; brightRadius =  2.0; intensity =  1; line = true ;}
-			else if(::ghg::WEAPON_LOAD_Shell	== solarSystem.ShipState.Weapons[shipPart.Weapon].Load) {
-				colorShot										= ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE;
-				brightRadius									= 7;
-				intensity										= 9;
-				line											= false;
+			if(::ghg::WEAPON_LOAD_Ray == weapon.Load) { 
+				colorShot			= ::gpk::SColorFloat{1.0f, 0.1f, 0.0f}; 
+				brightRadius		=  2; 
+				intensity			=  1; 
+				line				= true;
+			}
+			else if(::ghg::WEAPON_LOAD_Bullet == weapon.Load) { 
+				colorShot			= ::gpk::DARKGRAY; 
+				brightRadius		= 2; 
+				intensity			= 1; 
+				line				= true;
+			}
+			else if(::ghg::WEAPON_LOAD_Shell == weapon.Load) { 
+				colorShot			= ::gpk::GRAY; 
+				brightRadius		= 2; 
+				intensity			= 1; 
+				line				= true;
+			}
+			else if(::ghg::WEAPON_LOAD_Cannonball == weapon.Load) {
+				colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE;
+				brightRadius		= 7;
+				intensity			= 9;
+				line				= false;
+			}
+			else if(::ghg::WEAPON_LOAD_Rocket == weapon.Load) {
+				colorShot			= ::gpk::LIGHTORANGE;
+				brightRadius		= 2;
+				intensity			= 1;
+				line				= true;
+			}
+			else if(::ghg::WEAPON_LOAD_Missile == weapon.Load) {
+				colorShot			= ::gpk::CYAN;
+				brightRadius		= 2;
+				intensity			= 1;
+				line				= true;
 			}
 			::drawShots(targetPixels, solarSystem.ShipState.Shots[shipPart.Weapon], matrixView, colorShot, brightRadius, intensity, line, depthBuffer, drawCache.LightPointsModel);
 		}

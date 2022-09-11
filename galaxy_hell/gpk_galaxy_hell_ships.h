@@ -86,11 +86,12 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(SHIP_ACTION, dash			, 15);
 	GDEFINE_ENUM_VALUE(SHIP_ACTION, vanish			, 16);
 	GDEFINE_ENUM_VALUE(SHIP_ACTION, explode			, 17);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, hit				, 18);
 
 	struct SShipPart {
 		int32_t											Entity							= -1;
 		SHIP_PART_TYPE									Type							= SHIP_PART_TYPE_Cargo;
-		int32_t											Health							= -1;
+		int32_t											Health							= 0;
 		uint32_t										MaxHealth						= 0;
 		int32_t											Weapon							= -1;
 		uint32_t										ActiveAction					= ~0U;

@@ -58,13 +58,15 @@ namespace ghg
 
 	};
 
-	int													stageSetup						(::ghg::SGalaxyHell & solarSystem);
-	int													solarSystemSetup				(::ghg::SGalaxyHell & solarSystem, const ::gpk::SCoord2<uint16_t> & windowSize);
-	int													solarSystemReset				(::ghg::SGalaxyHell & solarSystem); 
-	int													solarSystemDraw					(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
-	int													solarSystemUpdate				(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, const ::gpk::view_array<::gpk::SSysEvent> & frameEvents);
+	::gpk::error_t										stageSetup						(::ghg::SGalaxyHell & solarSystem);
+	::gpk::error_t										solarSystemSetup				(::ghg::SGalaxyHell & solarSystem, const ::gpk::SCoord2<uint16_t> & windowSize);
+	::gpk::error_t										solarSystemReset				(::ghg::SGalaxyHell & solarSystem); 
+	::gpk::error_t										solarSystemDraw					(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
+	::gpk::error_t										solarSystemUpdate				(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, const ::gpk::view_array<::gpk::SSysEvent> & frameEvents);
+	::gpk::error_t										solarSystemLoad					(::ghg::SGalaxyHell & world,::gpk::vcc filename);
+	::gpk::error_t										solarSystemSave					(const ::ghg::SGalaxyHell & world,::gpk::vcc filename);
 
-	int													getLightArrays
+	::gpk::error_t										getLightArrays
 		( const ::ghg::SShipState								& shipState
 		, const ::ghg::SDecoState								& decoState
 		, ::gpk::array_pod<::gpk::SCoord3<float>>				& lightPoints
@@ -72,7 +74,7 @@ namespace ghg
 		, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
 		);
 
-	int													drawShipPart
+	::gpk::error_t										drawShipPart
 		( const ::ghg::SShipState							& shipState
 		, const ::ghg::SShipPart							& shipPart
 		, const ::gpk::SMatrix4<float>						& matrixVP

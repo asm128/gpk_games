@@ -6,7 +6,7 @@
 namespace ghg
 {
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
-	GDEFINE_ENUM_VALUE(APP_STATE, Load		, 0);
+	GDEFINE_ENUM_VALUE(APP_STATE, Init		, 0);
 	GDEFINE_ENUM_VALUE(APP_STATE, Home		, 1);
 	GDEFINE_ENUM_VALUE(APP_STATE, User		, 2);
 	GDEFINE_ENUM_VALUE(APP_STATE, Shop		, 3);
@@ -19,7 +19,8 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(APP_STATE, About		, 10);
 	GDEFINE_ENUM_VALUE(APP_STATE, Setup		, 11);
 	GDEFINE_ENUM_VALUE(APP_STATE, Quit		, 12);
-	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 13);
+	GDEFINE_ENUM_VALUE(APP_STATE, Load		, 13);
+	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 14);
 
 	// Start New Game
 	// Continue Game
@@ -43,25 +44,28 @@ namespace ghg
 	GDEFINE_ENUM_TYPE (UI_PLAY, uint8_t	);
 	GDEFINE_ENUM_VALUE(UI_PLAY, Menu			, 0);
 
+	GDEFINE_ENUM_TYPE (UI_LOAD, uint8_t	);
+
 	GDEFINE_ENUM_TYPE (UI_SETTINGS, uint8_t);
-	GDEFINE_ENUM_VALUE(UI_SETTINGS, Graphics	, 0x0);
-	GDEFINE_ENUM_VALUE(UI_SETTINGS, Audio		, 0x1);
-	GDEFINE_ENUM_VALUE(UI_SETTINGS, Controller	, 0x2);
+	GDEFINE_ENUM_VALUE(UI_SETTINGS, Game		, 0x0);
+	GDEFINE_ENUM_VALUE(UI_SETTINGS, Graphics	, 0x1);
+	GDEFINE_ENUM_VALUE(UI_SETTINGS, Audio		, 0x2);
+	GDEFINE_ENUM_VALUE(UI_SETTINGS, Controller	, 0x3);
 	GDEFINE_ENUM_VALUE(UI_SETTINGS, Back		, 0x3);
 
 	GDEFINE_ENUM_TYPE (UI_SHOP, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_SHOP, Back			, 0x0);
 
 	struct SUIPlayModuleViewport {
-		::gpk::SMatrix4	<float>								MatrixProjection			;
-		::gpk::SCamera										Camera						;
-		::ghg::TRenderTarget								RenderTarget				;
-		int32_t												Viewport					;
+		::gpk::SMatrix4	<float>										MatrixProjection			;
+		::gpk::SCamera												Camera						;
+		::ghg::TRenderTarget										RenderTarget				;
+		int32_t														Viewport					;
 	};
 
 	struct SUIPlay {
-		::gpk::array_pobj<::ghg::SUIPlayModuleViewport>		ModuleViewports					;
-		::ghg::SGalaxyHellDrawCache							DrawCache						;
+		::gpk::array_pobj<::ghg::SUIPlayModuleViewport>				ModuleViewports					;
+		::ghg::SGalaxyHellDrawCache									DrawCache						;
 	};
 
 	struct SGalaxyHellApp {
@@ -74,16 +78,22 @@ namespace ghg
 		::ghg::SGalaxyHell											World;
 		::ghg::STextOverlay											Overlay;
 
-		::gpk::array_pod<::gpk::vcc>								SavegameList				= {};
-		::gpk::vcs													SavegameFolder				= "./";
+		::gpk::array_obj<::gpk::array_pod<char>>					FileNames					= {};
+		::gpk::vcs													SavegameFolder				= ".";
+		::gpk::vcs													ExtensionSaveAuto			= ".autosave.ghs";
+		::gpk::vcs													ExtensionSaveCheckpoint		= ".checkpoint.ghs";
+		::gpk::vcs													ExtensionSaveUser			= ".user.ghs";
+		::gpk::vcs													ExtensionSave				= ".ghs";
+		::gpk::vcs													ExtensionImages				= ".png";
 		::ghg::SUIPlay												UIPlay;
 
-		APP_STATE													ActiveState					= APP_STATE_Load;
+		APP_STATE													ActiveState					= APP_STATE_Init;
 	};
 
 	::gpk::error_t												guiSetup					(::ghg::SGalaxyHellApp & gameui, const ::gpk::ptr_obj<::gpk::SInput> & inputState);
-	::gpk::error_t												guiUpdate					(::ghg::SGalaxyHellApp & gameui, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents, const ::gpk::SCoord2<uint16_t> & screenMetrics);
+	::gpk::error_t												guiUpdate					(::ghg::SGalaxyHellApp & gameui, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents);
 	
-	::gpk::error_t												galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents, const ::gpk::SCoord2<uint16_t> & windowSize);
+	::gpk::error_t												galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents);
 	::gpk::error_t												galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::SCoord2<uint16_t> renderTargetSize);
+
 }

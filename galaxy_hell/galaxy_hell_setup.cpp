@@ -6,7 +6,20 @@
 #include <windows.h>
 #include <mmsystem.h>
 
+::gpk::error_t					ghg::solarSystemSave		(const ::ghg::SGalaxyHell & game, ::gpk::vcc fileName) {
+	::gpk::array_pod<byte_t>			serialized;
+	game.Save(serialized);
+	return ::gpk::fileFromMemory(fileName, serialized);
+}
 
+::gpk::error_t					ghg::solarSystemLoad		(::ghg::SGalaxyHell & world,::gpk::vcc filename) {
+	::gpk::array_pod<byte_t>			serialized;
+	gpk_necall(::gpk::fileToMemory(filename, serialized), "%s", "");
+	::gpk::view_array<const byte_t>		viewSerialized			= {(const byte_t*)serialized.begin(), serialized.size()};
+	world.Load(viewSerialized);
+	world.PlayState.Paused		= true;
+	return 0;
+}
 
 static	int											shipCreate			(::ghg::SShipState & shipState, int32_t teamId, int32_t iGeometry, int32_t iImage)	{
 	::ghg::SShipScene										& scene				= shipState.Scene;
@@ -26,6 +39,7 @@ static	int											shipCreate			(::ghg::SShipState & shipState, int32_t teamId
 	}
 	const int32_t											indexShip			= shipState.ShipCores.push_back(ship);
 	shipState.ShipCoresParts.push_back({});
+	shipState.ShipActionQueue.push_back({});
 	//ship.Parts.reserve(countParts);
 	::ghg::SEntity											entityOrbit				= {ship.Entity};
 	for(uint32_t iPart = 0; iPart < countParts; ++iPart) {	// Create child parts
@@ -167,25 +181,34 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 		solarSystem.DecoState.Stars.Reset(solarSystem.DrawCache.RenderTargetMetrics);
 	}
 
+#pragma pack(push, 1)
 	struct SShipPartSetup {
-		::ghg::SHIP_PART_TYPE	Type		;
-		::ghg::WEAPON_TYPE		Weapon		;
-		::ghg::WEAPON_LOAD		Munition	;
-		double					MaxDelay	;
-		int32_t					Damage		;
-		uint32_t				MaxHealth	;
+		::ghg::SHIP_PART_TYPE	Type			;
+		uint32_t				MaxHealth		;
+		::ghg::WEAPON_TYPE		Weapon			;
+		double					MaxDelay		;
+		double					Stability		;
+		::ghg::WEAPON_LOAD		Munition		;
+		float					MaxSpeed		;
+		int32_t					Damage			;
+		uint8_t					ParticleCount	;
+		::ghg::WEAPON_DAMAGE	DamageType		;
 	};
+#pragma pack(pop)
 
 	::gpk::SJSONFile										stageFile;
 	char													stageFileName[256]							= "./%s.json";
 	static constexpr const SShipPartSetup					weaponDefinitions		[]				=
-		{ {::ghg::SHIP_PART_TYPE_Gun	, ::ghg::WEAPON_TYPE_Gun		, ::ghg::WEAPON_LOAD_Bullet		, .1,  10, 100}
-		, {::ghg::SHIP_PART_TYPE_Gun	, ::ghg::WEAPON_TYPE_Shotgun	, ::ghg::WEAPON_LOAD_Bullet		, .3,  10, 100}
-		, {::ghg::SHIP_PART_TYPE_Wafer	, ::ghg::WEAPON_TYPE_Gun		, ::ghg::WEAPON_LOAD_Ray		, .3,  30, 100}
-		, {::ghg::SHIP_PART_TYPE_Wafer	, ::ghg::WEAPON_TYPE_Shotgun	, ::ghg::WEAPON_LOAD_Ray		, .6,  30, 100}
-		, {::ghg::SHIP_PART_TYPE_Cannon	, ::ghg::WEAPON_TYPE_Cannon		, ::ghg::WEAPON_LOAD_Shell		,  2, 100, 100}
-		, {::ghg::SHIP_PART_TYPE_Cannon	, ::ghg::WEAPON_TYPE_Cannon		, ::ghg::WEAPON_LOAD_Rocket		,  2,  50, 100}
-		, {::ghg::SHIP_PART_TYPE_Cannon	, ::ghg::WEAPON_TYPE_Cannon		, ::ghg::WEAPON_LOAD_Missile	,  2,  30, 100}
+		{ {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Gun		, .12, 0.95, ::ghg::WEAPON_LOAD_Bullet		,  256,    16, 1, ::ghg::WEAPON_DAMAGE_Pierce	}
+		, {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Shotgun	, .24, 0.93, ::ghg::WEAPON_LOAD_Shell		,  192,     8, 6, ::ghg::WEAPON_DAMAGE_Impact	}
+		, {::ghg::SHIP_PART_TYPE_Wafer	, 128, ::ghg::WEAPON_TYPE_Gun		, .32, 0.99, ::ghg::WEAPON_LOAD_Ray			,  320,    24, 1, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn	}
+		, {::ghg::SHIP_PART_TYPE_Wafer	, 128, ::ghg::WEAPON_TYPE_Shotgun	, .48, 0.97, ::ghg::WEAPON_LOAD_Ray			,  256,    12, 6, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn	}
+		, {::ghg::SHIP_PART_TYPE_Cannon	, 128, ::ghg::WEAPON_TYPE_Cannon	,   2, 0.99, ::ghg::WEAPON_LOAD_Cannonball	,   32,   128, 1, ::ghg::WEAPON_DAMAGE_Impact	}
+		, {::ghg::SHIP_PART_TYPE_Cannon	, 128, ::ghg::WEAPON_TYPE_Cannon	,  .5, 0.95, ::ghg::WEAPON_LOAD_Rocket		,   80,    64, 1, ::ghg::WEAPON_DAMAGE_Impact	| ::ghg::WEAPON_DAMAGE_Burn | ::ghg::WEAPON_DAMAGE_Wave }
+		, {::ghg::SHIP_PART_TYPE_Cannon	, 128, ::ghg::WEAPON_TYPE_Cannon	,   1, 0.90, ::ghg::WEAPON_LOAD_Missile		,   96,    96, 1, ::ghg::WEAPON_DAMAGE_Impact	| ::ghg::WEAPON_DAMAGE_Burn | ::ghg::WEAPON_DAMAGE_Wave }
+		, {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Shotgun	,   4, 0.95, ::ghg::WEAPON_LOAD_Cannonball	,   80,   128, 7, ::ghg::WEAPON_DAMAGE_Impact	}
+		, {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Shotgun	,   2, 0.92, ::ghg::WEAPON_LOAD_Rocket		,  160,    64, 6, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn | ::ghg::WEAPON_DAMAGE_Wave }
+		, {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Shotgun	,   3, 0.90, ::ghg::WEAPON_LOAD_Missile		,  240,    96, 5, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn | ::ghg::WEAPON_DAMAGE_Wave }
 		};
 
 	sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage);
@@ -234,8 +257,9 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 				//ship.Team										= iShip ? 1 : 0;
 				int32_t												weapon							= 0;
 				if(0 == ship.Team) {
-					weapon											= (iPart % 5) % (solarSystem.ShipState.ShipCores.size() / 2);
-					weapon											= ::gpk::min(::gpk::max(weapon, (int32_t)(solarSystem.PlayState.Stage / ::gpk::size(weaponDefinitions))), 3);
+					weapon											= (iPart % 5) % (solarSystem.ShipState.ShipCores.size());
+					weapon											%= ::gpk::size(weaponDefinitions) - 3;
+					weapon											+= ::gpk::min(3, int32_t(solarSystem.PlayState.Stage / 3) % (int32_t)::gpk::size(weaponDefinitions));
 				}
 				else {
 					if(iShip < 4 || 0 != ((iShip - 1 - solarSystem.PlayState.PlayerCount - solarSystem.PlayState.OffsetStage) % 3) || 0 != iPart) 
@@ -243,8 +267,8 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 					else {
 						weapon											= (iShip - 5) / 3;
 					}
+					weapon											%= ::gpk::size(weaponDefinitions) >> 1;
 				}
-				weapon											%= ::gpk::size(weaponDefinitions);
 
 				SShipPartSetup										partCreationData	= weaponDefinitions[weapon];
 				::ghg::SWeapon										newWeapon			= {};
@@ -256,7 +280,10 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 				newWeapon.Type							= partCreationData.Weapon;
 				newWeapon.Load							= partCreationData.Munition;
 				newWeapon.Damage						= partCreationData.Damage;
+				newWeapon.Speed							= partCreationData.MaxSpeed;
 				newWeapon.Delay							= newWeapon.MaxDelay / shipParts.size() * iPart;
+				newWeapon.Stability						= partCreationData.Stability;
+				newWeapon.ParticleCount					= partCreationData.ParticleCount;
 				shipPart.Weapon							= solarSystem.ShipState.Weapons.push_back(newWeapon);
 				solarSystem.ShipState.Shots.push_back({});
 
@@ -276,7 +303,8 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 	++solarSystem.PlayState.Stage;
 	solarSystem.PlayState.Slowing			= true;
 #if defined(GPK_WINDOWS)
-	PlaySoundA((LPCSTR)SND_ALIAS_SYSTEMSTART, GetModuleHandle(0), SND_ALIAS_ID | SND_ASYNC);
+	solarSystem.ShipState.ShipActionQueue[0].push_back(SHIP_ACTION_spawn);
+	//PlaySoundA((LPCSTR)SND_ALIAS_SYSTEMSTART, GetModuleHandle(0), SND_ALIAS_ID | SND_ASYNC);
 #endif
 	return 0;
 }

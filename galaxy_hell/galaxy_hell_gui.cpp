@@ -15,29 +15,50 @@ static	::gpk::error_t			guiSetupCommon				(::gpk::SGUI & gui) {
 	return 0;
 }
 
-template<typename _tUIEnum>
-static	::gpk::error_t			guiSetupButtonList			(::gpk::SGUI & gui, uint16_t buttonWidth, int16_t yOffset, ::gpk::ALIGN controlAlign) {
-	for(uint16_t iButton = 0; iButton < ::gpk::get_value_count<_tUIEnum>(); ++iButton) {
+static	::gpk::error_t			guiSetupButtonList			(::gpk::SGUI & gui, uint16_t buttonWidth, int16_t yOffset, ::gpk::ALIGN controlAlign, ::gpk::view_array<::gpk::vcc> buttonText) {
+	for(uint16_t iButton = 0; iButton < buttonText.size(); ++iButton) {
 		int32_t								idControl						= ::gpk::controlCreate(gui);
 		::gpk::SControl						& control						= gui.Controls.Controls[idControl];
-		control.Area					= {{0,(int16_t)(20*iButton) + yOffset}, {(int16_t)buttonWidth, 20}};
+		control.Area					= {{0U, (int16_t)(20*iButton + yOffset)}, {(int16_t)buttonWidth, 20}};
 		control.Border					= {1, 1, 1, 1};//{10, 10, 10, 10};
 		control.Margin					= {1, 1, 1, 1};
 		control.Align					= controlAlign;
 		::gpk::SControlText					& controlText					= gui.Controls.Text[idControl];
-		controlText.Text				= ::gpk::get_value_label((_tUIEnum)iButton);
+		controlText.Text				= buttonText[iButton];
 		controlText.Align				= ::gpk::ALIGN_CENTER;
 		::gpk::controlSetParent(gui, idControl, -1);
 	}
 	return 0;
 }
 
-static	::gpk::error_t			guiSetupLoad				(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_PLAY>(*dialog.GUI,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT); }
+template<typename _tUIEnum>
+static	::gpk::error_t			guiSetupButtonList			(::gpk::SGUI & gui, uint16_t buttonWidth, int16_t yOffset, ::gpk::ALIGN controlAlign) {
+	for(uint16_t iButton = 0; iButton < ::gpk::get_value_count<_tUIEnum>(); ++iButton) {
+		int32_t								idControl						= ::gpk::controlCreate(gui);
+		::gpk::SControl						& control						= gui.Controls.Controls[idControl];
+		control.Area					= {{0U,(int16_t)(20*iButton + yOffset)}, {(int16_t)buttonWidth, 20}};
+		control.Border					= {1, 1, 1, 1};//{10, 10, 10, 10};
+		control.Margin					= {1, 1, 1, 1};
+		control.Align					= controlAlign;
+		::gpk::SControlText					& controlText					= gui.Controls.Text[idControl];
+		controlText.Text				= ::gpk::get_value_label((_tUIEnum)iButton);
+		controlText.Align				= ::gpk::ALIGN_CENTER;
+		::gpk::controlSetParent(gui, idControl, 0);
+	}
+	return 0;
+}
+
+static	::gpk::error_t			guiSetupInit				(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_LOAD>(*dialog.GUI,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT); }
+static	::gpk::error_t			guiSetupLoad				(::gpk::SDialog & dialog) { 
+	gpk_necall(guiSetupButtonList<::ghg::UI_LOAD>(*dialog.GUI,  60, 0, ::gpk::ALIGN_CENTER), "%s", ""); 
+	return 0;
+}
+
 static	::gpk::error_t			guiSetupHome				(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_HOME>(*dialog.GUI, 160, int16_t(-20 * ::gpk::get_value_count<::ghg::UI_HOME>() / 2), ::gpk::ALIGN_CENTER); }
 static	::gpk::error_t			guiSetupUser				(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_PLAY>(*dialog.GUI,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT); }
 static	::gpk::error_t			guiSetupShop				(::gpk::SDialog & dialog) { 
 	::gpk::SGUI							& gui						= *dialog.GUI;
-	guiSetupButtonList<::ghg::UI_SHOP>(gui,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT);
+	gpk_necall(guiSetupButtonList<::ghg::UI_SHOP>(gui,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT), "%s", "");
 	::gpk::ptr_obj<::gpk::SDialogViewport>	viewport									= {};
 	//int32_t									idViewport					=
 	::gpk::viewportCreate(dialog, viewport);
@@ -71,10 +92,10 @@ static	::gpk::error_t			guiSetupAbout				(::gpk::SDialog & dialog) { return guiS
 ::gpk::error_t					ghg::guiSetup				(::ghg::SGalaxyHellApp & app, const ::gpk::ptr_obj<::gpk::SInput> & input) {
 	for(uint32_t iGUI = 0; iGUI < ::gpk::size(app.DialogPerState); ++iGUI) {
 		app.DialogPerState[iGUI].Input				= input;
-		app.DialogPerState[iGUI].GUI->SelectedFont	= 7;
 		guiSetupCommon(*app.DialogPerState[iGUI].GUI);
 		app.DialogPerState[iGUI].Update();
 	};
+	::guiSetupInit	(app.DialogPerState[::ghg::APP_STATE_Init	]);
 	::guiSetupLoad	(app.DialogPerState[::ghg::APP_STATE_Load	]);
 	::guiSetupHome	(app.DialogPerState[::ghg::APP_STATE_Home	]);
 	::guiSetupUser	(app.DialogPerState[::ghg::APP_STATE_User	]);
@@ -90,41 +111,48 @@ static	::gpk::error_t			guiSetupAbout				(::gpk::SDialog & dialog) { return guiS
 	return 0;
 }
 
-static	::gpk::error_t			guiHandleLoad				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/, const ::gpk::SCoord2<uint16_t> & /*screenMetrics*/) { return ::ghg::APP_STATE_Load; }
-static	::gpk::error_t			guiHandleHome				(::gpk::SGUI & /*gui*/, uint32_t idControl, ::ghg::SGalaxyHell & game, const ::gpk::SCoord2<uint16_t> & /*screenMetrics*/) { 
+static	::gpk::error_t			guiHandleLoad				(::gpk::SGUI & gui, uint32_t idControl, ::ghg::SGalaxyHell & game) { 
+	if(idControl < (gui.Controls.Text.size() - 2)) {
+		::ghg::solarSystemLoad(game, gui.Controls.Text[idControl + 1].Text);
+	}
+	return ::ghg::APP_STATE_Home; 
+}
+
+static	::gpk::error_t			guiHandleHome				(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & /*gui*/, uint32_t idControl, ::ghg::SGalaxyHell & game) { 
 	switch((::ghg::UI_HOME)idControl) {
 	case ::ghg::UI_HOME_Start: 
 		::ghg::solarSystemReset(game);
-		game.PlayState.Paused						= false;
-		return ::ghg::APP_STATE_Play;
-	case ::ghg::UI_HOME_Continue: 
-		game.PlayState.Paused						= false;
-		return ::ghg::APP_STATE_Play;
-	case ::ghg::UI_HOME_Save: {
-		::gpk::array_pod<byte_t>			serialized;
-		game.Save(serialized);
-
-		char fileName[4096] = {};
-		sprintf_s(fileName, "./%llu.ghs", ::gpk::timeCurrentInMs());
-		::gpk::fileFromMemory(fileName, serialized);
 		game.PlayState.Paused			= false;
 		return ::ghg::APP_STATE_Play;
+	case ::ghg::UI_HOME_Continue: 
+		game.PlayState.Paused			= false;
+		return ::ghg::APP_STATE_Play;
+	case ::ghg::UI_HOME_Save: {
+		if(game.ShipState.ShipCores.size() && game.ShipState.ShipCores[0].Health > 0) {
+			char								fileName[4096] = {};
+			sprintf_s(fileName, "%s/%llu%s", app.SavegameFolder.begin(), ::gpk::timeCurrentInMs(), app.ExtensionSaveUser.begin());
+			::ghg::solarSystemSave(game, ::gpk::vcs{fileName});
+			game.PlayState.Paused			= true;
+			break;
+		}
 	}
 	case ::ghg::UI_HOME_Load: {
-		::gpk::array_pod<byte_t>			serialized;
-		//char								fileName[4096]		= {};
-		::gpk::array_obj<::gpk::array_pod<char>>	pathFiles;
-		::gpk::pathList(::gpk::vcs{"./"}, pathFiles);
-		for(uint32_t iFile = 0; iFile < pathFiles.size(); ++iFile)  {
-			if(0 == strcmp(&pathFiles[iFile][pathFiles[iFile].size() - 4], ".ghs")) {
-				::gpk::fileToMemory(pathFiles[iFile], serialized);
-				::gpk::view_array<const byte_t>		viewSerialized		= {(const byte_t*)serialized.begin(), serialized.size()};
-				game.Load(viewSerialized);
-				break;
-			}
+		::gpk::array_obj<::gpk::vcc>				pathFileNames;
+		app.FileNames							= {};
+		::gpk::pathList(app.SavegameFolder, app.FileNames);
+		for(uint32_t iFile = 0; iFile < app.FileNames.size(); ++iFile)  {
+			const ::gpk::vcc							fileName			= app.FileNames[iFile];
+			if(fileName.size() > app.ExtensionSave.size() && 0 == strcmp(&fileName[fileName.size() - app.ExtensionSave.size()], app.ExtensionSave.begin())) 
+				pathFileNames.push_back(fileName);
 		}
-
-		return ::ghg::APP_STATE_Home;
+		pathFileNames.push_back(::gpk::vcs{"Back"});
+		app.DialogPerState[::ghg::APP_STATE_Load]					= {};
+		app.DialogPerState[::ghg::APP_STATE_Load].Input				= app.DialogPerState[::ghg::APP_STATE_Home].Input;
+		app.DialogPerState[::ghg::APP_STATE_Load].GUI->CursorPos	= app.DialogPerState[::ghg::APP_STATE_Home].GUI->CursorPos;
+		guiSetupCommon(*app.DialogPerState[::ghg::APP_STATE_Load].GUI);
+		app.DialogPerState[::ghg::APP_STATE_Load].Update();
+		::guiSetupButtonList(*app.DialogPerState[::ghg::APP_STATE_Load].GUI, 256, 0, ::gpk::ALIGN_CENTER, pathFileNames);
+		return ::ghg::APP_STATE_Load;
 	}
 	case ::ghg::UI_HOME_Settings: {
 		return ::ghg::APP_STATE_Setup;
@@ -139,32 +167,34 @@ static	::gpk::error_t			guiHandleHome				(::gpk::SGUI & /*gui*/, uint32_t idCont
 	return ::ghg::APP_STATE_Home; 
 }
 
-static	::gpk::error_t			guiHandleUser				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/, const ::gpk::SCoord2<uint16_t> & /*screenMetrics*/) { return ::ghg::APP_STATE_User; }
-static	::gpk::error_t			guiHandleShop				(::gpk::SGUI & /*gui*/, uint32_t idControl, ::ghg::SGalaxyHell & /*game*/, const ::gpk::SCoord2<uint16_t> & /*screenMetrics*/) { 
+static	::gpk::error_t			guiHandleUser				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/) { return ::ghg::APP_STATE_User; }
+static	::gpk::error_t			guiHandleShop				(::gpk::SGUI & /*gui*/, uint32_t idControl, ::ghg::SGalaxyHell & /*game*/) { 
 	if(idControl == (uint32_t)::ghg::UI_SHOP_Back) {
 		return ::ghg::APP_STATE_Home;
 	}
 	return ::ghg::APP_STATE_Shop; 
 }
-static	::gpk::error_t			guiHandlePlay				(::gpk::SGUI & /*gui*/, uint32_t idControl, ::ghg::SGalaxyHell & game, const ::gpk::SCoord2<uint16_t> & /*screenMetrics*/) { 
+static	::gpk::error_t			guiHandlePlay				(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & /*gui*/, uint32_t idControl, ::ghg::SGalaxyHell & game) { 
 	if(idControl == (uint32_t)::ghg::UI_PLAY_Menu) {
-		::gpk::array_pod<byte_t>			serialized;
-		game.Save(serialized);
-		char								fileName[4096] = {};
-		sprintf_s(fileName, "./%llu.autosave.ghs", 0ULL); //::gpk::timeCurrentInMs());
-		::gpk::fileFromMemory(fileName, serialized);
+		if(game.ShipState.ShipCores.size() && game.ShipState.ShipCores[0].Health > 0) {
+			::gpk::array_pod<byte_t>			serialized;
+			game.Save(serialized);
+			char								fileName[4096] = {};
+			sprintf_s(fileName, "%s/%llu%s", app.SavegameFolder.begin(), 0ULL, app.ExtensionSaveAuto.begin());
+			::gpk::fileFromMemory(fileName, serialized);
+		}
 		game.PlayState.Paused								= true;
 		return ::ghg::APP_STATE_Home;
 	}
 	return ::ghg::APP_STATE_Play; 
 }
 
-static	::gpk::error_t			guiHandleBrief				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/, const ::gpk::SCoord2<uint16_t> & /*screenMetrics*/) { return ::ghg::APP_STATE_Brief; }
-static	::gpk::error_t			guiHandleStage				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/, const ::gpk::SCoord2<uint16_t> & /*screenMetrics*/) { return ::ghg::APP_STATE_Stage; }
-static	::gpk::error_t			guiHandleStats				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/, const ::gpk::SCoord2<uint16_t> & /*screenMetrics*/) { return ::ghg::APP_STATE_Stats; }
-static	::gpk::error_t			guiHandleStore				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/, const ::gpk::SCoord2<uint16_t> & /*screenMetrics*/) { return ::ghg::APP_STATE_Store; }
-static	::gpk::error_t			guiHandleScore				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/, const ::gpk::SCoord2<uint16_t> & /*screenMetrics*/) { return ::ghg::APP_STATE_Score; }
-static	::gpk::error_t			guiHandleSetup				(::gpk::SGUI & /*gui*/, uint32_t idControl, ::ghg::SGalaxyHell & /*game*/, const ::gpk::SCoord2<uint16_t> & /*screenMetrics*/) { 
+static	::gpk::error_t			guiHandleBrief				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/) { return ::ghg::APP_STATE_Brief; }
+static	::gpk::error_t			guiHandleStage				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/) { return ::ghg::APP_STATE_Stage; }
+static	::gpk::error_t			guiHandleStats				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/) { return ::ghg::APP_STATE_Stats; }
+static	::gpk::error_t			guiHandleStore				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/) { return ::ghg::APP_STATE_Store; }
+static	::gpk::error_t			guiHandleScore				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/) { return ::ghg::APP_STATE_Score; }
+static	::gpk::error_t			guiHandleSetup				(::gpk::SGUI & /*gui*/, uint32_t idControl, ::ghg::SGalaxyHell & /*game*/) { 
 	if(idControl == (uint32_t)::ghg::UI_SETTINGS_Audio) {
 		return ::ghg::APP_STATE_Home;
 	}
@@ -179,7 +209,7 @@ static	::gpk::error_t			guiHandleSetup				(::gpk::SGUI & /*gui*/, uint32_t idCon
 	}
 	return ::ghg::APP_STATE_Setup; 
 }
-static	::gpk::error_t			guiHandleAbout				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/, const ::gpk::SCoord2<uint16_t> & /*screenMetrics*/) { return ::ghg::APP_STATE_About; }
+static	::gpk::error_t			guiHandleAbout				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/) { return ::ghg::APP_STATE_About; }
 
 
 static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) { 
@@ -281,7 +311,7 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 	return 0;
 }
 
-::gpk::error_t					ghg::guiUpdate				(::ghg::SGalaxyHellApp & gameApp, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents, const ::gpk::SCoord2<uint16_t> & screenMetrics) {
+::gpk::error_t					ghg::guiUpdate				(::ghg::SGalaxyHellApp & gameApp, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents) {
 	::ghg::SGalaxyHell					& game						= gameApp.World;
 	::ghg::APP_STATE					appState					= gameApp.ActiveState; 
 	for(uint32_t iAppState = 0; iAppState < ::ghg::APP_STATE_COUNT; ++iAppState) {
@@ -305,18 +335,18 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 			idControl = idControl - 1;
 			info_printf("Executed %u.", idControl);
 			switch(appState) {
-			case ::ghg::APP_STATE_Load	: appState = (::ghg::APP_STATE)::guiHandleLoad	(gui, idControl, game, screenMetrics); handled = true; break;
-			case ::ghg::APP_STATE_Home	: appState = (::ghg::APP_STATE)::guiHandleHome	(gui, idControl, game, screenMetrics); handled = true; break;
-			case ::ghg::APP_STATE_User	: appState = (::ghg::APP_STATE)::guiHandleUser	(gui, idControl, game, screenMetrics); handled = true; break;
-			case ::ghg::APP_STATE_Shop	: appState = (::ghg::APP_STATE)::guiHandleShop	(gui, idControl, game, screenMetrics); handled = true; break;
-			case ::ghg::APP_STATE_Play	: appState = (::ghg::APP_STATE)::guiHandlePlay	(gui, idControl, game, screenMetrics); handled = true; break;
-			case ::ghg::APP_STATE_Brief	: appState = (::ghg::APP_STATE)::guiHandleBrief	(gui, idControl, game, screenMetrics); handled = true; break;
-			case ::ghg::APP_STATE_Stage	: appState = (::ghg::APP_STATE)::guiHandleStage	(gui, idControl, game, screenMetrics); handled = true; break;
-			case ::ghg::APP_STATE_Stats	: appState = (::ghg::APP_STATE)::guiHandleStats	(gui, idControl, game, screenMetrics); handled = true; break;
-			case ::ghg::APP_STATE_Store	: appState = (::ghg::APP_STATE)::guiHandleStore	(gui, idControl, game, screenMetrics); handled = true; break;
-			case ::ghg::APP_STATE_Score	: appState = (::ghg::APP_STATE)::guiHandleScore	(gui, idControl, game, screenMetrics); handled = true; break;
-			case ::ghg::APP_STATE_Setup	: appState = (::ghg::APP_STATE)::guiHandleSetup	(gui, idControl, game, screenMetrics); handled = true; break;
-			case ::ghg::APP_STATE_About	: appState = (::ghg::APP_STATE)::guiHandleAbout	(gui, idControl, game, screenMetrics); handled = true; break;
+			case ::ghg::APP_STATE_Load	: appState = (::ghg::APP_STATE)::guiHandleLoad	(gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_Home	: appState = (::ghg::APP_STATE)::guiHandleHome	(gameApp, gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_User	: appState = (::ghg::APP_STATE)::guiHandleUser	(gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_Shop	: appState = (::ghg::APP_STATE)::guiHandleShop	(gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_Play	: appState = (::ghg::APP_STATE)::guiHandlePlay	(gameApp, gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_Brief	: appState = (::ghg::APP_STATE)::guiHandleBrief	(gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_Stage	: appState = (::ghg::APP_STATE)::guiHandleStage	(gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_Stats	: appState = (::ghg::APP_STATE)::guiHandleStats	(gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_Store	: appState = (::ghg::APP_STATE)::guiHandleStore	(gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_Score	: appState = (::ghg::APP_STATE)::guiHandleScore	(gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_Setup	: appState = (::ghg::APP_STATE)::guiHandleSetup	(gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_About	: appState = (::ghg::APP_STATE)::guiHandleAbout	(gui, idControl, game); handled = true; break;
 			}
 			if(handled)
 				break;

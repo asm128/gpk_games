@@ -6,42 +6,6 @@
 
 namespace ghg 
 {
-	GDEFINE_ENUM_TYPE(WEAPON_DAMAGE, uint8_t);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Pierce		,  0);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Impact		,  1);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Wave			,  2);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Burn			,  3);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Shock			,  4);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Magnetic		,  5);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Radiation		,  6);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Poison		,  7);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Plasma		,  8);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Light			,  9);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Sound			, 10);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Pem			, 11);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Gravity		, 12);
-	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Pow			, 13);
-
-	GDEFINE_ENUM_TYPE(WEAPON_TYPE, uint8_t);
-	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Gun			, 0);
-	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Cannon		, 1);
-	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Rocket		, 2);
-	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Missile		, 3);
-	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Torpedo		, 4);
-	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Shotgun		, 5);
-	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Bomb		, 6);
-	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Mothership	, 7);
-	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Shield		, 8);
-
-	GDEFINE_ENUM_TYPE(WEAPON_LOAD, uint8_t);
-	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Bullet	, 0);
-	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Shell	, 1);
-	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Ray		, 2);
-	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Rocket	, 3);
-	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Missile	, 4);
-	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Wave	, 5);
-	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Flare	, 6);
-
 	struct SShots	{
 		::gpk::array_pod<float>						Brightness			= {};
 		::gpk::array_pod<::gpk::SCoord3<float>>		PositionPrev		= {};
@@ -55,13 +19,13 @@ namespace ghg
 			return Brightness.push_back(brightness);
 		}
 
-		int											SpawnForcedDirected	(double noiseFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness)	{
+		int											SpawnForcedDirected	(double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness)	{
 			static constexpr const double					randUnit			= ::gpk::math_2pi / RAND_MAX;
 			::gpk::SCoord3<float>							finalDirection		= {0, 1, 0};
 			finalDirection.RotateX(rand() * randUnit);
 			finalDirection.RotateY(rand() * randUnit);
 			finalDirection.Normalize();
-			return SpawnForced(position, ::gpk::interpolate_linear(direction, finalDirection, noiseFactor), speedDebris, brightness);
+			return SpawnForced(position, ::gpk::interpolate_linear(finalDirection, direction, stabilityFactor), speedDebris, brightness);
 		}
 
 		int											Update				(float secondsLastFrame)	{
@@ -102,13 +66,53 @@ namespace ghg
 	};
 
 #pragma pack(push, 1)
+	GDEFINE_ENUM_TYPE(WEAPON_DAMAGE, uint16_t);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Pierce		, 0x0);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Impact		, 0x1);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Wave			, 0x2);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Burn			, 0x4);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Shock			, 0x8);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Magnetic		, 0x10);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Radiation		, 0x20);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Poison		, 0x40);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Plasma		, 0x80);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Light			, 0x100);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Sound			, 0x200);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, EMP			, 0x400);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Gravity		, 0x800);
+	GDEFINE_ENUM_VALUE(WEAPON_DAMAGE, Pow			, 0x1000);
+
+	GDEFINE_ENUM_TYPE(WEAPON_TYPE, uint8_t);
+	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Gun			, 0);
+	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Cannon		, 1);
+	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Rocket		, 2);
+	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Missile		, 3);
+	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Torpedo		, 4);
+	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Shotgun		, 5);
+	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Bomb		, 6);
+	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Mothership	, 7);
+	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Shield		, 8);
+
+	GDEFINE_ENUM_TYPE(WEAPON_LOAD, uint8_t);
+	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Bullet		, 0);
+	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Shell		, 1);
+	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Ray			, 2);
+	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Cannonball	, 3);
+	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Rocket		, 4);
+	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Missile		, 5);
+	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Wave		, 6);
+	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Flare		, 7);
+	
 	struct SWeapon {
-		WEAPON_DAMAGE								DamageType			= WEAPON_DAMAGE_Pierce;
 		WEAPON_TYPE									Type				= WEAPON_TYPE_Gun;
 		WEAPON_LOAD									Load				= WEAPON_LOAD_Bullet;
-		double										Delay				= 0;
-		int32_t										Damage				= 1;
+		WEAPON_DAMAGE								DamageType			= WEAPON_DAMAGE_Pierce;
+		uint8_t										ParticleCount		= 1;
 		double										MaxDelay			= .1;
+		double										Delay				= 0;
+		double										Stability			= 1.0;
+		float										Speed				= 150;
+		int32_t										Damage				= 1;
 
 		int											Create				(::ghg::SShots & shots, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness)	{
 			if(Delay < MaxDelay)
@@ -117,21 +121,21 @@ namespace ghg
 			return shots.SpawnForced(position, direction, speed, brightness);
 		}
 
-		int											SpawnDirected		(::ghg::SShots & shots, double noiseFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness)	{
+		int											SpawnDirected		(::ghg::SShots & shots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness)	{
 			if(Delay < MaxDelay)
 				return 0;
 			Delay										= 0;
-			return shots.SpawnForcedDirected(noiseFactor, position, direction, speedDebris, brightness);
+			return shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness);
 		}
 
-		int											SpawnDirected		(::ghg::SShots & shots, uint32_t countShots, double noiseFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness)	{
+		int											SpawnDirected		(::ghg::SShots & shots, uint32_t countShots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness)	{
 			if(Delay < MaxDelay || 0 == countShots)
 				return 0;
 			int32_t											indexFirst			= -1;
 			if(countShots)
-				indexFirst									= shots.SpawnForcedDirected(noiseFactor, position, direction, speedDebris, brightness);
+				indexFirst									= shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness);
 			for(uint32_t iDebris = 0; iDebris < (countShots - 1); ++iDebris)
-				shots.SpawnForcedDirected(noiseFactor, position, direction, speedDebris, brightness);
+				shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness);
 			Delay										= 0;
 			return indexFirst;
 		}
