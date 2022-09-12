@@ -7,25 +7,38 @@
 namespace ghg 
 {
 	struct SShots	{
-		::gpk::array_pod<float>						Brightness			= {};
-		::gpk::array_pod<::gpk::SCoord3<float>>		PositionPrev		= {};
-		::gpk::array_pod<::gpk::SCoord3<float>>		PositionDraw		= {};
-		::ghg::SParticles3							Particles;
+		::gpk::array_obj<::gpk::array_pod<::gpk::SCoord3<float>>>	DistanceToTargets	= {};
+		::gpk::array_pod<float>										Lifetime			= {};
+		::gpk::array_pod<float>										Brightness			= {};
+		::gpk::array_pod<::gpk::SCoord3<float>>						PositionDraw		= {};
+		::gpk::array_pod<::gpk::SCoord3<float>>						PositionPrev		= {};
+		::ghg::SParticles3											Particles;
 
-		int											SpawnForced			(const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness)	{
-			Particles.Create(position, direction, speed);
-			PositionPrev.push_back(position);
-			PositionDraw.push_back(position);
-			return Brightness.push_back(brightness);
+		int											Remove				(uint32_t iShot)			{
+			Particles.Remove(iShot);
+			DistanceToTargets	.remove_unordered(iShot);
+			Lifetime			.remove_unordered(iShot);
+			Brightness			.remove_unordered(iShot);
+			PositionPrev		.remove_unordered(iShot);
+			return PositionDraw	.remove_unordered(iShot);
 		}
 
-		int											SpawnForcedDirected	(double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness)	{
+		int											SpawnForced			(const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness, float lifetime = 1.0f)	{
+			PositionDraw.push_back(position);
+			PositionPrev.push_back(position);
+			Brightness.push_back(brightness);
+			Lifetime.push_back(lifetime);
+			DistanceToTargets[DistanceToTargets.push_back({})].push_back(direction);
+			return Particles.Create(position, direction, speed);
+		}
+
+		int											SpawnForcedDirected	(double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime = 1.0f)	{
 			static constexpr const double					randUnit			= ::gpk::math_2pi / RAND_MAX;
 			::gpk::SCoord3<float>							finalDirection		= {0, 1, 0};
 			finalDirection.RotateX(rand() * randUnit);
 			finalDirection.RotateY(rand() * randUnit);
 			finalDirection.Normalize();
-			return SpawnForced(position, ::gpk::interpolate_linear(finalDirection, direction, stabilityFactor), speedDebris, brightness);
+			return SpawnForced(position, ::gpk::interpolate_linear(finalDirection, direction, stabilityFactor), speedDebris, brightness, lifetime);
 		}
 
 		int											Update				(float secondsLastFrame)	{
@@ -34,32 +47,40 @@ namespace ghg
 			memcpy(PositionPrev.begin(), Particles.Position.begin(), Particles.Position.size() * sizeof(::gpk::SCoord3<float>));
 			Particles.IntegrateSpeed(secondsLastFrame);
 			for(uint32_t iShot = 0; iShot < Particles.Position.size(); ++iShot) {
-				if (Particles.Position[iShot].LengthSquared() > maxRangeSquared)
+				Lifetime[iShot] -= secondsLastFrame;
+				if(0 >= Lifetime[iShot])
 					Remove(iShot--);
+				//if (Particles.Position[iShot].LengthSquared() > maxRangeSquared)
+				//	Remove(iShot--);
 			}
 			return 0;
 		}
 
-		int											Remove				(uint32_t iShot)			{
-			Particles.Remove(iShot);
-			PositionPrev		.remove_unordered(iShot);
-			PositionDraw		.remove_unordered(iShot);
-			return Brightness	.remove_unordered(iShot);
-		}
 
 		::gpk::error_t								Save(::gpk::array_pod<byte_t> & output) const { 
 			Particles.Save(output);
 			::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>	>{PositionDraw	}, output);
 			::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>	>{PositionPrev	}, output);
 			::gpk::viewWrite(::gpk::view_array<const float					>{Brightness	}, output);
+			::gpk::viewWrite(::gpk::view_array<const float					>{Lifetime		}, output);
+			for(uint32_t iParticle = 0; iParticle < Particles.Position.size(); ++iParticle) {
+				::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>>{DistanceToTargets[iParticle]}, output);
+			}
 			return 0; 
 		}
-		::gpk::error_t								Load(::gpk::view_array<const byte_t> & input) { 
-			uint32_t												bytesRead				= 0;
+		::gpk::error_t								Load				(::gpk::view_array<const byte_t> & input) { 
+			uint32_t										bytesRead			= 0;
 			Particles.Load(input);
 			::gpk::view_array<const ::gpk::SCoord3<float>	>	readPositionPrev	= {}; bytesRead	= ::gpk::viewRead(readPositionPrev	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; PositionPrev	= readPositionPrev	;
 			::gpk::view_array<const ::gpk::SCoord3<float>	>	readPositionDraw	= {}; bytesRead	= ::gpk::viewRead(readPositionDraw	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; PositionDraw	= readPositionDraw	;
 			::gpk::view_array<const float					>	readBrightness		= {}; bytesRead	= ::gpk::viewRead(readBrightness	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Brightness		= readBrightness	;
+			::gpk::view_array<const float					>	readLifetime		= {}; bytesRead	= ::gpk::viewRead(readLifetime		, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Lifetime		= readLifetime		;
+			for(uint32_t iParticle = 0; iParticle < Particles.Position.size(); ++iParticle) {
+				::gpk::view_array<const ::gpk::SCoord3<float>>		readDistanceToTargets	= {}; 
+				bytesRead						= ::gpk::viewRead(readDistanceToTargets, input); 
+				input							= {input.begin() + bytesRead, input.size() - bytesRead}; 
+				DistanceToTargets.push_back(readDistanceToTargets);
+			}
 			return 0;
 		}
 
@@ -114,28 +135,28 @@ namespace ghg
 		float										Speed				= 150;
 		int32_t										Damage				= 1;
 
-		int											Create				(::ghg::SShots & shots, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness)	{
+		int											Create				(::ghg::SShots & shots, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness, float lifetime = 1.0f)	{
 			if(Delay < MaxDelay)
 				return 0;
 			Delay										= 0;
-			return shots.SpawnForced(position, direction, speed, brightness);
+			return shots.SpawnForced(position, direction, speed, brightness, lifetime);
 		}
 
-		int											SpawnDirected		(::ghg::SShots & shots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness)	{
+		int											SpawnDirected		(::ghg::SShots & shots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime = 1.0f)	{
 			if(Delay < MaxDelay)
 				return 0;
 			Delay										= 0;
-			return shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness);
+			return shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness, lifetime);
 		}
 
-		int											SpawnDirected		(::ghg::SShots & shots, uint32_t countShots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness)	{
+		int											SpawnDirected		(::ghg::SShots & shots, uint32_t countShots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime = 1.0f)	{
 			if(Delay < MaxDelay || 0 == countShots)
 				return 0;
 			int32_t											indexFirst			= -1;
 			if(countShots)
-				indexFirst									= shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness);
+				indexFirst									= shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness, lifetime);
 			for(uint32_t iDebris = 0; iDebris < (countShots - 1); ++iDebris)
-				shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness);
+				shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness, lifetime);
 			Delay										= 0;
 			return indexFirst;
 		}

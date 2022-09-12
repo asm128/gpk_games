@@ -26,9 +26,9 @@
 		case ::gpk::SYSEVENT_CLOSE:
 		case ::gpk::SYSEVENT_DEACTIVATE: {
 			if(app.World.ShipState.ShipCores.size() && app.World.ShipState.ShipCores[0].Health > 0) {
-				::gpk::array_pod<byte_t>			serialized;
+				::gpk::array_pod<byte_t>				serialized;
 				app.World.Save(serialized);
-				char								fileName[4096] = {};
+				char									fileName[4096] = {};
 				sprintf_s(fileName, "%s/%llu%s", app.SavegameFolder.begin(), 0ULL, app.ExtensionSaveAuto.begin());
 				::gpk::fileFromMemory(fileName, serialized);
 

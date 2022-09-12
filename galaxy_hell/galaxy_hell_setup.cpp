@@ -35,11 +35,13 @@ static	int											shipCreate			(::ghg::SShipState & shipState, int32_t teamId
 		entity.Body											= shipState.ShipPhysics.Create();
 		ship.Entity											= shipState.EntitySystem.Create(entity, {});
 		ship.Team											= teamId;
-		const int32_t											indexBody			= shipState.ShipPhysics.Create(); (void)indexBody;
+		//const int32_t											indexBody			= shipState.ShipPhysics.Create(); 
+		//(void)indexBody;
 	}
 	const int32_t											indexShip			= shipState.ShipCores.push_back(ship);
 	shipState.ShipCoresParts.push_back({});
 	shipState.ShipActionQueue.push_back({});
+
 	//ship.Parts.reserve(countParts);
 	::ghg::SEntity											entityOrbit				= {ship.Entity};
 	for(uint32_t iPart = 0; iPart < countParts; ++iPart) {	// Create child parts
@@ -72,10 +74,11 @@ static	int											shipCreate			(::ghg::SShipState & shipState, int32_t teamId
 
 		::ghg::SShipPart										shipPart				= {};
 		shipPart.Entity										= entityPart.Parent;
-		::gpk::array_pod<uint32_t>								& parentEntityChildren	= shipState.EntitySystem.EntityChildren[ship.Entity];
- 		parentEntityChildren.push_back(shipPart.Entity);
-
 		shipState.ShipCoresParts[indexShip].push_back(shipState.ShipParts.push_back(shipPart));
+		shipState.ShipPartsDistanceToTargets.push_back({});
+
+		::gpk::array_pod<uint32_t>								& parentEntityChildren	= shipState.EntitySystem.EntityChildren[ship.Entity];
+		parentEntityChildren.push_back(shipPart.Entity);
 	}
 	return indexShip;
 }
@@ -163,6 +166,7 @@ static	int											modelsSetup				(::ghg::SShipScene & scene)			{
 
 int													ghg::solarSystemReset					(::ghg::SGalaxyHell & solarSystem)	{	// Set up enemy ships
 	::gpk::clear(solarSystem.ShipState.Scene.Transforms, solarSystem.ShipState.ShipParts, solarSystem.ShipState.Weapons, solarSystem.ShipState.ShipCores);
+	solarSystem.ShipState.Shots							= {};
 	solarSystem.ShipState.ShipCoresParts				= {};
 	solarSystem.ShipState.ShipPhysics					= {};
 	solarSystem.ShipState.ShipActionQueue				= {};
@@ -257,9 +261,10 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 				//ship.Team										= iShip ? 1 : 0;
 				int32_t												weapon							= 0;
 				if(0 == ship.Team) {
-					weapon											= (iPart % 5) % (solarSystem.ShipState.ShipCores.size());
-					weapon											%= ::gpk::size(weaponDefinitions) - 3;
-					weapon											+= ::gpk::min(3, int32_t(solarSystem.PlayState.Stage / 3) % (int32_t)::gpk::size(weaponDefinitions));
+					uint32_t											minWeapon						= solarSystem.PlayState.Stage / 4;
+					uint32_t											maxWeapon						= ::gpk::min(solarSystem.PlayState.Stage, ::gpk::size(weaponDefinitions) - 1);
+
+					weapon											= (int32_t)::gpk::clamp((uint32_t)minWeapon + iPart, minWeapon, maxWeapon);
 				}
 				else {
 					if(iShip < 4 || 0 != ((iShip - 1 - solarSystem.PlayState.PlayerCount - solarSystem.PlayState.OffsetStage) % 3) || 0 != iPart) 
