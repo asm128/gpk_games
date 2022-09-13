@@ -147,10 +147,14 @@ static	int											updateShots				(::ghg::SGalaxyHell & solarSystem, double se
 					if(2.5f > shotsAttacker.Lifetime[iShot])
 						continue;
 
-					::gpk::SCoord3<float>			target = distances[0];
-					target.Normalize();
-					if(shotsAttacker.Particles.Direction[iShot].Dot(target) > 0)
-						shotsAttacker.Particles.Direction[iShot] = ::gpk::interpolate_linear(shotsAttacker.Particles.Direction[iShot], distances[0], ::gpk::min(secondsLastFrame, 1.0)).Normalize();
+					for(uint32_t iTarget = 0; iTarget < distances.size(); ++iTarget) {
+						::gpk::SCoord3<float>			target = distances[iTarget];
+						target.Normalize();
+						if(shotsAttacker.Particles.Direction[iShot].Dot(target) > 0) {
+							shotsAttacker.Particles.Direction[iShot] = ::gpk::interpolate_linear(shotsAttacker.Particles.Direction[iShot], distances[0], ::gpk::min(secondsLastFrame * 2, 1.0)).Normalize();
+							break;
+						}
+					}
 				}
 			}
 			else if(weaponAttacker.Load == ::ghg::WEAPON_LOAD_Missile) {
@@ -162,7 +166,7 @@ static	int											updateShots				(::ghg::SGalaxyHell & solarSystem, double se
 					if(2.5f > shotsAttacker.Lifetime[iShot])
 						continue;
 
-					shotsAttacker.Particles.Direction[iShot] = ::gpk::interpolate_linear(shotsAttacker.Particles.Direction[iShot], distances[0], ::gpk::min(secondsLastFrame * 2, 1.0)).Normalize();
+					shotsAttacker.Particles.Direction[iShot] = ::gpk::interpolate_linear(shotsAttacker.Particles.Direction[iShot], distances[0], ::gpk::min(secondsLastFrame * 1, 1.0)).Normalize();
 				}
 			}
 
@@ -209,12 +213,10 @@ static	int											updateShipPart				(::ghg::SGalaxyHell & solarSystem, int32_
 
 	updateDistancesToTargets(solarSystem, team, shipPart, shipPartDistancesToTargets, solarSystem.ShipState.Shots[shipPart.Weapon]); 
 
-	::gpk::SCoord3<float>									targetPositionOriginal		= shipPartDistancesToTargets.size() ? shipPartDistancesToTargets[0] : ::gpk::SCoord3<float>{};
-	::gpk::SCoord3<float>									targetPosition				= targetPositionOriginal;
-
 	const ::gpk::SMatrix4<float>							& shipModuleMatrix			= solarSystem.ShipState.Scene.Transforms[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Transform];
 	::gpk::SCoord3<float>									positionGlobal				= shipModuleMatrix.GetTranslation();
-	::gpk::SCoord3<float>									targetDistance				= targetPosition - positionGlobal;
+	::gpk::SCoord3<float>									targetDistance				= shipPartDistancesToTargets.size() ? shipPartDistancesToTargets[0] : ::gpk::SCoord3<float>{};
+	::gpk::SCoord3<float>									targetPosition				= targetDistance + positionGlobal;
 	::ghg::SWeapon											& weapon					= solarSystem.ShipState.Weapons	[shipPart.Weapon];
 	::ghg::SShots											& shots						= solarSystem.ShipState.Shots	[shipPart.Weapon];
 	if(weapon.Type == ::ghg::WEAPON_TYPE_Cannon) {
@@ -222,11 +224,11 @@ static	int											updateShipPart				(::ghg::SGalaxyHell & solarSystem, int32_
 			::gpk::SCoord3<float>									direction					= targetDistance;
 			direction.Normalize();
 			if(weapon.Load == ::ghg::WEAPON_LOAD_Rocket)
-				weapon.SpawnDirected(shots, weapon.ParticleCount, positionGlobal, direction, weapon.Speed, 1, 5.0f);
+				weapon.SpawnDirected(shots, 1, positionGlobal, direction, weapon.Speed, 1, 5.0f);
 			else if(weapon.Load == ::ghg::WEAPON_LOAD_Cannonball)
-				weapon.SpawnDirected(shots, weapon.ParticleCount, positionGlobal, direction, weapon.Speed, 1, 10.0f);
+				weapon.SpawnDirected(shots, 1, positionGlobal, direction, weapon.Speed, 1, 10.0f);
 			else if(weapon.Load == ::ghg::WEAPON_LOAD_Missile)
-				weapon.SpawnDirected(shots, weapon.ParticleCount, positionGlobal, direction, weapon.Speed, 1, 5.0f);
+				weapon.SpawnDirected(shots, 1, positionGlobal, direction, weapon.Speed, 1, 5.0f);
 
 			if(solarSystem.PlayState.TimeStage > 1) {
 				solarSystem.ShipState.ShipPhysics.Forces[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Body].Rotation	= {};
@@ -247,14 +249,14 @@ static	int											updateShipPart				(::ghg::SGalaxyHell & solarSystem, int32_
 		if(weapon.Load == ::ghg::WEAPON_LOAD_Ray)
 			weapon.Create(shots, positionGlobal, direction, weapon.Speed, .75f, 1.0f);
 		else
-			weapon.SpawnDirected(shots, weapon.ParticleCount, positionGlobal, direction, weapon.Speed, 5.0f, 1.5f);
+			weapon.SpawnDirected(shots, weapon.ParticleCount, positionGlobal, direction, weapon.Speed, 5.0f, 5.0f);
 	}
 	else if(weapon.Type == ::ghg::WEAPON_TYPE_Shotgun) {
 		::gpk::SCoord3<float>									direction				= {team ? -1.0f : 1.0f, 0, 0};
 		if(weapon.Load == ::ghg::WEAPON_LOAD_Ray)
 			weapon.SpawnDirected(shots, weapon.ParticleCount, 1, positionGlobal, direction, weapon.Speed, .75f, 1.0f);
 		else
-			weapon.SpawnDirected(shots, weapon.ParticleCount, 1, positionGlobal, direction, weapon.Speed, 5.0f, 1.5f);
+			weapon.SpawnDirected(shots, weapon.ParticleCount, 1, positionGlobal, direction, weapon.Speed, 5.0f, 5.0f);
 	}
 	return 0;
 }

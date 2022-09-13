@@ -203,16 +203,16 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 	::gpk::SJSONFile										stageFile;
 	char													stageFileName[256]							= "./%s.json";
 	static constexpr const SShipPartSetup					weaponDefinitions		[]				=
-		{ {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Gun		, .12, 0.95, ::ghg::WEAPON_LOAD_Bullet		,  256,    16, 1, ::ghg::WEAPON_DAMAGE_Pierce	}
-		, {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Shotgun	, .24, 0.93, ::ghg::WEAPON_LOAD_Shell		,  192,     8, 6, ::ghg::WEAPON_DAMAGE_Impact	}
-		, {::ghg::SHIP_PART_TYPE_Wafer	, 128, ::ghg::WEAPON_TYPE_Gun		, .32, 0.99, ::ghg::WEAPON_LOAD_Ray			,  320,    24, 1, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn	}
-		, {::ghg::SHIP_PART_TYPE_Wafer	, 128, ::ghg::WEAPON_TYPE_Shotgun	, .48, 0.97, ::ghg::WEAPON_LOAD_Ray			,  256,    12, 6, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn	}
-		, {::ghg::SHIP_PART_TYPE_Cannon	, 128, ::ghg::WEAPON_TYPE_Cannon	,   2, 0.99, ::ghg::WEAPON_LOAD_Cannonball	,   32,   128, 1, ::ghg::WEAPON_DAMAGE_Impact	}
-		, {::ghg::SHIP_PART_TYPE_Cannon	, 128, ::ghg::WEAPON_TYPE_Cannon	,  .5, 0.95, ::ghg::WEAPON_LOAD_Rocket		,   80,    64, 1, ::ghg::WEAPON_DAMAGE_Impact	| ::ghg::WEAPON_DAMAGE_Burn | ::ghg::WEAPON_DAMAGE_Wave }
-		, {::ghg::SHIP_PART_TYPE_Cannon	, 128, ::ghg::WEAPON_TYPE_Cannon	,   1, 0.90, ::ghg::WEAPON_LOAD_Missile		,   96,    96, 1, ::ghg::WEAPON_DAMAGE_Impact	| ::ghg::WEAPON_DAMAGE_Burn | ::ghg::WEAPON_DAMAGE_Wave }
-		, {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Shotgun	,   4, 0.95, ::ghg::WEAPON_LOAD_Cannonball	,   80,   128, 7, ::ghg::WEAPON_DAMAGE_Impact	}
-		, {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Shotgun	,   2, 0.92, ::ghg::WEAPON_LOAD_Rocket		,  160,    64, 6, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn | ::ghg::WEAPON_DAMAGE_Wave }
-		, {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Shotgun	,   3, 0.90, ::ghg::WEAPON_LOAD_Missile		,  240,    96, 5, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn | ::ghg::WEAPON_DAMAGE_Wave }
+		{ {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Gun		, .12, 0.975, ::ghg::WEAPON_LOAD_Bullet		,  256,    16, 1, ::ghg::WEAPON_DAMAGE_Pierce	}
+		, {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Shotgun	, .24, 0.925, ::ghg::WEAPON_LOAD_Shell		,  160,     8, 6, ::ghg::WEAPON_DAMAGE_Impact	}
+		, {::ghg::SHIP_PART_TYPE_Wafer	, 128, ::ghg::WEAPON_TYPE_Gun		, .32, 0.99, ::ghg::WEAPON_LOAD_Ray			,  480,    24, 1, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn	}
+		, {::ghg::SHIP_PART_TYPE_Wafer	, 128, ::ghg::WEAPON_TYPE_Shotgun	, .48, 0.98, ::ghg::WEAPON_LOAD_Ray			,  320,    12, 6, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn	}
+		, {::ghg::SHIP_PART_TYPE_Cannon	, 160, ::ghg::WEAPON_TYPE_Cannon	,   2, 1.00, ::ghg::WEAPON_LOAD_Cannonball	,   32,   128, 1, ::ghg::WEAPON_DAMAGE_Impact	}
+		, {::ghg::SHIP_PART_TYPE_Cannon	, 128, ::ghg::WEAPON_TYPE_Cannon	,  .5, 0.90, ::ghg::WEAPON_LOAD_Rocket		,   48,    64, 1, ::ghg::WEAPON_DAMAGE_Impact	| ::ghg::WEAPON_DAMAGE_Burn | ::ghg::WEAPON_DAMAGE_Wave }
+		, {::ghg::SHIP_PART_TYPE_Cannon	, 128, ::ghg::WEAPON_TYPE_Cannon	,   1, 0.80, ::ghg::WEAPON_LOAD_Missile		,   64,    96, 1, ::ghg::WEAPON_DAMAGE_Impact	| ::ghg::WEAPON_DAMAGE_Burn | ::ghg::WEAPON_DAMAGE_Wave }
+		, {::ghg::SHIP_PART_TYPE_Gun	, 160, ::ghg::WEAPON_TYPE_Shotgun	,   4, 0.95, ::ghg::WEAPON_LOAD_Cannonball	,   64,   128, 7, ::ghg::WEAPON_DAMAGE_Impact	}
+		, {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Shotgun	,   2, 0.75, ::ghg::WEAPON_LOAD_Rocket		,   80,    64, 6, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn | ::ghg::WEAPON_DAMAGE_Wave }
+		, {::ghg::SHIP_PART_TYPE_Gun	, 128, ::ghg::WEAPON_TYPE_Shotgun	,   3, 0.50, ::ghg::WEAPON_LOAD_Missile		,   96,    96, 5, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn | ::ghg::WEAPON_DAMAGE_Wave }
 		};
 
 	sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage);

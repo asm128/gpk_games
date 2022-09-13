@@ -23,7 +23,7 @@ namespace ghg
 			return PositionDraw	.remove_unordered(iShot);
 		}
 
-		int											SpawnForced			(const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness, float lifetime = 1.0f)	{
+		int											SpawnForced			(const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness, float lifetime)	{
 			PositionDraw.push_back(position);
 			PositionPrev.push_back(position);
 			Brightness.push_back(brightness);
@@ -32,7 +32,7 @@ namespace ghg
 			return Particles.Create(position, direction, speed);
 		}
 
-		int											SpawnForcedDirected	(double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime = 1.0f)	{
+		int											SpawnForcedDirected	(double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime)	{
 			static constexpr const double					randUnit			= ::gpk::math_2pi / RAND_MAX;
 			::gpk::SCoord3<float>							finalDirection		= {0, 1, 0};
 			finalDirection.RotateX(rand() * randUnit);
@@ -135,21 +135,21 @@ namespace ghg
 		float										Speed				= 150;
 		int32_t										Damage				= 1;
 
-		int											Create				(::ghg::SShots & shots, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness, float lifetime = 1.0f)	{
+		int											Create				(::ghg::SShots & shots, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness, float lifetime)	{
 			if(Delay < MaxDelay)
 				return 0;
 			Delay										= 0;
 			return shots.SpawnForced(position, direction, speed, brightness, lifetime);
 		}
 
-		int											SpawnDirected		(::ghg::SShots & shots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime = 1.0f)	{
+		int											SpawnDirected		(::ghg::SShots & shots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime)	{
 			if(Delay < MaxDelay)
 				return 0;
 			Delay										= 0;
 			return shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness, lifetime);
 		}
 
-		int											SpawnDirected		(::ghg::SShots & shots, uint32_t countShots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime = 1.0f)	{
+		int											SpawnDirected		(::ghg::SShots & shots, uint32_t countShots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime)	{
 			if(Delay < MaxDelay || 0 == countShots)
 				return 0;
 			int32_t											indexFirst			= -1;
