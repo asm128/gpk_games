@@ -15,6 +15,8 @@ namespace ghg
 {
 #pragma pack(push, 1)
 	struct SPlayState {
+		uint64_t												TimeStart				= 0;
+		uint64_t												TimeLast				= 0;
 		uint32_t												Seed					= 0;
 		uint32_t												OffsetStage				= 2;
 		uint32_t												PlayerCount				= 1;
@@ -45,14 +47,14 @@ namespace ghg
 		::std::mutex											LockUpdate;
 
 		::gpk::error_t											Save					(::gpk::array_pod<byte_t> & output) const {
-			ShipState.Save(output);
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SPlayState>{&PlayState, 1}, output);
+			ShipState.Save(output);
 			return 0;
 		}
 		::gpk::error_t											Load					(::gpk::view_array<const byte_t> & input) {
-			ShipState.Load(input);
 			::gpk::view_array<const ::ghg::SPlayState>					readPlayState			= {};
 			int32_t bytesRead = ::gpk::viewRead(readPlayState, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; PlayState	= readPlayState[0];
+			ShipState.Load(input);
 			return 0;
 		}
 

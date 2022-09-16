@@ -26,13 +26,7 @@
 		case ::gpk::SYSEVENT_CLOSE:
 		case ::gpk::SYSEVENT_DEACTIVATE: {
 			if(app.World.ShipState.ShipCores.size() && app.World.ShipState.ShipCores[0].Health > 0) {
-				::gpk::array_pod<byte_t>				serialized;
-				app.World.Save(serialized);
-				char									fileName[4096] = {};
-				sprintf_s(fileName, "%s/%llu%s", app.SavegameFolder.begin(), 0ULL, app.ExtensionSaveAuto.begin());
-				::gpk::fileFromMemory(fileName, serialized);
-
-				app.World.PlayState.Paused			= true;
+				app.Save(::ghg::SAVE_MODE_AUTO);
 				app.ActiveState						= ::ghg::APP_STATE_Home;
 			}
 		}
@@ -50,7 +44,7 @@
 			if(fileName.size() < app.ExtensionSaveAuto.size())
 				continue;
 			if(0 == strcmp(&fileName[fileName.size() - (uint32_t)app.ExtensionSaveAuto.size()], app.ExtensionSaveAuto.begin())) {
-				::ghg::solarSystemLoad(app.World, fileName);
+				app.Load(fileName);
 				break;
 			}
 		}
@@ -62,15 +56,13 @@
 		break;
 	}	 
 	::ghg::solarSystemUpdate(app.World, (app.ActiveState != ::ghg::APP_STATE_Play) ? 0 : lastTimeSeconds, *inputState, systemEvents);
-	for(uint32_t iShip = 0; iShip < app.World.ShipState.ShipActionQueue.size(); ++iShip)
+	for(uint32_t iShip = 0; iShip < app.World.ShipState.ShipPartActionQueue.size(); ++iShip)
 		if(iShip < app.World.PlayState.PlayerCount) {
-			for(uint32_t iEvent = 0; iEvent < app.World.ShipState.ShipActionQueue[iShip].size(); ++iEvent)
-				if(app.World.ShipState.ShipActionQueue[iShip][iEvent] == ::ghg::SHIP_ACTION_spawn) {
+			for(uint32_t iEvent = 0; iEvent < app.World.ShipState.ShipPartActionQueue[iShip].size(); ++iEvent)
+				if(app.World.ShipState.ShipPartActionQueue[iShip][iEvent] == ::ghg::SHIP_ACTION_spawn) {
 					::gpk::array_pod<byte_t>			serialized;
-					app.World.Save(serialized);
-					char								fileName[4096] = {};
-					sprintf_s(fileName, "%s/%llu%s", app.SavegameFolder.begin(), 0ULL, app.ExtensionSaveCheckpoint.begin());
-					::gpk::fileFromMemory(fileName, serialized);
+					app.Save(::ghg::SAVE_MODE_STAGE);
+					app.World.ShipState.ShipPartActionQueue[iShip][iEvent] = (::ghg::SHIP_ACTION)-1;
 				}
 		}
 	::ghg::overlayUpdate(app.Overlay, app.World.PlayState.Stage, app.World.ShipState.ShipCores.size() ? app.World.ShipState.ShipCores[0].Score : 0, app.World.PlayState.TimeWorld);
@@ -80,7 +72,8 @@
 }
 
 ::gpk::error_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::SCoord2<uint16_t> renderTargetSize) {
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	target			= app.RenderTarget[0];
+	::gpk::ptr_obj<::ghg::TRenderTarget>		target	= {};
+	target									= app.RenderTarget[1];
 	target->resize(renderTargetSize.Cast<uint32_t>(), {0, 0, 0, 1}, 0xFFFFFFFFU);
 	::gpk::view_grid<::gpk::SColorBGRA>							targetPixels			= target->Color.View;
 	::gpk::view_grid<uint32_t>									depthBuffer				= target->DepthStencil.View;
@@ -89,11 +82,9 @@
 	case APP_STATE_Play		: 
 		::ghg::solarSystemDraw(app.World, app.World.DrawCache, app.World.LockUpdate);
 		::gpk::ptr_obj<::ghg::TRenderTarget>		sourceRT	= {};
-		{
-			::std::lock_guard<::std::mutex>				lockRTQueue	(app.World.DrawCache.RenderTargetQueueMutex);
-			sourceRT								= app.World.DrawCache.RenderTargetQueue;
-			app.World.DrawCache.RenderTargetQueue	= {};
-		}
+		sourceRT								= app.World.DrawCache.RenderTarget;
+		if(!sourceRT)
+			break;
 
 		::gpk::view_grid<::gpk::SColorBGRA>			cameraView			= sourceRT->Color.View;
 		::gpk::SCoord2<int16_t>						cameraViewMetrics	= cameraView.metrics().Cast<int16_t>();
@@ -120,20 +111,14 @@
 		::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{cornerTopRight		, cornerBottomRight	}, ::gpk::GRAY * 1.1);
 		::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{cornerBottomLeft	, cornerBottomRight	}, ::gpk::GRAY * 1.1);
 
-		{
-			::std::lock_guard<::std::mutex>				lockRTQueue	(app.World.DrawCache.RenderTargetQueueMutex);
-			if(app.World.DrawCache.RenderTargetQueue)
-				app.World.DrawCache.RenderTargetPool.push_back(sourceRT);
-			else
-				app.World.DrawCache.RenderTargetQueue = sourceRT;
-		}
-
-
 		::ghg::overlayDraw(app.Overlay, app.World.DrawCache, app.World.PlayState.TimeWorld, depthBuffer, targetPixels);
 		break;
 	}
-
 	::gpk::guiDraw(*app.DialogPerState[app.ActiveState].GUI, targetPixels);
-	app.RenderTarget[0] = target;
+	{
+		::std::lock_guard<::std::mutex>				lockRTQueue	(app.World.DrawCache.RenderTargetQueueMutex);
+		app.RenderTarget[1] = app.RenderTarget[0];
+		app.RenderTarget[0] = target;
+	}
 	return 0;
 }

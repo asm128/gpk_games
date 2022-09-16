@@ -89,83 +89,78 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(SHIP_ACTION, hit				, 18);
 
 	struct SShipPart {
-		int32_t											Entity							= -1;
-		SHIP_PART_TYPE									Type							= SHIP_PART_TYPE_Cargo;
-		int32_t											Health							= 0;
-		uint32_t										MaxHealth						= 0;
-		int32_t											Weapon							= -1;
-		uint32_t										ActiveAction					= ~0U;
+		int32_t														Entity							= -1;
+		SHIP_PART_TYPE												Type							= SHIP_PART_TYPE_Cargo;
+		int32_t														Health							= 0;
+		uint32_t													MaxHealth						= 0;
+		int32_t														Weapon							= -1;
+		uint32_t													ActiveAction					= ~0U;
 	};
 
 	struct SShipCore {
-		int32_t											Entity							;
-		int32_t											Team							;
-		int32_t											Health							;
-		uint32_t										Score							;
-		double											TimePlayed						;
+		int32_t														Entity							;
+		int32_t														Team							;
+		int32_t														Health							;
+		uint32_t													Score							;
+		double														TimePlayed						;
 	};
 
 	struct SShipState {
-		::ghg::SShipScene								Scene							= {};
-
-		::ghg::SEntitySystem							EntitySystem;
-
-		::gpk::array_pod<::ghg::SShipPart			>				ShipParts					= {};
-		::gpk::array_pod<::ghg::SWeapon				>				Weapons						= {};
 		::gpk::array_pod<::ghg::SShipCore			>				ShipCores					= {};
 		::gpk::array_obj<::gpk::array_pod<uint32_t>	>				ShipCoresParts				= {};
+		::gpk::array_pod<::ghg::SShipPart			>				ShipParts					= {};
+		::gpk::array_pod<::ghg::SWeapon				>				Weapons						= {};
 		::gpk::array_obj<::gpk::array_pod<::gpk::SCoord3<float>>>	ShipPartsDistanceToTargets	= {};
 		::gpk::array_obj<::ghg::SShots				>				Shots						= {};	// one per weapon
+		::gpk::array_obj<::gpk::array_pod<SHIP_ACTION>>				ShipPartActionQueue			= {};
 		::gpk::SIntegrator3											ShipPhysics					= {};
-		::gpk::array_obj<::gpk::array_pod<SHIP_ACTION>>				ShipActionQueue;
 
-		::gpk::SCoord3<float>&							GetShipPosition		(const SShipCore & ship)		{ return ShipPhysics.Transforms	[EntitySystem.Entities[ship.Entity].Body].Position; }
+		::ghg::SEntitySystem										EntitySystem;
+		::ghg::SShipScene											Scene						= {};
 
-		::gpk::STransform3&								GetShipPartTransform(const SShipPart & shipPart)	{ return ShipPhysics.Transforms	[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
-		::gpk::SForce3&									GetShipPartForces	(const SShipPart & shipPart)	{ return ShipPhysics.Forces		[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
+		int32_t														GetShipHealth				(uint32_t iShipCore)				{ 
+			int32_t															totalHealth					= 0;
+			::gpk::view_array<const uint32_t>								shipCoreParts				= ShipCoresParts[iShipCore];
+			for(uint32_t iShipCorePart = 0, countParts = shipCoreParts.size(); iShipCorePart < countParts; ++iShipCorePart)
+				totalHealth += ShipParts[shipCoreParts[iShipCorePart]].Health;
 
-		inline	::gpk::SCoord3<float>&					GetShipPosition(uint32_t indexShip)					{ return GetShipPosition(ShipCores[indexShip]); }
+			return totalHealth;
+		}
 
-		::gpk::error_t									Save				(::gpk::array_pod<byte_t> & output) const { 
-			Scene		.Save(output);
-			EntitySystem.Save(output);
-			ShipPhysics	.Save(output);
+		::gpk::SCoord3<float>&										GetShipPosition		(const SShipCore & ship)		{ return ShipPhysics.Transforms	[EntitySystem.Entities[ship.Entity].Body].Position; }
 
-			::gpk::viewWrite(::gpk::view_array<const ::ghg::SWeapon		>{Weapons	}, output);
-			for(uint32_t iWeapon = 0; iWeapon < Weapons.size(); ++iWeapon)
-				Shots[iWeapon].Save(output);
+		::gpk::STransform3&											GetShipPartTransform(const SShipPart & shipPart)	{ return ShipPhysics.Transforms	[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
+		::gpk::SForce3&												GetShipPartForces	(const SShipPart & shipPart)	{ return ShipPhysics.Forces		[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
 
-			::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipPart	>{ShipParts	}, output);
-			for(uint32_t iShipPart = 0; iShipPart < ShipParts.size(); ++iShipPart)
-				::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>>{ShipPartsDistanceToTargets[iShipPart]}, output);
+		inline	::gpk::SCoord3<float>&								GetShipPosition(uint32_t indexShip)					{ return GetShipPosition(ShipCores[indexShip]); }
 
+		::gpk::error_t												Save				(::gpk::array_pod<byte_t> & output) const { 
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipCore	>{ShipCores	}, output);
 			for(uint32_t iShipCore = 0; iShipCore < ShipCores.size(); ++iShipCore) 
 				::gpk::viewWrite(::gpk::view_array<const uint32_t>{ShipCoresParts[iShipCore]}, output);
 
+			::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipPart	>{ShipParts	}, output);
+			for(uint32_t iShipPart = 0; iShipPart < ShipParts.size(); ++iShipPart) {
+				::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>>	{ShipPartsDistanceToTargets	[iShipPart]}, output);
+				::gpk::viewWrite(::gpk::view_array<const ::ghg::SHIP_ACTION>	{ShipPartActionQueue		[iShipPart]}, output);
+			}
+
+			::gpk::viewWrite(::gpk::view_array<const ::ghg::SWeapon>{Weapons}, output);
+			for(uint32_t iWeapon = 0; iWeapon < Weapons.size(); ++iWeapon)
+				Shots[iWeapon].Save(output);
+
+			ShipPhysics	.Save(output);
+			EntitySystem.Save(output);
+			Scene		.Save(output);
 			return 0; 
 		}
 		::gpk::error_t									Load				(::gpk::view_array<const byte_t> & input) { 
-			Scene.Load(input);
-			EntitySystem.Load(input);
-			ShipPhysics.Load(input);
-
 			::gpk::view_array<const ::ghg::SShipPart	>		readShipParts	= {};
 			::gpk::view_array<const ::ghg::SWeapon		>		readWeapons		= {};
 			::gpk::view_array<const ::ghg::SShipCore	>		readShipCores	= {};
 			int32_t												bytesRead		= 0;
 
-			bytesRead = ::gpk::viewRead(readWeapons		, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Weapons	= readWeapons;
-			::gpk::clear(Shots, ShipCoresParts, ShipActionQueue);
-			for(uint32_t iWeapon = 0; iWeapon < Weapons.size(); ++iWeapon)
-				Shots[Shots.push_back({})].Load(input);
-
-			bytesRead = ::gpk::viewRead(readShipParts	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; ShipParts	= readShipParts;
-			for(uint32_t iShipPart = 0; iShipPart < ShipParts.size(); ++iShipPart) {
-				::gpk::view_array<const ::gpk::SCoord3<float>>		readShipPartsDistanceToTargets	= {};
-				bytesRead = ::gpk::viewRead(readShipPartsDistanceToTargets, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; 
-				ShipPartsDistanceToTargets.push_back(readShipPartsDistanceToTargets);
-			}
+			::gpk::clear(Shots, ShipCoresParts, ShipPartActionQueue, ShipPartsDistanceToTargets);
 
 			bytesRead = ::gpk::viewRead(readShipCores	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; ShipCores	= readShipCores;
 			for(uint32_t iWeapon = 0; iWeapon < ShipCores.size(); ++iWeapon) {
@@ -173,7 +168,24 @@ namespace ghg
 				bytesRead = ::gpk::viewRead(readShipCoresParts, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; 
 				ShipCoresParts.push_back(readShipCoresParts);
 			}
-			ShipActionQueue.resize(ShipCores.size());
+
+			bytesRead = ::gpk::viewRead(readShipParts	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; ShipParts	= readShipParts;
+			for(uint32_t iShipPart = 0; iShipPart < ShipParts.size(); ++iShipPart) {
+				::gpk::view_array<const ::gpk::SCoord3<float>>		readShipPartsDistanceToTargets	= {};
+				::gpk::view_array<const ::ghg::SHIP_ACTION>			readShipActions		= {};
+				bytesRead = ::gpk::viewRead(readShipPartsDistanceToTargets, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; 
+				ShipPartsDistanceToTargets.push_back(readShipPartsDistanceToTargets);
+				bytesRead = ::gpk::viewRead(readShipActions, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; 
+				ShipPartActionQueue.push_back(readShipActions);
+			}
+
+			bytesRead = ::gpk::viewRead(readWeapons		, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Weapons	= readWeapons;
+			for(uint32_t iWeapon = 0; iWeapon < Weapons.size(); ++iWeapon)
+				Shots[Shots.push_back({})].Load(input);
+
+			ShipPhysics		.Load(input);
+			EntitySystem	.Load(input);
+			Scene			.Load(input);
 			return 0; 
 		}
 	};

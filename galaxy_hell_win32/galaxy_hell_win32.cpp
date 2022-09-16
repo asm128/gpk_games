@@ -11,7 +11,7 @@
 //#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
 #include "gpk_app_impl.h"
 
-GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "PNG Test");
+GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "PNG Test");
 
 ::gpk::error_t							cleanup							(::SApplication & app)						{ 
 	::gpk::SFramework							& framework						= app.Framework;
@@ -33,7 +33,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "PNG Test");
 	::gpk::resize(4096 * 1024, drawCache.PixelCoords, drawCache.PixelVertexWeights, drawCache.LightColorsModel, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightPointsWorld);
 	app.SwapOffscreen->resize(mainWindow.Size);
 	app.AudioState.InitAudio();
-	app.AudioState.PrepareAudio("click.wav");
+	app.AudioState.PrepareAudio("thrust.wav");
 	return 0;
 }
 
@@ -76,24 +76,19 @@ int										update				(SApplication & app, bool exitSignal)	{
 		}
 	}
 	app.AudioState.UpdateAudio(framework.FrameInfo.Seconds.LastFrame);// / (app.GalaxyHellApp.World.ShipState.Ships.size() - 1));
+
 	{
-		::gpk::mutex_guard						lock				(app.LockRender);
-		app.GalaxyHellApp.RenderTarget[0]	= app.Framework.MainDisplayOffscreen;
-		app.Framework.MainDisplayOffscreen	= app.Offscreen;
+		::std::lock_guard<::std::mutex>			lockRTQueue	(app.GalaxyHellApp.World.DrawCache.RenderTargetQueueMutex);
+		if(app.GalaxyHellApp.RenderTarget[0]) 
+			app.Framework.MainDisplayOffscreen = app.GalaxyHellApp.RenderTarget[0];
+		else {
+			info_printf("5s", "");
+		}
+		retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 	}
-	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 	return 0;
 }
 
 int														draw					(SApplication & app) {
-	::ghg::galaxyHellDraw(app.GalaxyHellApp, app.Framework.MainDisplay.Size.Cast<uint16_t>());
-
-	{
-		::gpk::mutex_guard										lock					(app.LockRender);
-		::gpk::ptr_obj<::ghg::TRenderTarget>					target					= app.GalaxyHellApp.RenderTarget[0];
-		app.GalaxyHellApp.RenderTarget[0]					= app.Offscreen;
-		app.Offscreen										= target;
-	}
-
-	return 0;
+	return ::ghg::galaxyHellDraw(app.GalaxyHellApp, app.Framework.MainDisplay.Size.Cast<uint16_t>());
 }

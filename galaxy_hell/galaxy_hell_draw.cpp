@@ -100,15 +100,15 @@ static	int											drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixe
 	) {
 	const ::gpk::SCoord2<int32_t>						targetMetrics			= targetPixels.metrics().Cast<int32_t>();
 	for(uint32_t iShot = 0; iShot < shots.Brightness.size(); ++iShot) {
-		float													brightness			= shots.Brightness[iShot];
+		float												brightness				= shots.Brightness[iShot];
 		pixelCoordsCache.clear();
-		const ::gpk::SCoord3<float>								& starPosPrev		= shots.PositionDraw[iShot];
-		const ::gpk::SCoord3<float>								& starPos			= shots.Particles.Position[iShot];
-		//::gpk::SLine3<float>									raySegment			= {starPosPrev, starPos};
+		const ::gpk::SCoord3<float>							& starPosPrev			= shots.PositionDraw[iShot];
+		const ::gpk::SCoord3<float>							& starPos				= shots.Particles.Position[iShot];
+		//::gpk::SLine3<float>								raySegment				= {starPosPrev, starPos};
 
-		::gpk::SLine3<float>									raySegment			= {starPos, starPosPrev}; //raySegmentWorld;
-		raySegment.A										= matrixVPV.Transform(raySegment.A);
-		raySegment.B										= matrixVPV.Transform(raySegment.B);
+		::gpk::SLine3<float>								raySegment				= {starPos, starPosPrev}; //raySegmentWorld;
+		raySegment.A									= matrixVPV.Transform(raySegment.A);
+		raySegment.B									= matrixVPV.Transform(raySegment.B);
 		if(raySegment.A.z < 0 || raySegment.A.z > 1) continue;
 		if(raySegment.B.z < 0 || raySegment.B.z > 1) continue;
 		if(line)
@@ -323,60 +323,37 @@ static	int											drawExplosion
 }
 
 int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & mutexUpdate)	{
-	::gpk::ptr_obj<::ghg::TRenderTarget>					renderTarget;
-	{
-		::std::lock_guard<::std::mutex>							rtGuard(drawCache.RenderTargetQueueMutex);
-		if(0 == drawCache.RenderTargetPool.size()) {
-			drawCache.RenderTargetPool.resize(8);
-			for(uint32_t iRT = 0; iRT < drawCache.RenderTargetPool.size(); ++iRT) {
-				drawCache.RenderTargetPool[iRT]->resize(drawCache.RenderTargetMetrics);
-			}
-		}
-
-		renderTarget				= drawCache.RenderTargetPool[0];
-		drawCache.RenderTargetPool.remove_unordered(0);
-	}
-
-	renderTarget->resize(drawCache.RenderTargetMetrics);
-	::gpk::view_grid<::gpk::SColorBGRA>						targetPixels			= renderTarget->Color			; 
-	::gpk::view_grid<uint32_t>								depthBuffer				= renderTarget->DepthStencil	;
-	memset(targetPixels.begin(), 0, targetPixels.byte_count());
-	memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
-
-
+	drawCache.RenderTarget->resize(drawCache.RenderTargetMetrics);
+	::gpk::ptr_obj<::ghg::TRenderTarget>					renderTarget				= drawCache.RenderTarget;
+	::gpk::view_grid<::gpk::SColorBGRA>						targetPixels				= renderTarget->Color			; 
+	::gpk::view_grid<uint32_t>								depthBuffer					= renderTarget->DepthStencil	;
 	//------------------------------------------- Transform and Draw
 	if(0 == targetPixels.size())
 		return 1;
 
-	memset(depthBuffer.begin(), -1, sizeof(uint32_t) * depthBuffer.size());
-	{
-		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
-		::drawStars(solarSystem.DecoState.Stars, targetPixels);
-	}
+	memset(targetPixels.begin(), 0, targetPixels.byte_count());
+	memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
+	::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+	::drawStars(solarSystem.DecoState.Stars, targetPixels);
+
 	::gpk::SMatrix4<float>									matrixView			= {};
 	const ::gpk::SCamera									& camera			= solarSystem.ShipState.Scene.Global.Camera[solarSystem.ShipState.Scene.Global.CameraMode];
 	matrixView.LookAt(camera.Position, camera.Target, camera.Up);
 	matrixView											*= solarSystem.ShipState.Scene.Global.MatrixProjection;
 	drawCache.LightPointsWorld.clear();
 	drawCache.LightColorsWorld.clear();
-	{
-		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
-		::ghg::getLightArrays(solarSystem.ShipState, solarSystem.DecoState, drawCache.LightPointsWorld, drawCache.LightColorsWorld, ::ghg::DEBRIS_COLORS);
-	}
+	::ghg::getLightArrays(solarSystem.ShipState, solarSystem.DecoState, drawCache.LightPointsWorld, drawCache.LightColorsWorld, ::ghg::DEBRIS_COLORS);
 	drawCache.LightPointsModel.reserve(drawCache.LightPointsWorld.size());
 	drawCache.LightColorsModel.reserve(drawCache.LightColorsWorld.size());
 
 	for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
-		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
 		const ::ghg::SShipCore										& ship					= solarSystem.ShipState.ShipCores[iShip];
 		if(ship.Health <= 0)
 			continue;
 		::drawShip(solarSystem, iShip, matrixView, targetPixels, depthBuffer, drawCache);
 	}
 
-	::gpk::array_pod<uint16_t>								indicesPointLight;
 	for(uint32_t iExplosion = 0; iExplosion < solarSystem.DecoState.Explosions.size(); ++iExplosion) {
-		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
 		const ::ghg::SExplosion									& explosion				= solarSystem.DecoState.Explosions[iExplosion];
 		if(0 == explosion.Slices.size())
 			continue;
@@ -391,10 +368,7 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 	};
 #pragma pack(pop)
 
-	::gpk::array_pod<::gpk::SCoord3<float>>					pixelCoordsCache;
-	pixelCoordsCache.reserve(512);
 	for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
-		::std::lock_guard<::std::mutex>							lockUpdate			(mutexUpdate);
 		const ::ghg::SShipCore									& ship				= solarSystem.ShipState.ShipCores[iShip];
 		const ::gpk::array_pod<uint32_t>						& shipParts			= solarSystem.ShipState.ShipCoresParts[iShip];
 		for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
@@ -429,30 +403,29 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 				line				= false;
 			}
 			else if(::ghg::WEAPON_LOAD_Rocket == weapon.Load) {
-				colorShot			= ::gpk::LIGHTORANGE;
+				colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::LIGHTORANGE;
 				brightRadius		= 2;
 				intensity			= 1;
 				line				= true;
 			}
 			else if(::ghg::WEAPON_LOAD_Missile == weapon.Load) {
-				colorShot			= ::gpk::CYAN;
+				colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.025f, 0.05f} : ::gpk::CYAN;
 				brightRadius		= 2;
 				intensity			= 1;
 				line				= true;
 			}
 			::drawShots(targetPixels, solarSystem.ShipState.Shots[shipPart.Weapon], matrixView, colorShot, brightRadius, intensity, line, depthBuffer, drawCache.LightPointsModel);
+			for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
+				::gpk::array_pod<uint32_t>								& shipParts				= solarSystem.ShipState.ShipCoresParts[iShip];
+				for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
+					::ghg::SShipPart										& shipPart				= solarSystem.ShipState.ShipParts[shipParts[iPart]];
+					memcpy(solarSystem.ShipState.Shots[shipPart.Weapon].PositionDraw.begin(), solarSystem.ShipState.Shots[shipPart.Weapon].Particles.Position.begin(), solarSystem.ShipState.Shots[shipPart.Weapon].Particles.Position.size() * sizeof(::gpk::SCoord3<float>));
+				}
+			}
+
 		}
 	}
-	{
-		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
-		::drawDebris(targetPixels, solarSystem.DecoState.Debris, matrixView, depthBuffer, ::ghg::DEBRIS_COLORS);
-	}
-	{
-		::std::lock_guard<::std::mutex>			lockRTQueue	(drawCache.RenderTargetQueueMutex);
-		::gpk::ptr_obj<::ghg::TRenderTarget>	oldRT		= drawCache.RenderTargetQueue;
-		drawCache.RenderTargetQueue			= renderTarget;
-		if(oldRT)
-			drawCache.RenderTargetPool.push_back(oldRT);
-	}
+	::drawDebris(targetPixels, solarSystem.DecoState.Debris, matrixView, depthBuffer, ::ghg::DEBRIS_COLORS);
+
 	return 0;
 }

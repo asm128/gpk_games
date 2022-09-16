@@ -34,23 +34,6 @@ namespace ghg
 	::gpk::error_t		overlayUpdate			(::ghg::STextOverlay & textOverlay, uint32_t stage, uint32_t score, double playSeconds);
 	::gpk::error_t		overlayDraw				(const ::ghg::STextOverlay & textOverlay, ::ghg::SGalaxyHellDrawCache & drawCache, double playSeconds, ::gpk::view2d_uint32 & depthBuffer, ::gpk::view_grid<::gpk::SColorBGRA> targetPixels);
 
-	struct SUIControlGauge {
-		::gpk::array_pod<::gpk::SCoord3<float>>				Vertices				= {};
-		::gpk::array_pod<::gpk::STriangleWeights<int16_t>>	Indices					= {};
-		int16_t												CurrentValue			= 0;
-		int16_t												MaxValue				= 64;
-		::gpk::SImage<::gpk::SColorBGRA>					Image					= {};
-
-		inline	int16_t										SetValue				(float weight)							noexcept	{ return CurrentValue = int16_t(weight * MaxValue); }
-				int16_t										SetValue				(float currentValue, uint32_t maxValue)	noexcept	{ return SetValue(currentValue / maxValue); }
-	};
-
-			::gpk::error_t	gaugeBuildRadial		(::ghg::SUIControlGauge & gauge, const ::gpk::SCircle<float> & gaugeMetrics, int16_t resolution, int16_t width);
-			::gpk::error_t	gaugeImageUpdate		(::ghg::SUIControlGauge & gauge, ::gpk::view_grid<::gpk::SColorBGRA> target, ::gpk::SColorBGRA colorMin, ::gpk::SColorBGRA colorMid, ::gpk::SColorBGRA colorMax);
-	inline	::gpk::error_t	gaugeImageUpdate		(::ghg::SUIControlGauge & gauge, ::gpk::SColorBGRA colorMin = ::gpk::GREEN, ::gpk::SColorBGRA colorMid = ::gpk::ORANGE, ::gpk::SColorBGRA colorMax = ::gpk::LIGHTRED) {
-		gauge.Image.Texels.fill({0, 0, 0, 0});
-		return ::ghg::gaugeImageUpdate(gauge, gauge.Image, colorMin, colorMid, colorMax);
-	}
 
 } // namespace
 
