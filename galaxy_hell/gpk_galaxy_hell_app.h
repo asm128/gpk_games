@@ -1,5 +1,4 @@
 #include "gpk_galaxy_hell.h"
-#include "gpk_galaxy_hell_overlay.h"
 
 #include "gpk_dialog_controls.h"
 
@@ -41,8 +40,19 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(UI_HOME, Settings		, 8);
 	GDEFINE_ENUM_VALUE(UI_HOME, Exit			, 9);
 
-	GDEFINE_ENUM_TYPE (UI_PLAY, uint8_t	);
-	GDEFINE_ENUM_VALUE(UI_PLAY, Pause			, 0);
+	GDEFINE_ENUM_TYPE (UI_PLAY, uint8_t);
+	GDEFINE_ENUM_VALUE(UI_PLAY, Menu			, 0);
+	GDEFINE_ENUM_VALUE(UI_PLAY, Level			, 1);
+	GDEFINE_ENUM_VALUE(UI_PLAY, TimeReal		, 2);
+	GDEFINE_ENUM_VALUE(UI_PLAY, TimeWorld		, 3);
+	GDEFINE_ENUM_VALUE(UI_PLAY, TimeStage		, 4);
+	
+	GDEFINE_ENUM_TYPE (UI_PLAYER, uint8_t);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, Score			, 0);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, Life			, 1);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, Kills			, 2);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, Hits			, 3);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, Damage		, 4);
 
 	GDEFINE_ENUM_TYPE (UI_LOAD, uint8_t	);
 
@@ -97,18 +107,28 @@ namespace ghg
 	}
 
 	struct SUIPlayModuleViewport {
-		::gpk::SMatrix4	<float>								MatrixProjection			;
-		::gpk::SCamera										Camera						;
-		::ghg::TRenderTarget								RenderTarget				;
-		SUIControlGauge										GaugeLife					;
-		SUIControlGauge										GaugeCooldown				;
-		SUIControlGauge										GaugeDelay					;
-		int32_t												Viewport					;
+		::gpk::SMatrix4	<float>										MatrixProjection;
+		::gpk::SCamera												Camera			;
+		::ghg::TRenderTarget										RenderTarget	;
+		SUIControlGauge												GaugeLife		;
+		SUIControlGauge												GaugeCooldown	;
+		SUIControlGauge												GaugeDelay		;
+		int32_t														Viewport		;
+	};
+
+	struct SUIPlayer {
+		::gpk::array_pobj<::ghg::SUIPlayModuleViewport>				PlayerModuleViewports	= {};
+		::gpk::array_static<char, 128>								PlayerTextScore			= {};
 	};
 
 	struct SUIPlay {
-		::gpk::array_pobj<::ghg::SUIPlayModuleViewport>		ModuleViewports					;
-		::ghg::SGalaxyHellDrawCache							DrawCache						;
+		::gpk::array_pobj<::ghg::SUIPlayModuleViewport>				ModuleViewports			= {};
+		::ghg::SGalaxyHellDrawCache									DrawCache				= {};
+
+		::gpk::array_static<char, 128>								TextLevel		= {};
+		::gpk::array_static<char, 128>								TextTimeStage	= {};
+		::gpk::array_static<char, 128>								TextTimeWorld	= {};
+		::gpk::array_static<char, 128>								TextTimeReal	= {};
 	};
 
 	enum SAVE_MODE { SAVE_MODE_AUTO, SAVE_MODE_STAGE, SAVE_MODE_USER };
@@ -121,10 +141,9 @@ namespace ghg
 		::gpk::array_static<::gpk::SDialog, ::ghg::APP_STATE_COUNT>	DialogPerState				= {};
 
 		::ghg::SGalaxyHell											World;
-		::ghg::STextOverlay											Overlay;
 
 		::gpk::array_obj<::gpk::array_pod<char>>					FileNames					= {};
-		::gpk::array_obj<::gpk::ptr_obj<::ghg::SGalaxyHell>>		FileGames					= {};
+		::gpk::array_pobj<::ghg::SGalaxyHell>						FileGames					= {};
 		::gpk::vcs													SavegameFolder				= ".";
 		::gpk::vcs													ExtensionSaveAuto			= ".auto.ghz";
 		::gpk::vcs													ExtensionSaveCheckpoint		= ".stage.ghz";

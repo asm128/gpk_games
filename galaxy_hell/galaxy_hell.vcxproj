@@ -174,7 +174,6 @@
     <ClCompile Include="galaxy_hell_app.cpp" />
     <ClCompile Include="galaxy_hell_deco.cpp" />
     <ClCompile Include="galaxy_hell_draw.cpp" />
-    <ClCompile Include="galaxy_hell_overlay.cpp" />
     <ClCompile Include="galaxy_hell_physics.cpp" />
     <ClCompile Include="galaxy_hell_setup.cpp" />
     <ClCompile Include="galaxy_hell_update.cpp" />
@@ -187,7 +186,6 @@
     <ClInclude Include="gpk_galaxy_hell_entity.h" />
     <ClInclude Include="gpk_galaxy_hell_physics.h" />
     <ClInclude Include="gpk_galaxy_hell.h" />
-    <ClInclude Include="gpk_galaxy_hell_overlay.h" />
     <ClInclude Include="gpk_galaxy_hell_ships.h" />
     <ClInclude Include="gpk_galaxy_hell_weapon.h" />
   </ItemGroup>

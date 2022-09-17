@@ -34,7 +34,8 @@ static	::gpk::error_t			guiSetupButtonList			(::gpk::SGUI & gui, uint16_t button
 
 template<typename _tUIEnum>
 static	::gpk::error_t			guiSetupButtonList			(::gpk::SGUI & gui, uint16_t buttonWidth, int16_t yOffset, ::gpk::ALIGN controlAlign) {
-	for(uint16_t iButton = 0; iButton < ::gpk::get_value_count<_tUIEnum>(); ++iButton) {
+	::gpk::view_array<::gpk::vcc>		labels						= ::gpk::get_value_labels<_tUIEnum>();
+	for(uint16_t iButton = 0; iButton < labels.size(); ++iButton) {
 		int32_t								idControl						= ::gpk::controlCreate(gui);
 		::gpk::SControl						& control						= gui.Controls.Controls[idControl];
 		control.Area					= {{0U,(int16_t)(20*iButton + yOffset)}, {(int16_t)buttonWidth, 20}};
@@ -42,7 +43,7 @@ static	::gpk::error_t			guiSetupButtonList			(::gpk::SGUI & gui, uint16_t button
 		control.Margin					= {1, 1, 1, 1};
 		control.Align					= controlAlign;
 		::gpk::SControlText					& controlText					= gui.Controls.Text[idControl];
-		controlText.Text				= ::gpk::get_value_label((_tUIEnum)iButton);
+		controlText.Text				= labels[iButton];
 		controlText.Align				= ::gpk::ALIGN_CENTER;
 		::gpk::controlSetParent(gui, idControl, 0);
 	}
@@ -72,7 +73,7 @@ static	::gpk::error_t			guiSetupShop				(::gpk::SDialog & dialog) {
 	return 0;
 }
 static	::gpk::error_t			guiSetupPlay				(::ghg::SGalaxyHellApp & /*app*/, ::gpk::SDialog & dialog) { 
-	guiSetupButtonList<::ghg::UI_PLAY>(*dialog.GUI,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT); 
+	guiSetupButtonList<::ghg::UI_PLAY>(*dialog.GUI,  220, 0, ::gpk::ALIGN_TOP_RIGHT); 
 	return 0;
 }
 static	::gpk::error_t			guiSetupBrief				(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_PLAY>(*dialog.GUI,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT); }
@@ -95,6 +96,7 @@ static	::gpk::error_t			guiSetupAbout				(::gpk::SDialog & dialog) { return guiS
 		app.DialogPerState[iGUI].Input				= input;
 		guiSetupCommon(*app.DialogPerState[iGUI].GUI);
 		app.DialogPerState[iGUI].Update();
+		guiSetupCommon(*app.DialogPerState[iGUI].GUI);
 	};
 	::guiSetupInit	(app.DialogPerState[::ghg::APP_STATE_Init	]);
 	::guiSetupLoad	(app.DialogPerState[::ghg::APP_STATE_Load	]);
@@ -134,12 +136,28 @@ static	::gpk::error_t			guiHandleHome				(::ghg::SGalaxyHellApp & app, ::gpk::SG
 		break;
 	}
 	case ::ghg::UI_HOME_Load: {
-		::gpk::array_obj<::gpk::vcc>				pathFileNames;
-		app.FileNames							= {};
+		::gpk::array_obj<::gpk::vcc>	pathFileNames;
+		app.FileNames				= {};
 		::gpk::pathList(app.SavegameFolder, app.FileNames);
 		for(uint32_t iFile = 0; iFile < app.FileNames.size(); ++iFile)  {
-			const ::gpk::vcc							fileName			= app.FileNames[iFile];
-			if(fileName.size() > app.ExtensionSave.size() && 0 == strcmp(&fileName[fileName.size() - app.ExtensionSave.size()], app.ExtensionSave.begin())) 
+			const ::gpk::vcc				fileName			= app.FileNames[iFile];
+			if(fileName.size() < app.ExtensionSaveAuto.size())
+				continue;
+			if(0 == strcmp(&fileName[fileName.size() - (uint32_t)app.ExtensionSaveAuto.size()], app.ExtensionSaveAuto.begin())) 
+				pathFileNames.push_back(fileName);
+		}
+		for(uint32_t iFile = 0; iFile < app.FileNames.size(); ++iFile)  {
+			const ::gpk::vcc				fileName			= app.FileNames[iFile];
+			if(fileName.size() < app.ExtensionSaveCheckpoint.size())
+				continue;
+			if(0 == strcmp(&fileName[fileName.size() - (uint32_t)app.ExtensionSaveCheckpoint.size()], app.ExtensionSaveCheckpoint.begin())) 
+				pathFileNames.push_back(fileName);
+		}
+		for(uint32_t iFile = 0; iFile < app.FileNames.size(); ++iFile)  {
+			const ::gpk::vcc				fileName			= app.FileNames[iFile];
+			if(fileName.size() < app.ExtensionSaveUser.size())
+				continue;
+			if(0 == strcmp(&fileName[fileName.size() - (uint32_t)app.ExtensionSaveUser.size()], app.ExtensionSaveUser.begin())) 
 				pathFileNames.push_back(fileName);
 		}
 		pathFileNames.push_back(::gpk::vcs{"Back"});
@@ -148,7 +166,7 @@ static	::gpk::error_t			guiHandleHome				(::ghg::SGalaxyHellApp & app, ::gpk::SG
 		app.DialogPerState[::ghg::APP_STATE_Load].GUI->CursorPos	= app.DialogPerState[::ghg::APP_STATE_Home].GUI->CursorPos;
 		guiSetupCommon(*app.DialogPerState[::ghg::APP_STATE_Load].GUI);
 		app.DialogPerState[::ghg::APP_STATE_Load].Update();
-		::guiSetupButtonList(*app.DialogPerState[::ghg::APP_STATE_Load].GUI, 256, 0, ::gpk::ALIGN_CENTER, pathFileNames);
+		::guiSetupButtonList(*app.DialogPerState[::ghg::APP_STATE_Load].GUI, 256, (int16_t)(-20 * pathFileNames.size() / 2), ::gpk::ALIGN_CENTER, pathFileNames);
 		return ::ghg::APP_STATE_Load;
 	}
 	case ::ghg::UI_HOME_Settings: {
@@ -175,7 +193,7 @@ static	::gpk::error_t			guiHandleShop				(::gpk::SGUI & /*gui*/, uint32_t idCont
 	return ::ghg::APP_STATE_Shop; 
 }
 static	::gpk::error_t			guiHandlePlay				(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & /*gui*/, uint32_t idControl, ::ghg::SGalaxyHell & /*game*/) { 
-	if(idControl == (uint32_t)::ghg::UI_PLAY_Pause) {
+	if(idControl == (uint32_t)::ghg::UI_PLAY_Menu) {
 		app.Save(::ghg::SAVE_MODE_AUTO);
 		return ::ghg::APP_STATE_Home;
 	}
@@ -209,17 +227,41 @@ static	::gpk::error_t			guiHandleAbout				(::gpk::SGUI & /*gui*/, uint32_t idCon
 	return ::ghg::APP_STATE_About; 
 }
 
-
+template<size_t _nStorageSize>
+::gpk::error_t					sprintfTime					(const char *prefix, char (&dest)[_nStorageSize], double seconds) {
+	uint32_t							timeHours					= (int)seconds / 3600;
+	uint32_t							timeMinutes					= (int)seconds / 60 % 60;
+	uint32_t							timeSeconds					= (int)seconds % 60;
+	uint32_t							timeCents					= int (seconds * 10) % 10;
+	sprintf_s(dest, "%s%i:%.2i:%.2i.%.2i", prefix, timeHours, timeMinutes, timeSeconds, timeCents);
+	return 0;
+}
 static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) { 
 	::ghg::SGalaxyHell					& game						= app.World;
+
+	::gpk::SDialog						& dialog					= app.DialogPerState[::ghg::APP_STATE_Play];
+	::gpk::SGUI							& gui						= *dialog.GUI;
+
+	sprintf_s	(app.UIPlay.TextLevel		.Storage, "Level: %i", game.PlayState.Stage);
+	sprintfTime	("Real Time: "		, app.UIPlay.TextTimeReal	.Storage, game.PlayState.TimeReal);
+	sprintfTime	("Simulated Time: "	, app.UIPlay.TextTimeWorld	.Storage, game.PlayState.TimeWorld);
+	sprintfTime	("Stage Time: "		, app.UIPlay.TextTimeStage	.Storage, game.PlayState.TimeRealStage);
+	::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAY_Level		, ::gpk::vcs{app.UIPlay.TextLevel		.Storage});
+	::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAY_TimeStage , ::gpk::vcs{app.UIPlay.TextTimeStage	.Storage});
+	::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAY_TimeWorld , ::gpk::vcs{app.UIPlay.TextTimeWorld	.Storage});
+	::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAY_TimeReal	, ::gpk::vcs{app.UIPlay.TextTimeReal	.Storage});
+
 	if(0 == game.ShipState.ShipCores.size())
 		return 0;
 
-	::gpk::array_pod<uint32_t>			& shipParts					= game.ShipState.ShipCoresParts[0];
+	uint32_t							iPlayer						= 0;
+	//app.UIPlay.PlayerTextScore.resize(game.PlayState.PlayerCount);
+	//sprintf_s(app.UIPlay.PlayerTextScore[iPlayer].Storage, "Score : %i"	, game.ShipState.ShipCores[iPlayer].Score);
+
+	//::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAYER_Score, ::gpk::vcs{app.UIPlay.PlayerTextScore[iPlayer].Storage});
+
+	::gpk::array_pod<uint32_t>			& shipParts					= game.ShipState.ShipCoresParts[iPlayer];
 	const uint32_t						moduleCount					= shipParts.size();
-	::gpk::SDialog						& dialog					= app.DialogPerState[::ghg::APP_STATE_Play];
-	::gpk::SGUI							& gui						= *dialog.GUI;
-	::std::lock_guard<::std::mutex>							lockUpdate			(game.LockUpdate);
 
 	// Setup new viewports if necessary. This may happen if the ship acquires new modules while playing the stage
 	for(uint32_t iViewport = app.UIPlay.ModuleViewports.size(); iViewport < moduleCount; ++iViewport) {
@@ -232,9 +274,9 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 		::gpk::viewportAdjustSize(viewportSize, MODULE_VIEWPORT_SIZE.Cast<int16_t>());
 		viewport->Settings.DisplacementLockX	= true;
 		viewport->Settings.DisplacementLockY	= true;
-		gui.Controls.Modes		[viewport->IdGUIControl	].NoBackgroundRect		= true;
-		gui.Controls.Controls	[viewport->IdGUIControl	].Align					= ::gpk::ALIGN_CENTER_BOTTOM;
-		gui.Controls.Controls	[viewport->IdGUIControl	].Area.Offset			= {(int16_t)((-(int16_t)(moduleCount * viewportSize.x)>> 1) + viewportSize.x * iViewport), 0};
+		gui.Controls.Modes		[viewport->IdGUIControl].NoBackgroundRect		= true;
+		gui.Controls.Controls	[viewport->IdGUIControl].Align					= ::gpk::ALIGN_CENTER_BOTTOM;
+		gui.Controls.Controls	[viewport->IdGUIControl].Area.Offset			= {(int16_t)((-(int16_t)(moduleCount * viewportSize.x)>> 1) + viewportSize.x * iViewport), 0};
 
 		gui.Controls.Controls	[viewport->IdClient].Image						= vp.RenderTarget.Color.View;
 		gui.Controls.Controls	[viewport->IdClient].ImageAlign					= ::gpk::ALIGN_RIGHT;
@@ -250,16 +292,16 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 		const ::gpk::SCircle<float> circleDelay		= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 1, vp.RenderTarget.Color.View.metrics().Cast<float>() * .5};
 		const ::gpk::SCircle<float> circleCooldown	= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 2, vp.RenderTarget.Color.View.metrics().Cast<float>() * .5};
 		
-		::ghg::gaugeBuildRadial(vp.GaugeLife	, circleLife		, 64, 6);
-		::ghg::gaugeBuildRadial(vp.GaugeDelay	, circleDelay		, 64, 6);
-		::ghg::gaugeBuildRadial(vp.GaugeCooldown, circleCooldown	, 64, 6);
+		::ghg::gaugeBuildRadial(vp.GaugeLife	, circleLife		, 32, 6);
+		::ghg::gaugeBuildRadial(vp.GaugeDelay	, circleDelay		, 32, 6);
+		::ghg::gaugeBuildRadial(vp.GaugeCooldown, circleCooldown	, 32, 6);
 
 		char number[256] = {};
 		sprintf_s(number, "#%i", iViewport + 1);
 		dialog.Update();
 	}
 	for(uint32_t iViewport = 0; iViewport < app.UIPlay.ModuleViewports.size(); ++iViewport) {
-		const ::ghg::SShipPart									& shipPart			= game.ShipState.ShipParts[shipParts[iViewport]];
+		const ::ghg::SShipOrbiter									& shipPart			= game.ShipState.ShipOrbiters[shipParts[iViewport]];
 		const ::ghg::SWeapon									& weapon			= game.ShipState.Weapons[shipPart.Weapon];
 
 		::gpk::ptr_nco<::gpk::SDialogViewport>	viewport				= {};
@@ -305,12 +347,12 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 				matrixView											*= app.UIPlay.ModuleViewports[iViewport]->MatrixProjection;
 				drawCache.LightPointsWorld.clear();
 				drawCache.LightColorsWorld.clear();
-				::ghg::getLightArrays(game.ShipState, game.DecoState, drawCache.LightPointsWorld, drawCache.LightColorsWorld, ::ghg::DEBRIS_COLORS);
+				::ghg::getLightArraysFromShips(game.ShipState, drawCache.LightPointsWorld, drawCache.LightColorsWorld);
 				drawCache.LightPointsModel.reserve(drawCache.LightPointsWorld.size());
 				drawCache.LightColorsModel.reserve(drawCache.LightColorsWorld.size());
 
 				uint32_t												pixelsDrawn				= 0;
-				pixelsDrawn											+= ::ghg::drawShipPart(game.ShipState, shipPart, matrixView, targetPixels, depthBuffer, drawCache);
+				pixelsDrawn											+= ::ghg::drawShipOrbiter(game.ShipState, shipPart, matrixView, targetPixels, depthBuffer, drawCache);
 
 				vp.GaugeLife	.SetValue(healthRatio	);
 				vp.GaugeDelay	.SetValue(ratioDelay	);
@@ -318,10 +360,10 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 
 				const ::gpk::SColorFloat colorLife		= ::gpk::interpolate_linear(::gpk::DARKRED, ::gpk::GREEN, healthRatio);
 				const ::gpk::SColorFloat colorDelay		= ::gpk::YELLOW;
-				const ::gpk::SColorFloat colorCooldown	= ::gpk::interpolate_linear(::gpk::BLUE, ::gpk::ORANGE * .5 + ::gpk::RED * .5, ratioOverheat);
+				const ::gpk::SColorFloat colorCooldown	= ::gpk::interpolate_linear(::gpk::LIGHTBLUE, ::gpk::ORANGE * .5 + ::gpk::RED * .5, ratioOverheat);
 
 				::ghg::gaugeImageUpdate(vp.GaugeLife	, targetPixels, colorLife		, colorLife		, colorLife		);
-				::ghg::gaugeImageUpdate(vp.GaugeDelay	, targetPixels, colorDelay		, colorDelay	, colorDelay		);
+				::ghg::gaugeImageUpdate(vp.GaugeDelay	, targetPixels, colorDelay		, colorDelay	, colorDelay	);
 				::ghg::gaugeImageUpdate(vp.GaugeCooldown, targetPixels, colorCooldown	, colorCooldown	, colorCooldown	);
 				
 				drawCache.PixelCoords.clear();
@@ -367,7 +409,11 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 	::gpk::SGUI							& gui						= *dialog.GUI;
 	::gpk::array_pod<uint32_t>			controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
-	::guiUpdatePlay(gameApp);
+
+	{
+		::gpk::mutex_guard lock(gameApp.World.LockUpdate);
+		::guiUpdatePlay(gameApp);
+	}
 
 	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
 		uint32_t							idControl			= controlsToProcess		[iControl];
@@ -462,6 +508,8 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 			const double						distanceFromCenter				= (floatCoord - center2).Length();
 			const double						distanceFromRadiusCenter		= fabs(distanceFromCenter - radiusCenter) / ((radiusLarge - radiusSmall) / 2);
 			finalColor.a					= (float)(1 - distanceFromRadiusCenter);
+#else
+			(void)radiusCenter;
 #endif		
 			::gpk::SColorBGRA					& targetPixel					= target[pixelCoord.y][pixelCoord.x];
 			finalColor.Clamp();

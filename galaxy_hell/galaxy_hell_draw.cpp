@@ -66,8 +66,8 @@ static	int													drawDebris
 		static constexpr	const double						brightRadiusSquared	= brightRadius * brightRadius;
 		static constexpr	const double						brightUnit			= 1.0 / brightRadiusSquared;
 
-		for(int32_t y = (int32_t)-brightRadius - 1; y < (int32_t)brightRadius + 1; ++y)
-		for(int32_t x = (int32_t)-brightRadius - 1; x < (int32_t)brightRadius + 1; ++x) {
+		for(int32_t y = (int32_t)-brightRadius - 1, yStop = (int32_t)brightRadius + 1; y < yStop; ++y)
+		for(int32_t x = (int32_t)-brightRadius - 1; x < yStop; ++x) {
 			::gpk::SCoord2<float>									brightPos			= {(float)x, (float)y};
 			const double											brightDistance		= brightPos.LengthSquared();
 			if(brightDistance <= brightRadiusSquared) {
@@ -157,25 +157,39 @@ static	int											drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixe
 	return 0;
 }
 
-int													ghg::getLightArrays
-	( const ::ghg::SShipState								& shipState
-	, const ::ghg::SDecoState								& decoState
+
+int													ghg::getLightArraysFromDebris
+	( const ::ghg::SDecoState								& decoState
 	, ::gpk::array_pod<::gpk::SCoord3<float>>				& lightPoints
 	, ::gpk::array_pod<::gpk::SColorBGRA>					& lightColors
 	, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
 	)						{
-	::gpk::SColorBGRA										colorLightPlayer		= ::gpk::SColorBGRA{0xFF, 0xFF, 0xFF};
-	::gpk::SColorBGRA										colorLightEnemy			= ::gpk::SColorBGRA{0xFF, 0xFF, 0xFF};
+	for(uint32_t iParticle = 0; iParticle < decoState.Debris.Particles.Position.size(); ++iParticle) {
+		lightPoints.push_back(decoState.Debris.Particles.Position[iParticle]);
+		::gpk::SColorFloat										colorShot			= debrisColors[iParticle % debrisColors.size()];
+		lightColors.push_back(colorShot * decoState.Debris.Brightness[iParticle]);
+	}
+	return 0;
+}
+
+
+int													ghg::getLightArraysFromShips
+	( const ::ghg::SShipState							& shipState
+	, ::gpk::array_pod<::gpk::SCoord3<float>>			& lightPoints
+	, ::gpk::array_pod<::gpk::SColorBGRA>				& lightColors
+	) {
+	constexpr ::gpk::SColorBGRA								colorLightPlayer		= ::gpk::SColorBGRA{0xFF, 0x88, 0xFF};
+	constexpr ::gpk::SColorBGRA								colorLightEnemy			= ::gpk::SColorBGRA{0xFF, 0x88, 0x88};
 	for(uint32_t iShip = 0; iShip < shipState.ShipCores.size(); ++iShip) {
 		const ::ghg::SShipCore									& ship					= shipState.ShipCores[iShip];
 		lightPoints.push_back(shipState.ShipPhysics.Transforms[shipState.EntitySystem.Entities[ship.Entity].Body].Position);
 		lightColors.push_back((0 == shipState.ShipCores[iShip].Team) ? colorLightPlayer : colorLightEnemy);
 		for(uint32_t iPart = 0; iPart < shipState.ShipCoresParts[iShip].size(); ++iPart) {
-			const ::ghg::SShipPart									& shipPart				= shipState.ShipParts[shipState.ShipCoresParts[iShip][iPart]];
+			const ::ghg::SShipOrbiter									& shipPart				= shipState.ShipOrbiters[shipState.ShipCoresParts[iShip][iPart]];
 			const ::gpk::SColorFloat								colorShot
-				= (::ghg::WEAPON_LOAD_Ray		== shipState.Weapons[shipPart.Weapon].Load) ? ::gpk::SColorFloat{1.0f, 0.1f, 0.0f}
-				: (::ghg::WEAPON_LOAD_Cannonball		== shipState.Weapons[shipPart.Weapon].Load) ? ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE
-				: (::ghg::WEAPON_LOAD_Bullet	== shipState.Weapons[shipPart.Weapon].Load) ? ::gpk::GRAY
+				= (::ghg::WEAPON_LOAD_Ray			== shipState.Weapons[shipPart.Weapon].Load) ? ::gpk::SColorFloat{1.0f, 0.1f, 0.0f}
+				: (::ghg::WEAPON_LOAD_Cannonball	== shipState.Weapons[shipPart.Weapon].Load) ? ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE
+				: (::ghg::WEAPON_LOAD_Bullet		== shipState.Weapons[shipPart.Weapon].Load) ? ::gpk::GRAY
 				: ::gpk::SColorFloat{::gpk::SColorBGRA{0xFF, 0xFF, 0xFF}}
 				;
 			for(uint32_t iShot = 0; iShot < shipState.Shots[shipPart.Weapon].Particles.Position.size(); ++iShot) {
@@ -184,12 +198,18 @@ int													ghg::getLightArrays
 			}
 		}
 	}
+	return 0;
+}
 
-	for(uint32_t iParticle = 0; iParticle < decoState.Debris.Particles.Position.size(); ++iParticle) {
-		lightPoints.push_back(decoState.Debris.Particles.Position[iParticle]);
-		::gpk::SColorFloat										colorShot			= debrisColors[iParticle % debrisColors.size()];
-		lightColors.push_back(colorShot * decoState.Debris.Brightness[iParticle]);
-	}
+int												ghg::getLightArrays
+	( const ::ghg::SShipState							& shipState
+	, const ::ghg::SDecoState							& decoState
+	, ::gpk::array_pod<::gpk::SCoord3<float>>			& lightPoints
+	, ::gpk::array_pod<::gpk::SColorBGRA>				& lightColors
+	, const ::gpk::view_array<const ::gpk::SColorBGRA>	& debrisColors
+	) {
+	::ghg::getLightArraysFromShips(shipState, lightPoints, lightColors);
+	::ghg::getLightArraysFromDebris(decoState, lightPoints, lightColors, debrisColors);
 	return 0;
 }
 
@@ -225,9 +245,9 @@ int												ghg::getLightArrays
 //	return 0;
 //}
 
-int												ghg::drawShipPart
+int												ghg::drawShipOrbiter
 	( const ::ghg::SShipState							& shipState
-	, const ::ghg::SShipPart							& shipPart
+	, const ::ghg::SShipOrbiter							& shipPart
 	, const ::gpk::SMatrix4<float>						& matrixVP
 	, ::gpk::view_grid<::gpk::SColorBGRA>				& targetPixels
 	, ::gpk::view_grid<uint32_t>						depthBuffer
@@ -264,10 +284,10 @@ static	int											drawShip
 	) {
 	uint32_t												pixelsDrawn				= 0;
 	for(uint32_t iPart = 0; iPart < solarSystem.ShipState.ShipCoresParts[iShip].size(); ++iPart) {
-		const ::ghg::SShipPart									& shipPart				= solarSystem.ShipState.ShipParts[solarSystem.ShipState.ShipCoresParts[iShip][iPart]];
+		const ::ghg::SShipOrbiter									& shipPart				= solarSystem.ShipState.ShipOrbiters[solarSystem.ShipState.ShipCoresParts[iShip][iPart]];
 		if(shipPart.Health <= 0)
 			continue;
-		pixelsDrawn += ::ghg::drawShipPart(solarSystem.ShipState, shipPart, matrixVP, targetPixels, depthBuffer, drawCache);
+		pixelsDrawn += ::ghg::drawShipOrbiter(solarSystem.ShipState, shipPart, matrixVP, targetPixels, depthBuffer, drawCache);
 	}
 	return pixelsDrawn;
 }
@@ -333,8 +353,10 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 
 	memset(targetPixels.begin(), 0, targetPixels.byte_count());
 	memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
-	::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
-	::drawStars(solarSystem.DecoState.Stars, targetPixels);
+	{
+		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		::drawStars(solarSystem.DecoState.Stars, targetPixels);
+	}
 
 	::gpk::SMatrix4<float>									matrixView			= {};
 	const ::gpk::SCamera									& camera			= solarSystem.ShipState.Scene.Global.Camera[solarSystem.ShipState.Scene.Global.CameraMode];
@@ -342,22 +364,30 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 	matrixView											*= solarSystem.ShipState.Scene.Global.MatrixProjection;
 	drawCache.LightPointsWorld.clear();
 	drawCache.LightColorsWorld.clear();
-	::ghg::getLightArrays(solarSystem.ShipState, solarSystem.DecoState, drawCache.LightPointsWorld, drawCache.LightColorsWorld, ::ghg::DEBRIS_COLORS);
+	{
+		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		::ghg::getLightArrays(solarSystem.ShipState, solarSystem.DecoState, drawCache.LightPointsWorld, drawCache.LightColorsWorld, ::ghg::DEBRIS_COLORS);
+	}
 	drawCache.LightPointsModel.reserve(drawCache.LightPointsWorld.size());
 	drawCache.LightColorsModel.reserve(drawCache.LightColorsWorld.size());
-
-	for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
-		const ::ghg::SShipCore										& ship					= solarSystem.ShipState.ShipCores[iShip];
-		if(ship.Health <= 0)
-			continue;
-		::drawShip(solarSystem, iShip, matrixView, targetPixels, depthBuffer, drawCache);
+	{
+		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
+			const ::ghg::SShipCore										& ship					= solarSystem.ShipState.ShipCores[iShip];
+			if(ship.Health <= 0)
+				continue;
+			::drawShip(solarSystem, iShip, matrixView, targetPixels, depthBuffer, drawCache);
+		}
 	}
 
-	for(uint32_t iExplosion = 0; iExplosion < solarSystem.DecoState.Explosions.size(); ++iExplosion) {
-		const ::ghg::SExplosion									& explosion				= solarSystem.DecoState.Explosions[iExplosion];
-		if(0 == explosion.Slices.size())
-			continue;
-		::drawExplosion(solarSystem, explosion, matrixView, targetPixels, depthBuffer, drawCache);
+	{
+		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		for(uint32_t iExplosion = 0; iExplosion < solarSystem.DecoState.Explosions.size(); ++iExplosion) {
+			const ::ghg::SExplosion									& explosion				= solarSystem.DecoState.Explosions[iExplosion];
+			if(0 == explosion.Slices.size())
+				continue;
+			::drawExplosion(solarSystem, explosion, matrixView, targetPixels, depthBuffer, drawCache);
+		}
 	}
 #pragma pack(push, 1)
 	struct SRenderNode	{
@@ -367,65 +397,62 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 		::gpk::array_pod<uint16_t>	IndicesPointLight	;
 	};
 #pragma pack(pop)
-
-	for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
-		const ::ghg::SShipCore									& ship				= solarSystem.ShipState.ShipCores[iShip];
-		const ::gpk::array_pod<uint32_t>						& shipParts			= solarSystem.ShipState.ShipCoresParts[iShip];
-		for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
-			const ::ghg::SShipPart								& shipPart				= solarSystem.ShipState.ShipParts[shipParts[iPart]];
-			const ::ghg::SWeapon								& weapon				= solarSystem.ShipState.Weapons[shipPart.Weapon];
-			::gpk::SColorFloat									colorShot				= ::gpk::WHITE;
-			double												brightRadius			= 1;
-			double												intensity				= 1;
-			bool												line					= true;
-			if(::ghg::WEAPON_LOAD_Ray == weapon.Load) { 
-				colorShot			= ::gpk::SColorFloat{1.0f, 0.1f, 0.0f}; 
-				brightRadius		=  2; 
-				intensity			=  1; 
-				line				= true;
-			}
-			else if(::ghg::WEAPON_LOAD_Bullet == weapon.Load) { 
-				colorShot			= ::gpk::DARKGRAY; 
-				brightRadius		= 2; 
-				intensity			= 1; 
-				line				= true;
-			}
-			else if(::ghg::WEAPON_LOAD_Shell == weapon.Load) { 
-				colorShot			= ::gpk::GRAY; 
-				brightRadius		= 2; 
-				intensity			= 1; 
-				line				= true;
-			}
-			else if(::ghg::WEAPON_LOAD_Cannonball == weapon.Load) {
-				colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE;
-				brightRadius		= 7;
-				intensity			= 9;
-				line				= false;
-			}
-			else if(::ghg::WEAPON_LOAD_Rocket == weapon.Load) {
-				colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::LIGHTORANGE;
-				brightRadius		= 2;
-				intensity			= 1;
-				line				= true;
-			}
-			else if(::ghg::WEAPON_LOAD_Missile == weapon.Load) {
-				colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.025f, 0.05f} : ::gpk::CYAN;
-				brightRadius		= 2;
-				intensity			= 1;
-				line				= true;
-			}
-			::drawShots(targetPixels, solarSystem.ShipState.Shots[shipPart.Weapon], matrixView, colorShot, brightRadius, intensity, line, depthBuffer, drawCache.LightPointsModel);
-			for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
-				::gpk::array_pod<uint32_t>								& shipParts				= solarSystem.ShipState.ShipCoresParts[iShip];
-				for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
-					::ghg::SShipPart										& shipPart				= solarSystem.ShipState.ShipParts[shipParts[iPart]];
-					memcpy(solarSystem.ShipState.Shots[shipPart.Weapon].PositionDraw.begin(), solarSystem.ShipState.Shots[shipPart.Weapon].Particles.Position.begin(), solarSystem.ShipState.Shots[shipPart.Weapon].Particles.Position.size() * sizeof(::gpk::SCoord3<float>));
+	{
+		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
+			const ::ghg::SShipCore									& ship				= solarSystem.ShipState.ShipCores[iShip];
+			const ::gpk::array_pod<uint32_t>						& shipParts			= solarSystem.ShipState.ShipCoresParts[iShip];
+			for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
+				const ::ghg::SShipOrbiter								& shipPart				= solarSystem.ShipState.ShipOrbiters[shipParts[iPart]];
+				const ::ghg::SWeapon								& weapon				= solarSystem.ShipState.Weapons[shipPart.Weapon];
+				::gpk::SColorFloat									colorShot				= ::gpk::WHITE;
+				double												brightRadius			= 1;
+				double												intensity				= 1;
+				bool												line					= true;
+				if(::ghg::WEAPON_LOAD_Ray == weapon.Load) { 
+					colorShot			= ::gpk::SColorFloat{1.0f, 0.1f, 0.0f}; 
+					brightRadius		=  2; 
+					intensity			=  1; 
+					line				= true;
 				}
-			}
+				else if(::ghg::WEAPON_LOAD_Bullet == weapon.Load) { 
+					colorShot			= ::gpk::DARKGRAY; 
+					brightRadius		= 2; 
+					intensity			= 1; 
+					line				= true;
+				}
+				else if(::ghg::WEAPON_LOAD_Shell == weapon.Load) { 
+					colorShot			= ::gpk::GRAY; 
+					brightRadius		= 2; 
+					intensity			= 1; 
+					line				= true;
+				}
+				else if(::ghg::WEAPON_LOAD_Cannonball == weapon.Load) {
+					colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE;
+					brightRadius		= 7;
+					intensity			= 9;
+					line				= false;
+				}
+				else if(::ghg::WEAPON_LOAD_Rocket == weapon.Load) {
+					colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::LIGHTORANGE;
+					brightRadius		= 2;
+					intensity			= 1;
+					line				= true;
+				}
+				else if(::ghg::WEAPON_LOAD_Missile == weapon.Load) {
+					colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.025f, 0.05f} : ::gpk::CYAN;
+					brightRadius		= 2;
+					intensity			= 1;
+					line				= true;
+				}
+				::drawShots(targetPixels, solarSystem.ShipState.Shots[shipPart.Weapon], matrixView, colorShot, brightRadius, intensity, line, depthBuffer, drawCache.LightPointsModel);
 
+			}
 		}
 	}
-	::drawDebris(targetPixels, solarSystem.DecoState.Debris, matrixView, depthBuffer, ::ghg::DEBRIS_COLORS);
-
+	{
+		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		::drawDebris(targetPixels, solarSystem.DecoState.Debris, matrixView, depthBuffer, ::ghg::DEBRIS_COLORS);
+	}
 	return 0;
 }

@@ -24,6 +24,8 @@ namespace ghg
 		uint32_t												Stage					= 0;
 		double													TimeStage				= 0;
 		double													TimeWorld				= 0;
+		double													TimeRealStage			= 0;
+		double													TimeReal				= 0;
 		bool													Paused					= false;
 
 		double													CameraSwitchDelay		= 0;
@@ -67,7 +69,18 @@ namespace ghg
 	::gpk::error_t										solarSystemUpdate				(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, const ::gpk::view_array<::gpk::SSysEvent> & frameEvents);
 	::gpk::error_t										solarSystemLoad					(::ghg::SGalaxyHell & world,::gpk::vcc filename);
 	::gpk::error_t										solarSystemSave					(const ::ghg::SGalaxyHell & world,::gpk::vcc filename);
-
+	
+	::gpk::error_t										getLightArraysFromDebris
+		( const ::ghg::SDecoState								& decoState
+		, ::gpk::array_pod<::gpk::SCoord3<float>>				& lightPoints
+		, ::gpk::array_pod<::gpk::SColorBGRA>					& lightColors
+		, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
+		);
+	::gpk::error_t										getLightArraysFromShips
+		( const ::ghg::SShipState								& shipState
+		, ::gpk::array_pod<::gpk::SCoord3<float>>				& lightPoints
+		, ::gpk::array_pod<::gpk::SColorBGRA>					& lightColors
+		);
 	::gpk::error_t										getLightArrays
 		( const ::ghg::SShipState								& shipState
 		, const ::ghg::SDecoState								& decoState
@@ -76,9 +89,9 @@ namespace ghg
 		, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
 		);
 
-	::gpk::error_t										drawShipPart
+	::gpk::error_t										drawShipOrbiter
 		( const ::ghg::SShipState							& shipState
-		, const ::ghg::SShipPart							& shipPart
+		, const ::ghg::SShipOrbiter							& shipPart
 		, const ::gpk::SMatrix4<float>						& matrixVP
 		, ::gpk::view_grid<::gpk::SColorBGRA>				& targetPixels
 		, ::gpk::view_grid<uint32_t>						depthBuffer
