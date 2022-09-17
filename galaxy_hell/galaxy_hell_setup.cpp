@@ -176,7 +176,7 @@ int													ghg::solarSystemReset					(::ghg::SGalaxyHell & solarSystem)	{	/
 	solarSystem.ShipState.Shots							= {};
 	solarSystem.ShipState.ShipCoresParts				= {};
 	solarSystem.ShipState.ShipPhysics					= {};
-	solarSystem.ShipState.ShipOrbiterActionQueue			= {};
+	solarSystem.ShipState.ShipOrbiterActionQueue		= {};
 	solarSystem.ShipState.EntitySystem.Entities			= {};
 	solarSystem.ShipState.EntitySystem.EntityChildren	= {};
 	solarSystem.PlayState								= {};
@@ -192,6 +192,7 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 		::gpk::mutex_guard										rtGuard	(solarSystem.DrawCache.RenderTargetQueueMutex);
 		solarSystem.DecoState.Stars.Reset(solarSystem.DrawCache.RenderTargetMetrics);
 		solarSystem.PlayState.TimeStart = solarSystem.PlayState.TimeLast = ::gpk::timeCurrent();
+		memset(solarSystem.ShipState.ShipScores.begin(), 0, solarSystem.ShipState.ShipScores.byte_count());
 	}
 
 #pragma pack(push, 1)
@@ -267,6 +268,10 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 				solarSystem.ShipState.ShipPhysics.Forces[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body].Rotation.y	*= float(1 + indexShip * .35);
 			}
 		}
+
+		solarSystem.ShipState.Weapons.clear();
+		solarSystem.ShipState.Shots.clear();
+
 		// set up weapons
 		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
 			::ghg::SShipCore										& ship							= solarSystem.ShipState.ShipCores[iShip];

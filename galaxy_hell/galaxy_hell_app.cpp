@@ -131,6 +131,10 @@
 	{
 		::std::lock_guard<::std::mutex>							lockUpdate			(app.World.LockUpdate);
 		::gpk::guiDraw(*app.DialogPerState[app.ActiveState].GUI, targetPixels);
+		if(app.ActiveState == ::ghg::APP_STATE_Play) {
+			for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUIs.size(); ++iPlayer)
+				::gpk::guiDraw(*app.UIPlay.PlayerUIs[iPlayer].Dialog.GUI, targetPixels);
+		}
 	}
 	{
 		::std::lock_guard<::std::mutex>				lockRTQueue	(app.World.DrawCache.RenderTargetQueueMutex);

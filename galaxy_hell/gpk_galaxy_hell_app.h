@@ -48,11 +48,14 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(UI_PLAY, TimeStage		, 4);
 	
 	GDEFINE_ENUM_TYPE (UI_PLAYER, uint8_t);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, Score			, 0);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, Life			, 1);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, Kills			, 2);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, Hits			, 3);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, Damage		, 4);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, Score				, 0);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, Hits				, 1);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, DamageDone		, 2);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, DamageReceived	, 3);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, HitsSurvived		, 4);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, OrbitersLost		, 5);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, KilledShips		, 6);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, KilledOrbiters	, 7);
 
 	GDEFINE_ENUM_TYPE (UI_LOAD, uint8_t	);
 
@@ -107,28 +110,37 @@ namespace ghg
 	}
 
 	struct SUIPlayModuleViewport {
-		::gpk::SMatrix4	<float>										MatrixProjection;
-		::gpk::SCamera												Camera			;
-		::ghg::TRenderTarget										RenderTarget	;
-		SUIControlGauge												GaugeLife		;
-		SUIControlGauge												GaugeCooldown	;
-		SUIControlGauge												GaugeDelay		;
-		int32_t														Viewport		;
+		int32_t											Viewport		;
+		::gpk::SCamera									Camera			;
+		SUIControlGauge									GaugeLife		;
+		SUIControlGauge									GaugeCooldown	;
+		SUIControlGauge									GaugeDelay		;
+		::gpk::SMatrix4	<float>							MatrixProjection;
+		::ghg::TRenderTarget							RenderTarget	;
 	};
 
 	struct SUIPlayer {
-		::gpk::array_pobj<::ghg::SUIPlayModuleViewport>				PlayerModuleViewports	= {};
-		::gpk::array_static<char, 128>								PlayerTextScore			= {};
+		::gpk::array_pobj<::ghg::SUIPlayModuleViewport>	ModuleViewports		= {};
+		::gpk::SDialog									Dialog				= {};
+		::gpk::array_static<char, 128>					TextScore			= {};
+		::gpk::array_static<char, 128>					TextHits			= {};
+		::gpk::array_static<char, 128>					TextDamageDone		= {};
+		::gpk::array_static<char, 128>					TextDamageReceived	= {};
+		::gpk::array_static<char, 128>					TextHitsSurvived	= {};
+		::gpk::array_static<char, 128>					TextOrbitersLost	= {};
+		::gpk::array_static<char, 128>					TextKilledShips		= {};
+		::gpk::array_static<char, 128>					TextKilledOrbiters	= {};
 	};
 
 	struct SUIPlay {
-		::gpk::array_pobj<::ghg::SUIPlayModuleViewport>				ModuleViewports			= {};
-		::ghg::SGalaxyHellDrawCache									DrawCache				= {};
+		::gpk::array_pobj<::ghg::SUIPlayModuleViewport>	ModuleViewports			= {};
+		::gpk::array_obj<::ghg::SUIPlayer>				PlayerUIs				= {};
+		::ghg::SGalaxyHellDrawCache						DrawCache				= {};
 
-		::gpk::array_static<char, 128>								TextLevel		= {};
-		::gpk::array_static<char, 128>								TextTimeStage	= {};
-		::gpk::array_static<char, 128>								TextTimeWorld	= {};
-		::gpk::array_static<char, 128>								TextTimeReal	= {};
+		::gpk::array_static<char, 128>					TextLevel		= {};
+		::gpk::array_static<char, 128>					TextTimeStage	= {};
+		::gpk::array_static<char, 128>					TextTimeWorld	= {};
+		::gpk::array_static<char, 128>					TextTimeReal	= {};
 	};
 
 	enum SAVE_MODE { SAVE_MODE_AUTO, SAVE_MODE_STAGE, SAVE_MODE_USER };

@@ -41,6 +41,8 @@ static	int											handleCollisionPoint	(::ghg::SGalaxyHell & solarSystem, int
 	solarSystem.DecoState.Debris.SpawnDirected(5, 0.3, bounceVector, collisionPoint, 50, 1);
 	attackerScore.Hits									+= 1;
 	attackerScore.Score									+= 1;
+	attackerScore.DamageDone							+= weaponDamage;
+	damagedScore.DamageReceived							+= weaponDamage;
 	if(::applyDamage(weaponDamage, damagedPart.Health, damagedShip.Health)) {	// returns true if health reaches zero
 		attackerScore.Score									+= 10;
 		attackerScore.KilledOrbiters						+= 1;
@@ -50,9 +52,7 @@ static	int											handleCollisionPoint	(::ghg::SGalaxyHell & solarSystem, int
 		const uint32_t											countTriangles				= solarSystem.ShipState.Scene.Geometry[indexMesh].Triangles.size();
 		::ghg::decoExplosionAdd(solarSystem.DecoState.Explosions, indexMesh, countTriangles, collisionPoint, 60);
 		solarSystem.DecoState.Debris.SpawnSpherical(30, collisionPoint, 60, 2);
-		if(0 < damagedShip.Health) 
-			damagedScore.HitsSurvived							+= 1;
-		else {
+		if(0 >= damagedShip.Health) {
 			attackerScore.Score									+= 50;
 			attackerScore.KilledShips							+= 1;
 			const ::gpk::SCoord3<float>								& parentPosition			= solarSystem.ShipState.GetShipPosition(damagedShip);
@@ -62,6 +62,10 @@ static	int											handleCollisionPoint	(::ghg::SGalaxyHell & solarSystem, int
 			solarSystem.PlayState.TimeScale						= 1.0;
 		}
 		return 1;
+	}
+	else {
+		if(0 < damagedShip.Health) 
+			damagedScore.HitsSurvived							+= 1;
 	}
 	return 0;
 }
@@ -108,9 +112,9 @@ static	int											updateShots				(::ghg::SGalaxyHell & solarSystem, double se
 			::ghg::SShipOrbiter										& shipPartAttacker		= solarSystem.ShipState.ShipOrbiters[shipAttackerParts[iPartAttacker]];
 
 			for(uint32_t iShipAttacked = 0; iShipAttacked < solarSystem.ShipState.ShipCores.size(); ++iShipAttacked) {
-				::ghg::SShipCore										& shipAttacked					= solarSystem.ShipState.ShipCores[iShipAttacked];
-				::gpk::array_pod<uint32_t>								& shipAttackedParts				= solarSystem.ShipState.ShipCoresParts[iShipAttacked];
-				::ghg::SShipScore										& shipAttackedScore				= solarSystem.ShipState.ShipScores					[iShipAttacker];
+				::ghg::SShipCore										& shipAttacked					= solarSystem.ShipState.ShipCores		[iShipAttacked];
+				::gpk::array_pod<uint32_t>								& shipAttackedParts				= solarSystem.ShipState.ShipCoresParts	[iShipAttacked];
+				::ghg::SShipScore										& shipAttackedScore				= solarSystem.ShipState.ShipScores		[iShipAttacked];
 				if(shipAttacked.Health <= 0 || shipAttacker.Team == shipAttacked.Team) // avoid dead ships and ships of the same team
 					continue;
 				for(uint32_t iPartAttacked = 0; iPartAttacked < shipAttackedParts.size(); ++iPartAttacked) {

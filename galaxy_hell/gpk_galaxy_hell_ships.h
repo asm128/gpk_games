@@ -99,14 +99,14 @@ namespace ghg
 	};
 
 	struct SShipScore {
-		uint32_t													Score;
-		uint64_t													KilledShips;
-		uint64_t													KilledOrbiters;
-		uint64_t													Hits;
-		uint64_t													DamageDone;
-		uint64_t													DamageReceived;
-		uint64_t													OrbitersLost;
-		uint64_t													HitsSurvived;
+		uint64_t													Score			= 0;
+		uint64_t													Hits			= 0;
+		uint64_t													DamageDone		= 0;
+		uint64_t													DamageReceived	= 0;
+		uint64_t													HitsSurvived	= 0;
+		uint32_t													OrbitersLost	= 0;
+		uint32_t													KilledShips		= 0;
+		uint32_t													KilledOrbiters	= 0;
 	};
 
 	struct SShipCore {
