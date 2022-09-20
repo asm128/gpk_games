@@ -116,7 +116,9 @@ namespace ghg
 		SUIControlGauge									GaugeCooldown	;
 		SUIControlGauge									GaugeDelay		;
 		::gpk::SMatrix4	<float>							MatrixProjection;
-		::ghg::TRenderTarget							RenderTarget	;
+		::ghg::TRenderTarget							RenderTargetOrbiter	;
+		::ghg::TRenderTarget							RenderTargetWeaponLoad	;
+		::ghg::TRenderTarget							RenderTargetWeaponType	;
 	};
 
 	struct SUIPlayer {
@@ -146,7 +148,10 @@ namespace ghg
 	enum SAVE_MODE { SAVE_MODE_AUTO, SAVE_MODE_STAGE, SAVE_MODE_USER };
 
 	struct SGalaxyHellApp {
-		::gpk::ptr_obj<TRenderTarget>								RenderTarget[16]			= {};
+		::gpk::array_pobj<TRenderTarget>							RenderTargetPool			= {};
+		::gpk::array_pobj<TRenderTarget>							RenderTargetQueue			= {};
+		::std::mutex												RenderTargetLockPool		= {};
+		::std::mutex												RenderTargetLockQueue		= {};
 		volatile uint64_t											CurrentRenderTarget			= 0;
 
 		bool														Exit						= false;
@@ -185,10 +190,7 @@ namespace ghg
 			sprintf_s(fileName, "%s/%llu.%llu%s", SavegameFolder.begin(), timeStart, timeCurrent, extension.begin());
 
 			// Save only if a player is alive
-			int32_t								totalHealth			= 0;
-			for(uint32_t iPlayer = 0; iPlayer < World.PlayState.PlayerCount; ++iPlayer)
-				totalHealth						+= World.ShipState.GetShipHealth(iPlayer);
-
+			int32_t								totalHealth			= World.ShipState.GetTeamHealth(0);
 			if(totalHealth > 0) 
 				return ::ghg::solarSystemSave(World, fileName);
 

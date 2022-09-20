@@ -17,9 +17,9 @@ namespace ghg
 	struct SPlayState {
 		uint64_t												TimeStart				= 0;
 		uint64_t												TimeLast				= 0;
-		uint32_t												Seed					= 0;
+		uint32_t												Seed					= 1;
 		uint32_t												OffsetStage				= 2;
-		uint32_t												PlayerCount				= 1;
+		uint32_t												PlayerCount				= 2;
 
 		uint32_t												Stage					= 0;
 		double													TimeStage				= 0;
@@ -91,7 +91,7 @@ namespace ghg
 
 	::gpk::error_t										drawShipOrbiter
 		( const ::ghg::SShipState							& shipState
-		, const ::ghg::SShipOrbiter							& shipPart
+		, const ::ghg::SOrbiter								& shipPart
 		, const ::gpk::SMatrix4<float>						& matrixVP
 		, ::gpk::view_grid<::gpk::SColorBGRA>				& targetPixels
 		, ::gpk::view_grid<uint32_t>						depthBuffer

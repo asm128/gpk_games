@@ -45,7 +45,7 @@ static	int											shipCreate			(::ghg::SShipState & shipState, int32_t teamId
 		//(void)indexBody;
 	}
 	const int32_t											indexShip			= shipState.ShipCores.push_back(ship);
-	shipState.ShipCoresParts.push_back({});
+	shipState.ShipParts.push_back({});
 	shipState.ShipScores.push_back({});
 
 	//ship.Parts.reserve(countParts);
@@ -78,9 +78,9 @@ static	int											shipCreate			(::ghg::SShipState & shipState, int32_t teamId
 		shipState.EntitySystem.EntityChildren[entityPart.Parent].push_back(indexEntityPart);
 		//solarSystem.ShipPhysics.Transforms[entityOrbit.Body].Orientation.Normalize();
 
-		::ghg::SShipOrbiter										shipPart				= {};
+		::ghg::SOrbiter										shipPart				= {};
 		shipPart.Entity										= entityPart.Parent;
-		shipState.ShipCoresParts[indexShip].push_back(shipState.ShipOrbiters.push_back(shipPart));
+		shipState.ShipParts[indexShip].push_back(shipState.Orbiters.push_back(shipPart));
 		shipState.ShipOrbitersDistanceToTargets.push_back({});
 		shipState.ShipOrbiterActionQueue.push_back({});
 
@@ -172,9 +172,9 @@ static	int											modelsSetup				(::ghg::SShipScene & scene)			{
 }
 
 int													ghg::solarSystemReset					(::ghg::SGalaxyHell & solarSystem)	{	// Set up enemy ships
-	::gpk::clear(solarSystem.ShipState.Scene.Transforms, solarSystem.ShipState.ShipOrbiters, solarSystem.ShipState.Weapons, solarSystem.ShipState.ShipCores);
+	::gpk::clear(solarSystem.ShipState.Scene.Transforms, solarSystem.ShipState.Orbiters, solarSystem.ShipState.Weapons, solarSystem.ShipState.ShipCores);
 	solarSystem.ShipState.Shots							= {};
-	solarSystem.ShipState.ShipCoresParts				= {};
+	solarSystem.ShipState.ShipParts				= {};
 	solarSystem.ShipState.ShipPhysics					= {};
 	solarSystem.ShipState.ShipOrbiterActionQueue		= {};
 	solarSystem.ShipState.EntitySystem.Entities			= {};
@@ -238,6 +238,21 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 	} 
 	else {
 		// Set up player ships
+		if(solarSystem.PlayState.Stage == 0) {
+			solarSystem.ShipState.ShipPhysics = {};
+			solarSystem.ShipState.EntitySystem = {};
+			::gpk::clear
+				( solarSystem.ShipState.ShipScores						
+				, solarSystem.ShipState.ShipCores						
+				, solarSystem.ShipState.ShipParts					
+				, solarSystem.ShipState.Orbiters					
+				, solarSystem.ShipState.ShipOrbitersDistanceToTargets	
+				, solarSystem.ShipState.ShipOrbiterActionQueue			
+			);
+		}
+		solarSystem.ShipState.Weapons.clear();
+		solarSystem.ShipState.Shots.clear();
+	
 		if(0 == solarSystem.ShipState.ShipCores.size()) { // Create player ship
 			solarSystem.PlayState.CameraSwitchDelay							= 0;
 			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_SKY].Target				= {};
@@ -249,36 +264,37 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_PERSPECTIVE].Up			= {0, 1, 0};
 			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_PERSPECTIVE].Position.RotateZ(::gpk::math_pi * .30);
 
-			const int32_t											indexShip						= ::shipCreate(solarSystem.ShipState, 0, 0, 0);
-			::ghg::SShipCore										& playerShip					= solarSystem.ShipState.ShipCores[indexShip];
-			::gpk::STransform3										& shipPivot						= solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[playerShip.Entity].Body];
-			shipPivot.Orientation.MakeFromEulerTaitBryan({0, 0, (float)(-::gpk::math_pi_2)});
-			shipPivot.Position									= {-30};
+			for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.PlayerCount; ++iPlayer) {
+				const int32_t											indexShip						= ::shipCreate(solarSystem.ShipState, 0, 0, 0);
+				::ghg::SShipCore										& playerShip					= solarSystem.ShipState.ShipCores[indexShip];
+				::gpk::STransform3										& shipPivot						= solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[playerShip.Entity].Body];
+				shipPivot.Orientation.MakeFromEulerTaitBryan({0, 0, (float)(-::gpk::math_pi_2)});
+				shipPivot.Position									= {-30};
+				shipPivot.Position.z = -float(solarSystem.PlayState.PlayerCount * 30) / 2 + iPlayer * 30;
+			}
 		}
 		// Set up enemy ships
-		while(((int)solarSystem.ShipState.ShipCores.size() - 2) < (int)(solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage)) {	// Create enemy ships depending on stage.
+		while(((int)solarSystem.ShipState.ShipCores.size() - (int)solarSystem.PlayState.PlayerCount - 1) < (int)(solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage)) {	// Create enemy ships depending on stage.
 			int32_t													indexShip						= ::shipCreate(solarSystem.ShipState, 1, solarSystem.PlayState.Stage + solarSystem.ShipState.ShipCores.size(), solarSystem.PlayState.Stage + solarSystem.ShipState.ShipCores.size());
 			::ghg::SShipCore										& enemyShip						= solarSystem.ShipState.ShipCores[indexShip];
-			::gpk::array_pod<uint32_t>								& enemyShipOrbiters				= solarSystem.ShipState.ShipCoresParts[indexShip];
+			::gpk::array_pod<uint32_t>								& enemyShipOrbiters				= solarSystem.ShipState.ShipParts[indexShip];
 			::gpk::STransform3										& shipTransform					= solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[enemyShip.Entity].Body];
 			shipTransform.Orientation.MakeFromEulerTaitBryan({0, 0, (float)(::gpk::math_pi_2)});
 			shipTransform.Position								= {5.0f + 5 * solarSystem.ShipState.ShipCores.size()};
 			for(uint32_t iPart = 0; iPart < enemyShipOrbiters.size(); ++iPart) {
-				const ::ghg::SShipOrbiter								& shipPart					= solarSystem.ShipState.ShipOrbiters[enemyShipOrbiters[iPart]];
+				const ::ghg::SOrbiter								& shipPart					= solarSystem.ShipState.Orbiters[enemyShipOrbiters[iPart]];
 				solarSystem.ShipState.ShipPhysics.Forces[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body].Rotation.y	*= float(1 + indexShip * .35);
 			}
 		}
 
-		solarSystem.ShipState.Weapons.clear();
-		solarSystem.ShipState.Shots.clear();
 
 		// set up weapons
 		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
 			::ghg::SShipCore										& ship							= solarSystem.ShipState.ShipCores[iShip];
-			::gpk::array_pod<uint32_t>								& shipParts						= solarSystem.ShipState.ShipCoresParts[iShip];
+			::gpk::array_pod<uint32_t>								& shipParts						= solarSystem.ShipState.ShipParts[iShip];
 			ship.Health										= 0;
 			for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
-				::ghg::SShipOrbiter									& shipPart						= solarSystem.ShipState.ShipOrbiters[shipParts[iPart]];
+				::ghg::SOrbiter									& shipPart						= solarSystem.ShipState.Orbiters[shipParts[iPart]];
 				//ship.Team										= iShip ? 1 : 0;
 				int32_t												weapon							= 0;
 				if(0 == ship.Team) {
@@ -286,6 +302,8 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 					uint32_t											maxWeapon						= ::gpk::min(solarSystem.PlayState.Stage, ::gpk::size(weaponDefinitions) - 1);
 
 					weapon											= (int32_t)::gpk::clamp((uint32_t)minWeapon + iPart, minWeapon, maxWeapon);
+					solarSystem.ShipState.ShipOrbiterActionQueue[shipParts[0]].push_back(SHIP_ACTION_spawn);
+
 				}
 				else {
 					if(iShip < 4 || 0 != ((iShip - 1 - solarSystem.PlayState.PlayerCount - solarSystem.PlayState.OffsetStage) % 3) || 0 != iPart) 
@@ -326,14 +344,15 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 				const uint32_t										depth		= ::gpk::get_value_count<::ghg::SHIP_PART_TYPE>();
 				solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Image	= iShip * width * height * depth + shipPart.Type * width * height + newWeapon.Type * width + newWeapon.Load;
 				solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Image	%= solarSystem.ShipState.Scene.Image.size();
+				solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Body].Orientation = {0, 0, 0, 1};
 			}
 		}
 	}
 
 	++solarSystem.PlayState.Stage;
 	solarSystem.PlayState.Slowing			= true;
+
 #if defined(GPK_WINDOWS)
-	solarSystem.ShipState.ShipOrbiterActionQueue[0].push_back(SHIP_ACTION_spawn);
 	//PlaySoundA((LPCSTR)SND_ALIAS_SYSTEMSTART, GetModuleHandle(0), SND_ALIAS_ID | SND_ASYNC);
 #endif
 	return 0;

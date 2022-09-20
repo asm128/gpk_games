@@ -89,7 +89,7 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(SHIP_ACTION, hit				, 18);
 
 #pragma pack(push, 1)
-	struct SShipOrbiter {
+	struct SOrbiter {
 		int32_t														Entity							= -1;
 		SHIP_PART_TYPE												Type							= SHIP_PART_TYPE_Cargo;
 		int32_t														Health							= 0;
@@ -121,8 +121,8 @@ namespace ghg
 	struct SShipState {
 		::gpk::array_pod<::ghg::SShipScore			>				ShipScores						= {};
 		::gpk::array_pod<::ghg::SShipCore			>				ShipCores						= {};
-		::gpk::array_obj<::gpk::array_pod<uint32_t>	>				ShipCoresParts					= {};
-		::gpk::array_pod<::ghg::SShipOrbiter			>			ShipOrbiters					= {};
+		::gpk::array_obj<::gpk::array_pod<uint32_t>	>				ShipParts						= {};
+		::gpk::array_pod<::ghg::SOrbiter			>				Orbiters						= {};
 		::gpk::array_pod<::ghg::SWeapon				>				Weapons							= {};
 		::gpk::array_obj<::gpk::array_pod<::gpk::SCoord3<float>>>	ShipOrbitersDistanceToTargets	= {};
 		::gpk::array_obj<::ghg::SShots				>				Shots							= {};	// one per weapon
@@ -134,17 +134,30 @@ namespace ghg
 
 		int32_t														GetShipHealth				(uint32_t iShipCore)				{ 
 			int32_t															totalHealth					= 0;
-			::gpk::view_array<const uint32_t>								shipCoreParts				= ShipCoresParts[iShipCore];
+			::gpk::view_array<const uint32_t>								shipCoreParts				= ShipParts[iShipCore];
 			for(uint32_t iShipCorePart = 0, countParts = shipCoreParts.size(); iShipCorePart < countParts; ++iShipCorePart)
-				totalHealth += ShipOrbiters[shipCoreParts[iShipCorePart]].Health;
+				totalHealth += Orbiters[shipCoreParts[iShipCorePart]].Health;
 
+			return totalHealth;
+		}
+
+		int32_t														GetTeamHealth(int32_t teamId) {
+			int32_t															totalHealth					= 0;
+			for(uint32_t iShipCore = 0, countShips = ShipCores.size(); iShipCore < countShips; ++iShipCore) {
+				if(ShipCores[iShipCore].Team != teamId) 
+					continue;
+
+				::gpk::view_array<const uint32_t>								shipCoreParts				= ShipParts[iShipCore];
+				for(uint32_t iShipCorePart = 0, countParts = shipCoreParts.size(); iShipCorePart < countParts; ++iShipCorePart) 
+					totalHealth += Orbiters[shipCoreParts[iShipCorePart]].Health;
+			}
 			return totalHealth;
 		}
 
 		::gpk::SCoord3<float>&										GetShipPosition			(const SShipCore & ship)		{ return ShipPhysics.Transforms	[EntitySystem.Entities[ship.Entity].Body].Position; }
 
-		::gpk::STransform3&											GetShipOrbiterTransform	(const SShipOrbiter & shipPart)	{ return ShipPhysics.Transforms	[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
-		::gpk::SForce3&												GetShipOrbiterForces	(const SShipOrbiter & shipPart)	{ return ShipPhysics.Forces		[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
+		::gpk::STransform3&											GetShipOrbiterTransform	(const SOrbiter & shipPart)	{ return ShipPhysics.Transforms	[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
+		::gpk::SForce3&												GetShipOrbiterForces	(const SOrbiter & shipPart)	{ return ShipPhysics.Forces		[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
 
 		inline	::gpk::SCoord3<float>&								GetShipPosition			(uint32_t indexShip)			{ return GetShipPosition(ShipCores[indexShip]); }
 
@@ -152,10 +165,10 @@ namespace ghg
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipScore	>{ShipScores	}, output);
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipCore	>{ShipCores		}, output);
 			for(uint32_t iShipCore = 0; iShipCore < ShipCores.size(); ++iShipCore) 
-				::gpk::viewWrite(::gpk::view_array<const uint32_t>{ShipCoresParts[iShipCore]}, output);
+				::gpk::viewWrite(::gpk::view_array<const uint32_t>{ShipParts[iShipCore]}, output);
 
-			::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipOrbiter	>{ShipOrbiters	}, output);
-			for(uint32_t iShipOrbiter = 0; iShipOrbiter < ShipOrbiters.size(); ++iShipOrbiter) {
+			::gpk::viewWrite(::gpk::view_array<const ::ghg::SOrbiter	>{Orbiters	}, output);
+			for(uint32_t iShipOrbiter = 0; iShipOrbiter < Orbiters.size(); ++iShipOrbiter) {
 				::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>>	{ShipOrbitersDistanceToTargets	[iShipOrbiter]}, output);
 				::gpk::viewWrite(::gpk::view_array<const ::ghg::SHIP_ACTION>	{ShipOrbiterActionQueue			[iShipOrbiter]}, output);
 			}
@@ -170,24 +183,24 @@ namespace ghg
 			return 0; 
 		}
 		::gpk::error_t									Load				(::gpk::view_array<const byte_t> & input) { 
-			::gpk::view_array<const ::ghg::SShipOrbiter	>		readShipOrbiters	= {};
+			::gpk::view_array<const ::ghg::SOrbiter	>		readShipOrbiters	= {};
 			::gpk::view_array<const ::ghg::SWeapon		>		readWeapons		= {};
 			::gpk::view_array<const ::ghg::SShipCore	>		readShipCores	= {};
 			::gpk::view_array<const ::ghg::SShipScore	>		readShipScores	= {};
 			int32_t												bytesRead		= 0;
 
-			::gpk::clear(Shots, ShipCoresParts, ShipOrbiterActionQueue, ShipOrbitersDistanceToTargets);
+			::gpk::clear(Shots, ShipParts, ShipOrbiterActionQueue, ShipOrbitersDistanceToTargets);
 
 			bytesRead = ::gpk::viewRead(readShipScores	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; ShipScores	= readShipScores;
 			bytesRead = ::gpk::viewRead(readShipCores	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; ShipCores	= readShipCores;
 			for(uint32_t iWeapon = 0; iWeapon < ShipCores.size(); ++iWeapon) {
 				::gpk::view_array<const uint32_t>					readShipCoresParts		= {};
 				bytesRead = ::gpk::viewRead(readShipCoresParts, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; 
-				ShipCoresParts.push_back(readShipCoresParts);
+				ShipParts.push_back(readShipCoresParts);
 			}
 
-			bytesRead = ::gpk::viewRead(readShipOrbiters	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; ShipOrbiters	= readShipOrbiters;
-			for(uint32_t iShipOrbiter = 0; iShipOrbiter < ShipOrbiters.size(); ++iShipOrbiter) {
+			bytesRead = ::gpk::viewRead(readShipOrbiters	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Orbiters	= readShipOrbiters;
+			for(uint32_t iShipOrbiter = 0; iShipOrbiter < Orbiters.size(); ++iShipOrbiter) {
 				::gpk::view_array<const ::gpk::SCoord3<float>>		readShipOrbitersDistanceToTargets	= {};
 				::gpk::view_array<const ::ghg::SHIP_ACTION>			readShipActions		= {};
 				bytesRead = ::gpk::viewRead(readShipOrbitersDistanceToTargets, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; 

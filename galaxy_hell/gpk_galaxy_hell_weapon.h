@@ -125,26 +125,57 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Missile		, 5);
 	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Wave		, 6);
 	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Flare		, 7);
-	
+
+	// One per value combination
+	struct SWeaponLoad {
+		WEAPON_LOAD									Type				;//= WEAPON_LOAD_Bullet;
+		WEAPON_DAMAGE								DamageType			;//= WEAPON_DAMAGE_Pierce;
+		uint8_t										ParticleCount		;//= 1;
+		float										Delay				;//= .1;
+		int32_t										Damage				;//= 1;
+		float										Lifetime			;//= 0;
+		float										Speed				;//= 150;
+		float										Weight				;//= 150;
+	};
+
+	// One per value combination
+	struct SWeaponType {
+		WEAPON_TYPE									Type				;//= WEAPON_TYPE_Gun;
+		WEAPON_DAMAGE								DamageType			;//= WEAPON_DAMAGE_Pierce;
+		int32_t										DamageMultiplier	;//= 1;
+		float										Cooldown			;//= 1;
+		float										Stability			;//= 1.0;
+		float										ShotLifetime		;//= 0;
+		float										SpeedMultiplier		;//= 150;
+	};
+
+	// One per orbiter
+	struct SWeaponState {
+		bool										CoolingDown			;//= false;
+		float										Overheat			;//= 0;
+	};
+
+	// One per orbiter
 	struct SWeapon {
 		WEAPON_TYPE									Type				;//= WEAPON_TYPE_Gun;
 		WEAPON_LOAD									Load				;//= WEAPON_LOAD_Bullet;
 		WEAPON_DAMAGE								DamageType			;//= WEAPON_DAMAGE_Pierce;
 		uint8_t										ParticleCount		;//= 1;
-		bool										CoolingDown			;//= false;
 		float										MaxDelay			;//= .1;
 		float										Delay				;//= 0;
 		float										Cooldown			;//= 1;
 		float										OverheatPerShot		;//= 0;
-		float										Overheat			;//= 0;
 		float										Stability			;//= 1.0;
 		float										Speed				;//= 150;
 		int32_t										Damage				;//= 1;
 		float										ShotLifetime		;//= 0;
+		bool										CoolingDown			;//= false;
+		float										Overheat			;//= 0;
 
 		int											Create				(::ghg::SShots & shots, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness, float lifetime)	{
 			if(Delay < MaxDelay)
 				return 0;
+
 			Delay										= 0;
 			Overheat									+= OverheatPerShot;
 			return shots.SpawnForced(position, direction, speed, brightness, lifetime);
@@ -153,6 +184,7 @@ namespace ghg
 		int											SpawnDirected		(::ghg::SShots & shots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime)	{
 			if(Delay < MaxDelay)
 				return 0;
+
 			Delay										= 0;
 			Overheat									+= OverheatPerShot;
 			return shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness, lifetime);
@@ -161,11 +193,14 @@ namespace ghg
 		int											SpawnDirected		(::ghg::SShots & shots, uint32_t countShots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime)	{
 			if(Delay < MaxDelay || 0 == countShots)
 				return 0;
+
 			int32_t											indexFirst			= -1;
 			if(countShots)
 				indexFirst									= shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness, lifetime);
+
 			for(uint32_t iDebris = 0; iDebris < (countShots - 1); ++iDebris)
 				shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness, lifetime);
+
 			Delay										= 0;
 			Overheat									+= OverheatPerShot;
 			return indexFirst;

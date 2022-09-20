@@ -11,8 +11,6 @@
 
 struct SApplication {
 	::gpk::SFramework													Framework;
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	Offscreen					= {};
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>	SwapOffscreen				= {};
 
 	::std::mutex														LockGUI;
 	::std::mutex														LockRender;

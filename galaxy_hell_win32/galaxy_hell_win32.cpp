@@ -31,7 +31,6 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "PNG Test");
 
 	::ghg::SGalaxyHellDrawCache	& drawCache = app.GalaxyHellApp.World.DrawCache;
 	::gpk::resize(4096 * 1024, drawCache.PixelCoords, drawCache.PixelVertexWeights, drawCache.LightColorsModel, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightPointsWorld);
-	app.SwapOffscreen->resize(mainWindow.Size);
 	app.AudioState.InitAudio();
 	app.AudioState.PrepareAudio("thrust.wav");
 	return 0;
@@ -44,23 +43,22 @@ int										update				(SApplication & app, bool exitSignal)	{
 	if(1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.Input, framework.MainDisplay.EventQueue))
 		return ::gpk::APPLICATION_STATE_EXIT;
 
-	app.AudioState.vListenerPos = app.GalaxyHellApp.World.ShipState.Scene.Global.Camera[app.GalaxyHellApp.World.ShipState.Scene.Global.CameraMode].Position * .05; app.AudioState.vListenerPos.y = 0; app.AudioState.listener.OrientTop = {0, 1, 0}; app.AudioState.listener.OrientFront = {1, 0, 0};  
+	app.AudioState.vListenerPos = app.GalaxyHellApp.World.ShipState.Scene.Global.Camera[app.GalaxyHellApp.World.ShipState.Scene.Global.CameraMode].Position; 
+	app.AudioState.listener.OrientTop	= {0, 1, 0}; 
+	app.AudioState.listener.OrientFront	= {1, 0, 0};  
 	
 	if(app.GalaxyHellApp.World.ShipState.ShipCores.size())
 		app.AudioState.vEmitterPos					= app.GalaxyHellApp.World.ShipState.ShipPhysics.Transforms[app.GalaxyHellApp.World.ShipState.EntitySystem.Entities[app.GalaxyHellApp.World.ShipState.ShipCores[0].Entity].Body].Position;
 	
-	app.AudioState.vEmitterPos.y				=  0;//{app.AudioState.vEmitterPos.x, 0, app.AudioState.vEmitterPos.z};
-	app.AudioState.vEmitterPos					*= .1;
-
+	app.AudioState.vEmitterPos 			*= .03f;
+	app.AudioState.vListenerPos			*= .03f;
 	if(::ghg::CAMERA_MODE_SKY == app.GalaxyHellApp.World.ShipState.Scene.Global.CameraMode) {
 		app.AudioState.vEmitterPos .x				=  0;
 		app.AudioState.vListenerPos.x				=  0;
-		app.AudioState.vEmitterPos .z				*= .75f;
-		app.AudioState.vListenerPos.z				*= .75f;
 	}
 
-		app.AudioState.emitter.DopplerScaler	= 4.0f; //float(app.GalaxyHellApp.World.PlayState.TimeScale);
-		app.AudioState.FrequencyRatio			= (float)app.GalaxyHellApp.World.PlayState.TimeScale;
+	app.AudioState.emitter.DopplerScaler	= 6.0f; //float(app.GalaxyHellApp.World.PlayState.TimeScale);
+	app.AudioState.FrequencyRatio			= (float)app.GalaxyHellApp.World.PlayState.TimeScale;
 
 	if(app.GalaxyHellApp.ActiveState == ::ghg::APP_STATE_Play && false == app.GalaxyHellApp.World.PlayState.Paused)
 		app.AudioState.PauseAudio(true);
@@ -78,14 +76,19 @@ int										update				(SApplication & app, bool exitSignal)	{
 	app.AudioState.UpdateAudio(framework.FrameInfo.Seconds.LastFrame);// / (app.GalaxyHellApp.World.ShipState.Ships.size() - 1));
 
 	{
-		::std::lock_guard<::std::mutex>			lockRTQueue	(app.GalaxyHellApp.World.DrawCache.RenderTargetQueueMutex);
-		if(app.GalaxyHellApp.RenderTarget[0]) 
-			app.Framework.MainDisplayOffscreen = app.GalaxyHellApp.RenderTarget[0];
-		else {
-			info_printf("5s", "");
+		::std::lock_guard<::std::mutex>			lockRTQueue	(app.GalaxyHellApp.RenderTargetLockQueue);
+		if(app.GalaxyHellApp.RenderTargetQueue.size()) {
+			::std::lock_guard<::std::mutex>			lockRTPool	(app.GalaxyHellApp.RenderTargetLockPool);
+			app.GalaxyHellApp.RenderTargetPool.push_back(app.Framework.MainDisplayOffscreen);
+			app.Framework.MainDisplayOffscreen = app.GalaxyHellApp.RenderTargetQueue[app.GalaxyHellApp.RenderTargetQueue.size() - 1];
+			app.GalaxyHellApp.RenderTargetQueue.pop_back(0);
+			for(uint32_t iRT = 0; iRT < app.GalaxyHellApp.RenderTargetQueue.size(); ++iRT) {
+				app.GalaxyHellApp.RenderTargetPool.push_back(app.GalaxyHellApp.RenderTargetQueue[iRT]);
+			}
+			app.GalaxyHellApp.RenderTargetQueue.clear();
 		}
-		retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 	}
+	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
 	return 0;
 }
 

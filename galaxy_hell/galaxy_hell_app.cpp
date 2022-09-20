@@ -11,7 +11,7 @@
 		switch(systemEvents[iEvent].Type) {
 		case gpk::SYSEVENT_RESIZE: {
 			app.World.DrawCache.RenderTargetMetrics = *(const ::gpk::SCoord2<uint16_t>*)systemEvents[iEvent].Data.begin();
-
+			app.RenderTargetPool.resize(16);
 			//if(app.World.DrawCache.RenderTargetMetrics.x > 1600) app.World.DrawCache.RenderTargetMetrics.x = 1600;
 			//if(app.World.DrawCache.RenderTargetMetrics.y >  900) app.World.DrawCache.RenderTargetMetrics.y = 900;
 
@@ -38,10 +38,8 @@
 			break;
 		case ::gpk::SYSEVENT_CLOSE:
 		case ::gpk::SYSEVENT_DEACTIVATE: {
-			if(app.World.ShipState.ShipCores.size() && app.World.ShipState.ShipCores[0].Health > 0) {
-				app.Save(::ghg::SAVE_MODE_AUTO);
-				app.ActiveState						= ::ghg::APP_STATE_Home;
-			}
+			app.Save(::ghg::SAVE_MODE_AUTO);
+			app.ActiveState						= ::ghg::APP_STATE_Home;
 		}
 		}
 	}
@@ -86,8 +84,15 @@
 
 ::gpk::error_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::SCoord2<uint16_t> renderTargetSize) {
 	::gpk::ptr_obj<::ghg::TRenderTarget>		target	= {};
-	target									= app.RenderTarget[1];
+	{
+		::gpk::mutex_guard			rtLock(app.RenderTargetLockPool);
+		if(app.RenderTargetPool.size()) {
+			target					= app.RenderTargetPool[0];
+			app.RenderTargetPool.remove_unordered(0);
+		}
+	}
 	target->resize(renderTargetSize.Cast<uint32_t>(), {0, 0, 0, 1}, 0xFFFFFFFFU);
+
 	::gpk::view_grid<::gpk::SColorBGRA>							targetPixels			= target->Color.View;
 	::gpk::view_grid<uint32_t>									depthBuffer				= target->DepthStencil.View;
 	switch(app.ActiveState) {
@@ -131,15 +136,15 @@
 	{
 		::std::lock_guard<::std::mutex>							lockUpdate			(app.World.LockUpdate);
 		::gpk::guiDraw(*app.DialogPerState[app.ActiveState].GUI, targetPixels);
-		if(app.ActiveState == ::ghg::APP_STATE_Play) {
-			for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUIs.size(); ++iPlayer)
-				::gpk::guiDraw(*app.UIPlay.PlayerUIs[iPlayer].Dialog.GUI, targetPixels);
-		}
+	}
+	if(app.ActiveState == ::ghg::APP_STATE_Play) {
+		::std::lock_guard<::std::mutex>							lockUpdate			(app.World.LockUpdate);
+		for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUIs.size(); ++iPlayer) 
+			::gpk::guiDraw(*app.UIPlay.PlayerUIs[iPlayer].Dialog.GUI, targetPixels);
 	}
 	{
-		::std::lock_guard<::std::mutex>				lockRTQueue	(app.World.DrawCache.RenderTargetQueueMutex);
-		app.RenderTarget[1] = app.RenderTarget[0];
-		app.RenderTarget[0] = target;
+		::gpk::mutex_guard			rtLock(app.RenderTargetLockQueue);
+		app.RenderTargetQueue.push_back(target);
 	}
 	return 0;
 }

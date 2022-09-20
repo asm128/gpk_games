@@ -7,6 +7,7 @@ static constexpr	::gpk::GUI_COLOR_MODE		GHG_MENU_COLOR_MODE		= ::gpk::GUI_COLOR_
 static constexpr	bool						BACKGROUND_3D_ONLY		= true;
 static constexpr	::gpk::SCoord2<uint16_t>	MODULE_CAMERA_SIZE		= {64, 64};
 static constexpr	::gpk::SCoord2<uint16_t>	MODULE_VIEWPORT_SIZE	= {128, 64};
+static constexpr	::gpk::SCoord2<uint16_t>	WEAPON_BAR_SIZE			= {96, 20};
 
 static	::gpk::error_t			guiSetupCommon				(::gpk::SGUI & gui) {
 	gui.ColorModeDefault			= ::gpk::GUI_COLOR_MODE_3D;
@@ -261,11 +262,6 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 	if(::ghg::APP_STATE_Play != app.ActiveState)
 		return 0;
 
-	//app.UIPlay.PlayerTextScore.resize(game.PlayState.PlayerCount);
-	//sprintf_s(app.UIPlay.PlayerTextScore[iPlayer].Storage, "Score : %i"	, game.ShipState.ShipCores[iPlayer].Score);
-
-	//::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAYER_Score, ::gpk::vcs{app.UIPlay.PlayerTextScore[iPlayer].Storage});
-
 	// Setup new viewports if necessary. This may happen if the ship acquires new modules while playing the stage
 	if(app.UIPlay.PlayerUIs.size() != game.PlayState.PlayerCount) {
 		app.UIPlay.PlayerUIs.clear();
@@ -277,33 +273,41 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 			::dialogCreateCommon(playerDialog, app.DialogPerState[0].Input, app.DialogPerState[0].GUI->CursorPos);
 
 			::gpk::SGUI			& playerGUI		= *playerDialog.GUI;
-			::guiSetupButtonList<::ghg::UI_PLAYER>(playerGUI, 240, 0, ::gpk::ALIGN_BOTTOM_LEFT, ::gpk::ALIGN_LEFT);
+			::guiSetupButtonList<::ghg::UI_PLAYER>(playerGUI, 240, 0, iPlayer ? ::gpk::ALIGN_BOTTOM_RIGHT : ::gpk::ALIGN_BOTTOM_LEFT, ::gpk::ALIGN_LEFT);
 
-			for(uint32_t iOrbiter = 0, countViewports = game.ShipState.ShipCoresParts[iPlayer].size(); iOrbiter < countViewports; ++iOrbiter) {
+			for(uint32_t iOrbiter = 0, countViewports = game.ShipState.ShipParts[iPlayer].size(); iOrbiter < countViewports; ++iOrbiter) {
 				int32_t								indexVP				= uiPlayer.ModuleViewports.push_back({});
-				uiPlayer.ModuleViewports[indexVP]->Viewport = ::gpk::controlCreate(playerGUI);
-				::gpk::controlCreate(playerGUI); // 
-				::gpk::controlCreate(playerGUI); // 
+				uiPlayer.ModuleViewports[indexVP]->Viewport = ::gpk::controlCreate(playerGUI); // Orbiter
+				::gpk::controlCreate(playerGUI); // Weapon Load
+				::gpk::controlCreate(playerGUI); // Weapon Type
 
 				::ghg::SUIPlayModuleViewport		& viewport			= *uiPlayer.ModuleViewports[indexVP];
-				viewport.RenderTarget.resize(::MODULE_CAMERA_SIZE);
+				viewport.RenderTargetOrbiter.resize(::MODULE_CAMERA_SIZE);
+				viewport.RenderTargetWeaponLoad.resize(::WEAPON_BAR_SIZE - ::gpk::SCoord2<uint16_t>{4, 4});
+				viewport.RenderTargetWeaponType.resize(::WEAPON_BAR_SIZE - ::gpk::SCoord2<uint16_t>{4, 4});
 				::gpk::SControl						& control			= playerGUI.Controls.Controls [viewport.Viewport];
-				control.Image					= viewport.RenderTarget.Color.View;
-				control.ImageAlign				= ::gpk::ALIGN_LEFT;
-				control.Align					= playerGUI.Controls.Controls [viewport.Viewport + 1].Align			= playerGUI.Controls.Controls [viewport.Viewport + 2].Align			= ::gpk::ALIGN_CENTER_LEFT;
+				control.Image					= viewport.RenderTargetOrbiter.Color.View;
+				playerGUI.Controls.Controls [viewport.Viewport + 1].Image = viewport.RenderTargetWeaponLoad.Color.View;
+				playerGUI.Controls.Controls [viewport.Viewport + 2].Image = viewport.RenderTargetWeaponType.Color.View;
+				control.ImageAlign				= playerGUI.Controls.Controls [viewport.Viewport + 1].ImageAlign	= playerGUI.Controls.Controls [viewport.Viewport + 2].ImageAlign	= ::gpk::ALIGN_CENTER;
+				control.Align					= playerGUI.Controls.Controls [viewport.Viewport + 1].Align			= playerGUI.Controls.Controls [viewport.Viewport + 2].Align			= iPlayer ? ::gpk::ALIGN_CENTER_RIGHT : ::gpk::ALIGN_CENTER_LEFT;
 				control.Area.Offset				= playerGUI.Controls.Controls [viewport.Viewport + 1].Area.Offset	= playerGUI.Controls.Controls [viewport.Viewport + 2].Area.Offset	= {0, int16_t(-(int16_t(countViewports * (MODULE_CAMERA_SIZE.y + 4)) >> 1) + (MODULE_CAMERA_SIZE.y + 4) * iOrbiter)};
 				control.Area.Size				= MODULE_CAMERA_SIZE.Cast<int16_t>();
 				control.Border					= {};
 				control.Margin					= {};
 
-				playerGUI.Controls.Controls [viewport.Viewport + 1].Area.Size	= playerGUI.Controls.Controls [viewport.Viewport + 2].Area.Size		= MODULE_VIEWPORT_SIZE.Cast<int16_t>();
-				playerGUI.Controls.Controls [viewport.Viewport + 1].Border		= playerGUI.Controls.Controls [viewport.Viewport + 2].Border		= {2, 2, 2, 2};
-				playerGUI.Controls.Controls [viewport.Viewport + 1].Margin		= playerGUI.Controls.Controls [viewport.Viewport + 2].Margin		= {2, 2, 2, 2};
-				playerGUI.Controls.Controls [viewport.Viewport + 1].Area.Offset.x	= 
-				playerGUI.Controls.Controls [viewport.Viewport + 2].Area.Offset.x	= MODULE_CAMERA_SIZE.x + 2;
 
-				playerGUI.Controls.Text		[viewport.Viewport + 1].Align			= ::gpk::ALIGN_TOP_LEFT;
-				playerGUI.Controls.Text		[viewport.Viewport + 2].Align			= ::gpk::ALIGN_BOTTOM_LEFT;
+				playerGUI.Controls.Controls [viewport.Viewport + 1].Area.Size	= playerGUI.Controls.Controls [viewport.Viewport + 2].Area.Size		= WEAPON_BAR_SIZE.Cast<int16_t>();	//MODULE_VIEWPORT_SIZE.Cast<int16_t>();
+				playerGUI.Controls.Controls [viewport.Viewport + 1].Border		= playerGUI.Controls.Controls [viewport.Viewport + 2].Border		= {2, 2, 2, 2};
+				playerGUI.Controls.Controls [viewport.Viewport + 1].Margin		= playerGUI.Controls.Controls [viewport.Viewport + 2].Margin		= {}; //{2, 2, 2, 2};
+				playerGUI.Controls.Controls [viewport.Viewport + 1].Area.Offset.y	-= WEAPON_BAR_SIZE.y / 2 + 1;
+				playerGUI.Controls.Controls [viewport.Viewport + 2].Area.Offset.y	+= WEAPON_BAR_SIZE.y / 2 + 1;
+
+				playerGUI.Controls.Controls [viewport.Viewport + 1].Area.Offset.x	+= 
+				playerGUI.Controls.Controls [viewport.Viewport + 2].Area.Offset.x	+= MODULE_CAMERA_SIZE.x + 1;
+
+				playerGUI.Controls.Text		[viewport.Viewport + 1].Align			= iPlayer ? ::gpk::ALIGN_CENTER_RIGHT : ::gpk::ALIGN_CENTER_LEFT;
+				playerGUI.Controls.Text		[viewport.Viewport + 2].Align			= iPlayer ? ::gpk::ALIGN_CENTER_RIGHT : ::gpk::ALIGN_CENTER_LEFT;
 
 				playerGUI.Controls.Modes	[viewport.Viewport + 0].NoBackgroundRect		= true;
 				playerGUI.Controls.Modes	[viewport.Viewport + 1].NoBackgroundRect		= true;
@@ -316,13 +320,13 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 				matrixProjection						*= matrixViewport;
 
 
-				const ::gpk::SCircle<float> circleLife		= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 0, viewport.RenderTarget.Color.View.metrics().Cast<float>() * .5};
-				const ::gpk::SCircle<float> circleDelay		= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 1, viewport.RenderTarget.Color.View.metrics().Cast<float>() * .5};
-				const ::gpk::SCircle<float> circleCooldown	= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 2, viewport.RenderTarget.Color.View.metrics().Cast<float>() * .5};
+				const ::gpk::SCircle<float> circleLife		= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 0, viewport.RenderTargetOrbiter.Color.View.metrics().Cast<float>() * .5};
+				const ::gpk::SCircle<float> circleDelay		= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 1, viewport.RenderTargetOrbiter.Color.View.metrics().Cast<float>() * .5};
+				const ::gpk::SCircle<float> circleCooldown	= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 2, viewport.RenderTargetOrbiter.Color.View.metrics().Cast<float>() * .5};
 		
-				::ghg::gaugeBuildRadial(viewport.GaugeLife		, circleLife		, 32, 6);
-				::ghg::gaugeBuildRadial(viewport.GaugeDelay		, circleDelay		, 32, 6);
-				::ghg::gaugeBuildRadial(viewport.GaugeCooldown	, circleCooldown	, 32, 6);
+				::ghg::gaugeBuildRadial(viewport.GaugeLife		, circleLife		, 32, 12);
+				//::ghg::gaugeBuildRadial(viewport.GaugeDelay		, circleDelay		, 32, 6);
+				//::ghg::gaugeBuildRadial(viewport.GaugeCooldown	, circleCooldown	, 32, 6);
 
 
 			}
@@ -357,80 +361,98 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 
 		::gpk::SDialog		& playerDialog	= uiPlayer.Dialog;
 		::gpk::SGUI			& playerGUI		= *playerDialog.GUI;
-		for(uint32_t iOrbiter = 0, countViewports = game.ShipState.ShipCoresParts[iPlayer].size(); iOrbiter < countViewports; ++iOrbiter) {
+		for(uint32_t iOrbiter = 0, countViewports = game.ShipState.ShipParts[iPlayer].size(); iOrbiter < countViewports; ++iOrbiter) {
 			::ghg::SUIPlayModuleViewport		& viewport			= *uiPlayer.ModuleViewports[iOrbiter];
 
-			const ::ghg::SShipOrbiter			& orbiter			= game.ShipState.ShipOrbiters[game.ShipState.ShipCoresParts[iPlayer][iOrbiter]];
+			const ::ghg::SOrbiter				& orbiter			= game.ShipState.Orbiters[game.ShipState.ShipParts[iPlayer][iOrbiter]];
 			const ::ghg::SWeapon				& weapon			= game.ShipState.Weapons[orbiter.Weapon];
 
 			gpk_necall(::gpk::controlTextSet(playerGUI, viewport.Viewport + 1, ::gpk::get_value_label(weapon.Load)), "%s", "");
 			gpk_necall(::gpk::controlTextSet(playerGUI, viewport.Viewport + 2, ::gpk::get_value_label(weapon.Type)), "%s", "");
 
-			::ghg::TRenderTarget				& renderTarget		= viewport.RenderTarget;
-			::gpk::view_grid<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
-			::gpk::view_grid<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
+			const float							healthRatio			= ::gpk::clamp(orbiter.Health	/ float(orbiter.MaxHealth), 0.0f, 1.0f);
+			const float							ratioOverheat		= (orbiter.Health > 0) ? ::gpk::clamp(weapon.Overheat	/ float(weapon.Cooldown), 0.0f, 1.0f) : 0;
+			const float							ratioDelay			= (orbiter.Health > 0) ? ::gpk::clamp(weapon.Delay		/ float(weapon.MaxDelay), 0.0f, 1.0f) : 0;
 
-			const float							healthRatio			= orbiter.Health	/ float(orbiter.MaxHealth);
-			const float							ratioOverheat		= (orbiter.Health > 0) ? weapon.Overheat	/ float(weapon.Cooldown) : 0;
-			const float							ratioDelay			= (orbiter.Health > 0) ? weapon.Delay		/ float(weapon.MaxDelay) : 0;
-
-			const float							toneWeight			= fabsf(sinf((float)game.PlayState.TimeStage));
-			::gpk::SColorFloat					tone				= {::gpk::SColorFloat{::gpk::DARKRED * .5f} * (1.0f - healthRatio) * toneWeight};
-			//tone.a							= tone.r;
-			//targetPixels.fill(tone);
-			memset(targetPixels.begin(), 0, targetPixels.byte_count());
-			memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
-
-			drawCache.PixelCoords.clear();
-
-			::gpk::SMatrix4<float>									matrixView				= {};
-			::gpk::SCamera											& camera				= viewport.Camera;
-			camera.Target										= game.ShipState.Scene.Transforms[game.ShipState.EntitySystem.Entities[orbiter.Entity + 1].Transform].GetTranslation();
-			camera.Position										= camera.Target;
-			camera.Position.y									+= 10; //-= 20;
-			camera.Up											= {1, 0, 0};
-			matrixView.LookAt(camera.Position, camera.Target, camera.Up);
-			matrixView											*= uiPlayer.ModuleViewports[iOrbiter]->MatrixProjection;
-
-			uint32_t												pixelsDrawn				= 0;
-			pixelsDrawn											+= ::ghg::drawShipOrbiter(game.ShipState, orbiter, matrixView, targetPixels, depthBuffer, drawCache);
+			const ::gpk::SColorFloat colorLife		= ::gpk::interpolate_linear(::gpk::RED, ::gpk::GREEN, healthRatio);
+			const ::gpk::SColorFloat colorDelay		= ::gpk::interpolate_linear(::gpk::GRAY * .5, ::gpk::YELLOW, ratioDelay);;
+			const ::gpk::SColorFloat colorCooldown	= ::gpk::interpolate_linear(::gpk::LIGHTBLUE * ::gpk::CYAN, ::gpk::ORANGE * .5 + ::gpk::RED * .5, ratioOverheat);
 
 			viewport.GaugeLife		.SetValue(healthRatio	);
-			viewport.GaugeDelay		.SetValue(ratioDelay	);
-			viewport.GaugeCooldown	.SetValue(ratioOverheat	);
+			//viewport.GaugeDelay		.SetValue(ratioDelay	);
+			//viewport.GaugeCooldown	.SetValue(ratioOverheat	);
 
-			const ::gpk::SColorFloat colorLife		= ::gpk::interpolate_linear(::gpk::DARKRED, ::gpk::GREEN, healthRatio);
-			const ::gpk::SColorFloat colorDelay		= ::gpk::YELLOW;
-			const ::gpk::SColorFloat colorCooldown	= ::gpk::interpolate_linear(::gpk::LIGHTBLUE, ::gpk::ORANGE * .5 + ::gpk::RED * .5, ratioOverheat);
+			//const float							toneWeight			= fabsf(sinf((float)game.PlayState.TimeStage));
+			//::gpk::SColorFloat					tone				= {::gpk::SColorFloat{::gpk::DARKRED * .5f} * (1.0f - healthRatio) * toneWeight};
 
-			::ghg::gaugeImageUpdate(viewport.GaugeLife		, targetPixels, colorLife		, colorLife		, colorLife		);
-			::ghg::gaugeImageUpdate(viewport.GaugeDelay		, targetPixels, colorDelay		, colorDelay	, colorDelay	);
-			::ghg::gaugeImageUpdate(viewport.GaugeCooldown	, targetPixels, colorCooldown	, colorCooldown	, colorCooldown	);
+			{
+				::gpk::SMatrix4<float>									matrixView				= {};
+				::gpk::SCamera											& camera				= viewport.Camera;
+				camera.Target										= game.ShipState.Scene.Transforms[game.ShipState.EntitySystem.Entities[orbiter.Entity + 1].Transform].GetTranslation();
+				camera.Position										= camera.Target;
+				camera.Position.y									+= 7; //-= 20;
+				camera.Up											= {1, 0, 0};
+				matrixView.LookAt(camera.Position, camera.Target, camera.Up);
+				matrixView											*= uiPlayer.ModuleViewports[iOrbiter]->MatrixProjection;
 
-			//drawCache.PixelCoords.clear();
-			//for(uint32_t iLine = 0; iLine < 3; ++iLine)
-			//	::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{{0, (int16_t)(targetPixels.metrics().y - 1 * iLine)}, {int16_t((targetPixels.metrics().x - 1) * healthRatio), (int16_t)(targetPixels.metrics().y - 1 * iLine)}}, drawCache.PixelCoords);
+				::ghg::TRenderTarget				& renderTarget		= viewport.RenderTargetOrbiter;
+				::gpk::view_grid<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
+				::gpk::view_grid<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
+				//targetPixels.fill(tone);
+				memset(targetPixels.begin(), 0, targetPixels.byte_count());
+				memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
+
+				drawCache.PixelCoords.clear();
+				uint32_t												pixelsDrawn				= 0;
+				pixelsDrawn											+= ::ghg::drawShipOrbiter(game.ShipState, orbiter, matrixView, targetPixels, depthBuffer, drawCache);
+
+				if(healthRatio		) ::ghg::gaugeImageUpdate(viewport.GaugeLife		, targetPixels, colorLife		, colorLife		, colorLife		);
+				//if(ratioDelay		) ::ghg::gaugeImageUpdate(viewport.GaugeDelay		, targetPixels, colorDelay		, colorDelay	, colorDelay	);
+				//if(ratioOverheat	) ::ghg::gaugeImageUpdate(viewport.GaugeCooldown	, targetPixels, colorCooldown	, colorCooldown	, colorCooldown	);
+			}
+			//{
+			//	drawCache.PixelCoords.clear();
+			//	for(uint32_t iLine = 0; iLine < 3; ++iLine)
+			//		::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{{0, (int16_t)(targetPixels.metrics().y - 1 * iLine)}, {int16_t((targetPixels.metrics().x - 1) * healthRatio), (int16_t)(targetPixels.metrics().y - 1 * iLine)}}, drawCache.PixelCoords);
 			//	
-			//for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) {
-			//	::gpk::setPixel(targetPixels, drawCache.PixelCoords[iPixel], colorLife);
+			//	for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) {
+			//		::gpk::setPixel(targetPixels, drawCache.PixelCoords[iPixel], colorLife);
+			//	}
 			//}
-			//	
-			//drawCache.PixelCoords.clear();
-			//for(uint32_t iLine = 3; iLine < 6; ++iLine)
-			//	::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{{0, (int16_t)(targetPixels.metrics().y - 1 * iLine)}, {int16_t((targetPixels.metrics().x - 1) * ratioOverheat), (int16_t)(targetPixels.metrics().y - 1 * iLine)}}, drawCache.PixelCoords);
-			//	
-			//for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) {
-			//	::gpk::setPixel(targetPixels, drawCache.PixelCoords[iPixel], colorCooldown);
-			//}
-			//	
-			//drawCache.PixelCoords.clear();
-			//for(uint32_t iLine = 6; iLine < 9; ++iLine)
-			//	::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{{0, (int16_t)(targetPixels.metrics().y - 1 * iLine)}, {int16_t((targetPixels.metrics().x - 1) * ratioDelay), (int16_t)(targetPixels.metrics().y - 1 * iLine)}}, drawCache.PixelCoords);
-			//	
-			//for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) {
-			//	::gpk::setPixel(targetPixels, drawCache.PixelCoords[iPixel], colorDelay);
-			//}
+			 {
+				::ghg::TRenderTarget				& renderTarget		= viewport.RenderTargetWeaponLoad;
+				::gpk::view_grid<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
+				::gpk::view_grid<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
+				//targetPixels.fill(tone);
+				memset(targetPixels.begin(), 0, targetPixels.byte_count());
+				memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
 
+				if(ratioDelay) {
+					drawCache.PixelCoords.clear();
+					for(uint32_t iLine = 0; iLine < WEAPON_BAR_SIZE.y; ++iLine)
+						::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{{0, (int16_t)(targetPixels.metrics().y - 1 * iLine)}, {int16_t((targetPixels.metrics().x - 1) * ratioDelay), (int16_t)(targetPixels.metrics().y - 1 * iLine)}}, drawCache.PixelCoords);
+				
+					for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) 
+						::gpk::setPixel(targetPixels, drawCache.PixelCoords[iPixel], colorDelay * .35);
+				}
+			}
+
+			{
+				::ghg::TRenderTarget				& renderTarget		= viewport.RenderTargetWeaponType;
+				::gpk::view_grid<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
+				::gpk::view_grid<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
+				//targetPixels.fill(tone);
+				memset(targetPixels.begin(), 0, targetPixels.byte_count());
+				memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
+				if(ratioOverheat) {
+					drawCache.PixelCoords.clear();
+					for(uint32_t iLine = 0; iLine < WEAPON_BAR_SIZE.y; ++iLine)
+						::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{{0, (int16_t)(targetPixels.metrics().y - 1 * iLine)}, {int16_t((targetPixels.metrics().x - 1) * ratioOverheat), (int16_t)(targetPixels.metrics().y - 1 * iLine)}}, drawCache.PixelCoords);
+				
+					for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) 
+						::gpk::setPixel(targetPixels, drawCache.PixelCoords[iPixel], colorCooldown);
+				}
+			}
 		}
 	}
 
