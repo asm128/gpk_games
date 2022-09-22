@@ -236,11 +236,6 @@ template<size_t _nStorageSize>
 	return 0;
 }
 
-
-//static	::gpk::error_t			playerUISetup				(::ghg::SGalaxyHellApp & app) { 
-//	return 0;
-//}
-
 static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) { 
 	::ghg::SGalaxyHell					& game						= app.World;
 
@@ -283,8 +278,8 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 
 				::ghg::SUIPlayModuleViewport		& viewport			= *uiPlayer.ModuleViewports[indexVP];
 				viewport.RenderTargetOrbiter.resize(::MODULE_CAMERA_SIZE);
-				viewport.RenderTargetWeaponLoad.resize(::WEAPON_BAR_SIZE - ::gpk::SCoord2<uint16_t>{4, 4});
-				viewport.RenderTargetWeaponType.resize(::WEAPON_BAR_SIZE - ::gpk::SCoord2<uint16_t>{4, 4});
+				viewport.RenderTargetWeaponLoad.resize(::WEAPON_BAR_SIZE);
+				viewport.RenderTargetWeaponType.resize(::WEAPON_BAR_SIZE);
 				::gpk::SControl						& control			= playerGUI.Controls.Controls [viewport.Viewport];
 				control.Image					= viewport.RenderTargetOrbiter.Color.View;
 				playerGUI.Controls.Controls [viewport.Viewport + 1].Image = viewport.RenderTargetWeaponLoad.Color.View;
@@ -296,18 +291,17 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 				control.Border					= {};
 				control.Margin					= {};
 
-
 				playerGUI.Controls.Controls [viewport.Viewport + 1].Area.Size	= playerGUI.Controls.Controls [viewport.Viewport + 2].Area.Size		= WEAPON_BAR_SIZE.Cast<int16_t>();	//MODULE_VIEWPORT_SIZE.Cast<int16_t>();
 				playerGUI.Controls.Controls [viewport.Viewport + 1].Border		= playerGUI.Controls.Controls [viewport.Viewport + 2].Border		= {2, 2, 2, 2};
-				playerGUI.Controls.Controls [viewport.Viewport + 1].Margin		= playerGUI.Controls.Controls [viewport.Viewport + 2].Margin		= {}; //{2, 2, 2, 2};
+				playerGUI.Controls.Controls [viewport.Viewport + 1].Margin		= playerGUI.Controls.Controls [viewport.Viewport + 2].Margin		= {};
 				playerGUI.Controls.Controls [viewport.Viewport + 1].Area.Offset.y	-= WEAPON_BAR_SIZE.y / 2 + 1;
 				playerGUI.Controls.Controls [viewport.Viewport + 2].Area.Offset.y	+= WEAPON_BAR_SIZE.y / 2 + 1;
 
 				playerGUI.Controls.Controls [viewport.Viewport + 1].Area.Offset.x	+= 
 				playerGUI.Controls.Controls [viewport.Viewport + 2].Area.Offset.x	+= MODULE_CAMERA_SIZE.x + 1;
 
-				playerGUI.Controls.Text		[viewport.Viewport + 1].Align			= iPlayer ? ::gpk::ALIGN_CENTER_RIGHT : ::gpk::ALIGN_CENTER_LEFT;
-				playerGUI.Controls.Text		[viewport.Viewport + 2].Align			= iPlayer ? ::gpk::ALIGN_CENTER_RIGHT : ::gpk::ALIGN_CENTER_LEFT;
+				playerGUI.Controls.Text		[viewport.Viewport + 1].Align			= ::gpk::ALIGN_CENTER; //iPlayer ? ::gpk::ALIGN_CENTER_RIGHT : ::gpk::ALIGN_CENTER_LEFT;
+				playerGUI.Controls.Text		[viewport.Viewport + 2].Align			= ::gpk::ALIGN_CENTER; //iPlayer ? ::gpk::ALIGN_CENTER_RIGHT : ::gpk::ALIGN_CENTER_LEFT;
 
 				playerGUI.Controls.Modes	[viewport.Viewport + 0].NoBackgroundRect		= true;
 				playerGUI.Controls.Modes	[viewport.Viewport + 1].NoBackgroundRect		= true;
@@ -325,10 +319,6 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 				const ::gpk::SCircle<float> circleCooldown	= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 2, viewport.RenderTargetOrbiter.Color.View.metrics().Cast<float>() * .5};
 		
 				::ghg::gaugeBuildRadial(viewport.GaugeLife		, circleLife		, 32, 12);
-				//::ghg::gaugeBuildRadial(viewport.GaugeDelay		, circleDelay		, 32, 6);
-				//::ghg::gaugeBuildRadial(viewport.GaugeCooldown	, circleCooldown	, 32, 6);
-
-
 			}
 			playerDialog.Update();
 		}
@@ -379,11 +369,6 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 			const ::gpk::SColorFloat colorCooldown	= ::gpk::interpolate_linear(::gpk::LIGHTBLUE * ::gpk::CYAN, ::gpk::ORANGE * .5 + ::gpk::RED * .5, ratioOverheat);
 
 			viewport.GaugeLife		.SetValue(healthRatio	);
-			//viewport.GaugeDelay		.SetValue(ratioDelay	);
-			//viewport.GaugeCooldown	.SetValue(ratioOverheat	);
-
-			//const float							toneWeight			= fabsf(sinf((float)game.PlayState.TimeStage));
-			//::gpk::SColorFloat					tone				= {::gpk::SColorFloat{::gpk::DARKRED * .5f} * (1.0f - healthRatio) * toneWeight};
 
 			{
 				::gpk::SMatrix4<float>									matrixView				= {};
@@ -407,33 +392,25 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 				pixelsDrawn											+= ::ghg::drawShipOrbiter(game.ShipState, orbiter, matrixView, targetPixels, depthBuffer, drawCache);
 
 				if(healthRatio		) ::ghg::gaugeImageUpdate(viewport.GaugeLife		, targetPixels, colorLife		, colorLife		, colorLife		);
-				//if(ratioDelay		) ::ghg::gaugeImageUpdate(viewport.GaugeDelay		, targetPixels, colorDelay		, colorDelay	, colorDelay	);
-				//if(ratioOverheat	) ::ghg::gaugeImageUpdate(viewport.GaugeCooldown	, targetPixels, colorCooldown	, colorCooldown	, colorCooldown	);
 			}
-			//{
-			//	drawCache.PixelCoords.clear();
-			//	for(uint32_t iLine = 0; iLine < 3; ++iLine)
-			//		::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{{0, (int16_t)(targetPixels.metrics().y - 1 * iLine)}, {int16_t((targetPixels.metrics().x - 1) * healthRatio), (int16_t)(targetPixels.metrics().y - 1 * iLine)}}, drawCache.PixelCoords);
-			//	
-			//	for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) {
-			//		::gpk::setPixel(targetPixels, drawCache.PixelCoords[iPixel], colorLife);
-			//	}
-			//}
 			 {
 				::ghg::TRenderTarget				& renderTarget		= viewport.RenderTargetWeaponLoad;
 				::gpk::view_grid<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
 				::gpk::view_grid<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
-				//targetPixels.fill(tone);
 				memset(targetPixels.begin(), 0, targetPixels.byte_count());
 				memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
 
 				if(ratioDelay) {
 					drawCache.PixelCoords.clear();
-					for(uint32_t iLine = 0; iLine < WEAPON_BAR_SIZE.y; ++iLine)
-						::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{{0, (int16_t)(targetPixels.metrics().y - 1 * iLine)}, {int16_t((targetPixels.metrics().x - 1) * ratioDelay), (int16_t)(targetPixels.metrics().y - 1 * iLine)}}, drawCache.PixelCoords);
+					for(uint32_t iLine = 0; iLine < targetPixels.metrics().y; ++iLine)
+						::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{{0, (int16_t)iLine}, {int16_t((targetPixels.metrics().x - 1) * ratioDelay), (int16_t)iLine}}, drawCache.PixelCoords);
 				
-					for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) 
-						::gpk::setPixel(targetPixels, drawCache.PixelCoords[iPixel], colorDelay * .35);
+					for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) {
+						const ::gpk::SCoord2<int16_t>		& pixelCoord = drawCache.PixelCoords[iPixel];
+						const ::gpk::SCoord2<float>			floatCoord						= pixelCoord.Cast<float>();
+						const double						distanceFromCenter				= fabs((floatCoord.y / (targetPixels.metrics().y)) - .5) * 2.0;
+						::gpk::setPixel(targetPixels, pixelCoord, ::gpk::interpolate_linear(colorDelay, ::gpk::GRAY * .25, distanceFromCenter));
+					}
 				}
 			}
 
@@ -441,16 +418,19 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 				::ghg::TRenderTarget				& renderTarget		= viewport.RenderTargetWeaponType;
 				::gpk::view_grid<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
 				::gpk::view_grid<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
-				//targetPixels.fill(tone);
 				memset(targetPixels.begin(), 0, targetPixels.byte_count());
 				memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
 				if(ratioOverheat) {
 					drawCache.PixelCoords.clear();
-					for(uint32_t iLine = 0; iLine < WEAPON_BAR_SIZE.y; ++iLine)
-						::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{{0, (int16_t)(targetPixels.metrics().y - 1 * iLine)}, {int16_t((targetPixels.metrics().x - 1) * ratioOverheat), (int16_t)(targetPixels.metrics().y - 1 * iLine)}}, drawCache.PixelCoords);
+					for(uint32_t iLine = 0; iLine < targetPixels.metrics().y; ++iLine)
+						::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{{0, (int16_t)iLine}, {int16_t((targetPixels.metrics().x - 1) * ratioOverheat), (int16_t)iLine}}, drawCache.PixelCoords);
 				
-					for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) 
-						::gpk::setPixel(targetPixels, drawCache.PixelCoords[iPixel], colorCooldown);
+					for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) {
+						const ::gpk::SCoord2<int16_t>		& pixelCoord = drawCache.PixelCoords[iPixel];
+						const ::gpk::SCoord2<float>			floatCoord						= pixelCoord.Cast<float>();
+						const double						distanceFromCenter				= fabs((floatCoord.y / (targetPixels.metrics().y)) - .5) * 2.0;
+						::gpk::setPixel(targetPixels, drawCache.PixelCoords[iPixel], ::gpk::interpolate_linear(colorCooldown, ::gpk::GRAY * .25, distanceFromCenter));
+					}
 				}
 			}
 		}

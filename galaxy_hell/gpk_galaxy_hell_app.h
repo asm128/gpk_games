@@ -21,13 +21,6 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(APP_STATE, Load		, 13);
 	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 14);
 
-	// Start New Game
-	// Continue Game
-	// Load Game
-	// Save Game
-	// High Scores
-	// Credits
-	// Exit
 	GDEFINE_ENUM_TYPE (UI_HOME, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_HOME, Continue		, 0);
 	GDEFINE_ENUM_VALUE(UI_HOME, Start			, 1);
