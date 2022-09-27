@@ -27,9 +27,6 @@
     <ClCompile Include="galaxy_hell_gui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="galaxy_hell_physics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="galaxy_hell_deco.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

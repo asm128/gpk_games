@@ -29,7 +29,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT_MT(::SApplication, "PNG Test");
 	//framework.UseDoubleBuffer				= true;
 	srand((uint32_t)time(0));
 
-	::ghg::SGalaxyHellDrawCache	& drawCache = app.GalaxyHellApp.World.DrawCache;
+	::ghg::SGalaxyHellDrawCache	& drawCache = app.GalaxyHellApp.Game.DrawCache;
 	::gpk::resize(4096 * 1024, drawCache.PixelCoords, drawCache.PixelVertexWeights, drawCache.LightColorsModel, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightPointsWorld);
 	app.AudioState.InitAudio();
 	app.AudioState.PrepareAudio("thrust.wav");
@@ -43,24 +43,24 @@ int										update				(SApplication & app, bool exitSignal)	{
 	if(1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.Input, framework.MainDisplay.EventQueue))
 		return ::gpk::APPLICATION_STATE_EXIT;
 
-	app.AudioState.vListenerPos = app.GalaxyHellApp.World.ShipState.Scene.Global.Camera[app.GalaxyHellApp.World.ShipState.Scene.Global.CameraMode].Position; 
+	app.AudioState.vListenerPos = app.GalaxyHellApp.Game.ShipState.Scene.Global.Camera[app.GalaxyHellApp.Game.ShipState.Scene.Global.CameraMode].Position; 
 	app.AudioState.listener.OrientTop	= {0, 1, 0}; 
 	app.AudioState.listener.OrientFront	= {1, 0, 0};  
 	
-	if(app.GalaxyHellApp.World.ShipState.ShipCores.size())
-		app.AudioState.vEmitterPos					= app.GalaxyHellApp.World.ShipState.ShipPhysics.Transforms[app.GalaxyHellApp.World.ShipState.EntitySystem.Entities[app.GalaxyHellApp.World.ShipState.ShipCores[0].Entity].Body].Position;
+	if(app.GalaxyHellApp.Game.ShipState.ShipCores.size())
+		app.AudioState.vEmitterPos					= app.GalaxyHellApp.Game.ShipState.ShipPhysics.Transforms[app.GalaxyHellApp.Game.ShipState.EntitySystem.Entities[app.GalaxyHellApp.Game.ShipState.ShipCores[0].Entity].Body].Position;
 	
 	app.AudioState.vEmitterPos 			*= .03f;
 	app.AudioState.vListenerPos			*= .03f;
-	if(::ghg::CAMERA_MODE_SKY == app.GalaxyHellApp.World.ShipState.Scene.Global.CameraMode) {
+	if(::ghg::CAMERA_MODE_SKY == app.GalaxyHellApp.Game.ShipState.Scene.Global.CameraMode) {
 		app.AudioState.vEmitterPos .x				=  0;
 		app.AudioState.vListenerPos.x				=  0;
 	}
 
 	app.AudioState.emitter.DopplerScaler	= 6.0f; //float(app.GalaxyHellApp.World.PlayState.TimeScale);
-	app.AudioState.FrequencyRatio			= (float)app.GalaxyHellApp.World.PlayState.TimeScale;
+	app.AudioState.FrequencyRatio			= (float)app.GalaxyHellApp.Game.PlayState.TimeScale;
 
-	if(app.GalaxyHellApp.ActiveState == ::ghg::APP_STATE_Play && false == app.GalaxyHellApp.World.PlayState.Paused)
+	if(app.GalaxyHellApp.ActiveState == ::ghg::APP_STATE_Play && false == app.GalaxyHellApp.Game.PlayState.Paused)
 		app.AudioState.PauseAudio(true);
 	else
 		app.AudioState.PauseAudio(false);

@@ -35,17 +35,19 @@ namespace ghg
 		::gpk::array_pod<::gpk::SMatrix4<float>>			Transforms						= {}; // Ope per entity
 
 		::gpk::error_t										Save(::gpk::array_pod<byte_t> & output) const { 
-			::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipSceneGlobal>{&Global, 1}, output);
-			::gpk::viewWrite(::gpk::view_array<const ::gpk::SMatrix4<float>>{Transforms}, output);
+			gpk_necs(::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipSceneGlobal>{&Global, 1}, output));
+			gpk_necs(::gpk::viewWrite(Transforms, output));
+			info_printf("Saved %s, %i", "Geometries"	, Geometry	.size());
+			info_printf("Saved %s, %i", "Images"		, Image		.size());
+			info_printf("Saved %s, %i", "Transforms"	, Transforms.size());
 			return 0; 
 		}
+
 		::gpk::error_t										Load(::gpk::view_array<const byte_t> & input) { 
-			::gpk::view_array<const ::ghg::SShipSceneGlobal>		readGlobal				= {};
-			::gpk::view_array<const ::gpk::SMatrix4<float>>			readTransforms			= {};
 			int32_t													bytesRead				= 0;
-			bytesRead = ::gpk::viewRead(readGlobal		, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Global		= readGlobal[0];
-			bytesRead = ::gpk::viewRead(readTransforms	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Transforms	= readTransforms;
-			return bytesRead; 
+			::gpk::view_array<const ::ghg::SShipSceneGlobal> readGlobal		= {}; gpk_necs(bytesRead = ::gpk::viewRead(readGlobal		, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Global		= readGlobal[0];
+			::gpk::view_array<const ::gpk::SMatrix4<float>>	 readTransforms	= {}; gpk_necs(bytesRead = ::gpk::viewRead(readTransforms	, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Transforms	= readTransforms;
+			return 0; 
 		}
 	};
 
@@ -164,19 +166,28 @@ namespace ghg
 		::gpk::error_t												Save					(::gpk::array_pod<byte_t> & output) const { 
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipScore	>{ShipScores	}, output);
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipCore	>{ShipCores		}, output);
-			for(uint32_t iShipCore = 0; iShipCore < ShipCores.size(); ++iShipCore) 
-				::gpk::viewWrite(::gpk::view_array<const uint32_t>{ShipParts[iShipCore]}, output);
+			uint32_t												totalEntityChildren				= 0;
+			for(uint32_t iShipCore = 0; iShipCore < ShipCores.size(); ++iShipCore) {
+				::gpk::view_array<const uint32_t> v{ShipParts[iShipCore]};
+				::gpk::viewWrite(v, output);
+				totalEntityChildren += v.size();
+			}
 
+			info_printf("Saved %s, %i", "ShipScores	", ShipScores	.size());
+			info_printf("Saved %s, %i", "ShipCores	", ShipCores	.size());
+	
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SOrbiter	>{Orbiters	}, output);
+			info_printf("Saved %s, %i", "Orbiters", Orbiters.size());
 			for(uint32_t iShipOrbiter = 0; iShipOrbiter < Orbiters.size(); ++iShipOrbiter) {
 				::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>>	{ShipOrbitersDistanceToTargets	[iShipOrbiter]}, output);
 				::gpk::viewWrite(::gpk::view_array<const ::ghg::SHIP_ACTION>	{ShipOrbiterActionQueue			[iShipOrbiter]}, output);
 			}
 
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SWeapon>{Weapons}, output);
-			for(uint32_t iWeapon = 0; iWeapon < Weapons.size(); ++iWeapon)
+			info_printf("Saved %s, %i", "Weapons", Weapons.size());
+			for(uint32_t iWeapon = 0; iWeapon < Weapons.size(); ++iWeapon) 
 				Shots[iWeapon].Save(output);
-
+			
 			ShipPhysics	.Save(output);
 			EntitySystem.Save(output);
 			Scene		.Save(output);
@@ -184,38 +195,38 @@ namespace ghg
 		}
 		::gpk::error_t									Load				(::gpk::view_array<const byte_t> & input) { 
 			::gpk::view_array<const ::ghg::SOrbiter	>		readShipOrbiters	= {};
-			::gpk::view_array<const ::ghg::SWeapon		>		readWeapons		= {};
-			::gpk::view_array<const ::ghg::SShipCore	>		readShipCores	= {};
-			::gpk::view_array<const ::ghg::SShipScore	>		readShipScores	= {};
-			int32_t												bytesRead		= 0;
+			::gpk::view_array<const ::ghg::SWeapon		>	readWeapons		= {};
+			::gpk::view_array<const ::ghg::SShipCore	>	readShipCores	= {};
+			::gpk::view_array<const ::ghg::SShipScore	>	readShipScores	= {};
+			int32_t											bytesRead		= 0;
 
 			::gpk::clear(Shots, ShipParts, ShipOrbiterActionQueue, ShipOrbitersDistanceToTargets);
 
-			bytesRead = ::gpk::viewRead(readShipScores	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; ShipScores	= readShipScores;
-			bytesRead = ::gpk::viewRead(readShipCores	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; ShipCores	= readShipCores;
+			gpk_necs(bytesRead = ::gpk::viewRead(readShipScores	, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; ShipScores	= readShipScores;
+			gpk_necs(bytesRead = ::gpk::viewRead(readShipCores	, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; ShipCores	= readShipCores;
 			for(uint32_t iWeapon = 0; iWeapon < ShipCores.size(); ++iWeapon) {
 				::gpk::view_array<const uint32_t>					readShipCoresParts		= {};
 				bytesRead = ::gpk::viewRead(readShipCoresParts, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; 
 				ShipParts.push_back(readShipCoresParts);
 			}
 
-			bytesRead = ::gpk::viewRead(readShipOrbiters	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Orbiters	= readShipOrbiters;
+			gpk_necs(bytesRead = ::gpk::viewRead(readShipOrbiters, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Orbiters	= readShipOrbiters;
 			for(uint32_t iShipOrbiter = 0; iShipOrbiter < Orbiters.size(); ++iShipOrbiter) {
 				::gpk::view_array<const ::gpk::SCoord3<float>>		readShipOrbitersDistanceToTargets	= {};
 				::gpk::view_array<const ::ghg::SHIP_ACTION>			readShipActions		= {};
-				bytesRead = ::gpk::viewRead(readShipOrbitersDistanceToTargets, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; 
+				gpk_necs(bytesRead = ::gpk::viewRead(readShipOrbitersDistanceToTargets, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; 
 				ShipOrbitersDistanceToTargets.push_back(readShipOrbitersDistanceToTargets);
-				bytesRead = ::gpk::viewRead(readShipActions, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; 
+				gpk_necs(bytesRead = ::gpk::viewRead(readShipActions, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; 
 				ShipOrbiterActionQueue.push_back(readShipActions);
 			}
 
-			bytesRead = ::gpk::viewRead(readWeapons		, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Weapons	= readWeapons;
+			gpk_necs(bytesRead = ::gpk::viewRead(readWeapons, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Weapons	= readWeapons;
 			for(uint32_t iWeapon = 0; iWeapon < Weapons.size(); ++iWeapon)
-				Shots[Shots.push_back({})].Load(input);
+				gpk_necs(Shots[Shots.push_back({})].Load(input));
 
-			ShipPhysics		.Load(input);
-			EntitySystem	.Load(input);
-			Scene			.Load(input);
+			gpk_necs(ShipPhysics	.Load(input));
+			gpk_necs(EntitySystem	.Load(input));
+			gpk_necs(Scene			.Load(input));
 			return 0; 
 		}
 	};

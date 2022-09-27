@@ -16,6 +16,7 @@ namespace ghg
 		, {0x20, 0x80, 0xFF, }
 		, {0x00, 0x00, 0xFF, }
 		};
+
 	struct SGalaxyHellDrawCache {
 		// Used when rastering triangles
 		::gpk::array_pod<::gpk::SCoord2<int16_t>>			PixelCoords				;

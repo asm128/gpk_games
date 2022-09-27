@@ -26,8 +26,8 @@ namespace ghg
 		int											SpawnForced			(const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness, float lifetime)	{
 			PositionDraw.push_back(position);
 			PositionPrev.push_back(position);
-			Brightness.push_back(brightness);
-			Lifetime.push_back(lifetime);
+			Brightness	.push_back(brightness);
+			Lifetime	.push_back(lifetime);
 			DistanceToTargets[DistanceToTargets.push_back({})].push_back(direction);
 			return Particles.Create(position, direction, speed);
 		}
@@ -58,28 +58,28 @@ namespace ghg
 
 
 		::gpk::error_t								Save(::gpk::array_pod<byte_t> & output) const { 
-			Particles.Save(output);
-			::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>	>{PositionDraw	}, output);
-			::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>	>{PositionPrev	}, output);
-			::gpk::viewWrite(::gpk::view_array<const float					>{Brightness	}, output);
-			::gpk::viewWrite(::gpk::view_array<const float					>{Lifetime		}, output);
+			gpk_necs(Particles.Save(output));
+			gpk_necs(::gpk::viewWrite(PositionDraw	, output));
+			gpk_necs(::gpk::viewWrite(PositionPrev	, output));
+			gpk_necs(::gpk::viewWrite(Brightness	, output));
+			gpk_necs(::gpk::viewWrite(Lifetime		, output));
 			for(uint32_t iParticle = 0; iParticle < Particles.Position.size(); ++iParticle) {
-				::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>>{DistanceToTargets[iParticle]}, output);
+				gpk_necs(::gpk::viewWrite(DistanceToTargets[iParticle], output));
 			}
 			return 0; 
 		}
 		::gpk::error_t								Load				(::gpk::view_array<const byte_t> & input) { 
 			uint32_t										bytesRead			= 0;
-			Particles.Load(input);
-			::gpk::view_array<const ::gpk::SCoord3<float>	>	readPositionPrev	= {}; bytesRead	= ::gpk::viewRead(readPositionPrev	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; PositionPrev	= readPositionPrev	;
-			::gpk::view_array<const ::gpk::SCoord3<float>	>	readPositionDraw	= {}; bytesRead	= ::gpk::viewRead(readPositionDraw	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; PositionDraw	= readPositionDraw	;
-			::gpk::view_array<const float					>	readBrightness		= {}; bytesRead	= ::gpk::viewRead(readBrightness	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Brightness		= readBrightness	;
-			::gpk::view_array<const float					>	readLifetime		= {}; bytesRead	= ::gpk::viewRead(readLifetime		, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Lifetime		= readLifetime		;
+			gpk_necs(Particles.Load(input));
+			::gpk::view_array<const ::gpk::SCoord3<float>	> readPositionPrev	= {}; gpk_necs(bytesRead = ::gpk::viewRead(readPositionPrev	, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; PositionPrev	= readPositionPrev	;
+			::gpk::view_array<const ::gpk::SCoord3<float>	> readPositionDraw	= {}; gpk_necs(bytesRead = ::gpk::viewRead(readPositionDraw	, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; PositionDraw	= readPositionDraw	;
+			::gpk::view_array<const float					> readBrightness	= {}; gpk_necs(bytesRead = ::gpk::viewRead(readBrightness	, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Brightness	= readBrightness	;
+			::gpk::view_array<const float					> readLifetime		= {}; gpk_necs(bytesRead = ::gpk::viewRead(readLifetime		, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Lifetime		= readLifetime		;
 			for(uint32_t iParticle = 0; iParticle < Particles.Position.size(); ++iParticle) {
 				::gpk::view_array<const ::gpk::SCoord3<float>>		readDistanceToTargets	= {}; 
-				bytesRead						= ::gpk::viewRead(readDistanceToTargets, input); 
-				input							= {input.begin() + bytesRead, input.size() - bytesRead}; 
-				DistanceToTargets.push_back(readDistanceToTargets);
+				gpk_necs(bytesRead = ::gpk::viewRead(readDistanceToTargets, input));
+				input							= {input.begin() + bytesRead, input.size() - bytesRead};
+				gpk_necs(DistanceToTargets.push_back(readDistanceToTargets));
 			}
 			return 0;
 		}

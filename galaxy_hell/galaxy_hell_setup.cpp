@@ -1,3 +1,5 @@
+#define GPK_INFO_PRINTF_ENABLED
+
 #include "gpk_galaxy_hell.h"
 #include "gpk_storage.h"
 #include "gpk_json.h"
@@ -12,6 +14,8 @@
 	game.Save(serialized);
 	::gpk::array_pod<byte_t>			deflated;
 	::gpk::arrayDeflate(serialized, deflated);
+	info_printf("Savegame size in bytes: %u.", serialized.size());
+	info_printf("Savegame file size: %u.", deflated.size());
 	return ::gpk::fileFromMemory(fileName, deflated);
 }
 
@@ -21,6 +25,8 @@
 	gpk_necall(::gpk::fileToMemory(filename, serialized), "%s", "");
 	::gpk::array_pod<byte_t>			inflated;
 	::gpk::arrayInflate(serialized, inflated);
+	info_printf("Savegame file size: %u.", inflated.size());
+	info_printf("Savegame size in bytes: %u.", serialized.size());
 	::gpk::view_array<const byte_t>		viewSerialized			= {(const byte_t*)inflated.begin(), inflated.size()};
 	world.Load(viewSerialized);
 	world.PlayState.Paused			= true;

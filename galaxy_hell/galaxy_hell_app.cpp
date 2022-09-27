@@ -2,6 +2,7 @@
 #include "gpk_grid_copy.h"
 #include "gpk_raster_lh.h"
 #include "gpk_storage.h"
+#include "gpk_deflate.h"
 
 ::gpk::error_t					ghg::galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents) {
 	if(app.ActiveState == ::ghg::APP_STATE_Quit)
@@ -10,17 +11,19 @@
 	for(uint32_t iEvent = 0; iEvent < systemEvents.size(); ++iEvent) {
 		switch(systemEvents[iEvent].Type) {
 		case gpk::SYSEVENT_RESIZE: {
-			app.World.DrawCache.RenderTargetMetrics = *(const ::gpk::SCoord2<uint16_t>*)systemEvents[iEvent].Data.begin();
+			app.Game.DrawCache.RenderTargetMetrics = *(const ::gpk::SCoord2<uint16_t>*)systemEvents[iEvent].Data.begin();
 			app.RenderTargetPool.resize(16);
 			//if(app.World.DrawCache.RenderTargetMetrics.x > 1600) app.World.DrawCache.RenderTargetMetrics.x = 1600;
 			//if(app.World.DrawCache.RenderTargetMetrics.y >  900) app.World.DrawCache.RenderTargetMetrics.y = 900;
 
-			double								currentRatio					= app.World.DrawCache.RenderTargetMetrics.y / (double)app.World.DrawCache.RenderTargetMetrics.x;
+			double								currentRatio					= app.Game.DrawCache.RenderTargetMetrics.y / (double)app.Game.DrawCache.RenderTargetMetrics.x;
 			double								targetRatioY					=  9 / 16.0;
 			if(currentRatio >= targetRatioY)
-				app.World.DrawCache.RenderTargetMetrics.y = (uint16_t)(app.World.DrawCache.RenderTargetMetrics.x * targetRatioY + .1f);
+				app.Game.DrawCache.RenderTargetMetrics.y = (uint16_t)(app.Game.DrawCache.RenderTargetMetrics.x * targetRatioY + .1f);
 			else 
-				app.World.DrawCache.RenderTargetMetrics.x = (uint16_t)(app.World.DrawCache.RenderTargetMetrics.y / targetRatioY + .1f);
+				app.Game.DrawCache.RenderTargetMetrics.x = (uint16_t)(app.Game.DrawCache.RenderTargetMetrics.y / targetRatioY + .1f);
+
+			::gpk::guiUpdateMetrics(*app.DialogDesktop.GUI, app.Game.DrawCache.RenderTargetMetrics.Cast<uint32_t>(), true);
 
 			break;
 		}
@@ -31,7 +34,7 @@
 					app.ActiveState				= ::ghg::APP_STATE_Home;
 				}
 				else { 
-					app.World.PlayState.Paused	= false;
+					app.Game.PlayState.Paused	= false;
 					app.ActiveState				= ::ghg::APP_STATE_Play;
 				}
 			}
@@ -45,20 +48,13 @@
 	}
 	switch(app.ActiveState) {
 	case APP_STATE_Init		: {
-		::ghg::solarSystemSetup(app.World, app.World.DrawCache.RenderTargetMetrics);
-		//::ghg::overlaySetup(app.Overlay);
+		::ghg::solarSystemSetup(app.Game, app.Game.DrawCache.RenderTargetMetrics);
 		::ghg::guiSetup(app, inputState);
 
-		::gpk::pathList(app.SavegameFolder, app.FileNames);
-		for(uint32_t iFile = 0; iFile < app.FileNames.size(); ++iFile)  {
-			const ::gpk::vcc				fileName		= app.FileNames[iFile];
-			if(fileName.size() < app.ExtensionSaveAuto.size())
-				continue;
-			if(0 == strcmp(&fileName[fileName.size() - (uint32_t)app.ExtensionSaveAuto.size()], app.ExtensionSaveAuto.begin())) {
-				app.Load(fileName);
-				break;
-			}
-		}
+		::gpk::array_obj<::gpk::array_pod<char>>					fileNames					= {};
+		::gpk::pathList(app.SavegameFolder, fileNames, app.ExtensionSaveAuto);
+		if(fileNames.size())
+			::ghg::solarSystemLoad(app.Game, fileNames[0]);
 
 		app.ActiveState					= APP_STATE_Home;
 		break;
@@ -66,14 +62,14 @@
 	case  APP_STATE_Play	: 
 		break;
 	}	 
-	::ghg::solarSystemUpdate(app.World, (app.ActiveState != ::ghg::APP_STATE_Play) ? 0 : lastTimeSeconds, *inputState, systemEvents);
-	for(uint32_t iShip = 0; iShip < app.World.ShipState.ShipOrbiterActionQueue.size(); ++iShip)
-		if(iShip < app.World.PlayState.PlayerCount) {
-			for(uint32_t iEvent = 0; iEvent < app.World.ShipState.ShipOrbiterActionQueue[iShip].size(); ++iEvent)
-				if(app.World.ShipState.ShipOrbiterActionQueue[iShip][iEvent] == ::ghg::SHIP_ACTION_spawn) {
+	::ghg::solarSystemUpdate(app.Game, (app.ActiveState != ::ghg::APP_STATE_Play) ? 0 : lastTimeSeconds, *inputState, systemEvents);
+	for(uint32_t iShip = 0; iShip < app.Game.ShipState.ShipOrbiterActionQueue.size(); ++iShip)
+		if(iShip < app.Game.PlayState.PlayerCount) {
+			for(uint32_t iEvent = 0; iEvent < app.Game.ShipState.ShipOrbiterActionQueue[iShip].size(); ++iEvent)
+				if(app.Game.ShipState.ShipOrbiterActionQueue[iShip][iEvent] == ::ghg::SHIP_ACTION_spawn) {
 					::gpk::array_pod<byte_t>			serialized;
 					app.Save(::ghg::SAVE_MODE_STAGE);
-					app.World.ShipState.ShipOrbiterActionQueue[iShip][iEvent] = (::ghg::SHIP_ACTION)-1;
+					app.Game.ShipState.ShipOrbiterActionQueue[iShip][iEvent] = (::ghg::SHIP_ACTION)-1;
 				}
 		}
 	//::ghg::overlayUpdate(app.Overlay, app.World.PlayState.Stage, app.World.ShipState.ShipCores.size() ? app.World.ShipState.ShipCores[0].Score : 0, app.World.PlayState.TimeWorld);
@@ -98,9 +94,9 @@
 	switch(app.ActiveState) {
 	default					: 
 	case APP_STATE_Play		: 
-		::ghg::solarSystemDraw(app.World, app.World.DrawCache, app.World.LockUpdate);
+		::ghg::solarSystemDraw(app.Game, app.Game.DrawCache, app.Game.LockUpdate);
 		::gpk::ptr_obj<::ghg::TRenderTarget>		sourceRT	= {};
-		sourceRT								= app.World.DrawCache.RenderTarget;
+		sourceRT								= app.Game.DrawCache.RenderTarget;
 		if(!sourceRT)
 			break;
 
@@ -134,11 +130,15 @@
 	}
 
 	{
-		::std::lock_guard<::std::mutex>							lockUpdate			(app.World.LockUpdate);
+		::std::lock_guard<::std::mutex>							lockUpdate			(app.Game.LockUpdate);
 		::gpk::guiDraw(*app.DialogPerState[app.ActiveState].GUI, targetPixels);
 	}
-	if(app.ActiveState == ::ghg::APP_STATE_Play) {
-		::std::lock_guard<::std::mutex>							lockUpdate			(app.World.LockUpdate);
+	if(app.ActiveState != ::ghg::APP_STATE_Play) {
+		::std::lock_guard<::std::mutex>							lockUpdate			(app.Game.LockUpdate);
+		::gpk::guiDraw(*app.DialogDesktop.GUI, targetPixels);
+	}
+	else if(app.ActiveState == ::ghg::APP_STATE_Play) {
+		::std::lock_guard<::std::mutex>							lockUpdate			(app.Game.LockUpdate);
 		for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUIs.size(); ++iPlayer) 
 			::gpk::guiDraw(*app.UIPlay.PlayerUIs[iPlayer].Dialog.GUI, targetPixels);
 	}
@@ -146,5 +146,36 @@
 		::gpk::mutex_guard			rtLock(app.RenderTargetLockQueue);
 		app.RenderTargetQueue.push_back(target);
 	}
+	return 0;
+}
+
+::gpk::error_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::array_obj<::gpk::vcc> & savegameFilenames) {
+	::gpk::array_obj<::gpk::array_pod<char>>	fileNames;
+	gpk_necall(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionSave), "%s", saveGameFolder.begin());
+
+	::gpk::array_obj<::gpk::vcc>				pathFileNames;
+	for(uint32_t iFile = 0; iFile < fileNames.size(); ++iFile)
+		pathFileNames.push_back(fileNames[iFile]);
+
+	::gpk::array_obj<::gpk::vcc>				pathFileNamesSaveAuto;
+	::gpk::array_obj<::gpk::vcc>				pathFileNamesSaveUser;
+	::gpk::array_obj<::gpk::vcc>				pathFileNamesSaveStage;
+	::gpk::filterPostfix(pathFileNames, app.ExtensionSaveAuto	, pathFileNamesSaveAuto);
+	::gpk::filterPostfix(pathFileNames, app.ExtensionSaveUser	, pathFileNamesSaveUser);
+	::gpk::filterPostfix(pathFileNames, app.ExtensionSaveStage	, pathFileNamesSaveStage);
+		
+	for(uint32_t iPath = 0; iPath < pathFileNamesSaveAuto .size(); ++iPath) savegameFilenames.push_back(::gpk::label(pathFileNamesSaveAuto [iPath]));
+	for(uint32_t iPath = 0; iPath < pathFileNamesSaveUser .size(); ++iPath) savegameFilenames.push_back(::gpk::label(pathFileNamesSaveUser [iPath]));
+	for(uint32_t iPath = 0; iPath < pathFileNamesSaveStage.size(); ++iPath) savegameFilenames.push_back(::gpk::label(pathFileNamesSaveStage[iPath]));
+	return 0;
+}
+
+::gpk::error_t					ghg::listFilesProfile		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::array_obj<::gpk::vcc> & savegameFilenames) {
+	::gpk::array_obj<::gpk::array_pod<char>>	fileNames;
+	gpk_necall(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionProfile), "%s", saveGameFolder.begin());
+
+	::gpk::array_obj<::gpk::vcc>				pathFileNames;
+	for(uint32_t iFile = 0; iFile < fileNames.size(); ++iFile)
+		savegameFilenames.push_back(::gpk::label(::gpk::vcc{fileNames[iFile]}));
 	return 0;
 }

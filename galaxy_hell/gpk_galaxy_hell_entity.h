@@ -28,11 +28,10 @@ namespace ghg {
 			return EntityChildren.push_back(entityChildren);
 		}
 		::gpk::error_t										Save(::gpk::array_pod<byte_t> & output) const { 
-			//uint32_t entityCount = EntityChildren.size();
-			//output.append(::gpk::view_array<const byte_t>{(const byte_t*)&entityCount, (uint32_t)sizeof(uint32_t)});
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SEntity>{Entities}, output);
-			for(uint32_t iEntity = 0; iEntity < Entities.size(); ++iEntity)
+			for(uint32_t iEntity = 0; iEntity < Entities.size(); ++iEntity) 
 				::gpk::viewWrite(::gpk::view_array<const uint32_t>{EntityChildren[iEntity]}, output);
+			info_printf("Saved %s, %i", "Entities"					, EntityChildren.size());
 			return 0; 
 		}
 		::gpk::error_t										Load(::gpk::view_array<const byte_t> & input) { 

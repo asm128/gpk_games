@@ -174,7 +174,6 @@
     <ClCompile Include="galaxy_hell_app.cpp" />
     <ClCompile Include="galaxy_hell_deco.cpp" />
     <ClCompile Include="galaxy_hell_draw.cpp" />
-    <ClCompile Include="galaxy_hell_physics.cpp" />
     <ClCompile Include="galaxy_hell_setup.cpp" />
     <ClCompile Include="galaxy_hell_update.cpp" />
     <ClCompile Include="galaxy_hell_gui.cpp" />

@@ -39,7 +39,7 @@ namespace ghg
 	};
 
 #pragma pack(pop)
-	
+
 	struct SGalaxyHell {
 		::ghg::SShipState										ShipState				= {};
 		::ghg::SDecoState										DecoState				= {};	

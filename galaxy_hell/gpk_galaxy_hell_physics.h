@@ -34,9 +34,12 @@ namespace ghg
 			return Speed.push_back(speed);
 		}
 		::gpk::error_t										Save(::gpk::array_pod<byte_t> & output) const { 
-			::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>	>{Position	}, output);
-			::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>	>{Direction	}, output);
-			::gpk::viewWrite(::gpk::view_array<const float					>{Speed		}, output);
+			gpk_necs(::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>	>{Position	}, output)); 
+			gpk_necs(::gpk::viewWrite(::gpk::view_array<const ::gpk::SCoord3<float>	>{Direction	}, output)); 
+			gpk_necs(::gpk::viewWrite(::gpk::view_array<const float					>{Speed		}, output)); 
+			info_printf("Saved %s, %i", "Position	", Position		.size()); 
+			info_printf("Saved %s, %i", "Direction	", Direction	.size()); 
+			info_printf("Saved %s, %i", "Speed		", Speed		.size()); 
 			return 0; 
 		}
 		::gpk::error_t										Load(::gpk::view_array<const byte_t> & input) { 

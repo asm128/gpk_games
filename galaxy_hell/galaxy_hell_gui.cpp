@@ -38,14 +38,14 @@ static	::gpk::error_t			guiSetupButtonList			(::gpk::SGUI & gui, uint16_t button
 	return ::guiSetupButtonList(gui, buttonWidth, yOffset, controlAlign, textAlign, labels);
 }
 
-static	::gpk::error_t			guiSetupInit				(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_LOAD>(*dialog.GUI,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT); }
+//static	::gpk::error_t			guiSetupInit				(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_LOAD>(*dialog.GUI,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT); }
 static	::gpk::error_t			guiSetupLoad				(::gpk::SDialog & dialog) { 
 	gpk_necall(guiSetupButtonList<::ghg::UI_LOAD>(*dialog.GUI,  60, 0, ::gpk::ALIGN_CENTER), "%s", ""); 
 	return 0;
 }
 
 static	::gpk::error_t			guiSetupHome				(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_HOME>(*dialog.GUI, 160, int16_t(-20 * ::gpk::get_value_count<::ghg::UI_HOME>() / 2), ::gpk::ALIGN_CENTER); }
-static	::gpk::error_t			guiSetupUser				(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_PLAY>(*dialog.GUI,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT); }
+static	::gpk::error_t			guiSetupProfile				(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_PLAY>(*dialog.GUI,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT); }
 static	::gpk::error_t			guiSetupShop				(::gpk::SDialog & dialog) { 
 	::gpk::SGUI							& gui						= *dialog.GUI;
 	gpk_necall(guiSetupButtonList<::ghg::UI_SHOP>(gui,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT), "%s", "");
@@ -70,7 +70,7 @@ static	::gpk::error_t			guiSetupStats				(::gpk::SDialog & dialog) { return guiS
 static	::gpk::error_t			guiSetupStore				(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_PLAY>(*dialog.GUI,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT); }
 static	::gpk::error_t			guiSetupScore				(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_PLAY>(*dialog.GUI,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT); }
 //static	::gpk::error_t			guiSetupSetup				(::gpk::SGUI & gui) { return guiSetupButtonList<::ghg::UI_PLAY>(gui,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT	); }
-static	::gpk::error_t			guiSetupSetup				(::gpk::SDialog & dialog) { 
+static	::gpk::error_t			guiSetupSettings			(::gpk::SDialog & dialog) { 
 	dialog.GUI->SelectedFont		= 7;
 	::gpk::SGUI							& gui						= *dialog.GUI;
 	guiSetupButtonList<::ghg::UI_SETTINGS>(gui,  160, 0, ::gpk::ALIGN_CENTER); 
@@ -79,35 +79,17 @@ static	::gpk::error_t			guiSetupSetup				(::gpk::SDialog & dialog) {
 
 static	::gpk::error_t			guiSetupAbout				(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_CREDITS>(*dialog.GUI,  160, int16_t(-20 * ::gpk::get_value_count<::ghg::UI_CREDITS>() / 2), ::gpk::ALIGN_CENTER); }
 
-::gpk::error_t					ghg::guiSetup				(::ghg::SGalaxyHellApp & app, const ::gpk::ptr_obj<::gpk::SInput> & input) {
-	for(uint32_t iGUI = 0; iGUI < ::gpk::size(app.DialogPerState); ++iGUI) {
-		app.DialogPerState[iGUI]											= {};
-		app.DialogPerState[iGUI].Input										= input;
-		app.DialogPerState[iGUI].GUI->Controls.Modes[0].NoBackgroundRect	= true;
-		::guiSetupCommon(*app.DialogPerState[iGUI].GUI);
-		app.DialogPerState[iGUI].Update();
-	};
-	::guiSetupInit	(app.DialogPerState[::ghg::APP_STATE_Init	]);
-	::guiSetupLoad	(app.DialogPerState[::ghg::APP_STATE_Load	]);
-	::guiSetupHome	(app.DialogPerState[::ghg::APP_STATE_Home	]);
-	::guiSetupUser	(app.DialogPerState[::ghg::APP_STATE_User	]);
-	::guiSetupShop	(app.DialogPerState[::ghg::APP_STATE_Shop	]);
-	::guiSetupPlay	(app, app.DialogPerState[::ghg::APP_STATE_Play	]);
-	::guiSetupBrief	(app.DialogPerState[::ghg::APP_STATE_Brief	]);
-	::guiSetupStage	(app.DialogPerState[::ghg::APP_STATE_Stage	]);
-	::guiSetupStats	(app.DialogPerState[::ghg::APP_STATE_Stats	]);
-	::guiSetupStore	(app.DialogPerState[::ghg::APP_STATE_Store	]);
-	::guiSetupScore	(app.DialogPerState[::ghg::APP_STATE_Score	]);
-	::guiSetupSetup	(app.DialogPerState[::ghg::APP_STATE_Setup	]);
-	::guiSetupAbout	(app.DialogPerState[::ghg::APP_STATE_About	]);
-	return 0;
-}
-
-static	::gpk::error_t			guiHandleLoad				(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & gui, uint32_t idControl, ::ghg::SGalaxyHell & /*game*/) { 
-	if(idControl < (gui.Controls.Text.size() - 2)) {
-		gerror_if(0 > app.Load(gui.Controls.Text[idControl + 1].Text), "%s", gui.Controls.Text[idControl + 1].Text.begin());
+static	::gpk::error_t			virtualKeyboardSetup		(::gpk::SDialog & dialog, ::gpk::SVirtualKeyboard & vk) { 
+	::gpk::array_pod<uint16_t> keys;
+	for(uint16_t i = 1; i < 255; ++i) {
+		keys.push_back(i);
 	}
-	return ::ghg::APP_STATE_Home; 
+	keys.push_back('!');
+	keys.push_back('?');
+
+	gpk_necs(::gpk::virtualKeyboardSetup(*dialog.GUI, vk, 32, ::gpk::view_const_uint16{keys}));
+	dialog.GUI->Controls.States[vk.IdRoot].Hidden	= true;
+	return 0;
 }
 
 static	::gpk::error_t			dialogCreateCommon			(::gpk::SDialog & dialogLoad, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::SCoord2<float> & cursorPos) { 
@@ -118,6 +100,37 @@ static	::gpk::error_t			dialogCreateCommon			(::gpk::SDialog & dialogLoad, const
 	::guiSetupCommon(*dialogLoad.GUI);
 	dialogLoad.Update();
 	return 0;
+}
+
+::gpk::error_t					ghg::guiSetup				(::ghg::SGalaxyHellApp & app, const ::gpk::ptr_obj<::gpk::SInput> & input) {
+	::dialogCreateCommon(app.DialogDesktop, input, {});
+
+	for(uint32_t iGUI = 0; iGUI < ::gpk::size(app.DialogPerState); ++iGUI) {
+		::dialogCreateCommon(app.DialogPerState[iGUI], input, {});
+	};
+
+	::guiSetupLoad		(app.DialogPerState[::ghg::APP_STATE_Load		]);
+	::guiSetupHome		(app.DialogPerState[::ghg::APP_STATE_Home		]);
+	::guiSetupShop		(app.DialogPerState[::ghg::APP_STATE_Shop		]);
+	::guiSetupProfile	(app.DialogPerState[::ghg::APP_STATE_Profile	]);
+	::guiSetupPlay		(app, app.DialogPerState[::ghg::APP_STATE_Play		]);
+	::guiSetupBrief		(app.DialogPerState[::ghg::APP_STATE_Brief		]);
+	::guiSetupStage		(app.DialogPerState[::ghg::APP_STATE_Stage		]);
+	::guiSetupStats		(app.DialogPerState[::ghg::APP_STATE_Stats		]);
+	::guiSetupStore		(app.DialogPerState[::ghg::APP_STATE_Store		]);
+	::guiSetupScore		(app.DialogPerState[::ghg::APP_STATE_Score		]);
+	::guiSetupSettings	(app.DialogPerState[::ghg::APP_STATE_Settings	]);
+	::guiSetupAbout		(app.DialogPerState[::ghg::APP_STATE_About		]);
+
+	::virtualKeyboardSetup(app.DialogDesktop, app.VirtualKeyboard);
+	return 0;
+}
+
+static	::gpk::error_t			guiHandleLoad				(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & gui, uint32_t idControl, ::ghg::SGalaxyHell & /*game*/) { 
+	if(idControl < (gui.Controls.Text.size() - 2)) {
+		gerror_if(0 > app.Load(gui.Controls.Text[idControl + 1].Text), "%s", gui.Controls.Text[idControl + 1].Text.begin());
+	}
+	return ::ghg::APP_STATE_Home; 
 }
 
 static	::gpk::error_t			dialogCreateLoad			(::gpk::SDialog & dialogLoad, ::gpk::view_array<::gpk::vcc> pathFileNames, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::SCoord2<float> & cursorPos) { 
@@ -148,13 +161,13 @@ static	::gpk::error_t			guiHandleHome				(::ghg::SGalaxyHellApp & app, ::gpk::SG
 			if(fileName.size() < app.ExtensionSaveAuto.size())
 				continue;
 			if(0 == strcmp(&fileName[fileName.size() - (uint32_t)app.ExtensionSaveAuto.size()], app.ExtensionSaveAuto.begin())) 
-				pathFileNames.push_back(fileName);
+				pathFileNames.push_back(::gpk::label(fileName));
 		}
 		for(uint32_t iFile = 0; iFile < app.FileNames.size(); ++iFile)  {
 			const ::gpk::vcc				fileName			= app.FileNames[iFile];
-			if(fileName.size() < app.ExtensionSaveCheckpoint.size())
+			if(fileName.size() < app.ExtensionSaveStage.size())
 				continue;
-			if(0 == strcmp(&fileName[fileName.size() - (uint32_t)app.ExtensionSaveCheckpoint.size()], app.ExtensionSaveCheckpoint.begin())) 
+			if(0 == strcmp(&fileName[fileName.size() - (uint32_t)app.ExtensionSaveStage.size()], app.ExtensionSaveStage.begin())) 
 				pathFileNames.push_back(fileName);
 		}
 		for(uint32_t iFile = 0; iFile < app.FileNames.size(); ++iFile)  {
@@ -169,7 +182,7 @@ static	::gpk::error_t			guiHandleHome				(::ghg::SGalaxyHellApp & app, ::gpk::SG
 		return ::ghg::APP_STATE_Load;
 	}
 	case ::ghg::UI_HOME_Settings: {
-		return ::ghg::APP_STATE_Setup;
+		return ::ghg::APP_STATE_Settings;
 	}
 	case ::ghg::UI_HOME_Credits: {
 		return ::ghg::APP_STATE_About;
@@ -184,7 +197,7 @@ static	::gpk::error_t			guiHandleHome				(::ghg::SGalaxyHellApp & app, ::gpk::SG
 	return ::ghg::APP_STATE_Home; 
 }
 
-static	::gpk::error_t			guiHandleUser				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/) { return ::ghg::APP_STATE_User; }
+static	::gpk::error_t			guiHandleUser				(::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::ghg::SGalaxyHell & /*game*/) { return ::ghg::APP_STATE_Profile; }
 static	::gpk::error_t			guiHandleShop				(::gpk::SGUI & /*gui*/, uint32_t idControl, ::ghg::SGalaxyHell & /*game*/) { 
 	if(idControl == (uint32_t)::ghg::UI_SHOP_Back) {
 		return ::ghg::APP_STATE_Home;
@@ -217,7 +230,7 @@ static	::gpk::error_t			guiHandleSetup				(::gpk::SGUI & /*gui*/, uint32_t idCon
 	else if(idControl == (uint32_t)::ghg::UI_SETTINGS_Back) {
 		return ::ghg::APP_STATE_Home;
 	}
-	return ::ghg::APP_STATE_Setup; 
+	return ::ghg::APP_STATE_Settings; 
 }
 static	::gpk::error_t			guiHandleAbout				(::gpk::SGUI & /*gui*/, uint32_t idControl, ::ghg::SGalaxyHell & /*game*/) { 
 	if(idControl == (uint32_t)::ghg::UI_CREDITS_Back || idControl == (uint32_t)::ghg::UI_CREDITS_Home) {
@@ -237,7 +250,7 @@ template<size_t _nStorageSize>
 }
 
 static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) { 
-	::ghg::SGalaxyHell					& game						= app.World;
+	::ghg::SGalaxyHell					& game						= app.Game;
 
 	::gpk::SDialog						& dialog					= app.DialogPerState[::ghg::APP_STATE_Play];
 	::gpk::SGUI							& gui						= *dialog.GUI;
@@ -440,7 +453,29 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 }
 
 ::gpk::error_t					ghg::guiUpdate				(::ghg::SGalaxyHellApp & gameApp, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents) {
-	::ghg::SGalaxyHell					& game						= gameApp.World;
+	{
+		::gpk::SDialog						& dialog					= gameApp.DialogDesktop;
+		::gpk::SGUI							& gui						= *dialog.GUI;
+		::gpk::SInput						& input						= *dialog.Input;
+		::gpk::guiProcessInput(gui, input, sysEvents); 
+
+		dialog.Update();
+		::gpk::array_pod<uint32_t>			controlsToProcess			= {};
+		::gpk::guiGetProcessableControls(gui, controlsToProcess);
+
+		gameApp.VirtualKeyboard.Events.clear();
+		for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
+			uint32_t							idControl			= controlsToProcess		[iControl];
+			const ::gpk::SControlState			& controlState		= gui.Controls.States	[idControl];
+			//bool								handled				= false;
+			if(controlState.Execute) {
+				::gpk::virtualKeyboardHandleEvent(gameApp.VirtualKeyboard, idControl);
+			}
+		}
+	}
+
+	::ghg::SGalaxyHell					& game						= gameApp.Game;
+
 	::ghg::APP_STATE					appState					= gameApp.ActiveState; 
 	for(uint32_t iAppState = 0; iAppState < ::ghg::APP_STATE_COUNT; ++iAppState) {
 		::gpk::SDialog						& dialog					= gameApp.DialogPerState[iAppState];
@@ -453,7 +488,6 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 		::ghg::SUIPlayer					& uiPlayer					= gameApp.UIPlay.PlayerUIs[iPlayer];
 		::gpk::guiProcessInput(*uiPlayer.Dialog.GUI, *uiPlayer.Dialog.Input, sysEvents);
 	}
-
 	::gpk::SDialog						& dialog					= gameApp.DialogPerState[appState];
 	dialog.Update();
 	::gpk::SGUI							& gui						= *dialog.GUI;
@@ -461,7 +495,7 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 
 	{
-		::gpk::mutex_guard lock(gameApp.World.LockUpdate);
+		::gpk::mutex_guard lock(gameApp.Game.LockUpdate);
 		::guiUpdatePlay(gameApp);
 	}
 
@@ -475,7 +509,7 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 			switch(appState) {
 			case ::ghg::APP_STATE_Load	: appState = (::ghg::APP_STATE)::guiHandleLoad	(gameApp, gui, idControl, game); handled = true; break;
 			case ::ghg::APP_STATE_Home	: appState = (::ghg::APP_STATE)::guiHandleHome	(gameApp, gui, idControl, game); handled = true; break;
-			case ::ghg::APP_STATE_User	: appState = (::ghg::APP_STATE)::guiHandleUser	(gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_Profile	: appState = (::ghg::APP_STATE)::guiHandleUser	(gui, idControl, game); handled = true; break;
 			case ::ghg::APP_STATE_Shop	: appState = (::ghg::APP_STATE)::guiHandleShop	(gui, idControl, game); handled = true; break;
 			case ::ghg::APP_STATE_Play	: appState = (::ghg::APP_STATE)::guiHandlePlay	(gameApp, gui, idControl, game); handled = true; break;
 			case ::ghg::APP_STATE_Brief	: appState = (::ghg::APP_STATE)::guiHandleBrief	(gui, idControl, game); handled = true; break;
@@ -483,7 +517,7 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 			case ::ghg::APP_STATE_Stats	: appState = (::ghg::APP_STATE)::guiHandleStats	(gui, idControl, game); handled = true; break;
 			case ::ghg::APP_STATE_Store	: appState = (::ghg::APP_STATE)::guiHandleStore	(gui, idControl, game); handled = true; break;
 			case ::ghg::APP_STATE_Score	: appState = (::ghg::APP_STATE)::guiHandleScore	(gui, idControl, game); handled = true; break;
-			case ::ghg::APP_STATE_Setup	: appState = (::ghg::APP_STATE)::guiHandleSetup	(gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_Settings	: appState = (::ghg::APP_STATE)::guiHandleSetup	(gui, idControl, game); handled = true; break;
 			case ::ghg::APP_STATE_About	: appState = (::ghg::APP_STATE)::guiHandleAbout	(gui, idControl, game); handled = true; break;
 			}
 			if(handled)
