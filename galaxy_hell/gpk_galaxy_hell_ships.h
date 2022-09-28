@@ -120,7 +120,7 @@ namespace ghg
 	};
 #pragma pack(pop)
 
-	struct SShipState {
+	struct SShipManager {
 		::gpk::array_pod<::ghg::SShipScore			>				ShipScores						= {};
 		::gpk::array_pod<::ghg::SShipCore			>				ShipCores						= {};
 		::gpk::array_obj<::gpk::array_pod<uint32_t>	>				ShipParts						= {};

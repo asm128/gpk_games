@@ -6,23 +6,6 @@
 
 namespace ghg
 {
-	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
-	GDEFINE_ENUM_VALUE(APP_STATE, Init		, 0);
-	GDEFINE_ENUM_VALUE(APP_STATE, Home		, 1);
-	GDEFINE_ENUM_VALUE(APP_STATE, Profile	, 2);
-	GDEFINE_ENUM_VALUE(APP_STATE, Shop		, 3);
-	GDEFINE_ENUM_VALUE(APP_STATE, Play		, 4);
-	GDEFINE_ENUM_VALUE(APP_STATE, Brief		, 5);
-	GDEFINE_ENUM_VALUE(APP_STATE, Stage		, 6);
-	GDEFINE_ENUM_VALUE(APP_STATE, Stats		, 7);
-	GDEFINE_ENUM_VALUE(APP_STATE, Store		, 8);
-	GDEFINE_ENUM_VALUE(APP_STATE, Score		, 9);
-	GDEFINE_ENUM_VALUE(APP_STATE, About		, 10);
-	GDEFINE_ENUM_VALUE(APP_STATE, Settings	, 11);
-	GDEFINE_ENUM_VALUE(APP_STATE, Quit		, 12);
-	GDEFINE_ENUM_VALUE(APP_STATE, Load		, 13);
-	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 14);
-
 	GDEFINE_ENUM_TYPE (UI_HOME, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_HOME, Continue		, 0);
 	GDEFINE_ENUM_VALUE(UI_HOME, Start			, 1);
@@ -78,6 +61,9 @@ namespace ghg
 
 	GDEFINE_ENUM_TYPE (UI_SHOP, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_SHOP, Back			, 0);
+
+	GDEFINE_ENUM_TYPE (UI_WELCOME, uint8_t);
+	GDEFINE_ENUM_VALUE(UI_WELCOME, Confirm		, 0);
 
 	GDEFINE_ENUM_TYPE (UI_CREDITS, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_CREDITS, Back			, 0);
@@ -235,7 +221,8 @@ namespace ghg
 			gpk_necs(::gpk::arrayInflate(serialized, inflated));
 			info_printf("Player file size: %u.", inflated.size());
 			info_printf("Player size in bytes: %u.", serialized.size());
-			return Load(inflated);
+			::gpk::vcc									input		= inflated;
+			return Load(input);
 		}
 
 		::gpk::error_t							Save(::gpk::array_pod<byte_t> & output) const {
@@ -256,12 +243,12 @@ namespace ghg
 			::gpk::view_array<const ::ghg::SPlayerState>		readPlayerState			= {};
 			::gpk::view_array<const ::ghg::SWeapon	>			readWeapons				= {};
 			::gpk::view_array<const ::ghg::SOrbiter	>			readOrbiters			= {};
-			gpk_necs(bytesRead = ::gpk::viewRead(readName			, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Name		= readName			;
+			gpk_necs(bytesRead = ::gpk::viewRead(readName			, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Name		= ::gpk::label(readName);
 			gpk_necs(bytesRead = ::gpk::viewRead(readPlayerState	, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; State		= readPlayerState	[0];
 			gpk_necs(bytesRead = ::gpk::viewRead(readWeapons		, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Weapons	= readWeapons		;
 			gpk_necs(bytesRead = ::gpk::viewRead(readOrbiters		, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Orbiters	= readOrbiters		;
 			gpk_necs(Ships.resize(*(uint32_t*)input.begin()));
-			input											= {&input[4], input.size() - 4};
+			input											= {input.begin() + sizeof(uint32_t), input.size() - 4};
 			for(uint32_t iShip = 0; iShip < Ships.size(); ++iShip) {
 				gpk_necall(Ships[iShip].Load(input), "iShip: %u", iShip);
 			}
@@ -269,12 +256,34 @@ namespace ghg
 		}
 	};
 
+	struct SPlayerManager {
+
+	};
+
 	struct SUserCredentials {
 		::gpk::vcc								Username;
 		::gpk::vcc								Password;
 	};
 
-	enum SAVE_MODE { SAVE_MODE_AUTO, SAVE_MODE_STAGE, SAVE_MODE_USER };
+	enum SAVE_MODE { SAVE_MODE_AUTO, SAVE_MODE_QUICK, SAVE_MODE_STAGE, SAVE_MODE_USER };
+
+	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
+	GDEFINE_ENUM_VALUE(APP_STATE, Init		,  0);
+	GDEFINE_ENUM_VALUE(APP_STATE, Welcome	,  1);
+	GDEFINE_ENUM_VALUE(APP_STATE, Home		,  2);
+	GDEFINE_ENUM_VALUE(APP_STATE, Profile	,  3);
+	GDEFINE_ENUM_VALUE(APP_STATE, Shop		,  4);
+	GDEFINE_ENUM_VALUE(APP_STATE, Play		,  5);
+	GDEFINE_ENUM_VALUE(APP_STATE, Brief		,  6);
+	GDEFINE_ENUM_VALUE(APP_STATE, Stage		,  7);
+	GDEFINE_ENUM_VALUE(APP_STATE, Stats		,  8);
+	GDEFINE_ENUM_VALUE(APP_STATE, Store		,  9);
+	GDEFINE_ENUM_VALUE(APP_STATE, Score		, 10);
+	GDEFINE_ENUM_VALUE(APP_STATE, About		, 11);
+	GDEFINE_ENUM_VALUE(APP_STATE, Settings	, 12);
+	GDEFINE_ENUM_VALUE(APP_STATE, Quit		, 13);
+	GDEFINE_ENUM_VALUE(APP_STATE, Load		, 14);
+	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 15);
 
 	struct SGalaxyHellApp {
 		::gpk::array_pobj<TRenderTarget>							RenderTargetPool			= {};
@@ -291,13 +300,16 @@ namespace ghg
 		::gpk::array_obj<::ghg::SPlayer>							Players						= {};
 
 		::ghg::SGalaxyHell											Game;
+		::gpk::array_obj<::ghg::SUserCredentials>					UserCredentials				= {};
 
-		::gpk::array_pod<::ghg::SUserCredentials>					UserCredentials				= {};
+		::gpk::ptr_obj<::gpk::SDialogViewport>						Inputbox;
+		::gpk::array_pod<char>										InputboxText;
 
 		::gpk::array_obj<::gpk::array_pod<char>>					FileNames					= {};
 		::gpk::vcs													SavegameFolder				= ".";
 		::gpk::vcs													ExtensionSaveAuto			= ".auto.ghz";
 		::gpk::vcs													ExtensionSaveStage			= ".stage.ghz";
+		::gpk::vcs													ExtensionSaveQuick			= ".quick.ghz";
 		::gpk::vcs													ExtensionSaveUser			= ".user.ghz";
 		::gpk::vcs													ExtensionSave				= ".ghz";
 		::gpk::vcs													ExtensionImages				= ".png";
@@ -309,22 +321,27 @@ namespace ghg
 
 		APP_STATE													ActiveState					= APP_STATE_Init;
 
-		::gpk::error_t												Load						(const ::gpk::vcs fileName)				{
+		::gpk::error_t												AddNewPlayer				(::gpk::vcc playerName)			{
+			::gpk::trim(playerName);
 			::gpk::mutex_guard guard(Game.LockUpdate);
-			return ::ghg::solarSystemLoad(Game, fileName);
+			return Players.push_back({::gpk::label(playerName)});
 		}
 
 		::gpk::error_t												Save						(SAVE_MODE autosaveMode)				{
 			char															fileName[4096]				= {};
+			::gpk::array_pod<char>											b64PlayerName				= {};
 			for(uint32_t iPlayer = 0; iPlayer < Players.size(); ++iPlayer) {
+				b64PlayerName.clear();
 				const ::ghg::SPlayer & player = Players[iPlayer];
-				sprintf_s(fileName, "%s/%s.%llu%s", SavegameFolder.begin(), ::gpk::toString(player.Name).begin(), ::gpk::timeCurrent(), ExtensionProfile.begin());
+				::gpk::base64Encode(player.Name, b64PlayerName);
+				sprintf_s(fileName, "%s/%s.%llu%s", SavegameFolder.begin(), b64PlayerName.begin(), 0ULL, ExtensionProfile.begin());
 				gpk_necall(player.Save(fileName), "iPlayer: %i", iPlayer);
 			}
 			::gpk::vcc														extension;
 			switch(autosaveMode) {
 			case SAVE_MODE_USER		: extension = ExtensionSaveUser		; break;
 			case SAVE_MODE_STAGE	: extension = ExtensionSaveStage	; break;
+			case SAVE_MODE_QUICK	: extension = ExtensionSaveQuick	; break;
 			case SAVE_MODE_AUTO		: extension = ExtensionSaveAuto		; break;
 			}
 

@@ -33,7 +33,7 @@
 	return 0;
 }
 
-static	int											shipCreate			(::ghg::SShipState & shipState, int32_t teamId, int32_t iGeometry, int32_t iImage)	{
+static	int											shipCreate			(::ghg::SShipManager & shipState, int32_t teamId, int32_t iGeometry, int32_t iImage)	{
 	::ghg::SShipScene										& scene				= shipState.Scene;
 	const uint32_t											countParts			= 6;
 
@@ -199,6 +199,11 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 		solarSystem.DecoState.Stars.Reset(solarSystem.DrawCache.RenderTargetMetrics);
 		solarSystem.PlayState.TimeStart = solarSystem.PlayState.TimeLast = ::gpk::timeCurrent();
 		memset(solarSystem.ShipState.ShipScores.begin(), 0, solarSystem.ShipState.ShipScores.byte_count());
+		while(solarSystem.PlayerNames.size() < solarSystem.PlayState.PlayerCount) {
+			char text [64] = {};
+			sprintf_s(text, "Player %i", solarSystem.PlayerNames.size() + 1);
+			solarSystem.PlayerNames.push_back(::gpk::label(text));
+		}
 	}
 
 #pragma pack(push, 1)

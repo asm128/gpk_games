@@ -27,8 +27,32 @@
 
 			break;
 		}
+		case ::gpk::SYSEVENT_CHAR:
+			if(systemEvents[iEvent].Data[0] >= 0x20 && systemEvents[iEvent].Data[0] <= 0x7F) {
+				if(app.ActiveState == ::ghg::APP_STATE_Welcome)
+					app.InputboxText.push_back(systemEvents[iEvent].Data[0]);
+			}
+			break;
 		case ::gpk::SYSEVENT_KEY_DOWN:
-			if(systemEvents[iEvent].Data[0] == VK_ESCAPE) {
+			if(app.ActiveState == ::ghg::APP_STATE_Welcome) {
+				switch(systemEvents[iEvent].Data[0]) {
+				case VK_BACK:
+					app.InputboxText.pop_back(0);
+					break;
+				case VK_RETURN: {
+					::gpk::vcc trimmed{app.InputboxText};
+					::gpk::trim(trimmed, trimmed);
+					app.Players.push_back({::gpk::label(trimmed)});
+					app.Game.PlayerNames[0] = app.Players[0].Name;
+					app.Save(::ghg::SAVE_MODE_AUTO);
+					break;
+				}
+				case VK_ESCAPE:
+					app.InputboxText.clear();
+					break;
+				}
+			}
+			else if(systemEvents[iEvent].Data[0] == VK_ESCAPE) {
 				if(app.ActiveState != ::ghg::APP_STATE_Home) {
 					app.Save(::ghg::SAVE_MODE_AUTO);
 					app.ActiveState				= ::ghg::APP_STATE_Home;
@@ -40,10 +64,11 @@
 			}
 			break;
 		case ::gpk::SYSEVENT_CLOSE:
-		case ::gpk::SYSEVENT_DEACTIVATE: {
-			app.Save(::ghg::SAVE_MODE_AUTO);
-			app.ActiveState						= ::ghg::APP_STATE_Home;
-		}
+		case ::gpk::SYSEVENT_DEACTIVATE: 
+			if(app.ActiveState != ::ghg::APP_STATE_Welcome) {
+				app.Save(::ghg::SAVE_MODE_AUTO);
+				app.ActiveState						= ::ghg::APP_STATE_Home;
+			}
 		}
 	}
 	switch(app.ActiveState) {
@@ -56,10 +81,26 @@
 		if(fileNames.size())
 			::ghg::solarSystemLoad(app.Game, fileNames[0]);
 
-		app.ActiveState					= APP_STATE_Home;
+		fileNames					= {};
+		::gpk::pathList(app.SavegameFolder, fileNames, app.ExtensionProfile);
+		app.Players.resize(fileNames.size());
+		for(uint32_t iPlayer = 0; iPlayer < fileNames.size(); ++iPlayer) {
+			gpk_necall(app.Players[iPlayer].Load(fileNames[iPlayer]), "fileNames[iPlayer]: %s", fileNames[iPlayer].begin());
+		}
+		for(uint32_t iPlayer = 0; iPlayer < app.Players.size(); ++iPlayer) {
+			if(app.Game.PlayerNames.size() <= iPlayer)
+				break;
+			app.Game.PlayerNames[iPlayer] = ::gpk::label(app.Players[iPlayer].Name);
+		}
+		app.ActiveState					= APP_STATE_Welcome;
 		break;
 	}
-	case  APP_STATE_Play	: 
+	case  APP_STATE_Welcome:
+		if(app.Players.size())
+			app.ActiveState					= APP_STATE_Home;
+		else {
+			app.DialogDesktop.GUI->Controls.States[app.VirtualKeyboard.IdRoot].Hidden = false;
+		}
 		break;
 	}	 
 	::ghg::solarSystemUpdate(app.Game, (app.ActiveState != ::ghg::APP_STATE_Play) ? 0 : lastTimeSeconds, *inputState, systemEvents);

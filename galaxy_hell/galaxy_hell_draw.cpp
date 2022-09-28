@@ -126,43 +126,18 @@ int													drawScoreParticles
 		starFinalColor.g									-= 1.0f - ::gpk::min(1.0f, particle.Brightness);
 		starFinalColor.b									-= 1.0f - ::gpk::min(1.0f, particle.Brightness);
 		starFinalColor.Clamp();
-		::gpk::array_pod<::gpk::SCoord2<int32_t>>				dstCoords;
+		starFinalColor.a = starFinalColor.g;
+		::gpk::array_pod<::gpk::SCoord2<uint16_t>>				dstCoords;
 		char													textToShow[64]		= {};
 		sprintf_s(textToShow, "%i", particle.Score);
 		const ::gpk::vcs										finalText			= textToShow;
 		::gpk::SRectangle2<int16_t>								rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
 		rectText.Offset = (pixelCoord - ::gpk::SCoord2<int32_t>{(rectText.Size.x >> 1), (rectText.Size.y >> 1)}).Cast<int16_t>();
 
-		gpk_necs(::gpk::textLineRaster(targetPixels.metrics(), font.CharSize.Cast<uint16_t>(), rectText, font.Texture, finalText, dstCoords));
+		gpk_necs(::gpk::textLineRaster(targetPixels.metrics().Cast<uint16_t>(), font.CharSize, rectText, font.Texture, finalText, dstCoords));
 		for(uint32_t iCoord = 0; iCoord < dstCoords.size(); ++iCoord) {
-			const ::gpk::SCoord2<int32_t>										dstCoord												= dstCoords[iCoord];
-			::gpk::setPixel(targetPixels, dstCoord.Cast<int16_t>(), starFinalColor);
-			//targetPixels[dstCoord.y][dstCoord.x]							= starFinalColor;
-			//::gpk::drawPixelLight(target, dstCoords[iCoord], colorFace, controlState.Pressed ? 0.75f : 0.5f, controlState.Pressed ? 1.0f : 0.95);
+			::gpk::pixelBlend(targetPixels, dstCoords[iCoord].Cast<int16_t>(), starFinalColor);
 		}
-
-
-		//::gpk::setPixel(targetPixels, pixelCoord, starFinalColor);
-
-		//for(int32_t y = (int32_t)-brightRadius - 1, yStop = (int32_t)brightRadius + 1; y < yStop; ++y)
-		//for(int32_t x = (int32_t)-brightRadius - 1; x < yStop; ++x) {
-		//	::gpk::SCoord2<float>									brightPos			= {(float)x, (float)y};
-		//	const double											brightDistance		= brightPos.LengthSquared();
-		//	if(brightDistance <= brightRadiusSquared) {
-		//		::gpk::SCoord2<int32_t>									blendPos			= pixelCoord + (brightPos).Cast<int32_t>();
-		//		if( blendPos.y < 0 || blendPos.y >= (int32_t)targetPixels.metrics().y
-		//		 || blendPos.x < 0 || blendPos.x >= (int32_t)targetPixels.metrics().x
-		//		)
-		//			continue;
-		//		uint32_t												& blendVal			= depthBuffer[blendPos.y][blendPos.x];
-		//		if(depth > blendVal)
-		//			continue;
-		//		blendVal											= depth;
-		//		double													finalBrightness					= 1.0-(brightDistance * brightUnit);
-		//		::gpk::SColorBGRA										& pixelVal						= targetPixels[blendPos.y][blendPos.x];
-		//		pixelVal											= (starFinalColor * finalBrightness + pixelVal).Clamp();
-		//	}
-		//}
 	}
 	return 0;
 }
@@ -235,7 +210,6 @@ static	int											drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixe
 	return 0;
 }
 
-
 int													ghg::getLightArraysFromDebris
 	( const ::ghg::SDecoState								& decoState
 	, ::gpk::array_pod<::gpk::SCoord3<float>>				& lightPoints
@@ -252,7 +226,7 @@ int													ghg::getLightArraysFromDebris
 
 
 int													ghg::getLightArraysFromShips
-	( const ::ghg::SShipState							& shipState
+	( const ::ghg::SShipManager							& shipState
 	, ::gpk::array_pod<::gpk::SCoord3<float>>			& lightPoints
 	, ::gpk::array_pod<::gpk::SColorBGRA>				& lightColors
 	) {
@@ -280,7 +254,7 @@ int													ghg::getLightArraysFromShips
 }
 
 int												ghg::getLightArrays
-	( const ::ghg::SShipState							& shipState
+	( const ::ghg::SShipManager							& shipState
 	, const ::ghg::SDecoState							& decoState
 	, ::gpk::array_pod<::gpk::SCoord3<float>>			& lightPoints
 	, ::gpk::array_pod<::gpk::SColorBGRA>				& lightColors
@@ -324,7 +298,7 @@ int												ghg::getLightArrays
 //}
 
 int												ghg::drawShipOrbiter
-	( const ::ghg::SShipState							& shipState
+	( const ::ghg::SShipManager							& shipState
 	, const ::ghg::SOrbiter							& shipPart
 	, const ::gpk::SMatrix4<float>						& matrixVP
 	, ::gpk::view_grid<::gpk::SColorBGRA>				& targetPixels
@@ -339,7 +313,7 @@ int												ghg::drawShipOrbiter
 			continue;
 		if(-1 == entityChild.Geometry)
 			continue;
-		::gpk::SMatrix4<float>									matrixTransform				= shipState.Scene.Transforms[entityChild.Transform];
+		const ::gpk::SMatrix4<float>							& matrixTransform				= shipState.Scene.Transforms[entityChild.Transform];
 		::gpk::SMatrix4<float>									matrixTransformVP			= matrixTransform * matrixVP;
 		::ghg::getLightArrays(matrixTransform.GetTranslation(), drawCache.LightPointsWorld, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightColorsModel);
 		const ::gpk::SGeometryQuads								& mesh						= shipState.Scene.Geometry[entityChild.Geometry];
@@ -359,6 +333,7 @@ static	int											drawShip
 	, ::gpk::view_grid<::gpk::SColorBGRA>				& targetPixels
 	, ::gpk::view_grid<uint32_t>						depthBuffer
 	, ::ghg::SGalaxyHellDrawCache						& drawCache
+	, const ::gpk::SRasterFont							& font
 	) {
 	uint32_t												pixelsDrawn				= 0;
 	for(uint32_t iPart = 0; iPart < solarSystem.ShipState.ShipParts[iShip].size(); ++iPart) {
@@ -366,6 +341,36 @@ static	int											drawShip
 		if(shipPart.Health <= 0)
 			continue;
 		pixelsDrawn += ::ghg::drawShipOrbiter(solarSystem.ShipState, shipPart, matrixVP, targetPixels, depthBuffer, drawCache);
+	}
+	if(iShip >= (int32_t)solarSystem.PlayState.PlayerCount || solarSystem.ShipState.ShipCores[iShip].Team)
+		return 0;
+
+	const ::ghg::SEntity									& entity			= solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCores[iShip].Entity];
+	const ::gpk::SMatrix4<float>							& matrixTransform	= solarSystem.ShipState.Scene.Transforms[entity.Transform];
+	::gpk::SCoord3<float>									starPos				= matrixTransform.GetTranslation() + ::gpk::SCoord3<float>{0.0f, 8.0f, 0.0f};
+	starPos												= matrixVP.Transform(starPos);
+	starPos.x = ::gpk::clamp(starPos.x, 20.0f, targetPixels.metrics().x - 20.0f);
+	starPos.y = ::gpk::clamp(starPos.y, 20.0f, targetPixels.metrics().y - 20.0f);
+	const ::gpk::SCoord2<int32_t>							pixelCoord			= {(int32_t)starPos.x, (int32_t)starPos.y};
+
+	const ::gpk::vcs										finalText			= solarSystem.PlayerNames[iShip];
+	::gpk::SRectangle2<int16_t>								rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
+	rectText.Offset = (pixelCoord - ::gpk::SCoord2<int32_t>{(rectText.Size.x >> 1), (rectText.Size.y >> 1)}).Cast<int16_t>();
+
+	::gpk::array_pod<::gpk::SCoord2<uint16_t>>				dstCoords;
+	gpk_necs(::gpk::textLineRaster(targetPixels.metrics().Cast<uint16_t>(), font.CharSize, rectText, font.Texture, finalText, dstCoords));
+	::gpk::SColorBGRA	playerColors[] = {
+		0xFF0000FFU,
+		0xFF00FF00U,
+		0xFFFF0000U,
+		0xFFFFFF00U,
+		0xFFFF00FFU,
+		0xFF00FFFFU,
+	};
+	for(uint32_t iCoord = 0; iCoord < dstCoords.size(); ++iCoord) {
+		const ::gpk::SCoord2<uint16_t>										dstCoord												= dstCoords[iCoord];
+		if(::gpk::in_range(dstCoord, {{}, targetPixels.metrics().Cast<uint16_t>()}))
+			::gpk::setPixel(targetPixels, dstCoord.Cast<int16_t>(), playerColors[iShip % ::gpk::size(playerColors)]);
 	}
 	return pixelsDrawn;
 }
@@ -452,9 +457,9 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
 		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
 			const ::ghg::SShipCore										& ship					= solarSystem.ShipState.ShipCores[iShip];
-			if(ship.Health <= 0)
+			if(ship.Health <= 0 && ship.Team)
 				continue;
-			::drawShip(solarSystem, iShip, matrixView, targetPixels, depthBuffer, drawCache);
+			::drawShip(solarSystem, iShip, matrixView, targetPixels, depthBuffer, drawCache, *solarSystem.DecoState.FontManager.Fonts[10]);
 		}
 	}
 

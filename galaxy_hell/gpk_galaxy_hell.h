@@ -1,10 +1,13 @@
-#include "gpk_galaxy_hell_draw.h"
+#include "gpk_galaxy_hell_ships.h"
 
 #include "gpk_galaxy_hell_deco.h"
-#include "gpk_galaxy_hell_ships.h"
+
+#include "gpk_galaxy_hell_draw.h"
+
 
 #include "gpk_input.h"
 #include "gpk_sysevent.h"
+#include "gpk_label.h"
 
 #include <mutex>
 
@@ -19,7 +22,7 @@ namespace ghg
 		uint64_t												TimeLast				= 0;
 		uint32_t												Seed					= 1;
 		uint32_t												OffsetStage				= 2;
-		uint32_t												PlayerCount				= 2;
+		uint32_t												PlayerCount				= 1;
 
 		uint32_t												Stage					= 0;
 		double													TimeStage				= 0;
@@ -41,21 +44,30 @@ namespace ghg
 #pragma pack(pop)
 
 	struct SGalaxyHell {
-		::ghg::SShipState										ShipState				= {};
+		::ghg::SShipManager										ShipState				= {};
 		::ghg::SDecoState										DecoState				= {};	
 		::ghg::SPlayState										PlayState				= {};
+		::gpk::array_obj<::gpk::vcc>							PlayerNames				= {};
 		
 		::ghg::SGalaxyHellDrawCache								DrawCache;
 		::std::mutex											LockUpdate;
 
 		::gpk::error_t											Save					(::gpk::array_pod<byte_t> & output) const {
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SPlayState>{&PlayState, 1}, output);
+			for(uint32_t iPlayer = 0; iPlayer < PlayState.PlayerCount; ++iPlayer) 
+				::gpk::viewWrite(PlayerNames[iPlayer], output);
 			ShipState.Save(output);
 			return 0;
 		}
 		::gpk::error_t											Load					(::gpk::view_array<const byte_t> & input) {
 			::gpk::view_array<const ::ghg::SPlayState>					readPlayState			= {};
 			int32_t bytesRead = ::gpk::viewRead(readPlayState, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; PlayState	= readPlayState[0];
+			PlayerNames.resize(PlayState.PlayerCount);
+			for(uint32_t iPlayer = 0; iPlayer < PlayerNames.size(); ++iPlayer) {
+				::gpk::vcc readPlayerName = {};
+				bytesRead = ::gpk::viewRead(readPlayerName, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; 
+				PlayerNames[iPlayer] = ::gpk::label(readPlayerName);
+			}
 			ShipState.Load(input);
 			return 0;
 		}
@@ -77,12 +89,12 @@ namespace ghg
 		, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
 		);
 	::gpk::error_t										getLightArraysFromShips
-		( const ::ghg::SShipState								& shipState
+		( const ::ghg::SShipManager								& shipState
 		, ::gpk::array_pod<::gpk::SCoord3<float>>				& lightPoints
 		, ::gpk::array_pod<::gpk::SColorBGRA>					& lightColors
 		);
 	::gpk::error_t										getLightArrays
-		( const ::ghg::SShipState								& shipState
+		( const ::ghg::SShipManager								& shipState
 		, const ::ghg::SDecoState								& decoState
 		, ::gpk::array_pod<::gpk::SCoord3<float>>				& lightPoints
 		, ::gpk::array_pod<::gpk::SColorBGRA>					& lightColors
@@ -90,7 +102,7 @@ namespace ghg
 		);
 
 	::gpk::error_t										drawShipOrbiter
-		( const ::ghg::SShipState							& shipState
+		( const ::ghg::SShipManager							& shipState
 		, const ::ghg::SOrbiter								& shipPart
 		, const ::gpk::SMatrix4<float>						& matrixVP
 		, ::gpk::view_grid<::gpk::SColorBGRA>				& targetPixels

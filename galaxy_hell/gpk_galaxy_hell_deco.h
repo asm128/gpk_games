@@ -137,7 +137,10 @@ namespace ghg
 					Remove(iShot);
 				else {
 					float						& speed				= Particles.Speed[iShot];
-					speed					-= secondsLastFrame * ((0 > speed) ? (rand() % 16) * 5 : (rand() % 16));
+					if(speed > 0)
+						speed					-= secondsLastFrame;// * ((0 > speed) ? (rand() % 16) * 5 : (rand() % 16));
+					else
+						Remove(iShot);
 				}
 			}
 			return 0;

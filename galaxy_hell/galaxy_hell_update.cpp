@@ -42,12 +42,12 @@ static	int											handleCollisionPoint	(::ghg::SGalaxyHell & solarSystem, int
 	solarSystem.DecoState.Debris.SpawnDirected(5, 0.3, bounceVector, collisionPoint, 50, 1);
 	attackerScore.Hits									+= 1;
 	attackerScore.Score									+= weaponDamage;
-	solarSystem.DecoState.ScoreParticles.Create(collisionPoint, {0, 1, 0}, 10, {weaponDamage, 1});
+	solarSystem.DecoState.ScoreParticles.Create(collisionPoint, bounceVector, 10.0f + weaponDamage * .001f, {weaponDamage, 1});
 	attackerScore.DamageDone							+= weaponDamage;
 	damagedScore.DamageReceived							+= weaponDamage;
 	if(::applyDamage(weaponDamage, damagedPart.Health, damagedShip.Health)) {	// returns true if health reaches zero
 		attackerScore.Score									+= weaponDamage * 10;
-		solarSystem.DecoState.ScoreParticles.Create(collisionPoint, {0, 1, 0}, 10, {weaponDamage * 10, 2});
+		solarSystem.DecoState.ScoreParticles.Create(collisionPoint, bounceVector, 10.0f + weaponDamage * .001f, {weaponDamage * 10, 2});
 		attackerScore.KilledOrbiters						+= 1;
 		damagedScore.OrbitersLost							+= 1;
 		const ::ghg::SEntity									& entityGeometry			= solarSystem.ShipState.EntitySystem.Entities[damagedPart.Entity + 1];
@@ -57,7 +57,7 @@ static	int											handleCollisionPoint	(::ghg::SGalaxyHell & solarSystem, int
 		solarSystem.DecoState.Debris.SpawnSpherical(30, collisionPoint, 60, 2);
 		if(0 >= damagedShip.Health) {
 			attackerScore.Score									+= weaponDamage * 50;
-			solarSystem.DecoState.ScoreParticles.Create(collisionPoint, {0, 1, 0}, 10, {weaponDamage * 50, 3});
+			solarSystem.DecoState.ScoreParticles.Create(collisionPoint, bounceVector, 10.0f + weaponDamage * .001f, {weaponDamage * 50, 3});
 			attackerScore.KilledShips							+= 1;
 			const ::gpk::SCoord3<float>								& parentPosition			= solarSystem.ShipState.GetShipPosition(damagedShip);
 			::ghg::decoExplosionAdd(solarSystem.DecoState.Explosions, indexMesh, entityGeometry.Image, countTriangles, parentPosition, 13);
