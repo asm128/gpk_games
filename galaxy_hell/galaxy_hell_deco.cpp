@@ -1,12 +1,14 @@
 #include "gpk_galaxy_hell_deco.h"
+#include "gpk_noise.h"
 
-static constexpr int								MAX_SLICE_TRIANGLES	= 32;
+static constexpr int		MAX_SLICE_TRIANGLES		= 32;
 
-int							ghg::decoExplosionAdd	(::gpk::array_obj<::ghg::SExplosion> & explosions, int32_t indexMesh, uint32_t triangleCount, const ::gpk::SCoord3<float> &collisionPoint, double debrisSpeed) {
+int							ghg::decoExplosionAdd	(::gpk::array_obj<::ghg::SExplosion> & explosions, int32_t indexMesh, int32_t indexImage, uint32_t triangleCount, const ::gpk::SCoord3<float> &collisionPoint, double debrisSpeed) {
 	::ghg::SExplosion				newExplosion			= {};
 	newExplosion.IndexMesh		= indexMesh;
+	newExplosion.IndexImage		= indexImage;
 	for(uint32_t iTriangle = 0; iTriangle < triangleCount; ) {
-		const	uint32_t				sliceTriangleCount		= ::gpk::min((uint32_t)(rand() % MAX_SLICE_TRIANGLES), (uint32_t)(triangleCount - iTriangle));
+		const	uint32_t				sliceTriangleCount		= ::gpk::min((uint32_t)(::gpk::noise1DBase(explosions.size() * triangleCount + iTriangle + 1) % MAX_SLICE_TRIANGLES), (uint32_t)(triangleCount - iTriangle));
 		newExplosion.Slices.push_back({(uint16_t)iTriangle, (uint16_t)sliceTriangleCount});
 		iTriangle					+= sliceTriangleCount;
 
@@ -29,12 +31,13 @@ int							ghg::decoExplosionAdd	(::gpk::array_obj<::ghg::SExplosion> & explosion
 
 ::gpk::error_t				ghg::decoUpdate			(::ghg::SDecoState & decoState, double secondsLastFrame, double relativeSpeed, const ::gpk::SCoord2<uint16_t> & screenMetrics)		{
 	// Update background stars
-	decoState.Stars.Update(screenMetrics, (float)secondsLastFrame);
+	decoState.Stars			.Update(screenMetrics, (float)secondsLastFrame);
+	decoState.ScoreParticles.Update((float)secondsLastFrame);
+	decoState.Debris		.Update((float)secondsLastFrame);
 
 	// Create and update random debris traveling in the wind
 	const int32_t											randDebris			= rand();
 	decoState.Debris.Create({200.0f, ((randDebris % 2) ? -1.0f : 1.0f) * (randDebris % 400), ((randDebris % 3) ? -1.0f : 1.0f) * (randDebris % 400)}, {-1, 0, 0}, 400, 2);
-	decoState.Debris.Update((float)secondsLastFrame);
 	for(uint32_t iParticle = 0; iParticle < decoState.Debris.Particles.Position.size(); ++iParticle)
 		decoState.Debris.Particles.Position[iParticle].x	-= (float)(relativeSpeed * secondsLastFrame);
 

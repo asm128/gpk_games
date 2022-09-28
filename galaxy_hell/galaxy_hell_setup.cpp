@@ -367,6 +367,8 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 int										ghg::solarSystemSetup			(::ghg::SGalaxyHell & solarSystem, const ::gpk::SCoord2<uint16_t> & windowSize)	{
 	::ghg::SShipScene							& scene							= solarSystem.ShipState.Scene;
 	::modelsSetup(scene);
+	solarSystem.DecoState.FontManager.Fonts.clear();
+	gpk_necs(::gpk::rasterFontDefaults(solarSystem.DecoState.FontManager));
 
 	::ghg::stageSetup(solarSystem);
 

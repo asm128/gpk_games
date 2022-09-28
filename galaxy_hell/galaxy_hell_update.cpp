@@ -41,23 +41,26 @@ static	int											handleCollisionPoint	(::ghg::SGalaxyHell & solarSystem, int
 	const ::gpk::SCoord3<float>								bounceVector				= (collisionPoint - sphereCenter).Normalize();
 	solarSystem.DecoState.Debris.SpawnDirected(5, 0.3, bounceVector, collisionPoint, 50, 1);
 	attackerScore.Hits									+= 1;
-	attackerScore.Score									+= 1;
+	attackerScore.Score									+= weaponDamage;
+	solarSystem.DecoState.ScoreParticles.Create(collisionPoint, {0, 1, 0}, 10, {weaponDamage, 1});
 	attackerScore.DamageDone							+= weaponDamage;
 	damagedScore.DamageReceived							+= weaponDamage;
 	if(::applyDamage(weaponDamage, damagedPart.Health, damagedShip.Health)) {	// returns true if health reaches zero
-		attackerScore.Score									+= 10;
+		attackerScore.Score									+= weaponDamage * 10;
+		solarSystem.DecoState.ScoreParticles.Create(collisionPoint, {0, 1, 0}, 10, {weaponDamage * 10, 2});
 		attackerScore.KilledOrbiters						+= 1;
 		damagedScore.OrbitersLost							+= 1;
 		const ::ghg::SEntity									& entityGeometry			= solarSystem.ShipState.EntitySystem.Entities[damagedPart.Entity + 1];
 		const int32_t											indexMesh					= entityGeometry.Geometry;
 		const uint32_t											countTriangles				= solarSystem.ShipState.Scene.Geometry[indexMesh].Triangles.size();
-		::ghg::decoExplosionAdd(solarSystem.DecoState.Explosions, indexMesh, countTriangles, collisionPoint, 60);
+		::ghg::decoExplosionAdd(solarSystem.DecoState.Explosions, indexMesh, entityGeometry.Image, countTriangles, collisionPoint, 60);
 		solarSystem.DecoState.Debris.SpawnSpherical(30, collisionPoint, 60, 2);
 		if(0 >= damagedShip.Health) {
-			attackerScore.Score									+= 50;
+			attackerScore.Score									+= weaponDamage * 50;
+			solarSystem.DecoState.ScoreParticles.Create(collisionPoint, {0, 1, 0}, 10, {weaponDamage * 50, 3});
 			attackerScore.KilledShips							+= 1;
 			const ::gpk::SCoord3<float>								& parentPosition			= solarSystem.ShipState.GetShipPosition(damagedShip);
-			::ghg::decoExplosionAdd(solarSystem.DecoState.Explosions, indexMesh, countTriangles, parentPosition, 13);
+			::ghg::decoExplosionAdd(solarSystem.DecoState.Explosions, indexMesh, entityGeometry.Image, countTriangles, parentPosition, 13);
 			solarSystem.DecoState.Debris.SpawnSpherical(150, parentPosition, 13, 2.8f);
 			solarSystem.PlayState.Slowing						= true;
 			solarSystem.PlayState.TimeScale						= 1.0;
@@ -393,13 +396,13 @@ static int											processInput			(::ghg::SGalaxyHell & solarSystem, double se
 	controllerPlayer[0].Back							= input.KeyboardCurrent.KeyState['S'];
 	controllerPlayer[0].Left							= input.KeyboardCurrent.KeyState['A'];
 	controllerPlayer[0].Right							= input.KeyboardCurrent.KeyState['D'];
-	controllerPlayer[0].Turbo							= input.KeyboardCurrent.KeyState[VK_LSHIFT];
+	controllerPlayer[0].Turbo							= input.KeyboardCurrent.KeyState[VK_LSHIFT] || input.KeyboardCurrent.KeyState[VK_SHIFT];
 
 	controllerPlayer[1].Forward							= input.KeyboardCurrent.KeyState[VK_UP		];
 	controllerPlayer[1].Back							= input.KeyboardCurrent.KeyState[VK_DOWN	];
 	controllerPlayer[1].Left							= input.KeyboardCurrent.KeyState[VK_LEFT	];
 	controllerPlayer[1].Right							= input.KeyboardCurrent.KeyState[VK_RIGHT	];
-	controllerPlayer[1].Turbo							= input.KeyboardCurrent.KeyState[VK_RCONTROL];
+	controllerPlayer[1].Turbo							= input.KeyboardCurrent.KeyState[VK_RCONTROL] || input.KeyboardCurrent.KeyState[VK_CONTROL];
 
 	//const bool												key_rotate_left			= input.KeyboardCurrent.KeyState[VK_NUMPAD8	];
 	//const bool												key_rotate_right		= input.KeyboardCurrent.KeyState[VK_NUMPAD2	];

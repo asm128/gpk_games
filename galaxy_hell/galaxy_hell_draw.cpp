@@ -1,6 +1,10 @@
 #include "gpk_galaxy_hell.h"
 
 #include "gpk_raster_lh.h"
+#include "gpk_gui_text.h"
+#include "gpk_font.h"
+
+#include "gpk_label.h"
 
 #include <algorithm>
 
@@ -44,6 +48,7 @@ static	int													drawDebris
 	, const ::gpk::view_array<const ::gpk::SColorBGRA>	& debrisColors
 	)	{
 
+	float prebrightness = 2.5f * (1.0f / debris.Brightness.size());
 	for(uint32_t iParticle = 0; iParticle < debris.Brightness.size(); ++iParticle) {
 		const ::gpk::SColorFloat								& colorShot			= debrisColors[iParticle % debrisColors.size()];
 		::gpk::SCoord3<float>									starPos				= debris.Particles.Position[iParticle];
@@ -58,9 +63,10 @@ static	int													drawDebris
 		uint32_t												depth				= uint32_t(starPos.z * 0xFFFFFFFFU);
 		if(depth > depthBuffer[pixelCoord.y][pixelCoord.x])
 			continue;
-		::gpk::SColorFloat										starFinalColor	= colorShot * debris.Brightness[iParticle];
-		starFinalColor.g									= ::gpk::max(0.0f, starFinalColor.g - (1.0f - ::gpk::min(1.0f, debris.Brightness[iParticle] * 2.5f * (1.0f / debris.Brightness.size() * iParticle * 2))));
-		starFinalColor.b									= ::gpk::max(0.0f, starFinalColor.b - (1.0f - ::gpk::min(1.0f, debris.Brightness[iParticle] * 2.5f * (1.0f / debris.Brightness.size() * iParticle * 1))));
+		float													brightness		= debris.Brightness[iParticle];
+		::gpk::SColorFloat										starFinalColor	= colorShot * brightness;
+		starFinalColor.g									= ::gpk::max(0.0f, starFinalColor.g - (1.0f - ::gpk::min(1.0f, brightness * prebrightness * (iParticle * 2))));
+		starFinalColor.b									= ::gpk::max(0.0f, starFinalColor.b - (1.0f - ::gpk::min(1.0f, brightness * prebrightness * (iParticle * 1))));
 		//::gpk::setPixel(targetPixels, pixelCoord, starFinalColor);
 		static constexpr	const double						brightRadius		= 1.5;
 		static constexpr	const double						brightRadiusSquared	= brightRadius * brightRadius;
@@ -85,6 +91,78 @@ static	int													drawDebris
 				pixelVal											= (starFinalColor * finalBrightness + pixelVal).Clamp();
 			}
 		}
+	}
+	return 0;
+}
+
+int													drawScoreParticles
+	( ::gpk::view_grid<::gpk::SColorBGRA>				targetPixels
+	, const ::ghg::SScoreParticles						& debris
+	, const ::gpk::SMatrix4<float>						& matrixVPV
+	, ::gpk::view_grid<uint32_t>						depthBuffer
+	, const ::gpk::SRasterFont							& font
+	)	{
+
+	static constexpr	const double						brightRadius		= 1.5;
+	static constexpr	const double						brightRadiusSquared	= brightRadius * brightRadius;
+	static constexpr	const double						brightUnit			= 1.0 / brightRadiusSquared;
+	for(uint32_t iParticle = 0; iParticle < debris.Scores.size(); ++iParticle) {
+		::gpk::SCoord3<float>									starPos				= debris.Particles.Position[iParticle];
+		starPos												= matrixVPV.Transform(starPos);
+		if(starPos.z > 1 || starPos.z < 0)
+			continue;
+		const ::gpk::SCoord2<int32_t>							pixelCoord			= {(int32_t)starPos.x, (int32_t)starPos.y};
+		if( pixelCoord.y < 0 || pixelCoord.y >= (int32_t)targetPixels.metrics().y
+		 || pixelCoord.x < 0 || pixelCoord.x >= (int32_t)targetPixels.metrics().x
+		)
+			continue;
+		uint32_t												depth				= uint32_t(starPos.z * 0xFFFFFFFFU);
+		if(depth > depthBuffer[pixelCoord.y][pixelCoord.x])
+			continue;
+
+		::ghg::SScoreParticle									particle			= debris.Scores[iParticle];
+		::gpk::SColorFloat										starFinalColor		= ::gpk::GREEN;
+		starFinalColor.r									+= 1.0f - ::gpk::min(1.0f, particle.Brightness);
+		starFinalColor.g									-= 1.0f - ::gpk::min(1.0f, particle.Brightness);
+		starFinalColor.b									-= 1.0f - ::gpk::min(1.0f, particle.Brightness);
+		starFinalColor.Clamp();
+		::gpk::array_pod<::gpk::SCoord2<int32_t>>				dstCoords;
+		char													textToShow[64]		= {};
+		sprintf_s(textToShow, "%i", particle.Score);
+		const ::gpk::vcs										finalText			= textToShow;
+		::gpk::SRectangle2<int16_t>								rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
+		rectText.Offset = (pixelCoord - ::gpk::SCoord2<int32_t>{(rectText.Size.x >> 1), (rectText.Size.y >> 1)}).Cast<int16_t>();
+
+		gpk_necs(::gpk::textLineRaster(targetPixels.metrics(), font.CharSize.Cast<uint16_t>(), rectText, font.Texture, finalText, dstCoords));
+		for(uint32_t iCoord = 0; iCoord < dstCoords.size(); ++iCoord) {
+			const ::gpk::SCoord2<int32_t>										dstCoord												= dstCoords[iCoord];
+			::gpk::setPixel(targetPixels, dstCoord.Cast<int16_t>(), starFinalColor);
+			//targetPixels[dstCoord.y][dstCoord.x]							= starFinalColor;
+			//::gpk::drawPixelLight(target, dstCoords[iCoord], colorFace, controlState.Pressed ? 0.75f : 0.5f, controlState.Pressed ? 1.0f : 0.95);
+		}
+
+
+		//::gpk::setPixel(targetPixels, pixelCoord, starFinalColor);
+
+		//for(int32_t y = (int32_t)-brightRadius - 1, yStop = (int32_t)brightRadius + 1; y < yStop; ++y)
+		//for(int32_t x = (int32_t)-brightRadius - 1; x < yStop; ++x) {
+		//	::gpk::SCoord2<float>									brightPos			= {(float)x, (float)y};
+		//	const double											brightDistance		= brightPos.LengthSquared();
+		//	if(brightDistance <= brightRadiusSquared) {
+		//		::gpk::SCoord2<int32_t>									blendPos			= pixelCoord + (brightPos).Cast<int32_t>();
+		//		if( blendPos.y < 0 || blendPos.y >= (int32_t)targetPixels.metrics().y
+		//		 || blendPos.x < 0 || blendPos.x >= (int32_t)targetPixels.metrics().x
+		//		)
+		//			continue;
+		//		uint32_t												& blendVal			= depthBuffer[blendPos.y][blendPos.x];
+		//		if(depth > blendVal)
+		//			continue;
+		//		blendVal											= depth;
+		//		double													finalBrightness					= 1.0-(brightDistance * brightUnit);
+		//		::gpk::SColorBGRA										& pixelVal						= targetPixels[blendPos.y][blendPos.x];
+		//		pixelVal											= (starFinalColor * finalBrightness + pixelVal).Clamp();
+		//	}
+		//}
 	}
 	return 0;
 }
@@ -300,8 +378,8 @@ static	int											drawExplosion
 	, ::gpk::view_grid<uint32_t>						depthBuffer
 	, ::ghg::SGalaxyHellDrawCache						& drawCache
 	) {
-	::gpk::view_grid<const ::gpk::SColorBGRA>				image					= solarSystem.ShipState.Scene.Image	[explosion.IndexMesh].View;
-	const ::gpk::SGeometryQuads								& mesh					= solarSystem.ShipState.Scene.Geometry[explosion.IndexMesh];
+	::gpk::view_grid<const ::gpk::SColorBGRA>				image					= solarSystem.ShipState.Scene.Image		[explosion.IndexImage].View;
+	const ::gpk::SGeometryQuads								& mesh					= solarSystem.ShipState.Scene.Geometry	[explosion.IndexMesh];
 	for(uint32_t iExplosionPart = 0; iExplosionPart < explosion.Particles.Position.size(); ++iExplosionPart) {
 		const ::gpk::SRange<uint16_t>							& sliceMesh				= explosion.Slices[iExplosionPart];
 		::gpk::SMatrix4<float>									matrixPart				= {};
@@ -453,6 +531,10 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 	{
 		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
 		::drawDebris(targetPixels, solarSystem.DecoState.Debris, matrixView, depthBuffer, ::ghg::DEBRIS_COLORS);
+	}
+	{
+		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		::drawScoreParticles(targetPixels, solarSystem.DecoState.ScoreParticles, matrixView, depthBuffer, *solarSystem.DecoState.FontManager.Fonts[8]);
 	}
 	return 0;
 }

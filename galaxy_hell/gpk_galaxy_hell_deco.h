@@ -1,4 +1,6 @@
 #include "gpk_galaxy_hell_physics.h"
+#include "gpk_array_static.h"
+#include "gpk_font.h"
 
 #ifndef GPK_GALAXY_HELL_DECO_H_293874239874
 #define GPK_GALAXY_HELL_DECO_H_293874239874
@@ -49,6 +51,11 @@ namespace ghg
 	struct SDebris	{
 		::gpk::array_pod<float>						Brightness			= {};
 		::ghg::SParticles3							Particles			= {};
+		
+		int											Remove				(int32_t iParticle)	{
+			Brightness.remove_unordered(iParticle);
+			return Particles.Remove(iParticle);
+		}
 
 		int											Create				(const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness)	{
 			Particles.Create(position, direction, speed);
@@ -82,23 +89,71 @@ namespace ghg
 				float											& speed				= Particles.Speed		[iShot];
 				float											& brightness 		= Brightness			[iShot];
 				brightness									-= secondsLastFrame;
-				speed										-= secondsLastFrame * ((0 > speed) ? (rand() % 16) * 5 : (rand() % 16));
-
-				if(0 > brightness) {
-					Particles.Remove(iShot);
-					Brightness.remove_unordered(iShot--);
-				}
+				if(0 > brightness)
+					Remove(iShot);
+				else 
+					speed										-= secondsLastFrame * ((0 > speed) ? (rand() % 16) * 5 : (rand() % 16));
 			}
 			return 0;
 		}
 	};
 
 
+#pragma pack(push, 1)
+	struct STriColor {
+		uint32_t			Min;
+		uint32_t			Mid;
+		uint32_t			Max;
+	};
+	struct SScoreParticle {
+		int32_t										Score;
+		float										Brightness;
+		uint8_t										IndexColor;
+	};
+#pragma pack(pop)
+
+	struct SScoreParticles {
+		::gpk::array_pod<::ghg::SScoreParticle>		Scores		= {};
+		::ghg::SParticles3							Particles	= {};
+		::gpk::array_static<::ghg::STriColor, 256>	Palette		= {{0xFF00FF00, 0xFFFFEE11, 0xFFFF0000}, };
+
+		int											Remove				(int32_t iParticle)	{
+			Scores.remove_unordered(iParticle);
+			return Particles.Remove(iParticle);
+		}
+
+		int											Create				(const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, const ::ghg::SScoreParticle & score)	{
+			Particles.Create(position, direction + (direction * (score.Score * .0001)), speed);
+			return Scores.push_back(score);
+		}
+
+		int											Update				(float secondsLastFrame)	{
+			Particles.IntegrateSpeed(secondsLastFrame);
+			for(uint32_t iShot = 0; iShot < Particles.Position.size(); ++iShot) {
+				::ghg::SScoreParticle		& particle			= Scores[iShot];
+				float						& brightness 		= particle.Brightness;
+				brightness				-= secondsLastFrame;
+				if(0 >= brightness)
+					Remove(iShot);
+				else {
+					float						& speed				= Particles.Speed[iShot];
+					speed					-= secondsLastFrame * ((0 > speed) ? (rand() % 16) * 5 : (rand() % 16));
+				}
+			}
+			return 0;
+		}
+	};
+
 	struct SExplosion {
 		int32_t										IndexMesh;
+		int32_t										IndexImage;
 		::gpk::array_pod<::gpk::SRange<uint16_t>>	Slices;
 		::ghg::SParticles3							Particles;
 
+		int											Remove				(uint32_t iSlice)			{
+			Particles.Remove(iSlice);
+			return Slices.remove_unordered(iSlice);
+		}
 		int											Update				(float secondsLastFrame)	{
 			Particles.IntegrateSpeed(secondsLastFrame);
 			for(uint32_t iSlice = 0; iSlice < Particles.Speed.size(); ++iSlice) {
@@ -110,22 +165,21 @@ namespace ghg
 			}
 			return 0;
 		}
-		int											Remove				(uint32_t iSlice)			{
-			Particles.Remove(iSlice);
-			return Slices.remove_unordered(iSlice);
-		}
 	};
 
 		// Deco elements don't affect any relevant game variables. ie. they only use the game state as constants
 	struct SDecoState {
 		::ghg::SStars								Stars							= {};
 		::ghg::SDebris								Debris							= {};
+		::ghg::SScoreParticles						ScoreParticles					= {};
 		::gpk::array_obj<::ghg::SExplosion>			Explosions						= {};
 
 		double										AnimationTime					= 0;
+
+		::gpk::SRasterFontManager					FontManager						= {};
 	};
 
-	::gpk::error_t								decoExplosionAdd	(::gpk::array_obj<::ghg::SExplosion> & explosions, int32_t indexMesh, uint32_t triangleCount, const ::gpk::SCoord3<float> &collisionPoint, double debrisSpeed);
+	::gpk::error_t								decoExplosionAdd	(::gpk::array_obj<::ghg::SExplosion> & explosions, int32_t indexMesh, int32_t indexImage, uint32_t triangleCount, const ::gpk::SCoord3<float> &collisionPoint, double debrisSpeed);
 	::gpk::error_t								decoUpdate			(::ghg::SDecoState & decoState, double secondsLastFrame, double relativeSpeed, const ::gpk::SCoord2<uint16_t> & screenMetrics);
 }
 
