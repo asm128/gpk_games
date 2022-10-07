@@ -83,14 +83,14 @@ HRESULT AUDIO_STATE::InitAudio() {
 		return hr;
 
 #ifdef USING_XAUDIO2_7_DIRECTX
-//    // Workaround for XAudio 2.7 known issue
-//#ifdef _DEBUG
-//    mXAudioDLL = LoadLibraryExW(L"XAudioD2_7.DLL", nullptr, 0x00000800 /* LOAD_LIBRARY_SEARCH_SYSTEM32 */);
-//#else
-//    mXAudioDLL = LoadLibraryExW(L"XAudio2_7.DLL", nullptr, 0x00000800 /* LOAD_LIBRARY_SEARCH_SYSTEM32 */);
-//#endif
-//    if (!mXAudioDLL)
-//        return HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
+    // Workaround for XAudio 2.7 known issue
+#ifdef _DEBUG
+    mXAudioDLL = LoadLibraryExW(L"XAudioD2_7.DLL", nullptr, 0x00000800 /* LOAD_LIBRARY_SEARCH_SYSTEM32 */);
+#else
+    mXAudioDLL = LoadLibraryExW(L"XAudio2_7.DLL", nullptr, 0x00000800 /* LOAD_LIBRARY_SEARCH_SYSTEM32 */);
+#endif
+    if (!mXAudioDLL)
+        return HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
 #endif
 
 	UINT32 flags = 0;
@@ -131,14 +131,12 @@ HRESULT AUDIO_STATE::InitAudio() {
 	XAUDIO2_VOICE_DETAILS details;
 	pMasterVoice->GetVoiceDetails( &details );
 
-	if( details.InputChannels > OUTPUTCHANNELS )
-	{
+	if( details.InputChannels > OUTPUTCHANNELS ){
 		pXAudio2.Reset();
 		return E_FAIL;
 	}
 
-	if ( FAILED( hr = pMasterVoice->GetChannelMask( &dwChannelMask ) ) )
-	{
+	if ( FAILED( hr = pMasterVoice->GetChannelMask( &dwChannelMask ) ) ) {
 		pXAudio2.Reset();
 		return E_FAIL;
 	}
@@ -152,14 +150,12 @@ HRESULT AUDIO_STATE::InitAudio() {
 #else
 
 	XAUDIO2_DEVICE_DETAILS details;
-	if( FAILED( hr = pXAudio2->GetDeviceDetails( 0, &details ) ) )
-	{
+	if( FAILED( hr = pXAudio2->GetDeviceDetails( 0, &details ) ) ) {
 		pXAudio2.Reset();
 		return hr;
 	}
 
-	if( details.OutputFormat.Format.nChannels > OUTPUTCHANNELS )
-	{
+	if( details.OutputFormat.Format.nChannels > OUTPUTCHANNELS ) {
 		pXAudio2.Reset();
 		return E_FAIL;
 	}
@@ -177,8 +173,7 @@ HRESULT AUDIO_STATE::InitAudio() {
 	params.Loudness = FXMASTERINGLIMITER_DEFAULT_LOUDNESS;
 
 	hr = CreateFX(__uuidof(FXMasteringLimiter), &pVolumeLimiter, &params, sizeof(params));
-	if (FAILED(hr))
-	{
+	if (FAILED(hr)) {
 		pXAudio2.Reset();
 		return hr;
 	}

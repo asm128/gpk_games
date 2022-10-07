@@ -11,20 +11,25 @@
 	for(uint32_t iEvent = 0; iEvent < systemEvents.size(); ++iEvent) {
 		switch(systemEvents[iEvent].Type) {
 		case gpk::SYSEVENT_RESIZE: {
-			app.Game.DrawCache.RenderTargetMetrics = *(const ::gpk::SCoord2<uint16_t>*)systemEvents[iEvent].Data.begin();
-			app.RenderTargetPool.resize(16);
-			//if(app.World.DrawCache.RenderTargetMetrics.x > 1600) app.World.DrawCache.RenderTargetMetrics.x = 1600;
-			//if(app.World.DrawCache.RenderTargetMetrics.y >  900) app.World.DrawCache.RenderTargetMetrics.y = 900;
+			::gpk::SCoord2<uint16_t> newMetrics = *(const ::gpk::SCoord2<uint16_t>*)systemEvents[iEvent].Data.begin();
+			::gpk::guiUpdateMetrics(*app.DialogDesktop.GUI, newMetrics.Cast<uint32_t>(), true);
+			for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) {
+				if(app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI) ::gpk::guiUpdateMetrics(*app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI, newMetrics.Cast<uint32_t>(), true);
+				if(app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI) ::gpk::guiUpdateMetrics(*app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI, newMetrics.Cast<uint32_t>(), true);
+			}
 
+			app.RenderTargetPool.resize(16);
+			for(uint32_t iRT = 0; iRT < 16; ++iRT) {
+				app.RenderTargetPool[iRT]->resize(newMetrics);
+			}
+
+			app.Game.DrawCache.RenderTargetMetrics = newMetrics;
 			double								currentRatio					= app.Game.DrawCache.RenderTargetMetrics.y / (double)app.Game.DrawCache.RenderTargetMetrics.x;
 			double								targetRatioY					=  9 / 16.0;
 			if(currentRatio >= targetRatioY)
 				app.Game.DrawCache.RenderTargetMetrics.y = (uint16_t)(app.Game.DrawCache.RenderTargetMetrics.x * targetRatioY + .1f);
 			else 
 				app.Game.DrawCache.RenderTargetMetrics.x = (uint16_t)(app.Game.DrawCache.RenderTargetMetrics.y / targetRatioY + .1f);
-
-			::gpk::guiUpdateMetrics(*app.DialogDesktop.GUI, app.Game.DrawCache.RenderTargetMetrics.Cast<uint32_t>(), true);
-
 			break;
 		}
 		case ::gpk::SYSEVENT_CHAR:
@@ -43,7 +48,11 @@
 					::gpk::vcc trimmed{app.InputboxText};
 					::gpk::trim(trimmed, trimmed);
 					app.Players.push_back({::gpk::label(trimmed)});
-					app.Game.PlayerNames[0] = app.Players[0].Name;
+					if(app.Game.Pilots.size())
+						app.Game.Pilots[0].Name = app.Players[0].Name;
+					else 
+						app.Game.PilotCreate({app.Players[0].Name, ::ghg::PLAYER_COLORS[0]});
+
 					app.Save(::ghg::SAVE_MODE_AUTO);
 					break;
 				}
@@ -87,10 +96,17 @@
 		for(uint32_t iPlayer = 0; iPlayer < fileNames.size(); ++iPlayer) {
 			gpk_necall(app.Players[iPlayer].Load(fileNames[iPlayer]), "fileNames[iPlayer]: %s", fileNames[iPlayer].begin());
 		}
-		for(uint32_t iPlayer = 0; iPlayer < app.Players.size(); ++iPlayer) {
-			if(app.Game.PlayerNames.size() <= iPlayer)
-				break;
-			app.Game.PlayerNames[iPlayer] = ::gpk::label(app.Players[iPlayer].Name);
+		::gpk::tunerSetValue(*app.TunerPlayerCount, app.Game.PlayState.PlayerCount);
+		for(uint32_t iPilot = 0; iPilot < app.Game.PlayState.PlayerCount; ++iPilot) {
+			for(uint32_t iPlayer = 0; iPlayer < app.Game.PlayState.PlayerCount; ++iPlayer) {
+				if(iPlayer >= app.Players.size())
+					app.Players.push_back({::gpk::label(app.Game.Pilots[iPilot].Name)});
+
+				if(app.Game.Pilots[iPilot].Name == app.Players[iPlayer].Name) {
+					::std::swap(app.Players[iPlayer], app.Players[iPilot]);
+					break;
+				}
+			}
 		}
 		app.ActiveState					= APP_STATE_Welcome;
 		break;
@@ -99,11 +115,40 @@
 		if(app.Players.size())
 			app.ActiveState					= APP_STATE_Home;
 		else {
-			app.DialogDesktop.GUI->Controls.States[app.VirtualKeyboard.IdRoot].Hidden = false;
+			//app.DialogDesktop.GUI->Controls.States[app.VirtualKeyboard.IdRoot].Hidden = false;
 		}
 		break;
 	}	 
-	::ghg::solarSystemUpdate(app.Game, (app.ActiveState != ::ghg::APP_STATE_Play) ? 0 : lastTimeSeconds, *inputState, systemEvents);
+
+	const bool inGame = app.ActiveState == ::ghg::APP_STATE_Play;
+
+	::gpk::view_array<::ghg::SShipController>		controllerPlayer	= app.Game.ShipControllers;
+
+
+	const ::gpk::SInput								& input				= *app.DialogDesktop.Input;
+
+	if(controllerPlayer.size() == 1 || (controllerPlayer.size() > 1 && app.Game.PlayState.PlayerCount == 1)) {
+		controllerPlayer[0].Forward					= input.KeyboardCurrent.KeyState[VK_UP		] || input.KeyboardCurrent.KeyState['W'];
+		controllerPlayer[0].Back					= input.KeyboardCurrent.KeyState[VK_DOWN	] || input.KeyboardCurrent.KeyState['S'];
+		controllerPlayer[0].Left					= input.KeyboardCurrent.KeyState[VK_LEFT	] || input.KeyboardCurrent.KeyState['A'];
+		controllerPlayer[0].Right					= input.KeyboardCurrent.KeyState[VK_RIGHT	] || input.KeyboardCurrent.KeyState['D'];
+		controllerPlayer[0].Turbo					= input.KeyboardCurrent.KeyState[VK_RCONTROL] || input.KeyboardCurrent.KeyState[VK_CONTROL] || input.KeyboardCurrent.KeyState[VK_LSHIFT] || input.KeyboardCurrent.KeyState[VK_SHIFT];
+	}
+	else {
+		controllerPlayer[0].Forward					= input.KeyboardCurrent.KeyState['W'];
+		controllerPlayer[0].Back					= input.KeyboardCurrent.KeyState['S'];
+		controllerPlayer[0].Left					= input.KeyboardCurrent.KeyState['A'];
+		controllerPlayer[0].Right					= input.KeyboardCurrent.KeyState['D'];
+		controllerPlayer[0].Turbo					= input.KeyboardCurrent.KeyState[VK_LSHIFT] || input.KeyboardCurrent.KeyState[VK_SHIFT];
+
+		controllerPlayer[1].Forward					= input.KeyboardCurrent.KeyState[VK_UP		];
+		controllerPlayer[1].Back					= input.KeyboardCurrent.KeyState[VK_DOWN	];
+		controllerPlayer[1].Left					= input.KeyboardCurrent.KeyState[VK_LEFT	];
+		controllerPlayer[1].Right					= input.KeyboardCurrent.KeyState[VK_RIGHT	];
+		controllerPlayer[1].Turbo					= input.KeyboardCurrent.KeyState[VK_RCONTROL] || input.KeyboardCurrent.KeyState[VK_CONTROL];
+	}
+
+	::ghg::solarSystemUpdate(app.Game, (false == inGame) ? 0 : lastTimeSeconds, *inputState, systemEvents);
 	for(uint32_t iShip = 0; iShip < app.Game.ShipState.ShipOrbiterActionQueue.size(); ++iShip)
 		if(iShip < app.Game.PlayState.PlayerCount) {
 			for(uint32_t iEvent = 0; iEvent < app.Game.ShipState.ShipOrbiterActionQueue[iShip].size(); ++iEvent)
@@ -120,6 +165,9 @@
 }
 
 ::gpk::error_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::SCoord2<uint16_t> renderTargetSize) {
+	if(app.ActiveState < 2)
+		return 0;
+
 	::gpk::ptr_obj<::ghg::TRenderTarget>		target	= {};
 	{
 		::gpk::mutex_guard			rtLock(app.RenderTargetLockPool);
@@ -156,10 +204,10 @@
 		::gpk::SCoord2<int16_t>				cornerBottomLeft	= targetCenter + ::gpk::SCoord2<int16_t>{int16_t(-cameraCenter.x), int16_t( cameraCenter.y)};
 		::gpk::SCoord2<int16_t>				cornerBottomRight	= targetCenter + ::gpk::SCoord2<int16_t>{int16_t( cameraCenter.x), int16_t( cameraCenter.y)};
 
-		cornerTopLeft		.InPlaceClamp({}, {(int16_t)(renderTargetSize.x - 1), (int16_t)(renderTargetSize.y - 1)});
-		cornerTopRight		.InPlaceClamp({}, {(int16_t)(renderTargetSize.x - 1), (int16_t)(renderTargetSize.y - 1)});
-		cornerBottomLeft	.InPlaceClamp({}, {(int16_t)(renderTargetSize.x - 1), (int16_t)(renderTargetSize.y - 1)});
-		cornerBottomRight	.InPlaceClamp({}, {(int16_t)(renderTargetSize.x - 1), (int16_t)(renderTargetSize.y - 1)});
+		cornerTopLeft		.InPlaceClamp({}, {(int16_t)(targetPixels.metrics().x - 1), (int16_t)(targetPixels.metrics().y - 1)});
+		cornerTopRight		.InPlaceClamp({}, {(int16_t)(targetPixels.metrics().x - 1), (int16_t)(targetPixels.metrics().y - 1)});
+		cornerBottomLeft	.InPlaceClamp({}, {(int16_t)(targetPixels.metrics().x - 1), (int16_t)(targetPixels.metrics().y - 1)});
+		cornerBottomRight	.InPlaceClamp({}, {(int16_t)(targetPixels.metrics().x - 1), (int16_t)(targetPixels.metrics().y - 1)});
 
 		::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{cornerTopLeft		, cornerTopRight	}, ::gpk::DARKGRAY);
 		::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{cornerTopLeft		, cornerBottomLeft	}, ::gpk::DARKGRAY);
@@ -178,10 +226,13 @@
 		::std::lock_guard<::std::mutex>							lockUpdate			(app.Game.LockUpdate);
 		::gpk::guiDraw(*app.DialogDesktop.GUI, targetPixels);
 	}
-	else if(app.ActiveState == ::ghg::APP_STATE_Play) {
+	for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) {
 		::std::lock_guard<::std::mutex>							lockUpdate			(app.Game.LockUpdate);
-		for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUIs.size(); ++iPlayer) 
-			::gpk::guiDraw(*app.UIPlay.PlayerUIs[iPlayer].Dialog.GUI, targetPixels);
+		::gpk::guiDraw((app.ActiveState == ::ghg::APP_STATE_Play)
+			? *app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI
+			: *app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI
+			, targetPixels
+		);
 	}
 	{
 		::gpk::mutex_guard			rtLock(app.RenderTargetLockQueue);

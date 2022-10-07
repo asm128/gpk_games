@@ -10,18 +10,18 @@
 
 
 struct SApplication {
-	::gpk::SFramework													Framework;
+	::gpk::SFramework			Framework;
 
-	::std::mutex														LockGUI;
-	::std::mutex														LockRender;
+	::std::mutex				LockGUI;
+	::std::mutex				LockRender;
 
-	bool																DebugUIEnabled				= true;
-	::gpk::SGUI															DebugUI						= {};
-	AUDIO_STATE															AudioState;
+	bool						DebugUIEnabled				= true;
+	::gpk::SGUI					DebugUI						= {};
+	AUDIO_STATE					AudioState;
 
-	::ghg::SGalaxyHellApp												GalaxyHellApp;
+	::ghg::SGalaxyHellApp		GalaxyHellApp;
 
-																	SApplication				(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
+							SApplication				(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
 };
 
 #endif // CED_DEMO_08_H_298837492837

@@ -178,12 +178,18 @@ static	int											modelsSetup				(::ghg::SShipScene & scene)			{
 }
 
 int													ghg::solarSystemReset					(::ghg::SGalaxyHell & solarSystem)	{	// Set up enemy ships
-	::gpk::clear(solarSystem.ShipState.Scene.Transforms, solarSystem.ShipState.Orbiters, solarSystem.ShipState.Weapons, solarSystem.ShipState.ShipCores);
+	::gpk::mutex_guard										lock(solarSystem.LockUpdate);
+	::gpk::clear
+		( solarSystem.ShipState.Scene.Transforms
+		, solarSystem.ShipState.EntitySystem.Entities
+		, solarSystem.ShipState.Orbiters
+		, solarSystem.ShipState.Weapons
+		, solarSystem.ShipState.ShipCores
+		);
 	solarSystem.ShipState.Shots							= {};
-	solarSystem.ShipState.ShipParts				= {};
+	solarSystem.ShipState.ShipParts						= {};
 	solarSystem.ShipState.ShipPhysics					= {};
 	solarSystem.ShipState.ShipOrbiterActionQueue		= {};
-	solarSystem.ShipState.EntitySystem.Entities			= {};
 	solarSystem.ShipState.EntitySystem.EntityChildren	= {};
 	solarSystem.PlayState								= {};
 	return 0;
@@ -192,17 +198,20 @@ int													ghg::solarSystemReset					(::ghg::SGalaxyHell & solarSystem)	{	/
 int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Set up enemy ships
 	static constexpr	const uint32_t						partHealth								= 100;
 
-	solarSystem.PlayState.TimeStage									= 0;
-	solarSystem.PlayState.TimeRealStage								= 0;
+	solarSystem.PlayState.TimeStage						= 0;
+	solarSystem.PlayState.TimeRealStage					= 0;
 	if(0 == solarSystem.PlayState.Stage) {
-		::gpk::mutex_guard										rtGuard	(solarSystem.DrawCache.RenderTargetQueueMutex);
+		::gpk::mutex_guard										lock(solarSystem.LockUpdate);
 		solarSystem.DecoState.Stars.Reset(solarSystem.DrawCache.RenderTargetMetrics);
 		solarSystem.PlayState.TimeStart = solarSystem.PlayState.TimeLast = ::gpk::timeCurrent();
 		memset(solarSystem.ShipState.ShipScores.begin(), 0, solarSystem.ShipState.ShipScores.byte_count());
-		while(solarSystem.PlayerNames.size() < solarSystem.PlayState.PlayerCount) {
+		while(solarSystem.Pilots.size() < solarSystem.PlayState.PlayerCount) {
 			char text [64] = {};
-			sprintf_s(text, "Player %i", solarSystem.PlayerNames.size() + 1);
-			solarSystem.PlayerNames.push_back(::gpk::label(text));
+			sprintf_s(text, "Player %i", solarSystem.Pilots.size() + 1);
+			solarSystem.Pilots.push_back({::gpk::label(text), PLAYER_COLORS[solarSystem.Pilots.size() % ::gpk::size(PLAYER_COLORS)]});
+		}
+		while(solarSystem.ShipControllers.size() < solarSystem.PlayState.PlayerCount) {
+			solarSystem.ShipControllers.push_back({});
 		}
 	}
 
@@ -245,13 +254,19 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 
 	sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage);
 	if(0 <= ::gpk::fileToMemory(stageFileName, stageFile.Bytes) && stageFile.Bytes.size()) {
+		::gpk::mutex_guard										lock(solarSystem.LockUpdate);
 		gpk_necall(-1 == ::gpk::jsonParse(stageFile.Reader, stageFile.Bytes), "%s", stageFileName);
 	} 
 	else {
+		::gpk::mutex_guard										lock(solarSystem.LockUpdate);
 		// Set up player ships
 		if(solarSystem.PlayState.Stage == 0) {
-			solarSystem.ShipState.ShipPhysics = {};
-			solarSystem.ShipState.EntitySystem = {};
+			solarSystem.PlayState.TimeWorld		= 0;
+			solarSystem.PlayState.TimeReal		= 0;
+			solarSystem.PlayState.TimeStage		= 0;
+			solarSystem.PlayState.TimeRealStage	= 0;
+			solarSystem.ShipState.ShipPhysics	= {};
+			solarSystem.ShipState.EntitySystem	= {};
 			::gpk::clear
 				( solarSystem.ShipState.ShipScores						
 				, solarSystem.ShipState.ShipCores						
@@ -265,15 +280,8 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 		solarSystem.ShipState.Shots.clear();
 	
 		if(0 == solarSystem.ShipState.ShipCores.size()) { // Create player ship
-			solarSystem.PlayState.CameraSwitchDelay							= 0;
-			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_SKY].Target				= {};
-			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_SKY].Position				= {-0.000001f, 250, 0};
-			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_SKY].Up					= {0, 1, 0};
-
-			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_PERSPECTIVE].Target		= {};
-			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_PERSPECTIVE].Position		= {-0.000001f, 200, 0};
-			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_PERSPECTIVE].Up			= {0, 1, 0};
-			solarSystem.ShipState.Scene.Global.Camera[CAMERA_MODE_PERSPECTIVE].Position.RotateZ(::gpk::math_pi * .30);
+			solarSystem.PlayState.CameraSwitchDelay											= 0;
+			solarSystem.ShipState.Scene.Global.CameraReset();
 
 			for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.PlayerCount; ++iPlayer) {
 				const int32_t											indexShip						= ::shipCreate(solarSystem.ShipState, 0, 0, 0);
@@ -281,7 +289,7 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 				::gpk::STransform3										& shipPivot						= solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[playerShip.Entity].Body];
 				shipPivot.Orientation.MakeFromEulerTaitBryan({0, 0, (float)(-::gpk::math_pi_2)});
 				shipPivot.Position									= {-30};
-				shipPivot.Position.z = -float(solarSystem.PlayState.PlayerCount * 30) / 2 + iPlayer * 30;
+				shipPivot.Position.z = float(solarSystem.PlayState.PlayerCount * 30) / 2 - iPlayer * 30;
 			}
 		}
 		// Set up enemy ships
@@ -371,11 +379,11 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 
 int										ghg::solarSystemSetup			(::ghg::SGalaxyHell & solarSystem, const ::gpk::SCoord2<uint16_t> & windowSize)	{
 	::ghg::SShipScene							& scene							= solarSystem.ShipState.Scene;
-	::modelsSetup(scene);
+	gpk_necs(::modelsSetup(scene));
 	solarSystem.DecoState.FontManager.Fonts.clear();
 	gpk_necs(::gpk::rasterFontDefaults(solarSystem.DecoState.FontManager));
 
-	::ghg::stageSetup(solarSystem);
+	gpk_necs(::ghg::stageSetup(solarSystem));
 
 	::gpk::SMatrix4<float>						& matrixProjection				= solarSystem.ShipState.Scene.Global.MatrixProjection;
 	matrixProjection.FieldOfView(::gpk::math_pi * .25, windowSize.x / (double)windowSize.y, 0.01, 500);

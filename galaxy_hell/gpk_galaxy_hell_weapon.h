@@ -69,18 +69,14 @@ namespace ghg
 			return 0; 
 		}
 		::gpk::error_t								Load				(::gpk::view_array<const byte_t> & input) { 
-			uint32_t										bytesRead			= 0;
 			gpk_necs(Particles.Load(input));
-			::gpk::view_array<const ::gpk::SCoord3<float>	> readPositionPrev	= {}; gpk_necs(bytesRead = ::gpk::viewRead(readPositionPrev	, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; PositionPrev	= readPositionPrev	;
-			::gpk::view_array<const ::gpk::SCoord3<float>	> readPositionDraw	= {}; gpk_necs(bytesRead = ::gpk::viewRead(readPositionDraw	, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; PositionDraw	= readPositionDraw	;
-			::gpk::view_array<const float					> readBrightness	= {}; gpk_necs(bytesRead = ::gpk::viewRead(readBrightness	, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Brightness	= readBrightness	;
-			::gpk::view_array<const float					> readLifetime		= {}; gpk_necs(bytesRead = ::gpk::viewRead(readLifetime		, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Lifetime		= readLifetime		;
-			for(uint32_t iParticle = 0; iParticle < Particles.Position.size(); ++iParticle) {
-				::gpk::view_array<const ::gpk::SCoord3<float>>		readDistanceToTargets	= {}; 
-				gpk_necs(bytesRead = ::gpk::viewRead(readDistanceToTargets, input));
-				input							= {input.begin() + bytesRead, input.size() - bytesRead};
-				gpk_necs(DistanceToTargets.push_back(readDistanceToTargets));
-			}
+			gpk_necs(::gpk::loadView(input, PositionPrev	));
+			gpk_necs(::gpk::loadView(input, PositionDraw	));
+			gpk_necs(::gpk::loadView(input, Brightness		));
+			gpk_necs(::gpk::loadView(input, Lifetime		));
+			DistanceToTargets.resize(Particles.Position.size());
+			for(uint32_t iParticle = 0; iParticle < DistanceToTargets.size(); ++iParticle)
+				gpk_necs(::gpk::loadView(input, DistanceToTargets[iParticle]));
 			return 0;
 		}
 

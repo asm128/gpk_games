@@ -8,46 +8,44 @@ namespace ghg
 {
 	GDEFINE_ENUM_TYPE (UI_HOME, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_HOME, Continue		, 0);
-	GDEFINE_ENUM_VALUE(UI_HOME, Start			, 1);
-	GDEFINE_ENUM_VALUE(UI_HOME, Shop			, 2);
+	GDEFINE_ENUM_VALUE(UI_HOME, Shop			, 1);
+	GDEFINE_ENUM_VALUE(UI_HOME, Save			, 2);
 	GDEFINE_ENUM_VALUE(UI_HOME, Load			, 3);
-	GDEFINE_ENUM_VALUE(UI_HOME, Save			, 4);
-	GDEFINE_ENUM_VALUE(UI_HOME, Profile			, 5);
-	GDEFINE_ENUM_VALUE(UI_HOME, Leaderboards	, 6);
-	GDEFINE_ENUM_VALUE(UI_HOME, Credits			, 7);
-	GDEFINE_ENUM_VALUE(UI_HOME, Settings		, 8);
-	GDEFINE_ENUM_VALUE(UI_HOME, Exit			, 9);
-
+	GDEFINE_ENUM_VALUE(UI_HOME, Start			, 4);
+	GDEFINE_ENUM_VALUE(UI_HOME, Leaderboards	, 5);
+	GDEFINE_ENUM_VALUE(UI_HOME, Credits			, 6);
+	GDEFINE_ENUM_VALUE(UI_HOME, Settings		, 7);
+	GDEFINE_ENUM_VALUE(UI_HOME, Exit			, 8);
+	
 	GDEFINE_ENUM_TYPE (UI_PROFILE, uint8_t);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, Back				, 0);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, Name				, 1);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, Score			, 2);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, Hits				, 3);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, DamageDone		, 4);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, DamageReceived	, 5);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, HitsSurvived		, 6);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, OrbitersLost		, 7);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, KilledShips		, 8);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, KilledOrbiters	, 9);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, TimeReal			,10);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, TimeWorld		,11);
+	GDEFINE_ENUM_VALUE(UI_PROFILE, Name				, 0);
+	GDEFINE_ENUM_VALUE(UI_PROFILE, Offline			, 1);
+	GDEFINE_ENUM_VALUE(UI_PROFILE, Controller		, 2);
+	GDEFINE_ENUM_VALUE(UI_PROFILE, Select			, 3);
 
 	GDEFINE_ENUM_TYPE (UI_PLAY, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_PLAY, Menu			, 0);
 	GDEFINE_ENUM_VALUE(UI_PLAY, Level			, 1);
 	GDEFINE_ENUM_VALUE(UI_PLAY, TimeReal		, 2);
-	GDEFINE_ENUM_VALUE(UI_PLAY, TimeWorld		, 3);
-	GDEFINE_ENUM_VALUE(UI_PLAY, TimeStage		, 4);
+	GDEFINE_ENUM_VALUE(UI_PLAY, TimeStage		, 3);
 	
 	GDEFINE_ENUM_TYPE (UI_PLAYER, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_PLAYER, Score				, 0);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, Hits				, 1);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, DamageDone		, 2);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, DamageReceived	, 3);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, HitsSurvived		, 4);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, OrbitersLost		, 5);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, KilledShips		, 6);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, KilledOrbiters	, 7);
+	GDEFINE_ENUM_VALUE(UI_PLAYER, Name				, 1);
+	
+	GDEFINE_ENUM_TYPE (UI_PLAYER_SCORE, uint8_t);
+	GDEFINE_ENUM_VALUE(UI_PLAYER_SCORE, Score				, 0);
+	GDEFINE_ENUM_VALUE(UI_PLAYER_SCORE, Hits				, 1);
+	GDEFINE_ENUM_VALUE(UI_PLAYER_SCORE, Shots				, 2);
+	GDEFINE_ENUM_VALUE(UI_PLAYER_SCORE, Bullets				, 3);
+	GDEFINE_ENUM_VALUE(UI_PLAYER_SCORE, DamageDone			, 4);
+	GDEFINE_ENUM_VALUE(UI_PLAYER_SCORE, DamageReceived		, 5);
+	GDEFINE_ENUM_VALUE(UI_PLAYER_SCORE, HitsSurvived		, 6);
+	GDEFINE_ENUM_VALUE(UI_PLAYER_SCORE, OrbitersLost		, 7);
+	GDEFINE_ENUM_VALUE(UI_PLAYER_SCORE, KilledShips			, 8);
+	GDEFINE_ENUM_VALUE(UI_PLAYER_SCORE, KilledOrbiters		, 9);
+	//GDEFINE_ENUM_VALUE(UI_PLAYER_SCORE, TimeReal			,10);
+	//GDEFINE_ENUM_VALUE(UI_PLAYER_SCORE, TimeSim			,11);
 
 	GDEFINE_ENUM_TYPE (UI_LOAD, uint8_t	);
 	GDEFINE_ENUM_TYPE (UI_DESKTOP, uint8_t);
@@ -57,7 +55,6 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(UI_SETTINGS, Game		, 1);
 	GDEFINE_ENUM_VALUE(UI_SETTINGS, Graphics	, 2);
 	GDEFINE_ENUM_VALUE(UI_SETTINGS, Audio		, 3);
-	GDEFINE_ENUM_VALUE(UI_SETTINGS, Controller	, 4);
 
 	GDEFINE_ENUM_TYPE (UI_SHOP, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_SHOP, Back			, 0);
@@ -111,7 +108,7 @@ namespace ghg
 		return ::ghg::gaugeImageUpdate(gauge, gauge.Image, colorMin, colorMid, colorMax, colorEmpty);
 	}
 
-	struct SUIPlayModuleViewport {
+	struct SUIPlayShipPartViewport {
 		int32_t											Viewport		;
 		::gpk::SCamera									Camera			;
 		SUIControlGauge									GaugeLife		;
@@ -123,29 +120,45 @@ namespace ghg
 		::ghg::TRenderTarget							RenderTargetWeaponType	;
 	};
 
+
+	GDEFINE_ENUM_TYPE (SHIP_CONTROLLER, uint16_t);
+	GDEFINE_ENUM_VALUE(SHIP_CONTROLLER, Forward	, 0x01);
+	GDEFINE_ENUM_VALUE(SHIP_CONTROLLER, Back	, 0x02);
+	GDEFINE_ENUM_VALUE(SHIP_CONTROLLER, Left	, 0x03);
+	GDEFINE_ENUM_VALUE(SHIP_CONTROLLER, Right	, 0x04);
+	GDEFINE_ENUM_VALUE(SHIP_CONTROLLER, Turbo	, 0x05);
+
 	struct SUIPlayer {
-		::gpk::array_pobj<::ghg::SUIPlayModuleViewport>	ModuleViewports			= {};
-		::gpk::SDialog									Dialog					= {};
-		::gpk::array_static<char, 128>					TextScore				= {};
-		::gpk::array_static<char, 128>					TextHits				= {};
-		::gpk::array_static<char, 128>					TextDamageDone			= {};
-		::gpk::array_static<char, 128>					TextDamageReceived		= {};
-		::gpk::array_static<char, 128>					TextHitsSurvived		= {};
-		::gpk::array_static<char, 128>					TextOrbitersLost		= {};
-		::gpk::array_static<char, 128>					TextKilledShips			= {};
-		::gpk::array_static<char, 128>					TextKilledOrbiters		= {};
+		::gpk::array_pobj<::ghg::SUIPlayShipPartViewport>	ModuleViewports			= {};
+		::gpk::SDialog										DialogPlay				= {};
+		::gpk::SDialog										DialogHome				= {};
+
+		::gpk::SVirtualKeyboard								VirtualKeyboard			= {};	// This creates on top of DialogHome
+		::gpk::ptr_obj<::gpk::SDialogViewport>				Inputbox;
+		::gpk::array_pod<char>								InputboxText;
+	
+		::gpk::array_static<char, 128>						TextScore				= {};
+		::gpk::array_static<char, 128>						TextHits				= {};
+		::gpk::array_static<char, 128>						TextShots				= {};
+		::gpk::array_static<char, 128>						TextBullets				= {};
+		::gpk::array_static<char, 128>						TextDamageDone			= {};
+		::gpk::array_static<char, 128>						TextDamageReceived		= {};
+		::gpk::array_static<char, 128>						TextHitsSurvived		= {};
+		::gpk::array_static<char, 128>						TextOrbitersLost		= {};
+		::gpk::array_static<char, 128>						TextKilledShips			= {};
+		::gpk::array_static<char, 128>						TextKilledOrbiters		= {};
 	};
 
 	struct SUIPlay {
-		::gpk::array_pobj<::ghg::SUIPlayModuleViewport>	ModuleViewports			= {};
-		::gpk::array_obj<::ghg::SUIPlayer>				PlayerUIs				= {};
-		::ghg::SGalaxyHellDrawCache						DrawCache				= {};
+		::gpk::array_obj<::ghg::SUIPlayer>					PlayerUI				= {};
+		::ghg::SGalaxyHellDrawCache							DrawCache				= {};
 
-		::gpk::array_static<char, 128>					TextLevel				= {};
-		::gpk::array_static<char, 128>					TextTimeStage			= {};
-		::gpk::array_static<char, 128>					TextTimeWorld			= {};
-		::gpk::array_static<char, 128>					TextTimeReal			= {};
+		::gpk::array_static<char, 128>						TextLevel				= {};
+		::gpk::array_static<char, 128>						TextTimeStage			= {};
+		::gpk::array_static<char, 128>						TextTimeWorld			= {};
+		::gpk::array_static<char, 128>						TextTimeReal			= {};
 	};
+
 
 	struct SPlayerShip { 
 		::ghg::SShipCore								Core;
@@ -162,15 +175,10 @@ namespace ghg
 		}
 
 		::gpk::error_t									Load					(::gpk::vcc & input) {
-			int32_t												bytesRead				= 0;
-			::gpk::view_array<const ::ghg::SShipCore>			readCore				= {};
-			::gpk::view_array<const ::ghg::SShipScore>			readScore				= {};
-			::gpk::view_array<const uint32_t>					readParts				= {};
-			::gpk::view_array<const uint32_t>					readWeapons				= {};
-			gpk_necs(bytesRead = ::gpk::viewRead(readCore		, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Core		= readCore	[0];
-			gpk_necs(bytesRead = ::gpk::viewRead(readScore		, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Score		= readScore	[0];
-			gpk_necs(bytesRead = ::gpk::viewRead(readParts		, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Parts		= readParts		;
-			gpk_necs(bytesRead = ::gpk::viewRead(readWeapons	, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Weapons	= readWeapons	;
+			gpk_necs(::gpk::loadPOD	(input, Core	));
+			gpk_necs(::gpk::loadPOD	(input, Score	));
+			gpk_necs(::gpk::loadView(input, Parts	));
+			gpk_necs(::gpk::loadView(input, Weapons	));
 			return 0;
 		}
 	};
@@ -238,15 +246,10 @@ namespace ghg
 		}
 
 		::gpk::error_t							Load(::gpk::vcc & input) {
-			int32_t												bytesRead				= 0;
-			::gpk::vcc											readName				= {};
-			::gpk::view_array<const ::ghg::SPlayerState>		readPlayerState			= {};
-			::gpk::view_array<const ::ghg::SWeapon	>			readWeapons				= {};
-			::gpk::view_array<const ::ghg::SOrbiter	>			readOrbiters			= {};
-			gpk_necs(bytesRead = ::gpk::viewRead(readName			, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Name		= ::gpk::label(readName);
-			gpk_necs(bytesRead = ::gpk::viewRead(readPlayerState	, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; State		= readPlayerState	[0];
-			gpk_necs(bytesRead = ::gpk::viewRead(readWeapons		, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Weapons	= readWeapons		;
-			gpk_necs(bytesRead = ::gpk::viewRead(readOrbiters		, input)); input = {input.begin() + bytesRead, input.size() - bytesRead}; Orbiters	= readOrbiters		;
+			gpk_necs(::gpk::loadLabel	(input, Name	));
+			gpk_necs(::gpk::loadPOD		(input, State	));
+			gpk_necs(::gpk::loadView	(input, Weapons	));
+			gpk_necs(::gpk::loadView	(input, Orbiters));
 			gpk_necs(Ships.resize(*(uint32_t*)input.begin()));
 			input											= {input.begin() + sizeof(uint32_t), input.size() - 4};
 			for(uint32_t iShip = 0; iShip < Ships.size(); ++iShip) {
@@ -291,13 +294,17 @@ namespace ghg
 		::std::mutex												RenderTargetLockPool		= {};
 		::std::mutex												RenderTargetLockQueue		= {};
 		volatile uint64_t											CurrentRenderTarget			= 0;
+		int32_t														PlayerSelected				= 0;
 
 		bool														Exit						= false;
 		::gpk::array_static<::gpk::SDialog, ::ghg::APP_STATE_COUNT>	DialogPerState				= {};
 
 		::gpk::SVirtualKeyboard										VirtualKeyboard				= {};
+		::ghg::SUIPlay												UIPlay;
+
 		::gpk::SDialog												DialogDesktop				= {};
 		::gpk::array_obj<::ghg::SPlayer>							Players						= {};
+		::gpk::ptr_nco<::gpk::SDialogTuner>							TunerPlayerCount;
 
 		::ghg::SGalaxyHell											Game;
 		::gpk::array_obj<::ghg::SUserCredentials>					UserCredentials				= {};
@@ -317,13 +324,11 @@ namespace ghg
 		::gpk::vcs													ExtensionProfile			= ".ghp";
 		::gpk::vcs													ExtensionCredentials		= ".ghc";
 
-		::ghg::SUIPlay												UIPlay;
-
-		APP_STATE													ActiveState					= APP_STATE_Init;
+		::ghg::APP_STATE											ActiveState					= APP_STATE_Init;
 
 		::gpk::error_t												AddNewPlayer				(::gpk::vcc playerName)			{
 			::gpk::trim(playerName);
-			::gpk::mutex_guard guard(Game.LockUpdate);
+			::gpk::mutex_guard												guard						(Game.LockUpdate);
 			return Players.push_back({::gpk::label(playerName)});
 		}
 
@@ -332,7 +337,7 @@ namespace ghg
 			::gpk::array_pod<char>											b64PlayerName				= {};
 			for(uint32_t iPlayer = 0; iPlayer < Players.size(); ++iPlayer) {
 				b64PlayerName.clear();
-				const ::ghg::SPlayer & player = Players[iPlayer];
+				const ::ghg::SPlayer											& player					= Players[iPlayer];
 				::gpk::base64Encode(player.Name, b64PlayerName);
 				sprintf_s(fileName, "%s/%s.%llu%s", SavegameFolder.begin(), b64PlayerName.begin(), 0ULL, ExtensionProfile.begin());
 				gpk_necall(player.Save(fileName), "iPlayer: %i", iPlayer);
@@ -346,15 +351,12 @@ namespace ghg
 			}
 
 			const uint64_t													timeCurrent					= (SAVE_MODE_USER != autosaveMode) ? 0 : ::gpk::timeCurrent();
-			{
-				const uint64_t													timeStart					= (SAVE_MODE_AUTO == autosaveMode) ? 0 : Game.PlayState.TimeStart;
-				sprintf_s(fileName, "%s/%llu.%llu%s", SavegameFolder.begin(), timeStart, timeCurrent, extension.begin());
+			const uint64_t													timeStart					= (SAVE_MODE_AUTO == autosaveMode) ? 0 : Game.PlayState.TimeStart;
+			sprintf_s(fileName, "%s/%llu.%llu%s", SavegameFolder.begin(), timeStart, timeCurrent, extension.begin());
 
-				// Save only if a player is alive
-				const int32_t													totalHealth					= Game.ShipState.GetTeamHealth(0);
-				if(totalHealth > 0) 
-					return ::ghg::solarSystemSave(Game, fileName);
-			}
+			const int32_t													totalHealth					= Game.ShipState.GetTeamHealth(0);
+			if(totalHealth > 0) // Save only if a player is alive
+				return ::ghg::solarSystemSave(Game, fileName);
 			return 0;
 		}
 	};
@@ -364,8 +366,6 @@ namespace ghg
 	
 	::gpk::error_t												galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents);
 	::gpk::error_t												galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::SCoord2<uint16_t> renderTargetSize);
-	::gpk::error_t												galaxyHellAppLoad			(::ghg::SGalaxyHellApp & app,::gpk::vcc filename);
-	::gpk::error_t												galaxyHellAppSave			(const ::ghg::SGalaxyHellApp & app,::gpk::vcc filename);
 
 	::gpk::error_t												listFilesSavegame			(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::array_obj<::gpk::vcc> & savegameFilenames);
 	::gpk::error_t												listFilesProfile			(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::array_obj<::gpk::vcc> & savegameFilenames);

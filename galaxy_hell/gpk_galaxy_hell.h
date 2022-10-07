@@ -16,7 +16,25 @@
 
 namespace ghg
 {
+	static constexpr uint16_t								MAX_PLAYERS			= 4;
+	static constexpr uint32_t								MAX_ORBITER_COUNT	= 6;
+
 #pragma pack(push, 1)
+	static constexpr ::gpk::SColorBGRA						PLAYER_COLORS[]		= 
+		{ 0xFF00FF00U	// GREEN
+		, ::gpk::PURPLE
+		, 0xFF0000FFU	// BLUE
+		, 0xFFFFFF00U	// CYAN
+		, 0xFFFF00FFU	// MAGENTA
+		, 0xFF00FFFFU	// YELLOW
+		, 0xFFFF0000U	// RED
+		};
+
+	GDEFINE_ENUM_TYPE(PLAY_MODE, uint8_t);
+	GDEFINE_ENUM_VALUE(PLAY_MODE, Campaign		, 0);
+	GDEFINE_ENUM_VALUE(PLAY_MODE, Survival		, 1);
+	GDEFINE_ENUM_VALUE(PLAY_MODE, Deathmatch	, 2);
+
 	struct SPlayState {
 		uint64_t												TimeStart				= 0;
 		uint64_t												TimeLast				= 0;
@@ -39,36 +57,60 @@ namespace ghg
 
 		double													TimeScale				= 1.0f;
 		bool													Slowing					= true;
+
 	};
 
+	struct SShipController {
+		uint16_t	Forward	: 1;
+		uint16_t	Back	: 1;
+		uint16_t	Left	: 1;
+		uint16_t	Right	: 1;
+		uint16_t	Turbo	: 1;
+	};
 #pragma pack(pop)
+
+	struct SShipPilot {
+		::gpk::vcc												Name					= "Evil Dead";
+		::gpk::SColorBGRA										Color					= ::gpk::MAGENTA;
+	};
 
 	struct SGalaxyHell {
 		::ghg::SShipManager										ShipState				= {};
 		::ghg::SDecoState										DecoState				= {};	
 		::ghg::SPlayState										PlayState				= {};
-		::gpk::array_obj<::gpk::vcc>							PlayerNames				= {};
+		::gpk::array_obj<::ghg::SShipPilot>						Pilots					= {};
+		::gpk::array_pod<::ghg::SShipController>				ShipControllers			= {};
 		
 		::ghg::SGalaxyHellDrawCache								DrawCache;
 		::std::mutex											LockUpdate;
 
-		::gpk::error_t											Save					(::gpk::array_pod<byte_t> & output) const {
+		::gpk::error_t											PilotCreate				(const ::ghg::SShipPilot & shipPilot)			{
+			Pilots.push_back(shipPilot);
+			return ShipControllers.push_back({});
+		}
+
+		::gpk::error_t											Save					(::gpk::array_pod<byte_t> & output)		const	{
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SPlayState>{&PlayState, 1}, output);
-			for(uint32_t iPlayer = 0; iPlayer < PlayState.PlayerCount; ++iPlayer) 
-				::gpk::viewWrite(PlayerNames[iPlayer], output);
+			for(uint32_t iPlayer = 0; iPlayer < PlayState.PlayerCount; ++iPlayer) {
+				::gpk::viewWrite(Pilots[iPlayer].Name, output);
+				::gpk::viewWrite(::gpk::view_array<const ::gpk::SColorBGRA>{&Pilots[iPlayer].Color, 1}, output);
+			}
+
+			::gpk::viewWrite(ShipControllers, output);
 			ShipState.Save(output);
 			return 0;
 		}
 		::gpk::error_t											Load					(::gpk::view_array<const byte_t> & input) {
+			::gpk::mutex_guard											lock(LockUpdate);
 			::gpk::view_array<const ::ghg::SPlayState>					readPlayState			= {};
-			int32_t bytesRead = ::gpk::viewRead(readPlayState, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; PlayState	= readPlayState[0];
-			PlayerNames.resize(PlayState.PlayerCount);
-			for(uint32_t iPlayer = 0; iPlayer < PlayerNames.size(); ++iPlayer) {
-				::gpk::vcc readPlayerName = {};
-				bytesRead = ::gpk::viewRead(readPlayerName, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; 
-				PlayerNames[iPlayer] = ::gpk::label(readPlayerName);
+			gpk_necs(::gpk::loadPOD(input, PlayState));
+			Pilots.resize(PlayState.PlayerCount);
+			for(uint32_t iPlayer = 0; iPlayer < Pilots.size(); ++iPlayer) {
+				gpk_necall(::gpk::loadLabel(input, Pilots[iPlayer].Name), "iPlayer %i", iPlayer);
+				gpk_necall(::gpk::loadPOD(input, Pilots[iPlayer].Color), "iPlayer %i", iPlayer);
 			}
-			ShipState.Load(input);
+			gpk_necs(::gpk::loadView(input, ShipControllers));
+			gpk_necs(ShipState.Load(input));
 			return 0;
 		}
 
@@ -104,6 +146,8 @@ namespace ghg
 	::gpk::error_t										drawShipOrbiter
 		( const ::ghg::SShipManager							& shipState
 		, const ::ghg::SOrbiter								& shipPart
+		, const ::gpk::SColorFloat							& shipColor	
+		, float												animationTime
 		, const ::gpk::SMatrix4<float>						& matrixVP
 		, ::gpk::view_grid<::gpk::SColorBGRA>				& targetPixels
 		, ::gpk::view_grid<uint32_t>						depthBuffer

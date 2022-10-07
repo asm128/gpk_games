@@ -20,7 +20,7 @@ namespace ghg {
 	};
 
 	struct SEntitySystem {
-		::gpk::array_obj<::ghg::SEntity>					Entities						= {};
+		::gpk::array_pod<::ghg::SEntity>					Entities						= {};
 		::gpk::array_obj<::gpk::array_pod<uint32_t>>		EntityChildren					= {};
 
 		::gpk::error_t										Create(const ::ghg::SEntity & newEntity, ::gpk::view_array<const uint32_t> entityChildren) {
@@ -35,22 +35,12 @@ namespace ghg {
 			return 0; 
 		}
 		::gpk::error_t										Load(::gpk::view_array<const byte_t> & input) { 
-			::gpk::view_array<const ::ghg::SEntity>					entities;
-			int32_t													readBytes		= ::gpk::viewRead(entities, input);
-			input												= {input.begin() + readBytes, input.size() - readBytes};
-			Entities											= entities;
-			EntityChildren.clear();
-			if(0 == entities.size()) {
-				return readBytes;
-			}
-			for(uint32_t iEntity = 0; iEntity < Entities.size(); ++iEntity) {
-				::gpk::view_array<const uint32_t>						entityChildren;
-				readBytes											= ::gpk::viewRead(entityChildren, input);
-				input												= {input.begin() + readBytes, input.size() - readBytes};
-				EntityChildren.push_back(entityChildren);
+			gpk_necs(::gpk::loadView(input, Entities));
+			EntityChildren.resize(Entities.size());
+			for(uint32_t iEntity = 0; iEntity < Entities.size(); ++iEntity)
+				gpk_necall(::gpk::loadView(input, EntityChildren[iEntity]), "iEntity: %i", iEntity);
 
-			}
-			return readBytes; 
+			return 0; 
 		}
 
 

@@ -299,14 +299,18 @@ int												ghg::getLightArrays
 
 int												ghg::drawShipOrbiter
 	( const ::ghg::SShipManager							& shipState
-	, const ::ghg::SOrbiter							& shipPart
+	, const ::ghg::SOrbiter								& shipPart
+	, const ::gpk::SColorFloat							& shipColor
+	, float												animationTime
 	, const ::gpk::SMatrix4<float>						& matrixVP
 	, ::gpk::view_grid<::gpk::SColorBGRA>				& targetPixels
 	, ::gpk::view_grid<uint32_t>						depthBuffer
 	, ::ghg::SGalaxyHellDrawCache						& drawCache
 	) {
 	uint32_t												pixelsDrawn				= 0;
-	const ::gpk::array_pod<uint32_t>						& entityChildren			= shipState.EntitySystem.EntityChildren[shipPart.Entity];
+	const ::gpk::array_pod<uint32_t>						& entityChildren		= shipState.EntitySystem.EntityChildren[shipPart.Entity];
+	double													absanim					= fabsf(sinf(animationTime * 3));
+	const ::gpk::SColorFloat								shadedColor				= shipColor * absanim;
 	for(uint32_t iEntity = 0; iEntity < entityChildren.size(); ++iEntity) {
 		const ::ghg::SEntity									& entityChild				= shipState.EntitySystem.Entities[entityChildren[iEntity]];
 		if(-1 == entityChild.Parent)
@@ -320,7 +324,11 @@ int												ghg::drawShipOrbiter
 		const ::gpk::view_grid<const ::gpk::SColorBGRA>			image						= shipState.Scene.Image	[entityChild.Image].View;
 		for(uint32_t iTriangle = 0; iTriangle < mesh.Triangles.size(); ++iTriangle) {
 			::gpk::clear(drawCache.PixelCoords, drawCache.PixelVertexWeights);
-			pixelsDrawn += ::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformVP, shipState.Scene.Global.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer);
+			pixelsDrawn += ::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformVP, shipState.Scene.Global.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer
+				, [shadedColor](::gpk::view_grid<::gpk::SColorBGRA> targetPixels, const ::gpk::SCoord2<int16_t> & pixelCoord, const ::gpk::SColorBGRA & color) {
+					targetPixels[pixelCoord.y][pixelCoord.x] = (::gpk::SColorFloat(color) + shadedColor).Clamp();
+					return 0;
+			});
 		}
 	}
 
@@ -336,11 +344,12 @@ static	int											drawShip
 	, const ::gpk::SRasterFont							& font
 	) {
 	uint32_t												pixelsDrawn				= 0;
+	const ::gpk::SColorBGRA									playerColor			= ((uint32_t)iShip < solarSystem.PlayState.PlayerCount) ? solarSystem.Pilots[iShip].Color : ::gpk::SColorBGRA(::gpk::RED);
 	for(uint32_t iPart = 0; iPart < solarSystem.ShipState.ShipParts[iShip].size(); ++iPart) {
 		const ::ghg::SOrbiter									& shipPart				= solarSystem.ShipState.Orbiters[solarSystem.ShipState.ShipParts[iShip][iPart]];
 		if(shipPart.Health <= 0)
 			continue;
-		pixelsDrawn += ::ghg::drawShipOrbiter(solarSystem.ShipState, shipPart, matrixVP, targetPixels, depthBuffer, drawCache);
+		pixelsDrawn += ::ghg::drawShipOrbiter(solarSystem.ShipState, shipPart, playerColor, (float)solarSystem.DecoState.AnimationTime, matrixVP, targetPixels, depthBuffer, drawCache);
 	}
 	if(iShip >= (int32_t)solarSystem.PlayState.PlayerCount || solarSystem.ShipState.ShipCores[iShip].Team)
 		return 0;
@@ -353,24 +362,16 @@ static	int											drawShip
 	starPos.y = ::gpk::clamp(starPos.y, 20.0f, targetPixels.metrics().y - 20.0f);
 	const ::gpk::SCoord2<int32_t>							pixelCoord			= {(int32_t)starPos.x, (int32_t)starPos.y};
 
-	const ::gpk::vcs										finalText			= solarSystem.PlayerNames[iShip];
+	const ::gpk::vcs										finalText			= solarSystem.Pilots[iShip].Name;
 	::gpk::SRectangle2<int16_t>								rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
 	rectText.Offset = (pixelCoord - ::gpk::SCoord2<int32_t>{(rectText.Size.x >> 1), (rectText.Size.y >> 1)}).Cast<int16_t>();
 
 	::gpk::array_pod<::gpk::SCoord2<uint16_t>>				dstCoords;
 	gpk_necs(::gpk::textLineRaster(targetPixels.metrics().Cast<uint16_t>(), font.CharSize, rectText, font.Texture, finalText, dstCoords));
-	::gpk::SColorBGRA	playerColors[] = {
-		0xFF0000FFU,
-		0xFF00FF00U,
-		0xFFFF0000U,
-		0xFFFFFF00U,
-		0xFFFF00FFU,
-		0xFF00FFFFU,
-	};
 	for(uint32_t iCoord = 0; iCoord < dstCoords.size(); ++iCoord) {
 		const ::gpk::SCoord2<uint16_t>										dstCoord												= dstCoords[iCoord];
 		if(::gpk::in_range(dstCoord, {{}, targetPixels.metrics().Cast<uint16_t>()}))
-			::gpk::setPixel(targetPixels, dstCoord.Cast<int16_t>(), playerColors[iShip % ::gpk::size(playerColors)]);
+			::gpk::setPixel(targetPixels, dstCoord.Cast<int16_t>(), playerColor);
 	}
 	return pixelsDrawn;
 }
@@ -494,26 +495,26 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 				bool												line					= true;
 				if(::ghg::WEAPON_LOAD_Ray == weapon.Load) { 
 					colorShot			= ::gpk::SColorFloat{1.0f, 0.1f, 0.0f}; 
-					brightRadius		=  2; 
+					brightRadius		=  1; 
 					intensity			=  1; 
 					line				= true;
 				}
 				else if(::ghg::WEAPON_LOAD_Bullet == weapon.Load) { 
 					colorShot			= ::gpk::DARKGRAY; 
-					brightRadius		= 2; 
+					brightRadius		= 1; 
 					intensity			= 1; 
 					line				= true;
 				}
 				else if(::ghg::WEAPON_LOAD_Shell == weapon.Load) { 
 					colorShot			= ::gpk::GRAY; 
-					brightRadius		= 2; 
+					brightRadius		= 1;
 					intensity			= 1; 
 					line				= true;
 				}
 				else if(::ghg::WEAPON_LOAD_Cannonball == weapon.Load) {
 					colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE;
-					brightRadius		= 7;
-					intensity			= 9;
+					brightRadius		= 5;
+					intensity			= 7;
 					line				= false;
 				}
 				else if(::ghg::WEAPON_LOAD_Rocket == weapon.Load) {

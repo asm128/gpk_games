@@ -1,8 +1,38 @@
 #include "gpk_array.h"
 #include "gpk_coord.h"
+#include "gpk_label.h"
 
 #ifndef GPK_GALAXY_HELL_PHYSICS_H_293874239874
 #define GPK_GALAXY_HELL_PHYSICS_H_293874239874
+
+namespace gpk
+{
+	template<typename _tPOD> ::gpk::error_t		loadPOD			(::gpk::view_array<const byte_t> & input, _tPOD & output) { 
+		::gpk::view_array<const _tPOD>					readView		= {}; 
+		uint32_t										bytesRead		= 0;
+		gpk_necs(bytesRead = ::gpk::viewRead(readView, input)); 
+		input										= {input.begin() + bytesRead, input.size() - bytesRead}; 
+		output										= readView[0]; 
+		return 0;
+	}
+
+	template<typename _tPOD> ::gpk::error_t		loadView		(::gpk::view_array<const byte_t> & input, ::gpk::array_pod<_tPOD> & output) { 
+		::gpk::view_array<const _tPOD>					readView		= {}; 
+		uint32_t										bytesRead		= 0;
+		gpk_necs(bytesRead = ::gpk::viewRead(readView, input)); 
+		input										= {input.begin() + bytesRead, input.size() - bytesRead}; 
+		output										= readView; 
+		return 0;
+	}
+
+	static inline ::gpk::error_t				loadLabel		(::gpk::view_array<const byte_t> & input, ::gpk::vcc & output) { 
+		uint32_t										bytesRead		= 0;
+		gpk_necs(bytesRead = ::gpk::viewRead(output, input)); 
+		input										= {input.begin() + bytesRead, input.size() - bytesRead}; 
+		output										= ::gpk::label(output);
+		return 0;
+	}
+}
 
 namespace ghg 
 {
@@ -43,10 +73,9 @@ namespace ghg
 			return 0; 
 		}
 		::gpk::error_t										Load(::gpk::view_array<const byte_t> & input) { 
-			uint32_t												bytesRead				= 0;
-			::gpk::view_array<const ::gpk::SCoord3<float>	>	readPosition	= {}; bytesRead	= ::gpk::viewRead(readPosition	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Position	= readPosition	;
-			::gpk::view_array<const ::gpk::SCoord3<float>	>	readDirection	= {}; bytesRead	= ::gpk::viewRead(readDirection	, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Direction	= readDirection	;
-			::gpk::view_array<const float					>	readSpeed		= {}; bytesRead	= ::gpk::viewRead(readSpeed		, input); input = {input.begin() + bytesRead, input.size() - bytesRead}; Speed		= readSpeed		;
+			gpk_necs(::gpk::loadView(input, Position	));
+			gpk_necs(::gpk::loadView(input, Direction	));
+			gpk_necs(::gpk::loadView(input, Speed		));
 			return 0;
 		}
 	};
