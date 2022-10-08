@@ -21,6 +21,9 @@ struct SApplication {
 
 	::ghg::SGalaxyHellApp		GalaxyHellApp;
 
+	::gpk::SRectLimits<int32_t>	WindowedWindowRect;
+	bool						FullScreen					= false;
+
 							SApplication				(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
 };
 

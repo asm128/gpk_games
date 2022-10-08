@@ -139,6 +139,44 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	return 0;
 }
 
+static bool								fullScreenExit						(SApplication & app) {
+	app.Framework.MainDisplay.Size			= app.WindowedWindowRect.Dimensions().Cast<uint32_t>();
+
+	HWND										windowHandle						= app.Framework.MainDisplay.PlatformDetail.WindowHandle;
+	DWORD										style								= GetWindowLong(windowHandle, GWL_STYLE);
+	SetWindowLong(windowHandle, GWL_STYLE, style | WS_OVERLAPPEDWINDOW);
+	SetWindowPos(windowHandle, NULL, app.WindowedWindowRect.Left, app.WindowedWindowRect.Top,
+		app.WindowedWindowRect.Right  - app.WindowedWindowRect.Left,
+		app.WindowedWindowRect.Bottom - app.WindowedWindowRect.Top,
+		SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+
+	return app.FullScreen					= false;
+}
+
+static bool								fullScreenEnter						(SApplication & app) {
+	HWND										windowHandle						= app.Framework.MainDisplay.PlatformDetail.WindowHandle;
+	if(app.FullScreen)
+		return app.FullScreen;
+
+	DWORD										style								= GetWindowLong(windowHandle, GWL_STYLE);
+	MONITORINFO									monitor_info						= {sizeof(monitor_info)};
+	if (GetWindowRect(windowHandle, (LPRECT)&app.WindowedWindowRect) && GetMonitorInfo(MonitorFromWindow(windowHandle, MONITOR_DEFAULTTOPRIMARY), &monitor_info)) {
+		SetWindowLong(windowHandle, GWL_STYLE, style & ~WS_OVERLAPPEDWINDOW);
+		SetWindowPos(
+			windowHandle, HWND_TOP, monitor_info.rcMonitor.left, monitor_info.rcMonitor.top,
+			monitor_info.rcMonitor.right - monitor_info.rcMonitor.left,
+			monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top,
+			SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+		app.FullScreen							= true;
+		app.Framework.MainDisplay.Size			= 
+			{ uint32_t(monitor_info.rcMonitor.right - monitor_info.rcMonitor.left)
+			, uint32_t(monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top)
+			};
+	}
+	return app.FullScreen;
+}
+static bool								fullScreenToggle	(SApplication & app) { return app.FullScreen ? fullScreenExit(app) : ::fullScreenEnter(app); }
+
 int										update				(SApplication & app, bool exitSignal)	{
 	::gpk::SFramework							& framework			= app.Framework;
 	//::gpk::STimer								timer;
@@ -174,6 +212,15 @@ int										update				(SApplication & app, bool exitSignal)	{
 			break;
 		case ::gpk::SYSEVENT_DEACTIVATE:
 			break;
+		case ::gpk::SYSEVENT_SYSKEY_DOWN:
+		case ::gpk::SYSEVENT_KEY_DOWN:
+			switch(framework.MainDisplay.EventQueue[iEvent].Data[0]) {
+			case VK_RETURN:
+				if(GetAsyncKeyState(VK_MENU))
+					::fullScreenToggle(app);
+				break;
+			}
+
 		}
 	}
 	app.AudioState.UpdateAudio(framework.FrameInfo.Seconds.LastFrame);// / (app.GalaxyHellApp.World.ShipState.Ships.size() - 1));
