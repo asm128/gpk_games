@@ -168,7 +168,7 @@ static	int											drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixe
 			::gpk::drawLine(targetPixels, raySegment, pixelCoordsCache, depthBuffer);
 		else
 			pixelCoordsCache.push_back(raySegment.B);
-		const double											pixelCoordUnit		= 1.0 / pixelCoordsCache.size();
+		const double											pixelCoordUnit		= 1.0 / (pixelCoordsCache.size());
 		for(uint32_t iPixelCoord = 0, countPixelCoords = pixelCoordsCache.size(); iPixelCoord < countPixelCoords; ++iPixelCoord) {
 			const ::gpk::SCoord3<float>							& pixelCoord		= pixelCoordsCache[iPixelCoord];
 			if(pixelCoord.z < 0 || pixelCoord.z > 1)
@@ -198,8 +198,9 @@ static	int											drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixe
 					::gpk::SColorBGRA										& pixelVal						= targetPixels[blendPos.y][blendPos.x];
 					double													finalBrightness
 						= line
-						? (		 (brightDistance * brightUnit)) * (pixelCoordUnit * (countPixelCoords - 1 - iPixelCoord))
-						: (1.0 - (brightDistance * brightUnit));
+						? brightDistance * brightUnit * pixelCoordUnit * (countPixelCoords - 1 - iPixelCoord)
+						: 1.0 - (brightDistance * brightUnit)
+						;
 					::gpk::SColorFloat										pixelColor						= ::gpk::interpolate_linear(::gpk::SColorFloat{pixelVal}, colorShot, finalBrightness * intensity);
 					pixelVal											= pixelColor.Clamp();
 				}
@@ -496,36 +497,36 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 				if(::ghg::WEAPON_LOAD_Ray == weapon.Load) { 
 					colorShot			= ::gpk::SColorFloat{1.0f, 0.1f, 0.0f}; 
 					brightRadius		=  1; 
-					intensity			=  1; 
+					intensity			=  2; 
 					line				= true;
 				}
 				else if(::ghg::WEAPON_LOAD_Bullet == weapon.Load) { 
 					colorShot			= ::gpk::DARKGRAY; 
 					brightRadius		= 1; 
-					intensity			= 1; 
+					intensity			= .25; 
 					line				= true;
 				}
 				else if(::ghg::WEAPON_LOAD_Shell == weapon.Load) { 
 					colorShot			= ::gpk::GRAY; 
 					brightRadius		= 1;
-					intensity			= 1; 
+					intensity			= .25; 
 					line				= true;
 				}
 				else if(::ghg::WEAPON_LOAD_Cannonball == weapon.Load) {
 					colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE;
 					brightRadius		= 5;
-					intensity			= 7;
+					intensity			= 4;
 					line				= false;
 				}
 				else if(::ghg::WEAPON_LOAD_Rocket == weapon.Load) {
 					colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::LIGHTORANGE;
-					brightRadius		= 2;
+					brightRadius		= 2.6;
 					intensity			= 1;
 					line				= true;
 				}
 				else if(::ghg::WEAPON_LOAD_Missile == weapon.Load) {
 					colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.025f, 0.05f} : ::gpk::CYAN;
-					brightRadius		= 2;
+					brightRadius		= 2.6;
 					intensity			= 1;
 					line				= true;
 				}

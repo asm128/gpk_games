@@ -314,28 +314,28 @@ static	::gpk::error_t			guiSetupSettings			(::gpk::SDialog & dialog) {
 }
 
 ::gpk::error_t					ghg::guiSetup				(::ghg::SGalaxyHellApp & app, const ::gpk::ptr_obj<::gpk::SInput> & input) {
-	::dialogCreateCommon(app.DialogDesktop, input, {});
+	es_if(errored(::dialogCreateCommon(app.DialogDesktop, input, {})));
 
-	for(uint32_t iGUI = 0; iGUI < app.DialogPerState.size(); ++iGUI) {
-		::dialogCreateCommon(app.DialogPerState[iGUI], input, {});
-	};
+	for(uint32_t iGUI = 0; iGUI < app.DialogPerState.size(); ++iGUI)
+		e_if(errored(::dialogCreateCommon(app.DialogPerState[iGUI], input, {})), "iGUI: %i", iGUI);
 
-	::guiSetupLoad		(app.DialogPerState[::ghg::APP_STATE_Load			]);
-	::guiSetupWelcome	(app, app.DialogPerState[::ghg::APP_STATE_Welcome	]);
-	::guiSetupHome		(app, app.DialogPerState[::ghg::APP_STATE_Home		]);
-	::guiSetupPlay		(app, app.DialogPerState[::ghg::APP_STATE_Play		]);
-	::guiSetupShop		(app.DialogPerState[::ghg::APP_STATE_Shop			]);
-	::guiSetupProfile	(app.DialogPerState[::ghg::APP_STATE_Profile		]);
-	::guiSetupSettings	(app.DialogPerState[::ghg::APP_STATE_Settings		]);
-	::guiSetupAbout		(app.DialogPerState[::ghg::APP_STATE_About			]);
+	es_if(errored(::guiSetupWelcome	(app, app.DialogPerState[::ghg::APP_STATE_Welcome	])));
+	es_if(errored(::guiSetupHome	(app, app.DialogPerState[::ghg::APP_STATE_Home		])));
+	es_if(errored(::guiSetupPlay	(app, app.DialogPerState[::ghg::APP_STATE_Play		])));
+	es_if(errored(::guiSetupShop	(app.DialogPerState[::ghg::APP_STATE_Shop			])));
+	es_if(errored(::guiSetupProfile	(app.DialogPerState[::ghg::APP_STATE_Profile		])));
+	es_if(errored(::guiSetupSettings(app.DialogPerState[::ghg::APP_STATE_Settings		])));
+	es_if(errored(::guiSetupAbout	(app.DialogPerState[::ghg::APP_STATE_About			])));
+	es_if(errored(::guiSetupLoad	(app.DialogPerState[::ghg::APP_STATE_Load			])));
 
-	::virtualKeyboardSetup(app.DialogDesktop, app.VirtualKeyboard);
+	es_if(errored(::virtualKeyboardSetup(app.DialogDesktop, app.VirtualKeyboard)));;
 	return 0;
 }
 
 static	::gpk::error_t			guiHandleLoad				(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & gui, uint32_t idControl, ::ghg::SGalaxyHell & /*game*/) { 
 	if(idControl < (gui.Controls.Text.size() - 2)) {
 		gerror_if(0 > ::ghg::solarSystemLoad(app.Game, gui.Controls.Text[idControl + 1].Text), "%s", gui.Controls.Text[idControl + 1].Text.begin());
+		::gpk::tunerSetValue(*app.TunerPlayerCount, app.Game.PlayState.PlayerCount);
 	}
 	return ::ghg::APP_STATE_Home; 
 }

@@ -176,6 +176,14 @@
 			app.RenderTargetPool.remove_unordered(0);
 		}
 	}
+	if(!target) {
+		::gpk::mutex_guard			rtLock(app.RenderTargetLockQueue);
+		if(app.RenderTargetQueue.size() > 1) {
+			target					= app.RenderTargetQueue[0];
+			app.RenderTargetQueue.remove_unordered(0);
+		}
+	}
+
 	target->resize(renderTargetSize.Cast<uint32_t>(), {0, 0, 0, 1}, 0xFFFFFFFFU);
 
 	::gpk::view_grid<::gpk::SColorBGRA>							targetPixels			= target->Color.View;

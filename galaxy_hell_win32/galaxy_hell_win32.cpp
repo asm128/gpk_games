@@ -1,7 +1,5 @@
 #include "galaxy_hell_win32.h"
 
-#include "audio.h"
-
 #include "gpk_png.h"
 #include "gpk_grid_copy.h"
 #include "gpk_raster_lh.h"
@@ -43,6 +41,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Galaxy Hell v0.4");
 	SteamAPI_Shutdown();
 	Steamworks_TermCEGLibrary();
 #endif
+	::gpk::clientDisconnect(app.Client);
+	::gpk::tcpipShutdown();
 	return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); 
 }
 
@@ -122,6 +122,8 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 
 #endif // USE_STEAM_CLIENT
 
+	gpk_necall(::gpk::tcpipInitialize(), "Failed to initialize network subsystem: '%s'.", "Unknown error");
+
 	::gpk::SFramework							& framework						= app.Framework;
 	::gpk::SWindow								& mainWindow					= framework.MainDisplay;
 
@@ -136,54 +138,56 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 
 	app.AudioState.InitAudio();
 	app.AudioState.PrepareAudio("thrust.wav");
+
+	app.Client.AddressConnect											= {};
+	//::gpk::tcpipAddress(9898, 0, ::gpk::TRANSPORT_PROTOCOL_UDP, app.Client.AddressConnect);	// If loading the remote IP from the json fails, we fall back to the local address.
+	app.Client.AddressConnect.IP[0] = 192;
+	app.Client.AddressConnect.IP[1] = 168;
+	app.Client.AddressConnect.IP[2] = 0;
+	app.Client.AddressConnect.IP[3] = 188;
+	//::gpk::clientConnect(app.Client);
 	return 0;
 }
-
-static bool								fullScreenExit						(SApplication & app) {
-	app.Framework.MainDisplay.Size			= app.WindowedWindowRect.Dimensions().Cast<uint32_t>();
-
-	HWND										windowHandle						= app.Framework.MainDisplay.PlatformDetail.WindowHandle;
-	DWORD										style								= GetWindowLong(windowHandle, GWL_STYLE);
-	SetWindowLong(windowHandle, GWL_STYLE, style | WS_OVERLAPPEDWINDOW);
-	SetWindowPos(windowHandle, NULL, app.WindowedWindowRect.Left, app.WindowedWindowRect.Top,
-		app.WindowedWindowRect.Right  - app.WindowedWindowRect.Left,
-		app.WindowedWindowRect.Bottom - app.WindowedWindowRect.Top,
-		SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
-
-	return app.FullScreen					= false;
-}
-
-static bool								fullScreenEnter						(SApplication & app) {
-	HWND										windowHandle						= app.Framework.MainDisplay.PlatformDetail.WindowHandle;
-	if(app.FullScreen)
-		return app.FullScreen;
-
-	DWORD										style								= GetWindowLong(windowHandle, GWL_STYLE);
-	MONITORINFO									monitor_info						= {sizeof(monitor_info)};
-	if (GetWindowRect(windowHandle, (LPRECT)&app.WindowedWindowRect) && GetMonitorInfo(MonitorFromWindow(windowHandle, MONITOR_DEFAULTTOPRIMARY), &monitor_info)) {
-		SetWindowLong(windowHandle, GWL_STYLE, style & ~WS_OVERLAPPEDWINDOW);
-		SetWindowPos(
-			windowHandle, HWND_TOP, monitor_info.rcMonitor.left, monitor_info.rcMonitor.top,
-			monitor_info.rcMonitor.right - monitor_info.rcMonitor.left,
-			monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top,
-			SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
-		app.FullScreen							= true;
-		app.Framework.MainDisplay.Size			= 
-			{ uint32_t(monitor_info.rcMonitor.right - monitor_info.rcMonitor.left)
-			, uint32_t(monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top)
-			};
-	}
-	return app.FullScreen;
-}
-static bool								fullScreenToggle	(SApplication & app) { return app.FullScreen ? fullScreenExit(app) : ::fullScreenEnter(app); }
 
 int										update				(SApplication & app, bool exitSignal)	{
 	::gpk::SFramework							& framework			= app.Framework;
 	//::gpk::STimer								timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
+
+	for(uint32_t iEvent = 0; iEvent < framework.MainDisplay.EventQueue.size(); ++iEvent) {
+		switch(framework.MainDisplay.EventQueue[iEvent].Type) {
+		case ::gpk::SYSEVENT_ACTIVATE:
+			break;
+		case ::gpk::SYSEVENT_DEACTIVATE:
+			break;
+		case ::gpk::SYSEVENT_SYSKEY_DOWN:
+		case ::gpk::SYSEVENT_KEY_DOWN:
+			switch(framework.MainDisplay.EventQueue[iEvent].Data[0]) {
+			case VK_RETURN:
+				if(GetAsyncKeyState(VK_MENU))
+					gpk_necs(::gpk::fullScreenToggle(app.Framework.MainDisplay));
+				break;
+			}
+		}
+	}
+
 	if(1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.Input, framework.MainDisplay.EventQueue))
 		return ::gpk::APPLICATION_STATE_EXIT;
 
+	{
+		::std::lock_guard<::std::mutex>			lockRTQueue	(app.GalaxyHellApp.RenderTargetLockQueue);
+		if(app.GalaxyHellApp.RenderTargetQueue.size()) {
+			::std::lock_guard<::std::mutex>			lockRTPool	(app.GalaxyHellApp.RenderTargetLockPool);
+
+			app.GalaxyHellApp.RenderTargetPool.push_back(app.Framework.MainDisplayOffscreen);
+			app.Framework.MainDisplayOffscreen	= app.GalaxyHellApp.RenderTargetQueue[app.GalaxyHellApp.RenderTargetQueue.size() - 1];
+			app.GalaxyHellApp.RenderTargetQueue.pop_back(0);
+			for(uint32_t iRT = 0; iRT < app.GalaxyHellApp.RenderTargetQueue.size(); ++iRT) {
+				app.GalaxyHellApp.RenderTargetPool.push_back(app.GalaxyHellApp.RenderTargetQueue[iRT]);
+			}
+			app.GalaxyHellApp.RenderTargetQueue.clear();
+		}
+	}
 	app.AudioState.vListenerPos = app.GalaxyHellApp.Game.ShipState.Scene.Global.Camera[app.GalaxyHellApp.Game.ShipState.Scene.Global.CameraMode].Position; 
 	app.AudioState.listener.OrientTop	= {0, 1, 0}; 
 	app.AudioState.listener.OrientFront	= {1, 0, 0};  
@@ -206,39 +210,7 @@ int										update				(SApplication & app, bool exitSignal)	{
 	else
 		app.AudioState.PauseAudio(false);
 
-	for(uint32_t iEvent = 0; iEvent < framework.MainDisplay.EventQueue.size(); ++iEvent) {
-		switch(framework.MainDisplay.EventQueue[iEvent].Type) {
-		case ::gpk::SYSEVENT_ACTIVATE:
-			break;
-		case ::gpk::SYSEVENT_DEACTIVATE:
-			break;
-		case ::gpk::SYSEVENT_SYSKEY_DOWN:
-		case ::gpk::SYSEVENT_KEY_DOWN:
-			switch(framework.MainDisplay.EventQueue[iEvent].Data[0]) {
-			case VK_RETURN:
-				if(GetAsyncKeyState(VK_MENU))
-					::fullScreenToggle(app);
-				break;
-			}
-
-		}
-	}
 	app.AudioState.UpdateAudio(framework.FrameInfo.Seconds.LastFrame);// / (app.GalaxyHellApp.World.ShipState.Ships.size() - 1));
-
-	{
-		::std::lock_guard<::std::mutex>			lockRTQueue	(app.GalaxyHellApp.RenderTargetLockQueue);
-		if(app.GalaxyHellApp.RenderTargetQueue.size()) {
-			::std::lock_guard<::std::mutex>			lockRTPool	(app.GalaxyHellApp.RenderTargetLockPool);
-
-			app.GalaxyHellApp.RenderTargetPool.push_back(app.Framework.MainDisplayOffscreen);
-			app.Framework.MainDisplayOffscreen = app.GalaxyHellApp.RenderTargetQueue[app.GalaxyHellApp.RenderTargetQueue.size() - 1];
-			app.GalaxyHellApp.RenderTargetQueue.pop_back(0);
-			//for(uint32_t iRT = 0; iRT < app.GalaxyHellApp.RenderTargetQueue.size(); ++iRT) {
-			//	app.GalaxyHellApp.RenderTargetPool.push_back(app.GalaxyHellApp.RenderTargetQueue[iRT]);
-			//}
-			app.GalaxyHellApp.RenderTargetQueue.clear();
-		}
-	}
 #if defined(USE_STEAM_CLIENT)
 	SteamAPI_RunCallbacks();
 #endif

@@ -1,3 +1,4 @@
+#define WIN32_LEAN_AND_MEAN
 #include "XAudio2Versions.h"
 
 #include "gpk_array.h"
