@@ -133,9 +133,7 @@ namespace ghg
 		::gpk::SDialog										DialogPlay				= {};
 		::gpk::SDialog										DialogHome				= {};
 
-		::gpk::SVirtualKeyboard								VirtualKeyboard			= {};	// This creates on top of DialogHome
-		::gpk::ptr_obj<::gpk::SDialogViewport>				Inputbox;
-		::gpk::array_pod<char>								InputboxText;
+		::gpk::SUIInputBox									InputBox				= {};
 	
 		::gpk::array_static<char, 128>						TextScore				= {};
 		::gpk::array_static<char, 128>						TextHits				= {};

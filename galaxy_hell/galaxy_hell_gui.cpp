@@ -9,19 +9,6 @@ static constexpr	::gpk::SCoord2<uint16_t>	MODULE_CAMERA_SIZE		= {64, 64};
 static constexpr	::gpk::SCoord2<uint16_t>	MODULE_VIEWPORT_SIZE	= {128, 64};
 static constexpr	::gpk::SCoord2<uint16_t>	WEAPON_BAR_SIZE			= {96, 20};
 
-static	::gpk::error_t			virtualKeyboardSetup		(::gpk::SDialog & dialog, ::gpk::SVirtualKeyboard & vk) { 
-	::gpk::array_pod<uint16_t> keys;
-	for(uint16_t i = 1; i < 255; ++i) {
-		keys.push_back(i);
-	}
-	keys.push_back('!');
-	keys.push_back('?');
-
-	gpk_necs(::gpk::virtualKeyboardSetup(*dialog.GUI, vk, 32, ::gpk::view_const_uint16{keys}));
-	dialog.GUI->Controls.States[vk.IdRoot].Hidden	= true;
-	return 0;
-}
-
 static	::gpk::error_t			guiSetupCommon				(::gpk::SGUI & gui) {
 	gui.ColorModeDefault			= ::gpk::GUI_COLOR_MODE_3D;
 	gui.ThemeDefault				= ::gpk::ASCII_COLOR_DARKRED * 16 + 10;
@@ -62,7 +49,7 @@ static ::gpk::error_t			uiPlayerSetupHome			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 	::gpk::SGUI					& playerGUI			= *playerDialog.GUI;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
 	//playerGUI.Controls.Controls[playerDialog.Root].ColorTheme = app.Game.Pilots. == ::gpk::ASCII_COLOR_;
-	int32_t						profileMenuScore	= 
+	//int32_t						profileMenuScore	= 
 		::gpk::guiSetupButtonList<::ghg::UI_PLAYER_SCORE>(playerGUI, playerDialog.Root, {240, 20}, playerPosition, playerAlign, ::gpk::ALIGN_LEFT);
 
 	switch(iPlayer) {
@@ -80,24 +67,20 @@ static ::gpk::error_t			uiPlayerSetupHome			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 		playerGUI.Controls.Modes		[iButton].NoBackgroundRect		= true;
 	}
 
-	gpk_necs(::virtualKeyboardSetup(playerDialog, uiPlayer.VirtualKeyboard));
-	gpk_necs(::gpk::controlSetParent(playerGUI, uiPlayer.VirtualKeyboard.IdRoot, 0));
-	::gpk::SControl & vkControl = playerGUI.Controls.Controls[uiPlayer.VirtualKeyboard.IdRoot];
 	switch(iPlayer) {
 	default:
-	case 0: playerPosition = playerGUI.Controls.Controls[profileMenuScore  + ::gpk::get_value_count<::ghg::UI_PLAYER_SCORE	>() - 1].Area.Offset; playerPosition.y += vkControl.Area.Size.y / 2 + 10; break;
-	case 1: playerPosition = playerGUI.Controls.Controls[profileMenuScore].Area.Offset; playerPosition.y -= vkControl.Area.Size.y / 2 + 10; break;
-	case 2: playerPosition = {}; playerPosition.x += 240 + vkControl.Area.Size.x / 2; break;
-	case 3: playerPosition = {}; playerPosition.x -= 240 + vkControl.Area.Size.x / 2; break;
+	case 0: playerAlign = ::gpk::ALIGN_BOTTOM_LEFT	; break;
+	case 1: playerAlign = ::gpk::ALIGN_TOP_RIGHT	; break;
+	case 2: playerAlign = ::gpk::ALIGN_BOTTOM_RIGHT	; break;
+	case 3: playerAlign = ::gpk::ALIGN_TOP_LEFT		; break;
 	}
-	vkControl.Align			= playerAlign;
-	vkControl.Area.Offset	= playerPosition;
-	vkControl.ColorTheme	= ::gpk::ASCII_COLOR_DARKGREY;// * 16 + 8;
+	gpk_necs(::gpk::inputBoxCreate(uiPlayer.InputBox, *playerDialog.GUI, playerDialog.Root));
+	playerGUI.Controls.States[uiPlayer.InputBox.IdRoot].Hidden = true;
+	playerGUI.Controls.Controls[uiPlayer.InputBox.IdRoot].Align = playerAlign;
+	//::gpk::SControl & vkControl = playerGUI.Controls.Controls[uiPlayer.InputBox.IdRoot];
 
 	gpk_necs(::gpk::controlFontSet(playerGUI, 1 + ::gpk::get_value_count<::ghg::UI_PLAYER_SCORE>() + ::ghg::UI_PROFILE_Name, 10));
 	gpk_necs(::gpk::controlTextSet(playerGUI, 1 + ::gpk::get_value_count<::ghg::UI_PLAYER_SCORE>() + ::ghg::UI_PROFILE_Name, playerName));
-	for(uint32_t iControl = 0; iControl < playerGUI.Controls.States.size(); ++iControl)
-		playerGUI.Controls.States[iControl].Updated							= false;
 	return 0;
 }
 
@@ -328,7 +311,7 @@ static	::gpk::error_t			guiSetupSettings			(::gpk::SDialog & dialog) {
 	es_if(errored(::guiSetupAbout	(app.DialogPerState[::ghg::APP_STATE_About			])));
 	es_if(errored(::guiSetupLoad	(app.DialogPerState[::ghg::APP_STATE_Load			])));
 
-	es_if(errored(::virtualKeyboardSetup(app.DialogDesktop, app.VirtualKeyboard)));;
+	es_if(errored(::gpk::virtualKeyboardSetup437(*app.DialogDesktop.GUI, app.VirtualKeyboard)));;
 	return 0;
 }
 
@@ -336,6 +319,26 @@ static	::gpk::error_t			guiHandleLoad				(::ghg::SGalaxyHellApp & app, ::gpk::SG
 	if(idControl < (gui.Controls.Text.size() - 2)) {
 		gerror_if(0 > ::ghg::solarSystemLoad(app.Game, gui.Controls.Text[idControl + 1].Text), "%s", gui.Controls.Text[idControl + 1].Text.begin());
 		::gpk::tunerSetValue(*app.TunerPlayerCount, app.Game.PlayState.PlayerCount);
+		for(uint32_t iPilot = 0; iPilot < app.Game.PlayState.PlayerCount; ++iPilot) {
+			const ::gpk::vcc namePilot	= app.Game.Pilots[iPilot].Name;
+			for(uint32_t iPlayer = 0; iPlayer < app.Game.PlayState.PlayerCount; ++iPlayer) {
+				if(iPlayer >= app.Players.size())
+					app.Players.push_back({namePilot});
+
+				const ::gpk::vcc namePlayer	= app.Players[iPlayer].Name;
+				if(namePilot == namePlayer) {
+					::std::swap(app.Players[iPlayer], app.Players[iPilot]);
+					break;
+				}
+			}
+			for(uint32_t iPlayer = app.Game.PlayState.PlayerCount; iPlayer < app.Players.size(); ++iPlayer) {
+				const ::gpk::vcc namePlayer	= app.Players[iPlayer].Name;
+				if(namePilot == namePlayer) {
+					::std::swap(app.Players[iPlayer], app.Players[iPilot]);
+					break;
+				}
+			}
+		}
 	}
 	return ::ghg::APP_STATE_Home; 
 }
@@ -476,6 +479,9 @@ static	::gpk::error_t			uiPlayerUpdateHome			(::ghg::SUIPlayer & uiPlayer, uint1
 		const ::gpk::array_static<uint32_t, ::gpk::GUI_CONTROL_COLOR_COUNT>	& colorCombo											= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
 		playerGUI.Palette[colorCombo[::gpk::GUI_CONTROL_COLOR_TEXT_FACE		]] = shipColor;
 		playerGUI.Palette[colorCombo[::gpk::GUI_CONTROL_COLOR_BACKGROUND	]] = shipColor;
+		playerGUI.Controls.Controls[uiPlayer.InputBox.IdText].ColorTheme = control.ColorTheme;
+		playerGUI.Controls.Modes[uiPlayer.InputBox.IdText].NoBackgroundRect = true;
+
 	}
 	return 0;
 }
@@ -627,9 +633,13 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 	return 0;
 }
 
-static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app) {
+static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view_array<const ::gpk::SSysEvent> frameEvents) {
 	for(uint32_t iPlayer = 0; iPlayer < app.TunerPlayerCount->ValueCurrent; ++iPlayer) {
 		::ghg::SUIPlayer					& uiPlayer		= app.UIPlay.PlayerUI[iPlayer];
+		::gpk::SDialog						& dialog		= uiPlayer.DialogHome;
+		::gpk::SGUI							& gui			= *dialog.GUI;
+		gui.Controls.States[dialog.Root].Hidden = false; 
+
 		if(app.Players.size() <= iPlayer) {
 			::gpk::mutex_guard					lock				(app.Game.LockUpdate);
 			char text [64] = {};
@@ -647,10 +657,41 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app) {
 			, (app.Game.ShipState.ShipScores.size() <= iPlayer) ? ::ghg::SShipScore{} : app.Game.ShipState.ShipScores[iPlayer]
 			), "iPlayer: %i", iPlayer
 		);
-		app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI->Controls.States[0].Hidden = false; 
+
+		::gpk::array_pod<uint32_t>		controlsToProcess			= {};
+		::gpk::guiGetProcessableControls(gui, controlsToProcess);
+		if(int32_t result = uiPlayer.InputBox.Update(gui, frameEvents, controlsToProcess)) {
+			if(result == INT_MAX) {
+				::gpk::vcc						trimmed			= uiPlayer.InputBox.Text;
+				::gpk::trim(trimmed);
+				if(trimmed.size()) {
+					app.Players[iPlayer].Name	= ::gpk::label(trimmed);
+					if(iPlayer < app.Game.Pilots.size())
+						app.Game.Pilots[iPlayer].Name	= app.Players[iPlayer].Name;
+				}
+				uiPlayer.InputBox.Edit(gui, false);
+			}
+		}
+		else {
+			::gpk::guiProcessControls(gui, controlsToProcess, [&](uint32_t iControl) {
+				uint32_t offsetControl = ::gpk::get_value_count<::ghg::UI_PLAYER_SCORE>() + 1 + dialog.Root;
+				switch(iControl - (offsetControl)) {
+				case ::ghg::UI_PROFILE_Name:
+					uiPlayer.InputBox.SetText(gui, gui.Controls.Text[offsetControl + ::ghg::UI_PROFILE_Name].Text);
+					uiPlayer.InputBox.Edit(gui, gui.Controls.States[offsetControl + ::ghg::UI_PROFILE_Name].Execute);
+				}
+				return 0;
+			});
+		}
 	}
-	for(uint32_t iPlayer = (uint32_t)app.TunerPlayerCount->ValueCurrent; iPlayer < ghg::MAX_PLAYERS; ++iPlayer) 
-		app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI->Controls.States[0].Hidden = true; 
+
+	for(uint32_t iPlayer = (uint32_t)app.TunerPlayerCount->ValueCurrent; iPlayer < ghg::MAX_PLAYERS; ++iPlayer) {
+		::ghg::SUIPlayer					& uiPlayer		= app.UIPlay.PlayerUI[iPlayer];
+		::gpk::SDialog						& dialog		= uiPlayer.DialogHome;
+		::gpk::SGUI							& gui			= *dialog.GUI;
+		gui.Controls.States[dialog.Root].Hidden = true; 
+	}
+
 	return 0;
 }
 
@@ -660,41 +701,6 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app) {
 		::gpk::SGUI							& gui						= *dialog.GUI;
 		::gpk::SInput						& input						= *dialog.Input;
 		::gpk::guiProcessInput(gui, input, sysEvents); 
-
-		dialog.Update();
-		::gpk::array_pod<uint32_t>			controlsToProcess			= {};
-		::gpk::guiGetProcessableControls(gui, controlsToProcess);
-
-		{
-			::gpk::SVirtualKeyboard & vk = app.VirtualKeyboard;
-			vk.Events.clear();
-			for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
-				uint32_t							idControl			= controlsToProcess		[iControl];
-				const ::gpk::SControlState			& controlState		= gui.Controls.States	[idControl];
-				//bool								handled				= false;
-				if(controlState.Execute) {
-					::gpk::virtualKeyboardHandleEvent(vk, idControl);
-					for(uint32_t iEvent = 0; iEvent < vk.Events.size(); ++iEvent) {
-						if(vk.Events[iEvent].Type == ::gpk::VK_EVENT_RELEASE) {
-							app.InputboxText.push_back((char)vk.Events[iEvent].ScanCode);
-						}
-						else if(vk.Events[iEvent].Type == ::gpk::VK_EVENT_EDIT) {
-							if(vk.Events[iEvent].ScanCode == gpk::VK_SCANCODE_Backspace)
-								app.InputboxText.pop_back(0);
-							else if(vk.Events[iEvent].ScanCode == gpk::VK_SCANCODE_Enter) {
-								app.Players.push_back({::gpk::label(::gpk::vcc{app.InputboxText})});
-								app.Game.Pilots[0] = {app.Players[0].Name, ::ghg::PLAYER_COLORS[0]};
-								app.Save(::ghg::SAVE_MODE_AUTO);
-							}
-							else if(vk.Events[iEvent].ScanCode == gpk::VK_SCANCODE_Escape) {
-								app.InputboxText.clear();
-							}
-						}
-					}
-				}
-			}
-			::gpk::controlTextSet(*app.DialogPerState[::ghg::APP_STATE_Welcome].GUI, app.Inputbox->IdClient, ::gpk::vcc{app.InputboxText});
-		}
 	}
 
 	::ghg::SGalaxyHell					& game						= app.Game;
@@ -711,18 +717,12 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app) {
 		::ghg::SUIPlayer					& uiPlayer					= app.UIPlay.PlayerUI[iPlayer];
 		::gpk::guiProcessInput(*uiPlayer.DialogPlay.GUI, *uiPlayer.DialogPlay.Input, sysEvents);
 		::gpk::guiProcessInput(*uiPlayer.DialogHome.GUI, *uiPlayer.DialogHome.Input, sysEvents);
-		{
-			::gpk::SDialog				& playerDialog	= uiPlayer.DialogHome;
-			::gpk::SGUI					& playerGUI		= *playerDialog.GUI;
-			playerGUI.Controls.States[uiPlayer.VirtualKeyboard.IdRoot].Hidden	= false;
-		}
-
 	}
 	
 	if(app.ActiveState == ::ghg::APP_STATE_Play)
 		::guiUpdatePlay(app);
 	else 
-		::guiUpdateHome(app);
+		::guiUpdateHome(app, sysEvents);
 
 	::gpk::SDialog						& dialog					= app.DialogPerState[appState];
 	dialog.Update();

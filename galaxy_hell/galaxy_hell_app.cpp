@@ -67,8 +67,16 @@
 					app.ActiveState				= ::ghg::APP_STATE_Home;
 				}
 				else { 
-					app.Game.PlayState.Paused	= false;
-					app.ActiveState				= ::ghg::APP_STATE_Play;
+					bool editing = false;
+					for(uint32_t iPlayer = 0; iPlayer < app.TunerPlayerCount->ValueCurrent; ++iPlayer) {
+						if(app.UIPlay.PlayerUI[iPlayer].InputBox.Editing) {
+							editing = true;
+						}
+					}
+					if(!editing) {
+						app.Game.PlayState.Paused	= false;
+						app.ActiveState				= ::ghg::APP_STATE_Play;
+					}
 				}
 			}
 			break;
@@ -98,11 +106,20 @@
 		}
 		::gpk::tunerSetValue(*app.TunerPlayerCount, app.Game.PlayState.PlayerCount);
 		for(uint32_t iPilot = 0; iPilot < app.Game.PlayState.PlayerCount; ++iPilot) {
+			const ::gpk::vcc namePilot	= app.Game.Pilots[iPilot].Name;
 			for(uint32_t iPlayer = 0; iPlayer < app.Game.PlayState.PlayerCount; ++iPlayer) {
 				if(iPlayer >= app.Players.size())
-					app.Players.push_back({::gpk::label(app.Game.Pilots[iPilot].Name)});
+					app.Players.push_back({namePilot});
 
-				if(app.Game.Pilots[iPilot].Name == app.Players[iPlayer].Name) {
+				const ::gpk::vcc namePlayer	= app.Players[iPlayer].Name;
+				if(namePilot == namePlayer) {
+					::std::swap(app.Players[iPlayer], app.Players[iPilot]);
+					break;
+				}
+			}
+			for(uint32_t iPlayer = app.Game.PlayState.PlayerCount; iPlayer < app.Players.size(); ++iPlayer) {
+				const ::gpk::vcc namePlayer	= app.Players[iPlayer].Name;
+				if(namePilot == namePlayer) {
 					::std::swap(app.Players[iPlayer], app.Players[iPilot]);
 					break;
 				}
