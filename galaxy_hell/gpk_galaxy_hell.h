@@ -30,10 +30,14 @@ namespace ghg
 		, 0xFFFF0000U	// RED
 		};
 
+	GDEFINE_ENUM_TYPE(PLAY_TYPE, uint8_t);
+	GDEFINE_ENUM_VALUE(PLAY_TYPE, Survival		, 0);
+	GDEFINE_ENUM_VALUE(PLAY_TYPE, Campaign		, 1);
+	GDEFINE_ENUM_VALUE(PLAY_TYPE, Deathmatch	, 2);
+
 	GDEFINE_ENUM_TYPE(PLAY_MODE, uint8_t);
-	GDEFINE_ENUM_VALUE(PLAY_MODE, Campaign		, 0);
-	GDEFINE_ENUM_VALUE(PLAY_MODE, Survival		, 1);
-	GDEFINE_ENUM_VALUE(PLAY_MODE, Deathmatch	, 2);
+	GDEFINE_ENUM_VALUE(PLAY_MODE, Classic		, 0);
+	GDEFINE_ENUM_VALUE(PLAY_MODE, VR			, 1);
 
 	struct SPlayState {
 		uint64_t												TimeStart				= 0;
@@ -41,6 +45,8 @@ namespace ghg
 		uint32_t												Seed					= 1;
 		uint32_t												OffsetStage				= 2;
 		uint32_t												PlayerCount				= 1;
+		PLAY_TYPE												PlayType				= (PLAY_TYPE)0;
+		PLAY_MODE												PlayMode				= (PLAY_MODE)0;
 
 		uint32_t												Stage					= 0;
 		double													TimeStage				= 0;
@@ -59,7 +65,7 @@ namespace ghg
 		bool													Slowing					= true;
 
 	};
-
+	 
 	struct SShipController {
 		uint16_t	Forward	: 1;
 		uint16_t	Back	: 1;
@@ -87,6 +93,15 @@ namespace ghg
 		::gpk::error_t											PilotCreate				(const ::ghg::SShipPilot & shipPilot)			{
 			Pilots.push_back(shipPilot);
 			return ShipControllers.push_back({});
+		}
+
+		::gpk::error_t											PilotsReset				()			{
+			while(Pilots.size() < PlayState.PlayerCount) {
+				char														text [64]				= {};
+				sprintf_s(text, "Player %i", Pilots.size() + 1);
+				Pilots.push_back({::gpk::label(text), PLAYER_COLORS[Pilots.size() % ::gpk::size(PLAYER_COLORS)]});
+			}
+			return ShipControllers.resize(PlayState.PlayerCount);
 		}
 
 		::gpk::error_t											Save					(::gpk::array_pod<byte_t> & output)		const	{

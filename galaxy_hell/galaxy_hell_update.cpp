@@ -375,7 +375,7 @@ static int											processInput			(::ghg::SGalaxyHell & solarSystem, double se
 	(void)frameEvents;
 
 
-	::gpk::view_array<const ::ghg::SShipController>			controllerPlayer		= solarSystem.ShipControllers;
+	::gpk::view_array<const ::ghg::SShipController>			controllers				= solarSystem.ShipControllers;
 	//const bool												key_rotate_left			= input.KeyboardCurrent.KeyState[VK_NUMPAD8	];
 	//const bool												key_rotate_right		= input.KeyboardCurrent.KeyState[VK_NUMPAD2	];
 	//const bool												key_rotate_front		= input.KeyboardCurrent.KeyState[VK_NUMPAD6	];
@@ -390,18 +390,31 @@ static int											processInput			(::ghg::SGalaxyHell & solarSystem, double se
 	if(key_camera_reset)
 		solarSystem.ShipState.Scene.Global.CameraReset();
 
+	constexpr double										speed					= 40;
 	if(solarSystem.ShipState.EntitySystem.Entities.size()) {
 		for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.PlayerCount; ++iPlayer) {
+			const ::ghg::SShipController							& shipController		= controllers[iPlayer];
 			::gpk::STransform3										& playerBody			= solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCores[iPlayer].Entity].Body];
-			double													speed							= 10;
-			{
-					 if(controllerPlayer[iPlayer].Forward	) { playerBody.Position.x	+= (float)(secondsLastFrame * speed * (controllerPlayer[iPlayer].Turbo ? 2 : 8)); solarSystem.PlayState.AccelerationControl	= +1; }
-				else if(controllerPlayer[iPlayer].Back		) { playerBody.Position.x	-= (float)(secondsLastFrame * speed * (controllerPlayer[iPlayer].Turbo ? 2 : 8)); solarSystem.PlayState.AccelerationControl	= -1; }
-				else
-					solarSystem.PlayState.AccelerationControl	= 0;
+			::ghg::SShipCore										& ship					= solarSystem.ShipState.ShipCores[iPlayer];
+			bool													turbo					= shipController.Turbo;
+			double													speedMultiplier			= 1;
+			ship.Nitro											+= (float)(secondsLastFrame * .1);
+			if(ship.Nitro > 0 && turbo) {
+				ship.Nitro					-= (float)secondsLastFrame;
+				speedMultiplier				*= 2;
+			}
 
-				if(controllerPlayer[iPlayer].Left 	) { playerBody.Position.z			+= (float)(secondsLastFrame * speed * (controllerPlayer[iPlayer].Turbo ? 2 : 8)); }
-				if(controllerPlayer[iPlayer].Right	) { playerBody.Position.z			-= (float)(secondsLastFrame * speed * (controllerPlayer[iPlayer].Turbo ? 2 : 8)); }
+			{
+				solarSystem.PlayState.AccelerationControl	
+					= shipController.Forward	? +1
+					: shipController.Back		? -1
+					: 0
+					;
+
+				playerBody.Position.x	+= (float)(secondsLastFrame * speed * speedMultiplier * solarSystem.PlayState.AccelerationControl);
+
+				if(shipController.Left 	) { playerBody.Position.z += (float)(secondsLastFrame * speed * speedMultiplier); }
+				if(shipController.Right	) { playerBody.Position.z -= (float)(secondsLastFrame * speed * speedMultiplier); }
 			}
 			//if(key_rotate_reset)
 			//	playerBody.Orientation.MakeFromEulerTaitBryan({0, 0, (float)-::gpk::math_pi_2});
@@ -424,24 +437,26 @@ static int											processInput			(::ghg::SGalaxyHell & solarSystem, double se
 			solarSystem.ShipState.Scene.Global.Camera[::ghg::CAMERA_MODE_FOLLOW].Target		= shipPosition + ::gpk::SCoord3<float>{1000.f, 0, 0};
 			solarSystem.ShipState.Scene.Global.Camera[::ghg::CAMERA_MODE_FOLLOW].Up			= {0, 1, 0};
 		}
-		else if(solarSystem.ShipState.Scene.Global.CameraMode == ::ghg::CAMERA_MODE_CORE) {
-			solarSystem.ShipState.Scene.Global.Camera[::ghg::CAMERA_MODE_CORE].Position		= shipPosition + ::gpk::SCoord3<float>{0, 0, 0};
-			solarSystem.ShipState.Scene.Global.Camera[::ghg::CAMERA_MODE_CORE].Target		= shipPosition + ::gpk::SCoord3<float>{1, 0, 0};
-			solarSystem.ShipState.Scene.Global.Camera[::ghg::CAMERA_MODE_CORE].Up			= {0, 1, 0};
+		else if(solarSystem.ShipState.Scene.Global.CameraMode == ::ghg::CAMERA_MODE_FRONT) {
+			solarSystem.ShipState.Scene.Global.Camera[::ghg::CAMERA_MODE_FRONT].Position	= shipPosition + ::gpk::SCoord3<float>{0, 0, 0};
+			solarSystem.ShipState.Scene.Global.Camera[::ghg::CAMERA_MODE_FRONT].Target		= shipPosition + ::gpk::SCoord3<float>{1, 0, 0};
+			solarSystem.ShipState.Scene.Global.Camera[::ghg::CAMERA_MODE_FRONT].Up			= {0, 1, 0};
 		}
 	}
 
 	//------------------------------------------- Handle misc input
 	::gpk::SCamera											& camera				= solarSystem.ShipState.Scene.Global.Camera[solarSystem.ShipState.Scene.Global.CameraMode];
-	if(key_camera_move_up	) camera.Position.y	+= (float)secondsLastFrame * (controllerPlayer[0].Turbo || controllerPlayer[1].Turbo ? 20 : 10);
-	if(key_camera_move_down	) camera.Position.y	-= (float)secondsLastFrame * (controllerPlayer[0].Turbo || controllerPlayer[1].Turbo ? 20 : 10);
-	solarSystem.PlayState.CameraSwitchDelay							+= secondsLastFrame;
-	if(key_camera_switch && solarSystem.PlayState.CameraSwitchDelay > .2) {
-		solarSystem.PlayState.CameraSwitchDelay								= 0;
-
-		solarSystem.ShipState.Scene.Global.CameraMode = (::ghg::CAMERA_MODE)((solarSystem.ShipState.Scene.Global.CameraMode + 1) % ::ghg::CAMERA_MODE_COUNT);
+	if(controllers.size()) {
+		if(key_camera_move_up	) camera.Position.y	+= (float)secondsLastFrame * (controllers[0].Turbo ? 20 : 10);
+		if(key_camera_move_down	) camera.Position.y	-= (float)secondsLastFrame * (controllers[0].Turbo ? 20 : 10);
 	}
 
+	solarSystem.PlayState.CameraSwitchDelay							+= secondsLastFrame;
+	if(key_camera_switch && solarSystem.PlayState.CameraSwitchDelay > .2) {
+		solarSystem.PlayState.CameraSwitchDelay							= 0;
+
+		solarSystem.ShipState.Scene.Global.CameraMode = (::ghg::CAMERA_MODE)((solarSystem.ShipState.Scene.Global.CameraMode + 1) % ((solarSystem.PlayState.PlayerCount > 1) ? (::ghg::CAMERA_MODE_PERSPECTIVE + 1) : ::ghg::CAMERA_MODE_COUNT));
+	}
 
 	if(camera.Position.y > 0.001f)
 	if(camera.Position.y > 0.001f) if(key_camera_move_front) camera.Position.RotateZ(::gpk::math_pi * secondsLastFrame);

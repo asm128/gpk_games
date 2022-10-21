@@ -9,9 +9,10 @@
 		return 1;
 
 	for(uint32_t iEvent = 0; iEvent < systemEvents.size(); ++iEvent) {
-		switch(systemEvents[iEvent].Type) {
+		const ::gpk::SSysEvent				& eventToProcess				= systemEvents[iEvent];
+		switch(eventToProcess.Type) {
 		case gpk::SYSEVENT_RESIZE: {
-			::gpk::SCoord2<uint16_t> newMetrics = *(const ::gpk::SCoord2<uint16_t>*)systemEvents[iEvent].Data.begin();
+			::gpk::SCoord2<uint16_t>			newMetrics						= *(const ::gpk::SCoord2<uint16_t>*)eventToProcess.Data.begin();
 			::gpk::guiUpdateMetrics(*app.DialogDesktop.GUI, newMetrics.Cast<uint32_t>(), true);
 			for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) {
 				if(app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI) ::gpk::guiUpdateMetrics(*app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI, newMetrics.Cast<uint32_t>(), true);
@@ -33,35 +34,13 @@
 			break;
 		}
 		case ::gpk::SYSEVENT_CHAR:
-			if(systemEvents[iEvent].Data[0] >= 0x20 && systemEvents[iEvent].Data[0] <= 0x7F) {
+			if(eventToProcess.Data[0] >= 0x20 && eventToProcess.Data[0] <= 0x7F) {
 				if(app.ActiveState == ::ghg::APP_STATE_Welcome)
-					app.InputboxText.push_back(systemEvents[iEvent].Data[0]);
+					app.InputboxText.push_back(eventToProcess.Data[0]);
 			}
 			break;
 		case ::gpk::SYSEVENT_KEY_DOWN:
-			if(app.ActiveState == ::ghg::APP_STATE_Welcome) {
-				switch(systemEvents[iEvent].Data[0]) {
-				case VK_BACK:
-					app.InputboxText.pop_back(0);
-					break;
-				case VK_RETURN: {
-					::gpk::vcc trimmed{app.InputboxText};
-					::gpk::trim(trimmed, trimmed);
-					app.Players.push_back({::gpk::label(trimmed)});
-					if(app.Game.Pilots.size())
-						app.Game.Pilots[0].Name = app.Players[0].Name;
-					else 
-						app.Game.PilotCreate({app.Players[0].Name, ::ghg::PLAYER_COLORS[0]});
-
-					app.Save(::ghg::SAVE_MODE_AUTO);
-					break;
-				}
-				case VK_ESCAPE:
-					app.InputboxText.clear();
-					break;
-				}
-			}
-			else if(systemEvents[iEvent].Data[0] == VK_ESCAPE) {
+			if(eventToProcess.Data[0] == VK_ESCAPE) {
 				if(app.ActiveState != ::ghg::APP_STATE_Home) {
 					app.Save(::ghg::SAVE_MODE_AUTO);
 					app.ActiveState				= ::ghg::APP_STATE_Home;
@@ -95,21 +74,30 @@
 
 		::gpk::array_obj<::gpk::array_pod<char>>					fileNames					= {};
 		::gpk::pathList(app.SavegameFolder, fileNames, app.ExtensionSaveAuto);
-		if(fileNames.size())
-			::ghg::solarSystemLoad(app.Game, fileNames[0]);
-
+		if(fileNames.size()) {
+			if errored(::ghg::solarSystemLoad(app.Game, fileNames[0])) {
+				app.Game.PilotsReset();
+			}
+		}
 		fileNames					= {};
 		::gpk::pathList(app.SavegameFolder, fileNames, app.ExtensionProfile);
 		app.Players.resize(fileNames.size());
+
 		for(uint32_t iPlayer = 0; iPlayer < fileNames.size(); ++iPlayer) {
-			gpk_necall(app.Players[iPlayer].Load(fileNames[iPlayer]), "fileNames[iPlayer]: %s", fileNames[iPlayer].begin());
+			try {
+				gpk_necall(app.Players[iPlayer].Load(fileNames[iPlayer]), "fileNames[iPlayer]: %s", fileNames[iPlayer].begin());
+			}
+			catch (const char * ) {
+				app.Players[iPlayer] = {};
+			}
+
 		}
 		::gpk::tunerSetValue(*app.TunerPlayerCount, app.Game.PlayState.PlayerCount);
 		for(uint32_t iPilot = 0; iPilot < app.Game.PlayState.PlayerCount; ++iPilot) {
 			const ::gpk::vcc namePilot	= app.Game.Pilots[iPilot].Name;
 			for(uint32_t iPlayer = 0; iPlayer < app.Game.PlayState.PlayerCount; ++iPlayer) {
 				if(iPlayer >= app.Players.size())
-					app.Players.push_back({namePilot});
+					app.AddNewPlayer(namePilot);
 
 				const ::gpk::vcc namePlayer	= app.Players[iPlayer].Name;
 				if(namePilot == namePlayer) {
@@ -144,14 +132,22 @@
 
 	const ::gpk::SInput								& input				= *app.DialogDesktop.Input;
 
-	if(controllerPlayer.size() == 1 || (controllerPlayer.size() > 1 && app.Game.PlayState.PlayerCount == 1)) {
+	if(controllerPlayer.size() && app.Game.PlayState.PlayerCount == 1) {
 		controllerPlayer[0].Forward					= input.KeyboardCurrent.KeyState[VK_UP		] || input.KeyboardCurrent.KeyState['W'];
 		controllerPlayer[0].Back					= input.KeyboardCurrent.KeyState[VK_DOWN	] || input.KeyboardCurrent.KeyState['S'];
 		controllerPlayer[0].Left					= input.KeyboardCurrent.KeyState[VK_LEFT	] || input.KeyboardCurrent.KeyState['A'];
 		controllerPlayer[0].Right					= input.KeyboardCurrent.KeyState[VK_RIGHT	] || input.KeyboardCurrent.KeyState['D'];
 		controllerPlayer[0].Turbo					= input.KeyboardCurrent.KeyState[VK_RCONTROL] || input.KeyboardCurrent.KeyState[VK_CONTROL] || input.KeyboardCurrent.KeyState[VK_LSHIFT] || input.KeyboardCurrent.KeyState[VK_SHIFT];
+
+		//or(uint32_t i = 0; i < input.JoystickCurrent.size(); ++i) {
+		//	controllerPlayer[0].Forward					= controllerPlayer[0].Forward	; //|| (input.JoystickCurrent[i].Deltas.y < 0);
+		//	controllerPlayer[0].Back					= controllerPlayer[0].Back		; //|| (input.JoystickCurrent[i].Deltas.y > 0);
+		//	controllerPlayer[0].Left					= controllerPlayer[0].Left		; //|| (input.JoystickCurrent[i].Deltas.x < 0);
+		//	controllerPlayer[0].Right					= controllerPlayer[0].Right		; //|| (input.JoystickCurrent[i].Deltas.x > 0);
+		//	controllerPlayer[0].Turbo					= controllerPlayer[0].Turbo		; //|| input.JoystickCurrent[i].ButtonState;
+		//
 	}
-	else {
+	else if(controllerPlayer.size() > 1) {
 		controllerPlayer[0].Forward					= input.KeyboardCurrent.KeyState['W'];
 		controllerPlayer[0].Back					= input.KeyboardCurrent.KeyState['S'];
 		controllerPlayer[0].Left					= input.KeyboardCurrent.KeyState['A'];
@@ -163,6 +159,14 @@
 		controllerPlayer[1].Left					= input.KeyboardCurrent.KeyState[VK_LEFT	];
 		controllerPlayer[1].Right					= input.KeyboardCurrent.KeyState[VK_RIGHT	];
 		controllerPlayer[1].Turbo					= input.KeyboardCurrent.KeyState[VK_RCONTROL] || input.KeyboardCurrent.KeyState[VK_CONTROL];
+
+		//for(uint32_t i = 0; i < input.JoystickCurrent.size() && i < controllerPlayer.size(); ++i) {
+		//	controllerPlayer[i].Forward					= controllerPlayer[i].Forward	|| (input.JoystickCurrent[i].Deltas.y < 0);
+		//	controllerPlayer[i].Back					= controllerPlayer[i].Back		|| (input.JoystickCurrent[i].Deltas.y > 0);
+		//	controllerPlayer[i].Left					= controllerPlayer[i].Left		|| (input.JoystickCurrent[i].Deltas.x < 0);
+		//	controllerPlayer[i].Right					= controllerPlayer[i].Right		|| (input.JoystickCurrent[i].Deltas.x > 0);
+		//	controllerPlayer[i].Turbo					= controllerPlayer[i].Turbo		|| input.JoystickCurrent[i].ButtonState;
+		//}
 	}
 
 	::ghg::solarSystemUpdate(app.Game, (false == inGame) ? 0 : lastTimeSeconds, *inputState, systemEvents);

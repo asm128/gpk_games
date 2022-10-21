@@ -142,14 +142,107 @@ int													drawScoreParticles
 	return 0;
 }
 
-static	int											drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, const ::ghg::SShots & shots
+::gpk::error_t										drawPixels
+	( ::gpk::view_grid<::gpk::SColorBGRA>				targetPixels
+	, const ::gpk::SCoord3		<float>					& cameraPos
+	, const ::gpk::STriangle3	<float>					& triangleWorld
+	, const ::gpk::SCoord3		<float>					& normal
+	, const ::gpk::SColorBGRA							texelColor
+	, ::gpk::array_pod<::gpk::SCoord2<int16_t>>			& pixelCoords
+	, ::gpk::array_pod<::gpk::STriangleWeights<float>>	& pixelVertexWeights
+	, const ::std::function<::gpk::error_t(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, const ::gpk::SCoord2<int16_t> & pixelCoord, const ::gpk::SColorBGRA & color)> & funcSetPixel
+	) {
+	int32_t								countPixels				= 0;
+	for(uint32_t iPixelCoord = 0; iPixelCoord < pixelCoords.size(); ++iPixelCoord) {
+		::gpk::SCoord2<int16_t>									pixelCoord				= pixelCoords		[iPixelCoord];
+		const ::gpk::STriangleWeights<float>					& vertexWeights			= pixelVertexWeights[iPixelCoord];
+		const ::gpk::SCoord3<float>								position				= ::gpk::triangleWeight(vertexWeights, triangleWorld);
+		static constexpr	const double						rangeLight				= 100.0;
+		static constexpr	const double						rangeLightSquared		= rangeLight * rangeLight;
+		static constexpr	const double						rangeUnit				= 1.0 / rangeLightSquared;
+		const ::gpk::SCoord3<float>								lightToPoint			= cameraPos - position;
+		::gpk::SCoord3<float>									vectorToLight			= lightToPoint;
+		vectorToLight.Normalize();
+		const double											lightFactor				= vectorToLight.Dot(normal);
+		const double											distanceToLight			= lightToPoint.LengthSquared();
+		if(lightFactor <= 0)
+			continue;
+		const double											invAttenuation			= ::std::max(0.0, 1.0 - (distanceToLight * rangeUnit));
+		::gpk::SColorFloat										fragmentColor			= (::gpk::SColorFloat(texelColor) * invAttenuation).Clamp();
+		countPixels											+= funcSetPixel(targetPixels, pixelCoord, fragmentColor);
+	}
+	return countPixels;
+}
+
+int													drawQuadTriangle
+	( ::gpk::view_grid<::gpk::SColorBGRA>				targetPixels
+	, const ::gpk::SCoord3		<float>					& cameraPos
+	, const ::gpk::SColorBGRA							texelColor
+	, const ::gpk::SGeometryQuads						& geometry
+	, const int											iTriangle
+	, const ::gpk::SMatrix4<float>						& matrixTransform
+	, const ::gpk::SMatrix4<float>						& matrixTransformVP
+	, ::gpk::array_pod<::gpk::SCoord2<int16_t>>			& pixelCoords
+	, ::gpk::array_pod<::gpk::STriangleWeights<float>>	& pixelVertexWeights
+	, ::gpk::view_grid<uint32_t>						depthBuffer
+	, const ::std::function<::gpk::error_t(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, const ::gpk::SCoord2<int16_t> & pixelCoord, const ::gpk::SColorBGRA & color)> & funcSetPixel
+	) {
+	const ::gpk::STriangle3	<float>							& triangle			= geometry.Triangles	[iTriangle];;
+	const ::gpk::SCoord3	<float>							& normal			= geometry.Normals		[iTriangle / 2];
+	::gpk::drawQuadTriangle(targetPixels.metrics(), triangle, matrixTransformVP, pixelCoords, pixelVertexWeights, depthBuffer);
+	const ::gpk::SCoord3	<float>							xnormal				= matrixTransform.TransformDirection(normal).Normalize();
+	::gpk::STriangle3		<float>							triangleWorld		= triangle;
+	::gpk::transform(triangleWorld, matrixTransform);
+	return ::drawPixels(targetPixels, cameraPos, triangleWorld, xnormal, texelColor, pixelCoords, pixelVertexWeights, funcSetPixel);
+}
+
+
+static int										drawCannonball
+	( const ::ghg::SShipManager							& shipState
+	, const ::gpk::SCoord3<float>						& position
+	, const ::gpk::SColorFloat							& shipColor
+	, float												animationTime
+	, const ::gpk::SMatrix4<float>						& matrixVP
+	, ::gpk::view_grid<::gpk::SColorBGRA>				& targetPixels
+	, ::gpk::view_grid<uint32_t>						depthBuffer
+	, ::ghg::SGalaxyHellDrawCache						& drawCache
+	) {
+	uint32_t												pixelsDrawn				= 0;
+	double													absanim					= fabsf(sinf(animationTime * 3));
+	::gpk::SMatrix4<float>									matrixTransform				= {};
+	matrixTransform.SetIdentity();
+	matrixTransform.SetTranslation(position, false);
+	::gpk::SMatrix4<float>									matrixTransformVP			= matrixTransform * matrixVP;
+	::ghg::getLightArrays(matrixTransform.GetTranslation(), drawCache.LightPointsWorld, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightColorsModel);
+	const ::gpk::SGeometryQuads								& mesh						= shipState.Scene.Geometry[::ghg::SHIP_GEOMETRY_SPHERE];
+	//const ::gpk::view_grid<const ::gpk::SColorBGRA>			image						= shipState.Scene.Image	[entityChild.Image].View;
+
+	::gpk::SImage<::gpk::SColorBGRA>						image						= {};
+	image.resize({1, 1}, shipColor);
+	for(uint32_t iTriangle = 0; iTriangle < mesh.Triangles.size(); ++iTriangle) {
+		::gpk::clear(drawCache.PixelCoords, drawCache.PixelVertexWeights);
+		pixelsDrawn += ::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformVP, shipState.Scene.Global.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer
+			, [shipColor, absanim](::gpk::view_grid<::gpk::SColorBGRA> targetPixels, const ::gpk::SCoord2<int16_t> & pixelCoord, const ::gpk::SColorBGRA & color) {
+				targetPixels[pixelCoord.y][pixelCoord.x] = ::gpk::interpolate_linear(::gpk::SColorFloat(color), shipColor, absanim).Clamp(); 
+				return 0;
+		});
+	}
+
+	return pixelsDrawn;
+}
+
+static	int											drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixels
+	, const ::ghg::SShipManager					& shipState
+	, const ::ghg::SShots						& shots
 	, const ::gpk::SMatrix4<float>				& matrixVPV
 	, ::gpk::SColorFloat						colorShot
+	, float										animationTime
 	, const	double								brightRadius
 	, const	double								intensity
 	, const	bool								line
 	, ::gpk::view_grid<uint32_t>				depthBuffer
 	, ::gpk::array_pod<::gpk::SCoord3<float>>	pixelCoordsCache
+	, ::ghg::SGalaxyHellDrawCache				& drawCache
 	) {
 	const ::gpk::SCoord2<int32_t>						targetMetrics			= targetPixels.metrics().Cast<int32_t>();
 	for(uint32_t iShot = 0; iShot < shots.Brightness.size(); ++iShot) {
@@ -166,8 +259,11 @@ static	int											drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixe
 		if(raySegment.B.z < 0 || raySegment.B.z > 1) continue;
 		if(line)
 			::gpk::drawLine(targetPixels, raySegment, pixelCoordsCache, depthBuffer);
-		else
+		else {
 			pixelCoordsCache.push_back(raySegment.B);
+			::drawCannonball(shipState, starPos, colorShot, animationTime, matrixVPV, targetPixels, depthBuffer, drawCache);
+			continue;
+		}
 		const double											pixelCoordUnit		= 1.0 / (pixelCoordsCache.size());
 		for(uint32_t iPixelCoord = 0, countPixelCoords = pixelCoordsCache.size(); iPixelCoord < countPixelCoords; ++iPixelCoord) {
 			const ::gpk::SCoord3<float>							& pixelCoord		= pixelCoordsCache[iPixelCoord];
@@ -311,7 +407,7 @@ int												ghg::drawShipOrbiter
 	uint32_t												pixelsDrawn				= 0;
 	const ::gpk::array_pod<uint32_t>						& entityChildren		= shipState.EntitySystem.EntityChildren[shipPart.Entity];
 	double													absanim					= fabsf(sinf(animationTime * 3));
-	const ::gpk::SColorFloat								shadedColor				= shipColor * absanim;
+	const ::gpk::SColorFloat								shadedColor				= (absanim < .5) ? ::gpk::SColorFloat{} : shipColor * (absanim * .5);
 	for(uint32_t iEntity = 0; iEntity < entityChildren.size(); ++iEntity) {
 		const ::ghg::SEntity									& entityChild				= shipState.EntitySystem.Entities[entityChildren[iEntity]];
 		if(-1 == entityChild.Parent)
@@ -327,7 +423,12 @@ int												ghg::drawShipOrbiter
 			::gpk::clear(drawCache.PixelCoords, drawCache.PixelVertexWeights);
 			pixelsDrawn += ::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformVP, shipState.Scene.Global.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer
 				, [shadedColor](::gpk::view_grid<::gpk::SColorBGRA> targetPixels, const ::gpk::SCoord2<int16_t> & pixelCoord, const ::gpk::SColorBGRA & color) {
-					targetPixels[pixelCoord.y][pixelCoord.x] = (::gpk::SColorFloat(color) + shadedColor).Clamp();
+					if( color.r > 64
+					 || color.g > 128
+					)
+						targetPixels[pixelCoord.y][pixelCoord.x] = (::gpk::SColorFloat(color) + shadedColor).Clamp();
+					else
+						targetPixels[pixelCoord.y][pixelCoord.x] = color; 
 					return 0;
 			});
 		}
@@ -335,6 +436,7 @@ int												ghg::drawShipOrbiter
 
 	return pixelsDrawn;
 }
+
 static	int											drawShip
 	( const ::ghg::SGalaxyHell							& solarSystem
 	, int32_t											iShip
@@ -513,7 +615,7 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 					line				= true;
 				}
 				else if(::ghg::WEAPON_LOAD_Cannonball == weapon.Load) {
-					colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE;
+					colorShot			= ship.Team ? ::gpk::SColorFloat{1.0f, 0.25f, 0.75f} : ::gpk::TURQUOISE;
 					brightRadius		= 5;
 					intensity			= 4;
 					line				= false;
@@ -530,7 +632,7 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 					intensity			= 1;
 					line				= true;
 				}
-				::drawShots(targetPixels, solarSystem.ShipState.Shots[shipPart.Weapon], matrixView, colorShot, brightRadius, intensity, line, depthBuffer, drawCache.LightPointsModel);
+				::drawShots(targetPixels, solarSystem.ShipState, solarSystem.ShipState.Shots[shipPart.Weapon], matrixView, colorShot, (float)solarSystem.DecoState.AnimationTime, brightRadius, intensity, line, depthBuffer, drawCache.LightPointsModel, drawCache);
 
 			}
 		}

@@ -13,8 +13,10 @@ namespace ghg
 	enum CAMERA_MODE
 		{ CAMERA_MODE_SKY			= 0
 		, CAMERA_MODE_PERSPECTIVE
+		, CAMERA_MODE_MAP
 		, CAMERA_MODE_FOLLOW
-		, CAMERA_MODE_CORE
+		, CAMERA_MODE_FRONT
+		, CAMERA_MODE_REAR
 		, CAMERA_MODE_COUNT
 		};
 
@@ -30,6 +32,10 @@ namespace ghg
 			Camera[CAMERA_MODE_SKY].Position			= {-0.000001f, 250, 0};
 			Camera[CAMERA_MODE_SKY].Up					= {0, 1, 0};
 
+			Camera[CAMERA_MODE_MAP].Target				= {};
+			Camera[CAMERA_MODE_MAP].Position			= {-0.000001f, 2500, 0};
+			Camera[CAMERA_MODE_MAP].Up					= {0, 1, 0};
+
 			Camera[CAMERA_MODE_PERSPECTIVE].Target		= {};
 			Camera[CAMERA_MODE_PERSPECTIVE].Position	= {-0.000001f, 220, 0};
 			Camera[CAMERA_MODE_PERSPECTIVE].Up			= {0, 1, 0};
@@ -37,6 +43,27 @@ namespace ghg
 			return 0;
 		}
 	};
+
+	GDEFINE_ENUM_TYPE (SHIP_GEOMETRY, uint8_t);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, LINE			, 0);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, TRIANGLE		, 1);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, RECTANGLE		, 2);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, CIRCLE		, 3);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, FRAME			, 4);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, RING			, 5);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, CUBE			, 6);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, SPHERE		, 7);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, CYLINDER		, 8);
+//
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, ENGINE		, 100);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, GUN			, 101);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, WAFER			, 102);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, CANNON		, 103);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, SHOTGUN		, 104);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, WAFER_SHOTGUN	, 105);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, CANNONBALL	, 106);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, ROCKET		, 107);
+	GDEFINE_ENUM_VALUE(SHIP_GEOMETRY, MISSILE		, 108);
 #pragma pack(pop)
 
 	struct SShipScene {
@@ -49,7 +76,6 @@ namespace ghg
 		::gpk::error_t										Save(::gpk::array_pod<byte_t> & output) const { 
 			gpk_necs(::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipSceneGlobal>{&Global, 1}, output));
 			gpk_necs(::gpk::viewWrite(Transforms, output));
-			info_printf("Saved %s, %i", "Geometries"	, Geometry	.size());
 			info_printf("Saved %s, %i", "Transforms"	, Transforms.size());
 			return 0; 
 		}
@@ -70,14 +96,16 @@ namespace ghg
 		);
 
 	GDEFINE_ENUM_TYPE(SHIP_PART_TYPE, uint8_t);
-	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Cargo	, 0);
-	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Cannon	, 1);
-	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Wafer	, 2);
-	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Gun		, 3);
-	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Coil		, 4);
-	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Shield	, 5);
-	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Silo		, 6);
-	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Tractor	, 7);
+	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Cargo		, 0);
+	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Cannon		, 1);
+	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Wafer		, 2);
+	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Gun			, 3);
+	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, ShotgunWafer	, 4);
+	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Shotgun		, 5);
+	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Coil			, 6);
+	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Shield		, 7);
+	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Silo			, 8);
+	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Tractor		, 9);
 
 	GDEFINE_ENUM_TYPE (SHIP_ACTION, uint8_t);
 	GDEFINE_ENUM_VALUE(SHIP_ACTION, spawn			, 0);
@@ -111,23 +139,28 @@ namespace ghg
 	};
 
 	struct SShipScore {
-		uint64_t													Score			= 0;
-		uint64_t													Hits			= 0;
-		uint64_t													Shots			= 0;
-		uint64_t													Bullets			= 0;
-		uint64_t													DamageDone		= 0;
-		uint64_t													DamageReceived	= 0;
-		uint64_t													HitsSurvived	= 0;
-		uint32_t													OrbitersLost	= 0;
-		uint32_t													KilledShips		= 0;
-		uint32_t													KilledOrbiters	= 0;
+		uint64_t													Score							= 0;
+		uint64_t													Hits							= 0;
+		uint64_t													Shots							= 0;
+		uint64_t													Bullets							= 0;
+		uint64_t													DamageDone						= 0;
+		uint64_t													DamageReceived					= 0;
+		uint64_t													HitsSurvived					= 0;
+		uint32_t													OrbitersLost					= 0;
+		uint32_t													KilledShips						= 0;
+		uint32_t													KilledOrbiters					= 0;
 	};
 
 	struct SShipCore {
+		// Const
 		int32_t														Entity							;
 		int32_t														Team							;
-		int32_t														Health							;
+		int32_t														MaxNitro						;
 
+		// Variable
+		int32_t														Health							;
+		double														Nitro							;
+		uint32_t													AvailableNitros					;
 		double														TimePlayed						;
 	};
 #pragma pack(pop)
@@ -145,6 +178,24 @@ namespace ghg
 
 		::ghg::SEntitySystem										EntitySystem;
 		::ghg::SShipScene											Scene						= {};
+
+		int32_t														Clear						()	{
+			::gpk::clear
+				( Scene.Transforms
+				, EntitySystem.Entities
+				, Orbiters
+				, Weapons
+				, ShipCores
+				, ShipScores
+				, Weapons
+			);
+			Shots						= {};
+			ShipParts					= {};
+			ShipPhysics					= {};
+			ShipOrbiterActionQueue		= {};
+			EntitySystem				= {};
+			return 0;
+		}
 
 		int32_t														GetShipHealth				(uint32_t iShipCore)				{ 
 			int32_t															totalHealth					= 0;

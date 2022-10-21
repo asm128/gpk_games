@@ -19,9 +19,7 @@ namespace ghg
 	
 	GDEFINE_ENUM_TYPE (UI_PROFILE, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_PROFILE, Name				, 0);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, Offline			, 1);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, Controller		, 2);
-	GDEFINE_ENUM_VALUE(UI_PROFILE, Select			, 3);
+	GDEFINE_ENUM_VALUE(UI_PROFILE, Score			, 1);
 
 	GDEFINE_ENUM_TYPE (UI_PLAY, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_PLAY, Menu			, 0);
@@ -29,9 +27,9 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(UI_PLAY, TimeReal		, 2);
 	GDEFINE_ENUM_VALUE(UI_PLAY, TimeStage		, 3);
 	
-	GDEFINE_ENUM_TYPE (UI_PLAYER, uint8_t);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, Score				, 0);
-	GDEFINE_ENUM_VALUE(UI_PLAYER, Name				, 1);
+	GDEFINE_ENUM_TYPE (UI_PILOT, uint8_t);
+	GDEFINE_ENUM_VALUE(UI_PILOT, Name				, 0);
+	GDEFINE_ENUM_VALUE(UI_PILOT, Score				, 1);
 	
 	GDEFINE_ENUM_TYPE (UI_PLAYER_SCORE, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_PLAYER_SCORE, Score				, 0);
@@ -85,7 +83,7 @@ namespace ghg
 	GDEFINE_ENUM_TYPE(UI_STORE, uint8_t);
 	GDEFINE_ENUM_TYPE(UI_SCORE, uint8_t);
 
-	struct SUIControlGauge {
+	struct SUIRadialGauge {
 		::gpk::array_pod<::gpk::SCoord3<float>>				Vertices				= {};
 		::gpk::array_pod<::gpk::STriangleWeights<int16_t>>	Indices					= {};
 		int16_t												CurrentValue			= 0;
@@ -101,19 +99,19 @@ namespace ghg
 				int16_t										SetValue				(float currentValue, uint32_t maxValue)	noexcept	{ return SetValue(currentValue / maxValue); }
 	};
 
-			::gpk::error_t	gaugeBuildRadial		(::ghg::SUIControlGauge & gauge, const ::gpk::SCircle<float> & gaugeMetrics, int16_t resolution, int16_t width);
-			::gpk::error_t	gaugeImageUpdate		(::ghg::SUIControlGauge & gauge, ::gpk::view_grid<::gpk::SColorBGRA> target	, ::gpk::SColorFloat colorMin = ::ghg::SUIControlGauge::COLOR_MIN_DEFAULT, ::gpk::SColorFloat colorMid = ::ghg::SUIControlGauge::COLOR_MID_DEFAULT, ::gpk::SColorFloat colorMax = ::ghg::SUIControlGauge::COLOR_MAX_DEFAULT, ::gpk::SColorBGRA colorEmpty = ::ghg::SUIControlGauge::COLOR_BKG_DEFAULT);
-	inline	::gpk::error_t	gaugeImageUpdate		(::ghg::SUIControlGauge & gauge												, ::gpk::SColorFloat colorMin = ::ghg::SUIControlGauge::COLOR_MIN_DEFAULT, ::gpk::SColorFloat colorMid = ::ghg::SUIControlGauge::COLOR_MID_DEFAULT, ::gpk::SColorFloat colorMax = ::ghg::SUIControlGauge::COLOR_MAX_DEFAULT, ::gpk::SColorBGRA colorEmpty = ::ghg::SUIControlGauge::COLOR_BKG_DEFAULT) {
+			::gpk::error_t	gaugeBuildRadial		(::ghg::SUIRadialGauge & gauge, const ::gpk::SCircle<float> & gaugeMetrics, int16_t resolution, int16_t width);
+			::gpk::error_t	gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::view_grid<::gpk::SColorBGRA> target	, ::gpk::SColorFloat colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::SColorFloat colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::SColorFloat colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::SColorBGRA colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false);
+	inline	::gpk::error_t	gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge												, ::gpk::SColorFloat colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::SColorFloat colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::SColorFloat colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::SColorBGRA colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false) {
 		//gauge.Image.Texels.fill({0, 0, 0, 0});
-		return ::ghg::gaugeImageUpdate(gauge, gauge.Image, colorMin, colorMid, colorMax, colorEmpty);
+		return ::ghg::gaugeImageUpdate(gauge, gauge.Image, colorMin, colorMid, colorMax, colorEmpty, radialColor);
 	}
 
 	struct SUIPlayShipPartViewport {
 		int32_t											Viewport		;
 		::gpk::SCamera									Camera			;
-		SUIControlGauge									GaugeLife		;
-		SUIControlGauge									GaugeCooldown	;
-		SUIControlGauge									GaugeDelay		;
+		SUIRadialGauge									GaugeLife		;
+		SUIRadialGauge									GaugeCooldown	;
+		SUIRadialGauge									GaugeDelay		;
 		::gpk::SMatrix4	<float>							MatrixProjection;
 		::ghg::TRenderTarget							RenderTargetOrbiter	;
 		::ghg::TRenderTarget							RenderTargetWeaponLoad	;
@@ -326,8 +324,7 @@ namespace ghg
 
 		::gpk::error_t												AddNewPlayer				(::gpk::vcc playerName)			{
 			::gpk::trim(playerName);
-			::gpk::mutex_guard												guard						(Game.LockUpdate);
-			return Players.push_back({::gpk::label(playerName)});
+			return Players.push_back({::gpk::label(::gpk::vcs{playerName})});
 		}
 
 		::gpk::error_t												Save						(SAVE_MODE autosaveMode)				{

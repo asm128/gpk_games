@@ -7,6 +7,8 @@
 #include <time.h>
 #include <direct.h>
 
+//#include <joystickapi.h>
+
 //#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
 #include "gpk_app_impl.h"
 
@@ -41,8 +43,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Galaxy Hell v0.4");
 	SteamAPI_Shutdown();
 	Steamworks_TermCEGLibrary();
 #endif
-	::gpk::clientDisconnect(app.Client);
-	::gpk::tcpipShutdown();
+	//::gpk::clientDisconnect(app.Client);
+	//::gpk::tcpipShutdown();
 	return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); 
 }
 
@@ -122,7 +124,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 
 #endif // USE_STEAM_CLIENT
 
-	gpk_necall(::gpk::tcpipInitialize(), "Failed to initialize network subsystem: '%s'.", "Unknown error");
+	//gpk_necall(::gpk::tcpipInitialize(), "Failed to initialize network subsystem: '%s'.", "Unknown error");
 
 	::gpk::SFramework							& framework						= app.Framework;
 	::gpk::SWindow								& mainWindow					= framework.MainDisplay;
@@ -139,13 +141,23 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	app.AudioState.InitAudio();
 	app.AudioState.PrepareAudio("thrust.wav");
 
-	app.Client.AddressConnect											= {};
+	//app.Client.AddressConnect											= {};
 	//::gpk::tcpipAddress(9898, 0, ::gpk::TRANSPORT_PROTOCOL_UDP, app.Client.AddressConnect);	// If loading the remote IP from the json fails, we fall back to the local address.
-	app.Client.AddressConnect.IP[0] = 192;
-	app.Client.AddressConnect.IP[1] = 168;
-	app.Client.AddressConnect.IP[2] = 0;
-	app.Client.AddressConnect.IP[3] = 188;
+	//app.Client.AddressConnect.IP[0] = 192;
+	//app.Client.AddressConnect.IP[1] = 168;
+	//app.Client.AddressConnect.IP[2] = 0;
+	//app.Client.AddressConnect.IP[3] = 188;
 	//::gpk::clientConnect(app.Client);
+
+	//joySetThreshold(JOYSTICKID1, 1);
+	//joySetThreshold(JOYSTICKID2, 1);
+	//joySetCapture(framework.MainDisplay.PlatformDetail.WindowHandle, JOYSTICKID1, 10, 0);
+	//joySetCapture(framework.MainDisplay.PlatformDetail.WindowHandle, JOYSTICKID2, 10, 0);
+
+	framework.MainDisplay.Input->JoystickCurrent.resize(4, {});
+	//for(uint32_t i = 0; i < 4; ++i) 
+	//	app.GamePad.Resume();
+
 	return 0;
 }
 
@@ -164,7 +176,7 @@ int										update				(SApplication & app, bool exitSignal)	{
 		case ::gpk::SYSEVENT_KEY_DOWN:
 			switch(framework.MainDisplay.EventQueue[iEvent].Data[0]) {
 			case VK_RETURN:
-				if(GetAsyncKeyState(VK_MENU))
+				if(GetAsyncKeyState(VK_MENU) & 0xFFF0)
 					gpk_necs(::gpk::fullScreenToggle(app.Framework.MainDisplay));
 				break;
 			}
@@ -205,10 +217,14 @@ int										update				(SApplication & app, bool exitSignal)	{
 	app.AudioState.emitter.DopplerScaler	= 6.0f; //float(app.GalaxyHellApp.World.PlayState.TimeScale);
 	app.AudioState.FrequencyRatio			= (float)app.GalaxyHellApp.Game.PlayState.TimeScale;
 
-	if(app.GalaxyHellApp.ActiveState == ::ghg::APP_STATE_Play && false == app.GalaxyHellApp.Game.PlayState.Paused)
+	if(app.GalaxyHellApp.ActiveState == ::ghg::APP_STATE_Play && false == app.GalaxyHellApp.Game.PlayState.Paused) {
 		app.AudioState.PauseAudio(true);
-	else
+		//app.GamePad.Resume();
+	}
+	else {
 		app.AudioState.PauseAudio(false);
+		//app.GamePad.Suspend();
+	}
 
 	app.AudioState.UpdateAudio(framework.FrameInfo.Seconds.LastFrame);// / (app.GalaxyHellApp.World.ShipState.Ships.size() - 1));
 #if defined(USE_STEAM_CLIENT)
@@ -216,6 +232,21 @@ int										update				(SApplication & app, bool exitSignal)	{
 #endif
 
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
+
+	//for(uint32_t i = 0; i < 4; ++i) {
+	//	DirectX::GamePad::State padState = app.GamePad.GetState(i);
+	//	if(false == padState.IsConnected())
+	//		warning_printf("Pad %i not connected", i);
+	//	if(padState.IsLeftThumbStickDown	()) { 
+	//		framework.MainDisplay.Input->JoystickCurrent[i].Deltas.y = -1; }
+	//	if(padState.IsLeftThumbStickLeft	()) { 
+	//		framework.MainDisplay.Input->JoystickCurrent[i].Deltas.x = -1; }
+	//	if(padState.IsLeftThumbStickUp		()) { 
+	//		framework.MainDisplay.Input->JoystickCurrent[i].Deltas.y = +1; }
+	//	if(padState.IsLeftThumbStickRight	()) { 
+	//		framework.MainDisplay.Input->JoystickCurrent[i].Deltas.x = +1; }
+	//}
+	
 	return 0;
 }
 

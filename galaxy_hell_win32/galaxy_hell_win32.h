@@ -22,7 +22,7 @@ struct SApplication {
 
 	::ghg::SGalaxyHellApp	GalaxyHellApp;
 
-	::gpk::SUDPClient		Client;
+	//::gpk::SUDPClient		Client;
 
 							SApplication		(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
 };
