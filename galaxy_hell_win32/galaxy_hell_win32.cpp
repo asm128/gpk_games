@@ -39,6 +39,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Galaxy Hell v0.4");
 	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.Input, framework.MainDisplay.EventQueue);
 	app.AudioState.CleanupAudio(); 
 
+
+	// --- when the rendering context is no longer needed ...   
+ 	// make the rendering context not current  
+	if(app.GLRenderContext) {
+		wglMakeCurrent		(NULL, NULL) ; 
+		wglDeleteContext	(app.GLRenderContext);	// delete the rendering context  
+	}
 #ifdef USE_STEAM_CLIENT
 	SteamAPI_Shutdown();
 	Steamworks_TermCEGLibrary();
@@ -158,6 +165,17 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	//for(uint32_t i = 0; i < 4; ++i) 
 	//	app.GamePad.Resume();
 
+
+	// create a rendering context  
+	app.DrawingContext				= GetDC(framework.MainDisplay.PlatformDetail.WindowHandle);
+	app.GLRenderContext				= wglCreateContext(app.DrawingContext); 
+ 
+	// make it the calling thread's current rendering context 
+	wglMakeCurrent (app.DrawingContext, app.GLRenderContext);
+ 
+// call OpenGL APIs as desired ... 
+ 
+
 	return 0;
 }
 
@@ -247,9 +265,21 @@ int										update				(SApplication & app, bool exitSignal)	{
 	//		framework.MainDisplay.Input->JoystickCurrent[i].Deltas.x = +1; }
 	//}
 	
+	//const GLubyte *	glGetString(GL_EXTENSIONS);
 	return 0;
 }
 
 int														draw					(SApplication & app) {
+    /* rotate a triangle around */
+    //glClear(GL_COLOR_BUFFER_BIT);
+    //glBegin(GL_TRIANGLES);
+    //glColor3f(1.0f, 0.0f, 0.0f);
+    //glVertex2i(0,  1);
+    //glColor3f(0.0f, 1.0f, 0.0f);
+    //glVertex2i(-1, -1);
+    //glColor3f(0.0f, 0.0f, 1.0f);
+    //glVertex2i(1, -1);
+    //glEnd();
+    //glFlush();
 	return ::ghg::galaxyHellDraw(app.GalaxyHellApp, app.Framework.MainDisplay.Size.Cast<uint16_t>());
 }

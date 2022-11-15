@@ -36,7 +36,7 @@ static	int											collisionDetect		(::ghg::SShots & shots, const ::gpk::SCoor
 	return 0;
 }
 
-static	int											handleCollisionPoint	(::ghg::SGalaxyHell & solarSystem, int32_t weaponDamage, ::ghg::SShipScore & attackerScore, ::ghg::SShipScore & damagedScore, ::ghg::SOrbiter& damagedPart, ::ghg::SShipCore & damagedShip, int32_t iAttackedShip, const ::gpk::SCoord3<float> & sphereCenter, const ::gpk::SCoord3<float> & collisionPoint)	{
+static	int											handleCollisionPoint		(::ghg::SGalaxyHell & solarSystem, int32_t weaponDamage, ::ghg::SShipScore & attackerScore, ::ghg::SShipScore & damagedScore, ::ghg::SOrbiter& damagedPart, ::ghg::SShipCore & damagedShip, int32_t iAttackedShip, const ::gpk::SCoord3<float> & sphereCenter, const ::gpk::SCoord3<float> & collisionPoint)	{
 	solarSystem.ShipState.ShipOrbiterActionQueue[iAttackedShip].push_back(::ghg::SHIP_ACTION_hit);
 	const ::gpk::SCoord3<float>								bounceVector				= (collisionPoint - sphereCenter).Normalize();
 	solarSystem.DecoState.Debris.SpawnDirected(1 + weaponDamage / 10, 0.3, bounceVector, collisionPoint, 50, 1);
@@ -416,14 +416,11 @@ static int											processInput			(::ghg::SGalaxyHell & solarSystem, double se
 				if(shipController.Left 	) { playerBody.Position.z += (float)(secondsLastFrame * speed * speedMultiplier); }
 				if(shipController.Right	) { playerBody.Position.z -= (float)(secondsLastFrame * speed * speedMultiplier); }
 			}
-			//if(key_rotate_reset)
-			//	playerBody.Orientation.MakeFromEulerTaitBryan({0, 0, (float)-::gpk::math_pi_2});
-			//else {
-			//	//if(controllerPlayer[iPlayer].Left		) playerBody.Orientation.z -= (float)(secondsLastFrame * (controllerPlayer[iPlayer].Turbo ? 8 : 2));
-			//	//if(controllerPlayer[iPlayer].Right		) playerBody.Orientation.z += (float)(secondsLastFrame * (controllerPlayer[iPlayer].Turbo ? 8 : 2));
-			//	//if(controllerPlayer[iPlayer].Forward	) playerBody.Orientation.x -= (float)(secondsLastFrame * (controllerPlayer[iPlayer].Turbo ? 8 : 2));
-			//	//if(controllerPlayer[iPlayer].Back		) playerBody.Orientation.x += (float)(secondsLastFrame * (controllerPlayer[iPlayer].Turbo ? 8 : 2));
-			//}
+
+			//if(shipController.PointerDeltas.x) 
+			//	playerBody.Orientation.y += (float)(shipController.PointerDeltas.x / 128.f);
+			//if(shipController.PointerDeltas.y) 
+			//	playerBody.Orientation.z += (float)(shipController.PointerDeltas.y / 128.f);
 
 			playerBody.Orientation.Normalize();
 		}
@@ -467,6 +464,10 @@ static int											processInput			(::ghg::SGalaxyHell & solarSystem, double se
 	if(camera.Position.y < 0) camera.Position.y = 0.0001f;
 	if(camera.Position.x > 0) camera.Position.x = -0.0001f;
 	if(camera.Position.x > 0) camera.Position.x = -0.0001f;
+
+	for(uint32_t iPlayer = 0; iPlayer < solarSystem.ShipControllers.size(); ++iPlayer) 
+		solarSystem.ShipControllers[iPlayer].PointerDeltas		= {};
+
 	return 0;
 }
 

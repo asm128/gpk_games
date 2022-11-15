@@ -1,34 +1,56 @@
 #include "gpk_array.h"
+#include "gpk_rigidbody.h"
+#include "gpk_galaxy_hell_mesh.h"
 
 #ifndef GPK_GALAXY_HELL_ENTITY_H
 #define GPK_GALAXY_HELL_ENTITY_H
 
 namespace ghg {
-	#pragma pack(push, 1)
+#pragma pack(push, 1)
 	struct SEntityFlags {
-		int32_t												Padding						:1;
+		SHAPE_TYPE											ShapeType				;
+		uint8_t												Padding0				;
+		uint16_t											Padding1				;
 	};
-	#pragma pack(pop)
 
 	struct SEntity {
-		int32_t												Parent						;
-		int32_t												Geometry					;
-		int32_t												Transform					;
-		int32_t												Image						;
-		int32_t												Body						;
-		SEntityFlags										Flags						;
+		int32_t												Parent					;
+		int32_t												Geometry				;
+		int32_t												Transform				;
+		int32_t												Image					;
+		int32_t												Body					;
+		SEntityFlags										Flags					;
 	};
+#pragma pack(pop)
 
 	struct SEntitySystem {
-		::gpk::array_pod<::ghg::SEntity>					Entities						= {};
-		::gpk::array_obj<::gpk::array_pod<uint32_t>>		EntityChildren					= {};
+		::gpk::array_pod<::ghg::SEntity>					Entities				= {};
+		::gpk::array_obj<::gpk::array_pod<uint32_t>>		EntityChildren			= {};
 
-		::gpk::error_t										Create(const ::ghg::SEntity & newEntity, ::gpk::view_array<const uint32_t> entityChildren) {
-			Entities.push_back(newEntity);
-			return EntityChildren.push_back(entityChildren);
+		::gpk::error_t										Create					(const ::ghg::SEntity & newEntity, ::gpk::view_array<const uint32_t> entityChildren) {
+			EntityChildren.push_back(entityChildren);
+			return Entities.push_back(newEntity);
 		}
+
+		::gpk::error_t										Create					() {
+			EntityChildren.push_back({});
+			return Entities.push_back({});
+		}
+
+		//::gpk::error_t										CreateSquare			() {
+		//	SEntity													& squareEntity			= Entities[Create()];
+		//	return EntityChildren.push_back(entityChildren);
+		//}
+
+		//::gpk::error_t										CreateCircle	(const ::ghg::SEntity & newEntity, gpk::AXIS axis);
+		//::gpk::error_t										CreateRing		(const ::ghg::SEntity & newEntity, gpk::AXIS axis, float inset, float outset);
+		//::gpk::error_t										CreateCube		(const ::ghg::SEntity & newEntity);
+		//::gpk::error_t										CreateSphere	(const ::ghg::SEntity & newEntity, uint8_t stacks, uint8_t slices);
+		//::gpk::error_t										CreateCylinder	(const ::ghg::SEntity & newEntity, uint8_t stacks, uint8_t slices, float radiusYMin, float radiusYMax);
+		//::gpk::error_t										CreateTorus		(const ::ghg::SEntity & newEntity, uint8_t stacks, uint8_t slices, float radiusCircle, float radiusCylinder);
+
 		::gpk::error_t										Save(::gpk::array_pod<byte_t> & output) const { 
-			::gpk::viewWrite(::gpk::view_array<const ::ghg::SEntity>{Entities}, output);
+			::gpk::viewWrite(Entities, output);
 			for(uint32_t iEntity = 0; iEntity < Entities.size(); ++iEntity) 
 				::gpk::viewWrite(::gpk::view_array<const uint32_t>{EntityChildren[iEntity]}, output);
 			info_printf("Saved %s, %i", "Entities"					, EntityChildren.size());
@@ -42,8 +64,6 @@ namespace ghg {
 
 			return 0; 
 		}
-
-
 	};
 }
 

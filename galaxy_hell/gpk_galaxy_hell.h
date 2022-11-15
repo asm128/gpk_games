@@ -46,7 +46,7 @@ namespace ghg
 		uint32_t												OffsetStage				= 2;
 		uint32_t												PlayerCount				= 1;
 		PLAY_TYPE												PlayType				= (PLAY_TYPE)0;
-		PLAY_MODE												PlayMode				= (PLAY_MODE)0;
+		PLAY_MODE												PlayMode				= (PLAY_MODE)PLAY_MODE_VR;
 
 		uint32_t												Stage					= 0;
 		double													TimeStage				= 0;
@@ -67,11 +67,13 @@ namespace ghg
 	};
 	 
 	struct SShipController {
-		uint16_t	Forward	: 1;
-		uint16_t	Back	: 1;
-		uint16_t	Left	: 1;
-		uint16_t	Right	: 1;
-		uint16_t	Turbo	: 1;
+		uint8_t					Forward				: 1;
+		uint8_t					Back				: 1;
+		uint8_t					Left				: 1;
+		uint8_t					Right				: 1;
+		uint8_t					Turbo				: 1;
+		::gpk::SCoord3<int16_t>	PointerDeltas		= {};
+		::gpk::SCoord3<int16_t>	PointerPosition		= {};
 	};
 #pragma pack(pop)
 
@@ -158,7 +160,7 @@ namespace ghg
 		, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
 		);
 
-	::gpk::error_t										drawShipOrbiter
+	::gpk::error_t										drawOrbiter
 		( const ::ghg::SShipManager							& shipState
 		, const ::ghg::SOrbiter								& shipPart
 		, const ::gpk::SColorFloat							& shipColor	

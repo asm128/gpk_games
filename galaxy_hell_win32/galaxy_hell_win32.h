@@ -22,6 +22,9 @@ struct SApplication {
 
 	::ghg::SGalaxyHellApp	GalaxyHellApp;
 
+	HDC						DrawingContext		= {};
+	HGLRC					GLRenderContext	= {}; 
+ 
 	//::gpk::SUDPClient		Client;
 
 							SApplication		(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}

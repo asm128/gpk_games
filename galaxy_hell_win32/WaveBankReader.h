@@ -20,8 +20,7 @@
 
 namespace DirectX
 {
-    class WaveBankReader
-    {
+    class WaveBankReader {
         // Private implementation.
         class Impl;
 

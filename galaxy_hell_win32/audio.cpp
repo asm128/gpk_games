@@ -21,23 +21,19 @@
 // Emitters behind the listener are defined here to be more attenuated,
 // have a lower LPF cutoff frequency,
 // yet have a slightly higher reverb send level.
-static const X3DAUDIO_CONE Listener_DirectionalCone = { X3DAUDIO_PI*5.0f/6.0f, X3DAUDIO_PI*11.0f/6.0f, 1.0f, 0.75f, 0.0f, 0.25f, 0.708f, 1.0f };
+static const X3DAUDIO_CONE					Listener_DirectionalCone = { X3DAUDIO_PI*5.0f/6.0f, X3DAUDIO_PI*11.0f/6.0f, 1.0f, 0.75f, 0.0f, 0.25f, 0.708f, 1.0f };
 
-// Specify LFE level distance curve such that it rolls off much sooner than
-// all non-LFE channels, making use of the subwoofer more dramatic.
-static const X3DAUDIO_DISTANCE_CURVE_POINT Emitter_LFE_CurvePoints[3] = { 0.0f, 1.0f, 0.25f, 0.0f, 1.0f, 0.0f };
-static const X3DAUDIO_DISTANCE_CURVE       Emitter_LFE_Curve          = { (X3DAUDIO_DISTANCE_CURVE_POINT*)&Emitter_LFE_CurvePoints[0], 3 };
+// Specify LFE level distance curve such that it rolls off much sooner than all non-LFE channels, making use of the subwoofer more dramatic.
+static const X3DAUDIO_DISTANCE_CURVE_POINT	Emitter_LFE_CurvePoints[3]		= { 0.0f, 1.0f, 0.25f, 0.0f, 1.0f, 0.0f };
+static const X3DAUDIO_DISTANCE_CURVE		Emitter_LFE_Curve				= { (X3DAUDIO_DISTANCE_CURVE_POINT*)&Emitter_LFE_CurvePoints[0], 3 };
 
-// Specify reverb send level distance curve such that reverb send increases
-// slightly with distance before rolling off to silence.
-// With the direct channels being increasingly attenuated with distance,
-// this has the effect of increasing the reverb-to-direct sound ratio,
-// reinforcing the perception of distance.
-static const X3DAUDIO_DISTANCE_CURVE_POINT Emitter_Reverb_CurvePoints[3] = { 0.0f, 0.5f, 0.75f, 1.0f, 1.0f, 0.0f };
-static const X3DAUDIO_DISTANCE_CURVE       Emitter_Reverb_Curve          = { (X3DAUDIO_DISTANCE_CURVE_POINT*)&Emitter_Reverb_CurvePoints[0], 3 };
+// Specify reverb send level distance curve such that reverb send increases slightly with distance before rolling off to silence.
+// With the direct channels being increasingly attenuated with distance, this has the effect of increasing the reverb-to-direct sound ratio, reinforcing the perception of distance.
+static const X3DAUDIO_DISTANCE_CURVE_POINT	Emitter_Reverb_CurvePoints[3]	= { 0.0f, 0.5f, 0.75f, 1.0f, 1.0f, 0.0f };
+static const X3DAUDIO_DISTANCE_CURVE		Emitter_Reverb_Curve			= { (X3DAUDIO_DISTANCE_CURVE_POINT*)&Emitter_Reverb_CurvePoints[0], 3 };
 
 // Must match order of g_PRESET_NAMES
-XAUDIO2FX_REVERB_I3DL2_PARAMETERS g_PRESET_PARAMS[ NUM_PRESETS ] =
+XAUDIO2FX_REVERB_I3DL2_PARAMETERS			g_PRESET_PARAMS[ NUM_PRESETS ]	=
 {
 	XAUDIO2FX_I3DL2_PRESET_FOREST,
 	XAUDIO2FX_I3DL2_PRESET_DEFAULT,

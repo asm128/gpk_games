@@ -1,4 +1,4 @@
-#include "gpk_galaxy_hell_physics.h"
+#include "gpk_particle.h"
 #include "gpk_enum.h"
 
 #ifndef GPK_GALAXY_HELL_WEAPON_H
@@ -12,7 +12,7 @@ namespace ghg
 		::gpk::array_pod<float>										Brightness			= {};
 		::gpk::array_pod<::gpk::SCoord3<float>>						PositionDraw		= {};
 		::gpk::array_pod<::gpk::SCoord3<float>>						PositionPrev		= {};
-		::ghg::SParticles3											Particles;
+		::gpk::SParticles3											Particles			= {};
 
 		int											Remove				(uint32_t iShot)			{
 			Particles.Remove(iShot);
@@ -108,9 +108,8 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Missile		, 3);
 	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Torpedo		, 4);
 	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Shotgun		, 5);
-	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Bomb		, 6);
-	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Mothership	, 7);
-	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Shield		, 8);
+	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Mothership	, 6);
+	GDEFINE_ENUM_VALUE(WEAPON_TYPE, Shield		, 7);
 
 	GDEFINE_ENUM_TYPE(WEAPON_LOAD, uint8_t);
 	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Bullet		, 0);
@@ -122,16 +121,22 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Wave		, 6);
 	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Flare		, 7);
 
+	GDEFINE_ENUM_TYPE(WEAPON_EFFECT, uint8_t);
+	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Pierce		, 0);
+
+
 	// One per value combination
 	struct SWeaponLoad {
-		WEAPON_LOAD									Type				;//= WEAPON_LOAD_Bullet;
-		WEAPON_DAMAGE								DamageType			;//= WEAPON_DAMAGE_Pierce;
-		uint8_t										ParticleCount		;//= 1;
-		float										Delay				;//= .1;
-		int32_t										Damage				;//= 1;
-		float										Lifetime			;//= 0;
-		float										Speed				;//= 150;
-		float										Weight				;//= 150;
+		WEAPON_LOAD									Type			;//= WEAPON_LOAD_Bullet;
+		WEAPON_DAMAGE								DamageType		;//= WEAPON_DAMAGE_Pierce;
+		uint8_t										ParticleCount	;//= 1;
+		float										Delay			;//= .1;
+		int32_t										Damage			;//= 1;
+		float										Lifetime		;//= 0;
+		float										Speed			;//= 150;
+		float										Weight			;//= 150;
+		//uint32_t									Color			;
+
 	};
 
 	// One per value combination

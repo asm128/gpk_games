@@ -33,6 +33,7 @@
 				app.Game.DrawCache.RenderTargetMetrics.x = (uint16_t)(app.Game.DrawCache.RenderTargetMetrics.y / targetRatioY + .1f);
 			break;
 		}
+		//case ::gpk::SYSEVENT_MOUSE_POSITION:
 		case ::gpk::SYSEVENT_CHAR:
 			if(eventToProcess.Data[0] >= 0x20 && eventToProcess.Data[0] <= 0x7F) {
 				if(app.ActiveState == ::ghg::APP_STATE_Welcome)
@@ -131,14 +132,14 @@
 
 
 	const ::gpk::SInput								& input				= *app.DialogDesktop.Input;
-
 	if(controllerPlayer.size() && app.Game.PlayState.PlayerCount == 1) {
 		controllerPlayer[0].Forward					= input.KeyboardCurrent.KeyState[VK_UP		] || input.KeyboardCurrent.KeyState['W'];
 		controllerPlayer[0].Back					= input.KeyboardCurrent.KeyState[VK_DOWN	] || input.KeyboardCurrent.KeyState['S'];
 		controllerPlayer[0].Left					= input.KeyboardCurrent.KeyState[VK_LEFT	] || input.KeyboardCurrent.KeyState['A'];
 		controllerPlayer[0].Right					= input.KeyboardCurrent.KeyState[VK_RIGHT	] || input.KeyboardCurrent.KeyState['D'];
 		controllerPlayer[0].Turbo					= input.KeyboardCurrent.KeyState[VK_RCONTROL] || input.KeyboardCurrent.KeyState[VK_CONTROL] || input.KeyboardCurrent.KeyState[VK_LSHIFT] || input.KeyboardCurrent.KeyState[VK_SHIFT];
-
+		if(input.MouseCurrent.Deltas.x || input.MouseCurrent.Deltas.y || input.MouseCurrent.Deltas.z)
+			controllerPlayer[0].PointerDeltas			= input.MouseCurrent.Deltas.Cast<int16_t>();
 		//or(uint32_t i = 0; i < input.JoystickCurrent.size(); ++i) {
 		//	controllerPlayer[0].Forward					= controllerPlayer[0].Forward	; //|| (input.JoystickCurrent[i].Deltas.y < 0);
 		//	controllerPlayer[0].Back					= controllerPlayer[0].Back		; //|| (input.JoystickCurrent[i].Deltas.y > 0);

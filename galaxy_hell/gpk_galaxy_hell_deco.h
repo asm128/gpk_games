@@ -1,4 +1,4 @@
-#include "gpk_galaxy_hell_physics.h"
+#include "gpk_particle.h"
 #include "gpk_array_static.h"
 #include "gpk_font.h"
 
@@ -50,7 +50,7 @@ namespace ghg
 
 	struct SDebris	{
 		::gpk::array_pod<float>						Brightness			= {};
-		::ghg::SParticles3							Particles			= {};
+		::gpk::SParticles3							Particles			= {};
 		
 		int											Remove				(int32_t iParticle)	{
 			Brightness.remove_unordered(iParticle);
@@ -114,7 +114,7 @@ namespace ghg
 
 	struct SScoreParticles {
 		::gpk::array_pod<::ghg::SScoreParticle>		Scores		= {};
-		::ghg::SParticles3							Particles	= {};
+		::gpk::SParticles3							Particles	= {};
 		::gpk::array_static<::ghg::STriColor, 256>	Palette		= {{0xFF00FF00, 0xFFFFEE11, 0xFFFF0000}, };
 
 		int											Remove				(int32_t iParticle)	{
@@ -151,7 +151,7 @@ namespace ghg
 		int32_t										IndexMesh;
 		int32_t										IndexImage;
 		::gpk::array_pod<::gpk::SRange<uint16_t>>	Slices;
-		::ghg::SParticles3							Particles;
+		::gpk::SParticles3							Particles;
 
 		int											Remove				(uint32_t iSlice)			{
 			Particles.Remove(iSlice);

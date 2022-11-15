@@ -440,8 +440,7 @@ private:
 
 
 _Use_decl_annotations_
-HRESULT WaveBankReader::Impl::Open(const wchar_t* szFileName) noexcept(false)
-{
+HRESULT WaveBankReader::Impl::Open(const wchar_t* szFileName) noexcept(false) {
     Close();
     Clear();
 
@@ -449,9 +448,7 @@ HRESULT WaveBankReader::Impl::Open(const wchar_t* szFileName) noexcept(false)
 
     m_event.reset(CreateEventEx(nullptr, nullptr, CREATE_EVENT_MANUAL_RESET, EVENT_MODIFY_STATE | SYNCHRONIZE));
     if (!m_event)
-    {
         return HRESULT_FROM_WIN32(GetLastError());
-    }
 
 #if (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
     CREATEFILE2_EXTENDED_PARAMETERS params = { sizeof(CREATEFILE2_EXTENDED_PARAMETERS), 0, 0, 0, {}, nullptr };
@@ -502,19 +499,16 @@ HRESULT WaveBankReader::Impl::Open(const wchar_t* szFileName) noexcept(false)
     BOOL result = GetOverlappedResult(hFile.get(), &request, &bytes, FALSE);
 #endif
 
-    if (!result || (bytes != sizeof(m_header)))
-    {
+    if (!result || (bytes != sizeof(m_header))) {
         return HRESULT_FROM_WIN32(GetLastError());
     }
 
-    if (m_header.dwSignature != HEADER::SIGNATURE && m_header.dwSignature != HEADER::BE_SIGNATURE)
-    {
+    if (m_header.dwSignature != HEADER::SIGNATURE && m_header.dwSignature != HEADER::BE_SIGNATURE) {
         return E_FAIL;
     }
 
     const bool be = (m_header.dwSignature == HEADER::BE_SIGNATURE);
-    if (be)
-    {
+    if (be) {
         return E_FAIL;
     }
 

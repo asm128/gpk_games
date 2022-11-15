@@ -105,9 +105,9 @@ static	int											shipCreate			(::ghg::SShipManager & shipState, int32_t team
 
 static	int											shipGeometryBuildEngine	(::gpk::SGeometryQuads & geometry)			{
 	::gpk::geometryBuildHelix(geometry, 8U, 8U, 0.15f, {0, 1.1f, 0}, {1, 1, 1});
-	::gpk::geometryBuildCylinder(geometry, 1U, 6U, .05f, {0, 1, 0}, {1, 1, 1});
-	::gpk::geometryBuildCylinder(geometry, 1U, 8U, .35f, {0, 1, 0}, {1, 1, 1});
-	::gpk::geometryBuildCylinder(geometry, 1U, 8U, .35f, {0, 1, 0}, {-1, 1, 1});
+	//::gpk::geometryBuildCylinder(geometry, 1U, 6U, .05f, .05f, {0, 1, 0}, {1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 1U, 8U, .35f, .25f, {0, 1, 0}, {1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 1U, 8U, .35f, .25f, {0, 1, 0}, {-1, 1, 1});
 	return 0;
 }
 
@@ -134,8 +134,8 @@ static	int											shipGeometryBuildGun	(::gpk::SGeometryQuads & geometry)				
 	::shipGeometryBuildEngine(geometry);
 	::gpk::geometryBuildSphere	(geometry, 8U, 5U, .7f, {0, 0});
 	::gpk::geometryBuildFigure0	(geometry, 2U, 8U, 1, {});
-	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, {}, {1, 1, 1});
-	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, {}, {-1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .1f, {}, {1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .1f, {}, {-1, 1, 1});
 	return 0;
 }
 
@@ -143,10 +143,10 @@ static	int											shipGeometryBuildShotgun	(::gpk::SGeometryQuads & geometry)
 	::shipGeometryBuildEngine(geometry);
 	::gpk::geometryBuildSphere	(geometry, 8U, 5U, .35f, {0, 0});
 	::gpk::geometryBuildFigure0	(geometry, 2U, 8U, 1, {});
-	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .25f, {0, 0, .25f}, {1, 1, 1});
-	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .25f, {0, 0, .25f}, {-1, 1, 1});
-	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .25f, {0, 0, -.25f}, {1, 1, 1});
-	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .25f, {0, 0, -.25f}, {-1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .25f, .125f, {0, 0, .25f}, {1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .25f, .125f, {0, 0, .25f}, {-1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .25f, .125f, {0, 0, -.25f}, {1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .25f, .125f, {0, 0, -.25f}, {-1, 1, 1});
 	return 0;
 }
 
@@ -158,24 +158,54 @@ static	int											shipGeometryBuildCannon	(::gpk::SGeometryQuads & geometry)	
 	return 0;
 }
 
-//static	int											shipGeometryBuildSilo	(::gpk::SGeometryQuads & geometry)			{ return 0; }
-//static	int											shipGeometryBuildShield	(::gpk::SGeometryQuads & geometry)			{ return 0; }
+static	int											shipGeometryBuildCannonball	(::gpk::SGeometryQuads & geometry)			{
+	::gpk::geometryBuildSphere		(geometry, 6U, 4U, .5f, {0, 0});
+	return 0;
+}
+
+static	int											shipGeometryBuildRocket		(::gpk::SGeometryQuads & geometry)			{
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .125f, {}, {1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .125f, {}, {-1, 1, 1});
+	return 0;
+}
+
+static	int											shipGeometryBuildMissile	(::gpk::SGeometryQuads & geometry)			{
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .125f, {}, {1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .125f, {}, {-1, 1, 1});
+	return 0;
+}
+
+
+static	int											shipGeometryBuildBullet		(::gpk::SGeometryQuads & geometry)			{
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .125f, {}, {1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .001f, {}, {-1, 1, 1});
+	return 0;
+}
+
+static	int											shipGeometryBuildShred		(::gpk::SGeometryQuads & geometry)			{
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .125f, {}, {1, 1, 1});
+	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .001f, {}, {-1, 1, 1});
+	return 0;
+}
 
 static	int											modelsSetup				(::ghg::SShipScene & scene)			{
 	scene.Geometry.resize(::gpk::get_value_count<ghg::SHIP_GEOMETRY>() * 1024);
 
-	::shipGeometryBuildEngine		(scene.Geometry[::ghg::SHIP_GEOMETRY_ENGINE		]);
+	::shipGeometryBuildEngine		(scene.Geometry[::ghg::SHIP_GEOMETRY_ENGINE			]);
 	::shipGeometryBuildGun			(scene.Geometry[::ghg::SHIP_GEOMETRY_GUN			]);
 	::shipGeometryBuildWafer		(scene.Geometry[::ghg::SHIP_GEOMETRY_WAFER			]);
-	::shipGeometryBuildCannon		(scene.Geometry[::ghg::SHIP_GEOMETRY_CANNON		]);
+	::shipGeometryBuildCannon		(scene.Geometry[::ghg::SHIP_GEOMETRY_CANNON			]);
 	::shipGeometryBuildShotgun		(scene.Geometry[::ghg::SHIP_GEOMETRY_SHOTGUN		]);
 	::shipGeometryBuildWaferShotgun	(scene.Geometry[::ghg::SHIP_GEOMETRY_WAFER_SHOTGUN	]);
-	
-	::gpk::geometryBuildCube	(scene.Geometry[::ghg::SHIP_GEOMETRY_CUBE		], {1, 1, 1});
-	::gpk::geometryBuildSphere	(scene.Geometry[::ghg::SHIP_GEOMETRY_CUBE		], 4U, 2U, 1, {0, 0});
-	::gpk::geometryBuildSphere	(scene.Geometry[::ghg::SHIP_GEOMETRY_SPHERE		], 6U, 4U, .5f, {0, 0});
-	::gpk::geometryBuildCylinder(scene.Geometry[::ghg::SHIP_GEOMETRY_CYLINDER	], 6U, 2U, 1, {0, 0}, {1, 1});
+	::shipGeometryBuildCannonball	(scene.Geometry[::ghg::SHIP_GEOMETRY_CANNONBALL		]);
+	::shipGeometryBuildRocket		(scene.Geometry[::ghg::SHIP_GEOMETRY_ROCKET			]);
+	::shipGeometryBuildMissile		(scene.Geometry[::ghg::SHIP_GEOMETRY_MISSILE		]);
+	::shipGeometryBuildBullet		(scene.Geometry[::ghg::SHIP_GEOMETRY_BULLET			]);
+	::shipGeometryBuildShred		(scene.Geometry[::ghg::SHIP_GEOMETRY_SHRED			]);
 
+	::gpk::geometryBuildCube		(scene.Geometry[::ghg::SHIP_GEOMETRY_CUBE		], {1, 1, 1});
+	::gpk::geometryBuildSphere		(scene.Geometry[::ghg::SHIP_GEOMETRY_SPHERE		], 16U, 16U, .5f, {0, 0});
+	::gpk::geometryBuildCylinder	(scene.Geometry[::ghg::SHIP_GEOMETRY_CYLINDER	],  1U, 32U, .5, .5, {0, 0}, {1, 1, 1});
 	{
 
 		::gpk::array_pod<::gpk::SColorFloat>	baseColors;
@@ -252,7 +282,7 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 	char													stageFileName[256]							= "./%s.json";
 	static constexpr const SShipOrbiterSetup					weaponDefinitions		[]				=
 		{ {::ghg::SHIP_PART_TYPE_Gun			, 128, ::ghg::WEAPON_TYPE_Gun		, .08, 0.975, ::ghg::WEAPON_LOAD_Bullet		,  256,    20, 1,   0,0.00,  1.5, ::ghg::WEAPON_DAMAGE_Pierce	}
-		, {::ghg::SHIP_PART_TYPE_Shotgun		, 128, ::ghg::WEAPON_TYPE_Shotgun	, .16, 0.925, ::ghg::WEAPON_LOAD_Shell		,  160,    10, 6,   0,0.00,  1.5, ::ghg::WEAPON_DAMAGE_Impact	}
+		, {::ghg::SHIP_PART_TYPE_Shotgun		, 128, ::ghg::WEAPON_TYPE_Shotgun	, .16, 0.925, ::ghg::WEAPON_LOAD_Bullet		,  160,    10, 6,   0,0.00,  1.5, ::ghg::WEAPON_DAMAGE_Impact	}
 		, {::ghg::SHIP_PART_TYPE_Wafer			, 128, ::ghg::WEAPON_TYPE_Gun		, .24, 0.99, ::ghg::WEAPON_LOAD_Ray			,  480,    30, 1,   1,0.50,  1, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn	}
 		, {::ghg::SHIP_PART_TYPE_ShotgunWafer	, 128, ::ghg::WEAPON_TYPE_Shotgun	, .32, 0.98, ::ghg::WEAPON_LOAD_Ray			,  640,    15, 6,   1,0.50,  0.6, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn	}
 		, {::ghg::SHIP_PART_TYPE_Cannon			, 160, ::ghg::WEAPON_TYPE_Cannon	,   2, 1.00, ::ghg::WEAPON_LOAD_Cannonball	,   48,   156, 1,   0,0.00, 10, ::ghg::WEAPON_DAMAGE_Impact	}
@@ -402,3 +432,75 @@ int										ghg::solarSystemSetup			(::ghg::SGalaxyHell & solarSystem, const ::
 	matrixProjection						*= matrixViewport;
 	return 0;
 }
+
+
+// -----------------------------------------------------------------
+// DONE
+// -----------------------------------------------------------------
+// --- UI
+// - Resizeable screen/GUI controls reposition from screen size.
+// - Vanishing score particle effects
+// - Weapon shoot/reload time bars
+// - Radial health bars
+// - Always-visible score display
+
+// --- Main menu
+// - Save/Load Game options
+// - Start New Game option
+// - Player count selector (up to 4 players)
+// - Customizable name
+// - Virtual Keyboard for each of the 4 possible players
+
+// --- Game
+// - Progressive difficulty
+// - Camera controls
+// - Permutable weapon property system for procedural content generation (4 + 9 weapons currently available)
+// - Unlimited levels/Unlimited game time (but around 2 hours until it starts running too slow--optimizations pending)
+// - Destructible objects that explode into parts by slicing their meshes
+// - Sounds with Doppler effect
+// - Nitro burn
+// - Hundreds of dynamic lights
+
+// -----------------------------------------------------------------
+// IN PROGRESS
+// -----------------------------------------------------------------
+
+// --- Game
+// - First person gameplay
+// - Procedural world generation
+// - UGC support
+// - Light effects (radial bloom)
+// - Customizable colors
+
+// --- Multiplayer Online
+// - Lobby/Room creation and joining
+
+// -----------------------------------------------------------------
+// PENDING
+// -----------------------------------------------------------------
+// --- UI
+// - Gamepad/Joystick support
+// - Crosshairs
+
+// --- Main menu
+// - Control customization option
+
+// --- Game
+// - Shadows
+
+// --- Multiplayer Online
+// - User registration
+// - Online gameplay
+// - In-game store
+// - Content trading
+
+// --- General
+// - Rendering optimization
+
+
+// ---- build
+// asm128: 50s
+// ncoder: 30s code + ??s assets + 
+
+// ---- load
+// 

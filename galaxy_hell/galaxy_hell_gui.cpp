@@ -5,9 +5,9 @@
 
 static constexpr	::gpk::GUI_COLOR_MODE		GHG_MENU_COLOR_MODE		= ::gpk::GUI_COLOR_MODE_3D;
 static constexpr	bool						BACKGROUND_3D_ONLY		= true;
-static constexpr	::gpk::SCoord2<uint16_t>	MODULE_CAMERA_SIZE		= {64, 64};
+static constexpr	::gpk::SCoord2<uint16_t>	MODULE_CAMERA_SIZE		= {48, 48};
 static constexpr	::gpk::SCoord2<uint16_t>	MODULE_VIEWPORT_SIZE	= {128, 64};
-static constexpr	::gpk::SCoord2<uint16_t>	WEAPON_BAR_SIZE			= {96, 20};
+static constexpr	::gpk::SCoord2<uint16_t>	WEAPON_BAR_SIZE			= {96, 16};
 
 static	::gpk::error_t			guiSetupCommon				(::gpk::SGUI & gui) {
 	gui.ColorModeDefault			= ::gpk::GUI_COLOR_MODE_3D;
@@ -101,7 +101,7 @@ static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 	::gpk::guiSetupButtonList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, {240, 40}, playerPosition, playerAlign, ::gpk::ALIGN_CENTER);
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Name; iButton < iStop; ++iButton) {
 		playerGUI.Controls.Controls		[iOffset + iButton].Margin		= {}; 
-		//playerGUI.Controls.Controls		[iButton].Border			= {2, 2, 2, 2};
+		//playerGUI.Controls.Controls		[iOffset + iButton].Border			= {};
 		playerGUI.Controls.Modes		[iOffset + iButton].NoBackgroundRect		= true;
 	}
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Score; iButton < iStop; ++iButton) {
@@ -127,10 +127,10 @@ static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 		::gpk::SControl						& controlOrbiter	= playerGUI.Controls.Controls [viewport.Viewport + 0];
 		::gpk::SControl						& controlWeaponType	= playerGUI.Controls.Controls [viewport.Viewport + 2];
 		::gpk::SControl						& controlWeaponLoad	= playerGUI.Controls.Controls [viewport.Viewport + 1];
-		controlOrbiter		.Image				= viewport.RenderTargetOrbiter.Color.View;
-		controlWeaponLoad	.Image				= viewport.RenderTargetWeaponLoad.Color.View;
-		controlWeaponType	.Image				= viewport.RenderTargetWeaponType.Color.View;
-		controlOrbiter.ImageAlign				= controlWeaponType.ImageAlign	= controlWeaponLoad.ImageAlign	= ::gpk::ALIGN_CENTER;
+		controlOrbiter		.Image		= viewport.RenderTargetOrbiter.Color.View;
+		controlWeaponLoad	.Image		= viewport.RenderTargetWeaponLoad.Color.View;
+		controlWeaponType	.Image		= viewport.RenderTargetWeaponType.Color.View;
+		controlOrbiter.ImageAlign		= controlWeaponType.ImageAlign	= controlWeaponLoad.ImageAlign	= ::gpk::ALIGN_CENTER;
 
 			 if(0 == iPlayer) controlOrbiter.Align = controlWeaponLoad.Align = controlWeaponType.Align = ::gpk::ALIGN_CENTER_LEFT	;
 		else if(1 == iPlayer) controlOrbiter.Align = controlWeaponLoad.Align = controlWeaponType.Align = ::gpk::ALIGN_CENTER_RIGHT	;
@@ -143,7 +143,7 @@ static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 		controlOrbiter.Margin					= {};
 
 		controlWeaponLoad.Area.Size		= controlWeaponType.Area.Size	= WEAPON_BAR_SIZE.Cast<int16_t>();	//MODULE_VIEWPORT_SIZE.Cast<int16_t>();
-		controlWeaponLoad.Border		= controlWeaponType.Border		= {2, 2, 2, 2};
+		controlWeaponLoad.Border		= controlWeaponType.Border		= {1, 1, 1, 1};
 		controlWeaponLoad.Margin		= controlWeaponType.Margin		= {};
 
 		if(1 >= iPlayer) {
@@ -157,8 +157,8 @@ static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 			controlWeaponType.Area.Offset.y	+= 1 * MODULE_CAMERA_SIZE.y + WEAPON_BAR_SIZE.y + 2;
 		}
 
-		playerGUI.Controls.Text		[viewport.Viewport + 1].Align			= ::gpk::ALIGN_CENTER; //iPlayer ? ::gpk::ALIGN_CENTER_RIGHT : ::gpk::ALIGN_CENTER_LEFT;
-		playerGUI.Controls.Text		[viewport.Viewport + 2].Align			= ::gpk::ALIGN_CENTER; //iPlayer ? ::gpk::ALIGN_CENTER_RIGHT : ::gpk::ALIGN_CENTER_LEFT;
+		playerGUI.Controls.Text		[viewport.Viewport + 1].Align					= ::gpk::ALIGN_CENTER; //iPlayer ? ::gpk::ALIGN_CENTER_RIGHT : ::gpk::ALIGN_CENTER_LEFT;
+		playerGUI.Controls.Text		[viewport.Viewport + 2].Align					= ::gpk::ALIGN_CENTER; //iPlayer ? ::gpk::ALIGN_CENTER_RIGHT : ::gpk::ALIGN_CENTER_LEFT;
 
 		playerGUI.Controls.Modes	[viewport.Viewport + 0].NoBackgroundRect		= 
 		playerGUI.Controls.Modes	[viewport.Viewport + 1].NoBackgroundRect		= 
@@ -513,7 +513,7 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 
 			drawCache.PixelCoords.clear();
 			uint32_t												pixelsDrawn				= 0;
-			pixelsDrawn											+= ::ghg::drawShipOrbiter(game.ShipState, orbiter, {}, (float)game.DecoState.AnimationTime, matrixView, targetPixels, depthBuffer, drawCache);
+			pixelsDrawn											+= ::ghg::drawOrbiter(game.ShipState, orbiter, {}, (float)game.DecoState.AnimationTime, matrixView, targetPixels, depthBuffer, drawCache);
 
 			if(healthRatio) {
 				::ghg::gaugeImageUpdate(viewport.GaugeLife, targetPixels, ::gpk::RED, ::gpk::YELLOW, ::gpk::LIGHTGREEN);
@@ -728,16 +728,18 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 ::gpk::error_t					ghg::gaugeBuildRadial			(::ghg::SUIRadialGauge & gauge, const ::gpk::SCircle<float> & gaugeMetrics, int16_t resolution, int16_t width) {
 	const double						stepUnit						= (1.0 / resolution) * ::gpk::math_2pi;
 	const ::gpk::SSphere<float>			sphereMetrics					= {gaugeMetrics.Radius, {gaugeMetrics.Center.x, gaugeMetrics.Center.y, .5f}};
+	const double						finalRadius						= gaugeMetrics.Radius;	//::gpk::interpolate_linear(gaugeMetrics.Radius, gaugeMetrics.Radius * .5, ::gpk::clamp(abs(sinCos.Cos), 0.0, 1.0)); //
+	const double						outerRadius						= finalRadius;			//::gpk::interpolate_linear(gaugeMetrics.Radius, gaugeMetrics.Radius * .5, ::gpk::clamp(abs(sinCos.Cos), 0.0, 1.0)); //
+	const double						innerRadius						= outerRadius - width;	//::gpk::interpolate_linear(gaugeMetrics.Radius, gaugeMetrics.Radius * .5, ::gpk::clamp(abs(sinCos.Cos), 0.0, 1.0)); //
 	for(int16_t iStep = 0, stepCount = resolution; iStep < stepCount; ++iStep) {
 		::gpk::SPairSinCos					sinCos							= {sin(iStep * stepUnit), -cos(iStep * stepUnit)};
-		const double						finalRadius						= gaugeMetrics.Radius; //::gpk::interpolate_linear(gaugeMetrics.Radius, gaugeMetrics.Radius * .5, ::gpk::clamp(abs(sinCos.Cos), 0.0, 1.0)); //
- 		const ::gpk::SCoord3<double>		relativePosSmall				=
-			{ sinCos.Sin * (finalRadius - width)
-			, sinCos.Cos * (finalRadius - width)
+		const ::gpk::SCoord3<double>		relativePosSmall				=
+			{ sinCos.Sin * innerRadius
+			, sinCos.Cos * innerRadius
 			};
 		const ::gpk::SCoord3<double>		relativePos						=
-			{ sinCos.Sin * finalRadius
-	  		, sinCos.Cos * finalRadius
+			{ sinCos.Sin * outerRadius
+	  		, sinCos.Cos * outerRadius
 			};
 		gauge.Vertices.push_back(sphereMetrics.Center + relativePosSmall.Cast<float>());
 		gauge.Vertices.push_back(sphereMetrics.Center + relativePos.Cast<float>());
