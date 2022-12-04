@@ -149,13 +149,13 @@ int													drawScoreParticles
 	, const ::gpk::SCoord3		<float>					& normal
 	, const ::gpk::SColorBGRA							texelColor
 	, ::gpk::array_pod<::gpk::SCoord2<int16_t>>			& pixelCoords
-	, ::gpk::array_pod<::gpk::STriangleWeights<float>>	& pixelVertexWeights
+	, ::gpk::array_pod<::gpk::STriangle<float>>			& pixelVertexWeights
 	, const ::std::function<::gpk::error_t(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, const ::gpk::SCoord2<int16_t> & pixelCoord, const ::gpk::SColorBGRA & color)> & funcSetPixel
 	) {
 	int32_t								countPixels				= 0;
 	for(uint32_t iPixelCoord = 0; iPixelCoord < pixelCoords.size(); ++iPixelCoord) {
 		::gpk::SCoord2<int16_t>									pixelCoord				= pixelCoords		[iPixelCoord];
-		const ::gpk::STriangleWeights<float>					& vertexWeights			= pixelVertexWeights[iPixelCoord];
+		const ::gpk::STriangle<float>							& vertexWeights			= pixelVertexWeights[iPixelCoord];
 		const ::gpk::SCoord3<float>								position				= ::gpk::triangleWeight(vertexWeights, triangleWorld);
 		static constexpr	const double						rangeLight				= 100.0;
 		static constexpr	const double						rangeLightSquared		= rangeLight * rangeLight;
@@ -183,7 +183,7 @@ int													drawQuadTriangle
 	, const ::gpk::SMatrix4<float>						& matrixTransform
 	, const ::gpk::SMatrix4<float>						& matrixTransformVP
 	, ::gpk::array_pod<::gpk::SCoord2<int16_t>>			& pixelCoords
-	, ::gpk::array_pod<::gpk::STriangleWeights<float>>	& pixelVertexWeights
+	, ::gpk::array_pod<::gpk::STriangle<float>>			& pixelVertexWeights
 	, ::gpk::view_grid<uint32_t>						depthBuffer
 	, const ::std::function<::gpk::error_t(::gpk::view_grid<::gpk::SColorBGRA> targetPixels, const ::gpk::SCoord2<int16_t> & pixelCoord, const ::gpk::SColorBGRA & color)> & funcSetPixel
 	) {
@@ -401,7 +401,7 @@ int													ghg::getLightArraysFromShips
 	constexpr ::gpk::SColorBGRA								colorLightEnemy			= ::gpk::SColorBGRA{0xFF, 0x88, 0x88};
 	for(uint32_t iShip = 0; iShip < shipState.ShipCores.size(); ++iShip) {
 		const ::ghg::SShipCore									& ship					= shipState.ShipCores[iShip];
-		lightPoints.push_back(shipState.ShipPhysics.Transforms[shipState.EntitySystem.Entities[ship.Entity].Body].Position);
+		lightPoints.push_back(shipState.ShipPhysics.Centers[shipState.EntitySystem.Entities[ship.Entity].Body].Position);
 		lightColors.push_back((0 == shipState.ShipCores[iShip].Team) ? colorLightPlayer : colorLightEnemy);
 		for(uint32_t iPart = 0; iPart < shipState.ShipParts[iShip].size(); ++iPart) {
 			const ::ghg::SOrbiter									& shipPart				= shipState.Orbiters[shipState.ShipParts[iShip][iPart]];
@@ -493,13 +493,13 @@ int												ghg::drawOrbiter
 			::gpk::clear(drawCache.PixelCoords, drawCache.PixelVertexWeights);
 			pixelsDrawn += ::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformVP, shipState.Scene.Global.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer
 				, [shadedColor](::gpk::view_grid<::gpk::SColorBGRA> targetPixels, const ::gpk::SCoord2<int16_t> & pixelCoord, const ::gpk::SColorBGRA & color) {
-					if( color.r > 64
-					 || color.g > 128
-					)
+					//if( color.r > 64
+					// || color.g > 128
+					//)
 						targetPixels[pixelCoord.y][pixelCoord.x] = (::gpk::SColorFloat(color) + shadedColor).Clamp();
-					else
-						targetPixels[pixelCoord.y][pixelCoord.x] = color; 
-					return 0;
+					//else
+					//	targetPixels[pixelCoord.y][pixelCoord.x] = color; 
+					return 1;
 			});
 		}
 	}

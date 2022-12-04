@@ -218,18 +218,18 @@ int										update				(SApplication & app, bool exitSignal)	{
 			app.GalaxyHellApp.RenderTargetQueue.clear();
 		}
 	}
-	app.AudioState.vListenerPos = app.GalaxyHellApp.Game.ShipState.Scene.Global.Camera[app.GalaxyHellApp.Game.ShipState.Scene.Global.CameraMode].Position; 
+	app.AudioState.vListenerPos			= app.GalaxyHellApp.Game.ShipState.Scene.Global.Camera[app.GalaxyHellApp.Game.ShipState.Scene.Global.CameraMode].Position; 
 	app.AudioState.listener.OrientTop	= {0, 1, 0}; 
 	app.AudioState.listener.OrientFront	= {1, 0, 0};  
 	
 	if(app.GalaxyHellApp.Game.ShipState.ShipCores.size())
-		app.AudioState.vEmitterPos					= app.GalaxyHellApp.Game.ShipState.ShipPhysics.Transforms[app.GalaxyHellApp.Game.ShipState.EntitySystem.Entities[app.GalaxyHellApp.Game.ShipState.ShipCores[0].Entity].Body].Position;
+		app.AudioState.vEmitterPos			= app.GalaxyHellApp.Game.ShipState.ShipPhysics.Transforms[app.GalaxyHellApp.Game.ShipState.EntitySystem.Entities[app.GalaxyHellApp.Game.ShipState.ShipCores[0].Entity].Body].Position;
 	
 	app.AudioState.vEmitterPos 			*= .03f;
 	app.AudioState.vListenerPos			*= .03f;
 	if(::ghg::CAMERA_MODE_SKY == app.GalaxyHellApp.Game.ShipState.Scene.Global.CameraMode) {
-		app.AudioState.vEmitterPos .x				=  0;
-		app.AudioState.vListenerPos.x				=  0;
+		app.AudioState.vEmitterPos .x		=  0;
+		app.AudioState.vListenerPos.x		=  0;
 	}
 
 	app.AudioState.emitter.DopplerScaler	= 6.0f; //float(app.GalaxyHellApp.World.PlayState.TimeScale);

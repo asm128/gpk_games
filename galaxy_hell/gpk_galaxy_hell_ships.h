@@ -1,5 +1,5 @@
-#include "gpk_galaxy_hell_weapon.h"
 #include "gpk_galaxy_hell_entity.h"
+#include "gpk_galaxy_hell_weapon.h"
 #include "gpk_rigidbody.h"
 
 #include "gpk_geometry_lh.h"
@@ -177,7 +177,7 @@ namespace ghg
 		::gpk::array_obj<::gpk::array_pod<::gpk::SCoord3<float>>>	ShipOrbitersDistanceToTargets	= {};
 		::gpk::array_obj<::ghg::SShots				>				Shots							= {};	// one per weapon
 		::gpk::array_obj<::gpk::array_pod<SHIP_ACTION>>				ShipOrbiterActionQueue			= {};
-		::gpk::SIntegrator3											ShipPhysics						= {};
+		::gpk::SRigidBodyIntegrator									ShipPhysics						= {};
 
 		::ghg::SEntitySystem										EntitySystem;
 		::ghg::SShipScene											Scene						= {};
@@ -222,17 +222,17 @@ namespace ghg
 			return totalHealth;
 		}
 
-		::gpk::SCoord3<float>&										GetShipPosition			(const SShipCore & ship)		{ return ShipPhysics.Transforms	[EntitySystem.Entities[ship.Entity].Body].Position; }
+		::gpk::SCoord3<float>&										GetShipPosition			(const SShipCore & ship)	{ return ShipPhysics.Centers[EntitySystem.Entities[ship.Entity].Body].Position; }
 
 		::gpk::error_t												GetShipPosition			(uint32_t iShip, ::gpk::SCoord3<float> & output) const {
-			output = ShipPhysics.Transforms[EntitySystem.Entities[ShipCores[iShip].Entity].Body].Position;
+			output = ShipPhysics.Centers[EntitySystem.Entities[ShipCores[iShip].Entity].Body].Position;
 			return 0;
 		}
 		
-		::gpk::STransform3&											GetOrbiterTransform	(const SOrbiter & shipPart)	{ return ShipPhysics.Transforms	[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
-		::gpk::SForce3&												GetShipOrbiterForces	(const SOrbiter & shipPart)	{ return ShipPhysics.Forces		[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
+		::gpk::SBodyCenter&											GetOrbiterTransform		(const SOrbiter & shipPart)	{ return ShipPhysics.Centers	[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
+		::gpk::SBodyForces&											GetShipOrbiterForces	(const SOrbiter & shipPart)	{ return ShipPhysics.Forces		[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
 
-		inline	::gpk::SCoord3<float>&								GetShipPosition			(uint32_t indexShip)			{ return GetShipPosition(ShipCores[indexShip]); }
+		inline	::gpk::SCoord3<float>&								GetShipPosition			(uint32_t indexShip)		{ return GetShipPosition(ShipCores[indexShip]); }
 
 		::gpk::error_t												Save					(::gpk::array_pod<byte_t> & output) const { 
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipScore	>{ShipScores	}, output);

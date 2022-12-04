@@ -764,8 +764,8 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 	const double						radiusSmall						= (center3 - gauge.Vertices[0]).Length();
 	const double						radiusCenter					= (radiusLarge - radiusSmall) / 2 + radiusSmall;
 	dummyDepth.resize(target.metrics(), 0xFFFFFFFFU);
-	::gpk::array_pod<::gpk::SCoord2<int16_t>>			pixelCoords;
-	::gpk::array_pod<::gpk::STriangleWeights<float>>	triangleWeights;
+	::gpk::array_pod<::gpk::SCoord2<int16_t>>	pixelCoords;
+	::gpk::array_pod<::gpk::STriangle<float>>	triangleWeights;
 	for(uint32_t iTriangle = 0, triangleCount = gauge.Indices.size(); iTriangle < triangleCount; ++iTriangle) {
 		const ::gpk::STriangle3<float>		triangleCoords					=
 			{ gauge.Vertices[gauge.Indices[iTriangle].A]

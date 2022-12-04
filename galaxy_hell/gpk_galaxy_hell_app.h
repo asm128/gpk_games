@@ -85,7 +85,7 @@ namespace ghg
 
 	struct SUIRadialGauge {
 		::gpk::array_pod<::gpk::SCoord3<float>>				Vertices				= {};
-		::gpk::array_pod<::gpk::STriangleWeights<int16_t>>	Indices					= {};
+		::gpk::array_pod<::gpk::STriangle<int16_t>>			Indices					= {};
 		int16_t												CurrentValue			= 0;
 		int16_t												MaxValue				= 64;
 		::gpk::SImage<::gpk::SColorBGRA>					Image					= {};

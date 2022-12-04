@@ -319,14 +319,11 @@ HRESULT AUDIO_STATE::PrepareAudio( const char* wavname ) {
 	// Search for media
 	char strFilePath[ 4096 ] = {};
 	sprintf_s(strFilePath, "./%s", wavname);
-	wchar_t wstrFilePath[ 4096 ] = {};
-	size_t count = 0;
-	mbstowcs_s(&count, wstrFilePath, strFilePath, 4095);
 
 	// Read in the wave file
     const WAVEFORMATEX* pwfx = 0;
 	::gpk::view_array<const uint8_t> audioView = {};
-	gpk_hrcall(DirectX::LoadWAVAudioFromFile( ::gpk::view_array<const wchar_t>{wstrFilePath, (uint32_t)wcslen(wstrFilePath)}, WaveData, &pwfx, audioView));
+	gpk_hrcall(DirectX::LoadWAVAudioFromFile( ::gpk::vcs{strFilePath}, WaveData, &pwfx, audioView));
 
     assert(pwfx->nChannels == INPUTCHANNELS);
 

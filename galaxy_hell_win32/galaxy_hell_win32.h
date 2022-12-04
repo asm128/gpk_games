@@ -9,7 +9,6 @@
 #ifndef CED_DEMO_08_H_298837492837
 #define CED_DEMO_08_H_298837492837
 
-
 struct SApplication {
 	::gpk::SFramework		Framework;
 

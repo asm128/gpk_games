@@ -74,7 +74,7 @@ static	int											handleCollisionPoint		(::ghg::SGalaxyHell & solarSystem, in
 	return 0;
 }
 
-static	int											updateEntityTransforms		(uint32_t iEntity, const ::gpk::view_array<const ::ghg::SEntity> & entities, const ::gpk::view_array<const ::gpk::array_pod<uint32_t>> & entitiesChildren, ::ghg::SShipScene & scene, ::gpk::SIntegrator3 & bodies)	{
+static	int											updateEntityTransforms		(uint32_t iEntity, const ::gpk::view_array<const ::ghg::SEntity> & entities, const ::gpk::view_array<const ::gpk::array_pod<uint32_t>> & entitiesChildren, ::ghg::SShipScene & scene, ::gpk::SRigidBodyIntegrator & bodies)	{
 	const ::ghg::SEntity									& entity					= entities[iEntity];
 	if(-1 == entity.Body) {
 		if(-1 == entity.Parent)
@@ -280,7 +280,7 @@ static	int											updateShipOrbiter				(::ghg::SGalaxyHell & solarSystem, int
 				if(solarSystem.PlayState.TimeStage > 1) {
 					solarSystem.ShipState.ShipPhysics.Forces[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Body].Rotation	= {};
 					::gpk::SMatrix4<float>									inverseTransform			= shipModuleMatrix.GetInverse();
-					::gpk::STransform3										& shipModuleTransform		= solarSystem.ShipState.GetOrbiterTransform(shipPart);
+					::gpk::SBodyCenter										& shipModuleTransform		= solarSystem.ShipState.GetOrbiterTransform(shipPart);
 					::gpk::SCoord3<float>									up							= {1, 0, 0};
 					::gpk::SCoord3<float>									front						= {0, 1, 0};
 					//const ::gpk::SMatrix4<float>							& shipMatrix				= solarSystem.Scene.Transforms[solarSystem.Entities[solarSystem.Entities[shipPart.Entity].Parent].Transform];
@@ -325,7 +325,7 @@ int													shipsUpdate				(::ghg::SGalaxyHell & solarSystem, double seconds
 		if(0 >= ship.Health)
 			continue;
 		::gpk::array_pod<uint32_t>								& shipParts				= solarSystem.ShipState.ShipParts[iShip];
-		::gpk::STransform3										& shipTransform			= solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[ship.Entity].Body];
+		::gpk::SBodyCenter										& shipTransform			= solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[ship.Entity].Body];
 		if(ship.Team) { 
 			playing												= 1;
 
@@ -394,7 +394,7 @@ static int											processInput			(::ghg::SGalaxyHell & solarSystem, double se
 	if(solarSystem.ShipState.EntitySystem.Entities.size()) {
 		for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.PlayerCount; ++iPlayer) {
 			const ::ghg::SShipController							& shipController		= controllers[iPlayer];
-			::gpk::STransform3										& playerBody			= solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCores[iPlayer].Entity].Body];
+			::gpk::SBodyCenter										& playerBody			= solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCores[iPlayer].Entity].Body];
 			::ghg::SShipCore										& ship					= solarSystem.ShipState.ShipCores[iPlayer];
 			bool													turbo					= shipController.Turbo;
 			double													speedMultiplier			= 1;

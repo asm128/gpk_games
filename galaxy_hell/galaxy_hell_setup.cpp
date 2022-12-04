@@ -12,22 +12,28 @@
 ::gpk::error_t					ghg::solarSystemSave		(const ::ghg::SGalaxyHell & game, ::gpk::vcc fileName) {
 	::gpk::array_pod<byte_t>			serialized;
 	game.Save(serialized);
+
 	::gpk::array_pod<byte_t>			deflated;
 	::gpk::arrayDeflate(serialized, deflated);
+
 	info_printf("Savegame size in bytes: %u.", serialized.size());
 	info_printf("Savegame file size: %u.", deflated.size());
+
 	return ::gpk::fileFromMemory(fileName, deflated);
 }
 
 ::gpk::error_t					ghg::solarSystemLoad		(::ghg::SGalaxyHell & world,::gpk::vcc filename) {
 	::gpk::array_pod<byte_t>			serialized;
 	world.PlayState.TimeLast		= ::gpk::timeCurrent();
+
 	gpk_necall(::gpk::fileToMemory(filename, serialized), "%s", "");
 	::gpk::array_pod<byte_t>			inflated;
 	::gpk::arrayInflate(serialized, inflated);
+
 	info_printf("Savegame file size: %u.", inflated.size());
 	info_printf("Savegame size in bytes: %u.", serialized.size());
-	::gpk::view_array<const byte_t>		viewSerialized			= {(const byte_t*)inflated.begin(), inflated.size()};
+
+	::gpk::view_array<const byte_t>		viewSerialized				= {(const byte_t*)inflated.begin(), inflated.size()};
 	if errored(world.Load(viewSerialized)) {
 		::ghg::solarSystemReset(world);
 		return -1;
@@ -75,8 +81,8 @@ static	int											shipCreate			(::ghg::SShipManager & shipState, int32_t team
 			, 0		//PLANET_ORBITALINCLINATION	[iPlanet]
 			, 1		//1.0 / PLANET_DISTANCE		[PLANET_COUNT - 1] * 2500
 			);
-		shipState.ShipPhysics.Transforms[entityOrbit.Body].Orientation	= {};
-		shipState.ShipPhysics.Transforms[entityOrbit.Body].Orientation.MakeFromEulerTaitBryan(0, (float)(::gpk::math_2pi / countParts * iPart), 0);
+		shipState.ShipPhysics.Centers[entityOrbit.Body].Orientation	= {};
+		shipState.ShipPhysics.Centers[entityOrbit.Body].Orientation.MakeFromEulerTaitBryan(0, (float)(::gpk::math_2pi / countParts * iPart), 0);
 
 		entityPart.Parent									= shipState.EntitySystem.Create(entityOrbit, {});
 		entityPart.Geometry									= iGeometry;
@@ -87,7 +93,7 @@ static	int											shipCreate			(::ghg::SShipManager & shipState, int32_t team
 		shipState.EntitySystem.EntityChildren[entityPart.Parent].push_back(indexEntityPart);
 		//solarSystem.ShipPhysics.Transforms[entityOrbit.Body].Orientation.Normalize();
 
-		::ghg::SOrbiter										shipPart				= {};
+		::ghg::SOrbiter											shipPart				= {};
 		shipPart.Entity										= entityPart.Parent;
 		shipState.ShipParts[indexShip].push_back(shipState.Orbiters.push_back(shipPart));
 		shipState.ShipOrbitersDistanceToTargets.push_back({});
@@ -203,9 +209,9 @@ static	int											modelsSetup				(::ghg::SShipScene & scene)			{
 	::shipGeometryBuildBullet		(scene.Geometry[::ghg::SHIP_GEOMETRY_BULLET			]);
 	::shipGeometryBuildShred		(scene.Geometry[::ghg::SHIP_GEOMETRY_SHRED			]);
 
-	::gpk::geometryBuildCube		(scene.Geometry[::ghg::SHIP_GEOMETRY_CUBE		], {1, 1, 1});
-	::gpk::geometryBuildSphere		(scene.Geometry[::ghg::SHIP_GEOMETRY_SPHERE		], 16U, 16U, .5f, {0, 0});
-	::gpk::geometryBuildCylinder	(scene.Geometry[::ghg::SHIP_GEOMETRY_CYLINDER	],  1U, 32U, .5, .5, {0, 0}, {1, 1, 1});
+	::gpk::geometryBuildCube		(scene.Geometry[::ghg::SHIP_GEOMETRY_CUBE			], {1, 1, 1});
+	::gpk::geometryBuildSphere		(scene.Geometry[::ghg::SHIP_GEOMETRY_SPHERE			], 16U, 16U, .5f, {0, 0});
+	::gpk::geometryBuildCylinder	(scene.Geometry[::ghg::SHIP_GEOMETRY_CYLINDER		],  1U, 32U, .5, .5, {0, 0}, {1, 1, 1});
 	{
 
 		::gpk::array_pod<::gpk::SColorFloat>	baseColors;
@@ -270,17 +276,17 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 		float					Speed			;
 		int32_t					Damage			;
 		uint8_t					ParticleCount	;
-		double					Cooldown			;//= 1;
-		double					OverheatPerShot		;//= 0;
-		double					ShotLifetime		;//= 0;
+		double					Cooldown		;
+		double					OverheatPerShot	;
+		double					ShotLifetime	;
 		::ghg::WEAPON_DAMAGE	DamageType		;
 
 	};
 #pragma pack(pop)
 
-	::gpk::SJSONFile										stageFile;
-	char													stageFileName[256]							= "./%s.json";
-	static constexpr const SShipOrbiterSetup					weaponDefinitions		[]				=
+	::gpk::SJSONFile										stageFile								= {};
+	char													stageFileName			[256]			= "./%s.json";
+	static constexpr const SShipOrbiterSetup				weaponDefinitions		[]				=
 		{ {::ghg::SHIP_PART_TYPE_Gun			, 128, ::ghg::WEAPON_TYPE_Gun		, .08, 0.975, ::ghg::WEAPON_LOAD_Bullet		,  256,    20, 1,   0,0.00,  1.5, ::ghg::WEAPON_DAMAGE_Pierce	}
 		, {::ghg::SHIP_PART_TYPE_Shotgun		, 128, ::ghg::WEAPON_TYPE_Shotgun	, .16, 0.925, ::ghg::WEAPON_LOAD_Bullet		,  160,    10, 6,   0,0.00,  1.5, ::ghg::WEAPON_DAMAGE_Impact	}
 		, {::ghg::SHIP_PART_TYPE_Wafer			, 128, ::ghg::WEAPON_TYPE_Gun		, .24, 0.99, ::ghg::WEAPON_LOAD_Ray			,  480,    30, 1,   1,0.50,  1, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn	}
@@ -298,11 +304,11 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 
 	sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage);
 	if(0 <= ::gpk::fileToMemory(stageFileName, stageFile.Bytes) && stageFile.Bytes.size()) {
-		::gpk::mutex_guard										lock(solarSystem.LockUpdate);
+		::gpk::mutex_guard										lock	(solarSystem.LockUpdate);
 		gpk_necall(-1 == ::gpk::jsonParse(stageFile.Reader, stageFile.Bytes), "%s", stageFileName);
 	} 
 	else {
-		::gpk::mutex_guard										lock(solarSystem.LockUpdate);
+		::gpk::mutex_guard										lock	(solarSystem.LockUpdate);
 		// Set up player ships
 		if(solarSystem.PlayState.Stage == 0) {
 			solarSystem.PlayState.TimeWorld		= 0;
@@ -321,7 +327,7 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 			for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.PlayerCount; ++iPlayer) {
 				const int32_t											indexShip						= ::shipCreate(solarSystem.ShipState, 0, 0, iPlayer);
 				::ghg::SShipCore										& playerShip					= solarSystem.ShipState.ShipCores[indexShip];
-				::gpk::STransform3										& shipPivot						= solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[playerShip.Entity].Body];
+				::gpk::SBodyCenter										& shipPivot						= solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[playerShip.Entity].Body];
 				shipPivot.Orientation.MakeFromEulerTaitBryan({0, 0, (float)(-::gpk::math_pi_2)});
 				shipPivot.Position									= {-30};
 				shipPivot.Position.z = float(solarSystem.PlayState.PlayerCount * 30) / 2 - iPlayer * 30;
@@ -332,7 +338,7 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 			int32_t													indexShip						= ::shipCreate(solarSystem.ShipState, 1, -1, solarSystem.PlayState.Stage + solarSystem.ShipState.ShipCores.size());
 			::ghg::SShipCore										& enemyShip						= solarSystem.ShipState.ShipCores[indexShip];
 			::gpk::array_pod<uint32_t>								& enemyShipOrbiters				= solarSystem.ShipState.ShipParts[indexShip];
-			::gpk::STransform3										& shipTransform					= solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[enemyShip.Entity].Body];
+			::gpk::SBodyCenter										& shipTransform					= solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[enemyShip.Entity].Body];
 			shipTransform.Orientation.MakeFromEulerTaitBryan({0, 0, (float)(::gpk::math_pi_2)});
 			shipTransform.Position								= {5.0f + 5 * solarSystem.ShipState.ShipCores.size()};
 			for(uint32_t iPart = 0; iPart < enemyShipOrbiters.size(); ++iPart) {
@@ -403,7 +409,7 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 				const uint32_t								depth		= ::gpk::get_value_count<::ghg::SHIP_PART_TYPE>();
 				solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Image	= iShip * width * height * depth + shipPart.Type * width * height + newWeapon.Type * width + newWeapon.Load;
 				solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Image	%= solarSystem.ShipState.Scene.Image.size();
-				solarSystem.ShipState.ShipPhysics.Transforms[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Body].Orientation = {0, 0, 0, 1};
+				solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Body].Orientation = {0, 0, 0, 1};
 			}
 		}
 	}
@@ -432,75 +438,3 @@ int										ghg::solarSystemSetup			(::ghg::SGalaxyHell & solarSystem, const ::
 	matrixProjection						*= matrixViewport;
 	return 0;
 }
-
-
-// -----------------------------------------------------------------
-// DONE
-// -----------------------------------------------------------------
-// --- UI
-// - Resizeable screen/GUI controls reposition from screen size.
-// - Vanishing score particle effects
-// - Weapon shoot/reload time bars
-// - Radial health bars
-// - Always-visible score display
-
-// --- Main menu
-// - Save/Load Game options
-// - Start New Game option
-// - Player count selector (up to 4 players)
-// - Customizable name
-// - Virtual Keyboard for each of the 4 possible players
-
-// --- Game
-// - Progressive difficulty
-// - Camera controls
-// - Permutable weapon property system for procedural content generation (4 + 9 weapons currently available)
-// - Unlimited levels/Unlimited game time (but around 2 hours until it starts running too slow--optimizations pending)
-// - Destructible objects that explode into parts by slicing their meshes
-// - Sounds with Doppler effect
-// - Nitro burn
-// - Hundreds of dynamic lights
-
-// -----------------------------------------------------------------
-// IN PROGRESS
-// -----------------------------------------------------------------
-
-// --- Game
-// - First person gameplay
-// - Procedural world generation
-// - UGC support
-// - Light effects (radial bloom)
-// - Customizable colors
-
-// --- Multiplayer Online
-// - Lobby/Room creation and joining
-
-// -----------------------------------------------------------------
-// PENDING
-// -----------------------------------------------------------------
-// --- UI
-// - Gamepad/Joystick support
-// - Crosshairs
-
-// --- Main menu
-// - Control customization option
-
-// --- Game
-// - Shadows
-
-// --- Multiplayer Online
-// - User registration
-// - Online gameplay
-// - In-game store
-// - Content trading
-
-// --- General
-// - Rendering optimization
-
-
-// ---- build
-// asm128: 50s
-// ncoder: 30s code + ??s assets + 
-
-// ---- load
-// 
