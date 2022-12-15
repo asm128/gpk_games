@@ -140,6 +140,8 @@
 		controllerPlayer[0].Turbo					= input.KeyboardCurrent.KeyState[VK_RCONTROL] || input.KeyboardCurrent.KeyState[VK_CONTROL] || input.KeyboardCurrent.KeyState[VK_LSHIFT] || input.KeyboardCurrent.KeyState[VK_SHIFT];
 		if(input.MouseCurrent.Deltas.x || input.MouseCurrent.Deltas.y || input.MouseCurrent.Deltas.z)
 			controllerPlayer[0].PointerDeltas			= input.MouseCurrent.Deltas.Cast<int16_t>();
+		else 
+			controllerPlayer[0].PointerDeltas			= {};
 		//or(uint32_t i = 0; i < input.JoystickCurrent.size(); ++i) {
 		//	controllerPlayer[0].Forward					= controllerPlayer[0].Forward	; //|| (input.JoystickCurrent[i].Deltas.y < 0);
 		//	controllerPlayer[0].Back					= controllerPlayer[0].Back		; //|| (input.JoystickCurrent[i].Deltas.y > 0);
@@ -273,7 +275,7 @@
 
 ::gpk::error_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::array_obj<::gpk::vcc> & savegameFilenames) {
 	::gpk::array_obj<::gpk::array_pod<char>>	fileNames;
-	gpk_necall(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionSave), "%s", saveGameFolder.begin());
+	gerror_if(errored(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionSave)), "%s", saveGameFolder.begin());
 
 	::gpk::array_obj<::gpk::vcc>				pathFileNames;
 	for(uint32_t iFile = 0; iFile < fileNames.size(); ++iFile)
@@ -294,7 +296,7 @@
 
 ::gpk::error_t					ghg::listFilesProfile		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::array_obj<::gpk::vcc> & savegameFilenames) {
 	::gpk::array_obj<::gpk::array_pod<char>>	fileNames;
-	gpk_necall(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionProfile), "%s", saveGameFolder.begin());
+	gerror_if(errored(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionProfile)), "%s", saveGameFolder.begin());
 
 	::gpk::array_obj<::gpk::vcc>				pathFileNames;
 	for(uint32_t iFile = 0; iFile < fileNames.size(); ++iFile)

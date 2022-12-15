@@ -167,7 +167,7 @@ static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 		::gpk::SMatrix4<float>						& matrixProjection				= viewport.MatrixProjection;
 		matrixProjection.FieldOfView(::gpk::math_pi * .25, MODULE_CAMERA_SIZE.x / (double)MODULE_CAMERA_SIZE.y, 0.01, 500);
 		::gpk::SMatrix4<float>						matrixViewport					= {};
-		matrixViewport.ViewportLH(MODULE_CAMERA_SIZE.Cast<uint32_t>());
+		matrixViewport.ViewportLH(MODULE_CAMERA_SIZE.Cast<uint16_t>());
 		matrixProjection						*= matrixViewport;
 
 
@@ -573,8 +573,8 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 	::gpk::SGUI							& gui						= *dialog.GUI;
 
 	sprintf_s(app.UIPlay.TextLevel.Storage, "Level: %i", game.PlayState.Stage);
-	sprintfTime("Real Time: "		, app.UIPlay.TextTimeReal	.Storage, game.PlayState.TimeReal);
-	sprintfTime("Stage Time: "		, app.UIPlay.TextTimeStage	.Storage, game.PlayState.TimeRealStage);
+	sprintfTime("Real Time: "	, app.UIPlay.TextTimeReal	.Storage, game.PlayState.TimeReal);
+	sprintfTime("Stage Time: "	, app.UIPlay.TextTimeStage	.Storage, game.PlayState.TimeRealStage);
 	::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAY_Level		, ::gpk::vcs{app.UIPlay.TextLevel		.Storage});
 	::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAY_TimeStage , ::gpk::vcs{app.UIPlay.TextTimeStage	.Storage});
 	::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAY_TimeReal	, ::gpk::vcs{app.UIPlay.TextTimeReal	.Storage});

@@ -1,0 +1,172 @@
+File name: galaxy_hell_app.cpp
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Sat Sep 17 19:59:40 2022
+File code lines: 96
+File directive lines: 4
+File comment lines: 5
+File blank lines: 40
+File bytes: 6576
+
+File name: galaxy_hell_deco.cpp
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 16:33:21 2022
+File modification date: Fri Sep 16 16:33:21 2022
+File code lines: 33
+File directive lines: 1
+File comment lines: 3
+File blank lines: 13
+File bytes: 2412
+
+File name: galaxy_hell_draw.cpp
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Sat Sep 17 09:07:36 2022
+File code lines: 341
+File directive lines: 5
+File comment lines: 13
+File blank lines: 99
+File bytes: 21758
+
+File name: galaxy_hell_gui.cpp
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Sun Sep 18 00:25:15 2022
+File code lines: 407
+File directive lines: 7
+File comment lines: 22
+File blank lines: 133
+File bytes: 31562
+
+File name: galaxy_hell_physics.cpp
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 16:33:21 2022
+File modification date: Fri Sep 16 16:33:21 2022
+File code lines: 0
+File directive lines: 0
+File comment lines: 0
+File blank lines: 0
+File bytes: 0
+
+File name: galaxy_hell_setup.cpp
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Mon Sep 19 01:37:46 2022
+File code lines: 258
+File directive lines: 11
+File comment lines: 14
+File blank lines: 72
+File bytes: 18546
+
+File name: galaxy_hell_update.cpp
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Sat Sep 17 20:12:11 2022
+File code lines: 379
+File directive lines: 4
+File comment lines: 8
+File blank lines: 140
+File bytes: 28049
+
+File name: gpk_galaxy_hell.h
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Sat Sep 17 17:43:05 2022
+File code lines: 63
+File directive lines: 11
+File comment lines: 0
+File blank lines: 29
+File bytes: 3681
+
+File name: gpk_galaxy_hell_app.h
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Sat Sep 17 22:06:39 2022
+File code lines: 152
+File directive lines: 2
+File comment lines: 9
+File blank lines: 42
+File bytes: 8896
+
+File name: gpk_galaxy_hell_deco.h
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 16:33:21 2022
+File modification date: Fri Sep 16 16:33:21 2022
+File code lines: 88
+File directive lines: 4
+File comment lines: 2
+File blank lines: 38
+File bytes: 4707
+
+File name: gpk_galaxy_hell_draw.h
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Fri Sep 16 15:38:49 2022
+File code lines: 26
+File directive lines: 6
+File comment lines: 4
+File blank lines: 13
+File bytes: 1350
+
+File name: gpk_galaxy_hell_entity.h
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Fri Sep 16 15:38:49 2022
+File code lines: 35
+File directive lines: 6
+File comment lines: 2
+File blank lines: 18
+File bytes: 1920
+
+File name: gpk_galaxy_hell_physics.h
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Fri Sep 16 15:38:49 2022
+File code lines: 31
+File directive lines: 5
+File comment lines: 2
+File blank lines: 14
+File bytes: 2197
+
+File name: gpk_galaxy_hell_ships.h
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Sat Sep 17 20:03:39 2022
+File code lines: 150
+File directive lines: 12
+File comment lines: 1
+File blank lines: 49
+File bytes: 9252
+
+File name: gpk_galaxy_hell_weapon.h
+File folder: C:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Fri Sep 16 16:35:44 2022
+File code lines: 146
+File directive lines: 7
+File comment lines: 3
+File blank lines: 34
+File bytes: 8357
+
+
+----------------------------- Total Files: 15
+----------------------------- Total Lines: 3112
+
+Comments: 88
+Code: 2205
+Compiler directives: 85
+Blanks: 734
+Total bytes: 149263
+
+----------------------------- Stats: 
+
+Average lines per file: 207.46666666666667
+Average lines of comments per file: 5.866666666666666
+Average lines of code per file: 147.0
+Average lines of compiler directives per file: 5.666666666666667
+Average blank lines per file: 48.93333333333333
+
+Comments: 2.827763496143959%
+Code: 70.8547557840617%
+Compiler directives: 2.7313624678663238%
+Blanks: 23.58611825192802%

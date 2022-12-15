@@ -235,12 +235,15 @@ static int										drawCannonball
 		for(uint32_t y = 0; y < image.metrics().y; ++y)
 			image[y][0].a	= uint8_t(y * 2);
 		::gpk::SMatrix4<float>									mS							= {};
-		::gpk::SMatrix4<float>									mRY							= {};
-		::gpk::SMatrix4<float>									mRP							= {};
-		::gpk::SCoord3<float>									direction					= position - prevPosition;
-		//direction.AngleWith();
+
+		(void)position; (void)prevPosition;
+		::gpk::SCoord3<float>									direction					= _direction;//position - prevPosition;
 		double													blurLength					= direction.Length();
 		mS.Scale(1, (float)blurLength, 1, true);
+
+		::gpk::SMatrix4<float>									mRY							= {};
+		::gpk::SMatrix4<float>									mRP							= {};
+		//direction.AngleWith();
 		::gpk::SQuaternion<float>								qry							= {}; 
 		::gpk::SQuaternion<float>								qrz							= {}; 
 		direction.Normalize();

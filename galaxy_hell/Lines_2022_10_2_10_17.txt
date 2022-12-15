@@ -1,0 +1,162 @@
+File name: galaxy_hell_app.cpp
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Tue Sep 27 07:24:17 2022
+File modification date: Sun Oct  2 10:09:31 2022
+File code lines: 160
+File directive lines: 5
+File comment lines: 4
+File blank lines: 60
+File bytes: 10177
+
+File name: galaxy_hell_deco.cpp
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 16:33:21 2022
+File modification date: Tue Sep 27 20:30:10 2022
+File code lines: 35
+File directive lines: 2
+File comment lines: 3
+File blank lines: 13
+File bytes: 2612
+
+File name: galaxy_hell_draw.cpp
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Sun Oct  2 08:52:53 2022
+File code lines: 410
+File directive lines: 8
+File comment lines: 13
+File blank lines: 115
+File bytes: 26582
+
+File name: galaxy_hell_gui.cpp
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Tue Sep 27 18:27:50 2022
+File modification date: Sun Oct  2 10:15:31 2022
+File code lines: 497
+File directive lines: 7
+File comment lines: 26
+File blank lines: 157
+File bytes: 38523
+
+File name: galaxy_hell_setup.cpp
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Tue Sep 27 07:24:17 2022
+File modification date: Sun Oct  2 09:56:24 2022
+File code lines: 283
+File directive lines: 12
+File comment lines: 14
+File blank lines: 81
+File bytes: 19456
+
+File name: galaxy_hell_update.cpp
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Sun Oct  2 07:38:49 2022
+File code lines: 398
+File directive lines: 5
+File comment lines: 20
+File blank lines: 155
+File bytes: 30902
+
+File name: gpk_galaxy_hell.h
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Tue Sep 27 07:24:17 2022
+File modification date: Sun Oct  2 07:18:19 2022
+File code lines: 94
+File directive lines: 12
+File comment lines: 0
+File blank lines: 39
+File bytes: 4812
+
+File name: gpk_galaxy_hell_app.h
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Tue Sep 27 18:15:14 2022
+File modification date: Sun Oct  2 10:09:31 2022
+File code lines: 287
+File directive lines: 7
+File comment lines: 1
+File blank lines: 82
+File bytes: 15578
+
+File name: gpk_galaxy_hell_deco.h
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Fri Sep 16 16:33:21 2022
+File modification date: Wed Sep 28 04:49:07 2022
+File code lines: 125
+File directive lines: 8
+File comment lines: 2
+File blank lines: 54
+File bytes: 6301
+
+File name: gpk_galaxy_hell_draw.h
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Tue Sep 27 07:24:17 2022
+File modification date: Sun Oct  2 04:47:43 2022
+File code lines: 25
+File directive lines: 6
+File comment lines: 4
+File blank lines: 14
+File bytes: 1304
+
+File name: gpk_galaxy_hell_entity.h
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Tue Sep 27 07:24:17 2022
+File modification date: Thu Sep 29 15:41:49 2022
+File code lines: 28
+File directive lines: 6
+File comment lines: 0
+File blank lines: 16
+File bytes: 1472
+
+File name: gpk_galaxy_hell_physics.h
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Tue Sep 27 07:24:17 2022
+File modification date: Thu Sep 29 15:42:38 2022
+File code lines: 54
+File directive lines: 6
+File comment lines: 2
+File blank lines: 22
+File bytes: 2978
+
+File name: gpk_galaxy_hell_ships.h
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Tue Sep 27 07:24:17 2022
+File modification date: Sun Oct  2 08:43:15 2022
+File code lines: 169
+File directive lines: 12
+File comment lines: 1
+File blank lines: 59
+File bytes: 9341
+
+File name: gpk_galaxy_hell_weapon.h
+File folder: d:\asm128\gpk_games\galaxy_hell\
+File creation date: Tue Sep 27 18:15:14 2022
+File modification date: Thu Sep 29 15:42:12 2022
+File code lines: 163
+File directive lines: 7
+File comment lines: 7
+File blank lines: 44
+File bytes: 8215
+
+
+----------------------------- Total Files: 14
+----------------------------- Total Lines: 3839
+
+Comments: 97
+Code: 2728
+Compiler directives: 103
+Blanks: 911
+Total bytes: 178253
+
+----------------------------- Stats: 
+
+Average lines per file: 274.2142857142857
+Average lines of comments per file: 6.928571428571429
+Average lines of code per file: 194.85714285714286
+Average lines of compiler directives per file: 7.357142857142857
+Average blank lines per file: 65.07142857142857
+
+Comments: 2.5266996613701482%
+Code: 71.06017191977077%
+Compiler directives: 2.6829903620734563%
+Blanks: 23.73013805678562%

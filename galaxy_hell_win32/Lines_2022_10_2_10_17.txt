@@ -1,0 +1,112 @@
+File name: audio.cpp
+File folder: d:\asm128\gpk_games\galaxy_hell_win32\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Fri Sep 30 12:31:33 2022
+File code lines: 372
+File directive lines: 27
+File comment lines: 84
+File blank lines: 197
+File bytes: 20925
+
+File name: audio.h
+File folder: d:\asm128\gpk_games\galaxy_hell_win32\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Fri Sep 16 15:38:49 2022
+File code lines: 47
+File directive lines: 21
+File comment lines: 12
+File blank lines: 27
+File bytes: 3944
+
+File name: galaxy_hell_win32.cpp
+File folder: d:\asm128\gpk_games\galaxy_hell_win32\
+File creation date: Tue Sep 27 07:24:17 2022
+File modification date: Sat Oct  1 08:48:15 2022
+File code lines: 97
+File directive lines: 31
+File comment lines: 19
+File blank lines: 56
+File bytes: 9713
+
+File name: galaxy_hell_win32.h
+File folder: d:\asm128\gpk_games\galaxy_hell_win32\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Fri Sep 30 12:33:20 2022
+File code lines: 9
+File directive lines: 6
+File comment lines: 0
+File blank lines: 12
+File bytes: 502
+
+File name: WaveBankReader.cpp
+File folder: d:\asm128\gpk_games\galaxy_hell_win32\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Fri Sep 16 15:38:49 2022
+File code lines: 622
+File directive lines: 40
+File comment lines: 28
+File blank lines: 510
+File bytes: 28224
+
+File name: WaveBankReader.h
+File folder: d:\asm128\gpk_games\galaxy_hell_win32\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Fri Sep 16 15:38:49 2022
+File code lines: 32
+File directive lines: 7
+File comment lines: 9
+File blank lines: 31
+File bytes: 1974
+
+File name: WAVFileReader.cpp
+File folder: d:\asm128\gpk_games\galaxy_hell_win32\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Fri Sep 16 15:38:49 2022
+File code lines: 285
+File directive lines: 13
+File comment lines: 43
+File blank lines: 190
+File bytes: 15776
+
+File name: WAVFileReader.h
+File folder: d:\asm128\gpk_games\galaxy_hell_win32\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Fri Sep 16 15:38:49 2022
+File code lines: 12
+File directive lines: 7
+File comment lines: 8
+File blank lines: 15
+File bytes: 1594
+
+File name: XAudio2Versions.h
+File folder: d:\asm128\gpk_games\galaxy_hell_win32\
+File creation date: Fri Sep 16 15:38:49 2022
+File modification date: Fri Sep 16 15:38:49 2022
+File code lines: 0
+File directive lines: 35
+File comment lines: 18
+File blank lines: 6
+File bytes: 2039
+
+
+----------------------------- Total Files: 9
+----------------------------- Total Lines: 2928
+
+Comments: 221
+Code: 1476
+Compiler directives: 187
+Blanks: 1044
+Total bytes: 84691
+
+----------------------------- Stats: 
+
+Average lines per file: 325.3333333333333
+Average lines of comments per file: 24.555555555555557
+Average lines of code per file: 164.0
+Average lines of compiler directives per file: 20.77777777777778
+Average blank lines per file: 116.0
+
+Comments: 7.547814207650274%
+Code: 50.40983606557378%
+Compiler directives: 6.386612021857924%
+Blanks: 35.65573770491804%

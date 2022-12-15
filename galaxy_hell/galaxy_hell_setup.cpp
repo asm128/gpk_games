@@ -434,7 +434,7 @@ int										ghg::solarSystemSetup			(::ghg::SGalaxyHell & solarSystem, const ::
 	::gpk::SMatrix4<float>						& matrixProjection				= solarSystem.ShipState.Scene.Global.MatrixProjection;
 	matrixProjection.FieldOfView(::gpk::math_pi * .25, windowSize.x / (double)windowSize.y, 0.01, 500);
 	::gpk::SMatrix4<float>						matrixViewport					= {};
-	matrixViewport.ViewportLH(windowSize.Cast<uint32_t>());
+	matrixViewport.ViewportLH(windowSize.Cast<uint16_t>());
 	matrixProjection						*= matrixViewport;
 	return 0;
 }
