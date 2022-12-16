@@ -330,7 +330,7 @@ static	int											drawShots			(::gpk::view_grid<::gpk::SColorBGRA> targetPixe
 		raySegment.B									= matrixVPV.Transform(raySegment.B);
 		if(raySegment.A.z < 0 || raySegment.A.z > 1) continue;
 		if(raySegment.B.z < 0 || raySegment.B.z > 1) continue;
-		::gpk::drawLine(targetPixels, raySegment, pixelCoordsCache, depthBuffer);
+		::gpk::drawLine(targetMetrics.Cast<uint16_t>(), raySegment, pixelCoordsCache, depthBuffer);
 		if(line) {
 		}
 		else {
