@@ -23,15 +23,15 @@ namespace the_one_uwp
 	// This sample renderer instantiates a basic rendering pipeline.
 	struct Sample3DSceneRenderer {
 		// Cached pointer to device resources.
-		::gpk::ptr_obj<DX::D3DDeviceResources>			DeviceResources;
+		::gpk::ptr_obj<DX::D3DDeviceResources>		DeviceResources;
 
-		// Direct3D resources for cube geometry.
-		Microsoft::WRL::ComPtr<ID3D11InputLayout>	m_inputLayout;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>		m_vertexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>		m_indexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11VertexShader>	m_vertexShader;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader>	m_pixelShader;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>		m_constantBuffer;
+		// Direct3D resources for cube geometry
+		::gpk::array_obj<::gpk::ptr_com<ID3D11InputLayout	>>	InputLayout;
+		::gpk::array_obj<::gpk::ptr_com<ID3D11Buffer		>>	VertexBuffer;
+		::gpk::array_obj<::gpk::ptr_com<ID3D11Buffer		>>	IndexBuffer;
+		::gpk::array_obj<::gpk::ptr_com<ID3D11VertexShader	>>	VertexShader;
+		::gpk::array_obj<::gpk::ptr_com<ID3D11PixelShader	>>	PixelShader;
+		::gpk::array_obj<::gpk::ptr_com<ID3D11Buffer		>>	ConstantBuffer;
 
 		// System resources for cube geometry.
 		ModelViewProjectionConstantBuffer			m_constantBufferData					= {};
@@ -42,6 +42,8 @@ namespace the_one_uwp
 		bool										m_loadingComplete						= false;
 		bool										m_tracking								= false;
 		
+													~Sample3DSceneRenderer					()		{ ReleaseDeviceDependentResources(); }
+
 		::gpk::error_t								Initialize								(const ::gpk::ptr_obj<DX::D3DDeviceResources> & deviceResources)  {
 			DeviceResources								= deviceResources;
 			CreateDeviceDependentResources();
@@ -60,13 +62,13 @@ namespace the_one_uwp
 		}
 
 		void										ReleaseDeviceDependentResources			() {
-			m_loadingComplete = false;
-			m_vertexShader	.Reset();
-			m_inputLayout	.Reset();
-			m_pixelShader	.Reset();
-			m_constantBuffer.Reset();
-			m_vertexBuffer	.Reset();
-			m_indexBuffer	.Reset();
+			m_loadingComplete							= false;
+			VertexShader	.clear();
+			InputLayout		.clear();
+			PixelShader		.clear();
+			ConstantBuffer	.clear();
+			VertexBuffer	.clear();
+			IndexBuffer		.clear();
 		}
 
 		void										CreateDeviceDependentResources			();

@@ -83,7 +83,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::HWND																		windowHandle								= mainWindow.PlatformDetail.WindowHandle;
 	SetWindowTextA(windowHandle, buffer);
 
-
+	app.D3DText.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (uint32_t)frameInfo.FramesPerSecond);
 	app.D3DScene.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total);
 	
 	return 0;
@@ -110,6 +110,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	context->ClearDepthStencilView(app.DeviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);	
 
 	app.D3DScene.Render();
+	app.D3DText.Render();
 	app.DeviceResources->Present();
 
 	//::the1::theOneDraw(app.TheOne, *backBuffer, framework.FrameInfo.Seconds.Total);

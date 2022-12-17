@@ -26,12 +26,12 @@ namespace the_one_uwp
 		std::shared_ptr<DX::D3DDeviceResources>		m_deviceResources;
 
 		// Direct3D resources for cube geometry.
-		Microsoft::WRL::ComPtr<ID3D11InputLayout>	m_inputLayout;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>		m_vertexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>		m_indexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11VertexShader>	m_vertexShader;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader>	m_pixelShader;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>		m_constantBuffer;
+		::gpk::ptr_com<ID3D11InputLayout>	m_inputLayout;
+		::gpk::ptr_com<ID3D11Buffer>		m_vertexBuffer;
+		::gpk::ptr_com<ID3D11Buffer>		m_indexBuffer;
+		::gpk::ptr_com<ID3D11VertexShader>	m_vertexShader;
+		::gpk::ptr_com<ID3D11PixelShader>	m_pixelShader;
+		::gpk::ptr_com<ID3D11Buffer>		m_constantBuffer;
 
 		// System resources for cube geometry.
 		ModelViewProjectionConstantBuffer			m_constantBufferData					= {};
@@ -60,13 +60,13 @@ namespace the_one_uwp
 		}
 
 		void										ReleaseDeviceDependentResources			() {
-			m_loadingComplete = false;
-			m_vertexShader	.Reset();
-			m_inputLayout	.Reset();
-			m_pixelShader	.Reset();
-			m_constantBuffer.Reset();
-			m_vertexBuffer	.Reset();
-			m_indexBuffer	.Reset();
+			m_loadingComplete	= false;
+			m_vertexShader		= {};
+			m_inputLayout		= {};
+			m_pixelShader		= {};
+			m_constantBuffer	= {};
+			m_vertexBuffer		= {};
+			m_indexBuffer		= {};
 		}
 
 		void										CreateDeviceDependentResources			();

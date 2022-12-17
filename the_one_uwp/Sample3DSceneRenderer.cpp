@@ -104,17 +104,17 @@ void Sample3DSceneRenderer::Render() {
 		return;
 
 	auto									context					= m_deviceResources->GetD3DDeviceContext();
-	context->UpdateSubresource1(m_constantBuffer.Get(), 0, NULL, &m_constantBufferData, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
+	context->UpdateSubresource1(m_constantBuffer, 0, NULL, &m_constantBufferData, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
 
 	// Each vertex is one instance of the VertexPositionColor struct.
 	UINT									stride					= sizeof(VertexPositionColor);
 	UINT									offset					= 0;
-	context->IASetVertexBuffers		(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer		(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);// Each index is one 16-bit unsigned integer (short).
+	context->IASetVertexBuffers		(0, 1, &m_vertexBuffer, &stride, &offset);
+	context->IASetIndexBuffer		(m_indexBuffer, DXGI_FORMAT_R16_UINT, 0);// Each index is one 16-bit unsigned integer (short).
 	context->IASetPrimitiveTopology	(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	context->IASetInputLayout		(m_inputLayout.Get());
-	context->VSSetShader			(m_vertexShader.Get(), nullptr, 0);	// Attach our vertex shader.
-	context->VSSetConstantBuffers1	(0, 1, m_constantBuffer.GetAddressOf(), nullptr, nullptr);	// Send the constant buffer to the graphics device.
-	context->PSSetShader			(m_pixelShader.Get(), nullptr, 0);	// Attach our pixel shader.
+	context->IASetInputLayout		(m_inputLayout);
+	context->VSSetShader			(m_vertexShader, nullptr, 0);	// Attach our vertex shader.
+	context->VSSetConstantBuffers1	(0, 1, &m_constantBuffer, nullptr, nullptr);	// Send the constant buffer to the graphics device.
+	context->PSSetShader			(m_pixelShader, nullptr, 0);	// Attach our pixel shader.
 	context->DrawIndexed			(m_indexCount, 0, 0);	// Draw the objects.
 }

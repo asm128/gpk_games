@@ -2,18 +2,18 @@
 
 #include <dxgi1_4.h>
 
-::gpk::error_t				gpk::d3dDeviceValidate				(Microsoft::WRL::ComPtr<::ID3D11Device3> & d3dDevice)				{
+::gpk::error_t				gpk::d3dDeviceValidate				(::gpk::ptr_com<::ID3D11Device3> & d3dDevice)				{
 	// The D3D Device is no longer valid if the default adapter changed since the device was created or if the device has been removed. 
-	Microsoft::WRL::ComPtr<IDXGIDevice3>	dxgiDevice;
-	Microsoft::WRL::ComPtr<IDXGIAdapter>	deviceAdapter;
-	Microsoft::WRL::ComPtr<IDXGIFactory4>	deviceFactory;
-	Microsoft::WRL::ComPtr<IDXGIAdapter1>	previousDefaultAdapter;
-	Microsoft::WRL::ComPtr<IDXGIFactory4>	currentFactory;
-	Microsoft::WRL::ComPtr<IDXGIAdapter1>	currentDefaultAdapter;
+	::gpk::ptr_com<IDXGIDevice3>	dxgiDevice;
+	::gpk::ptr_com<IDXGIAdapter>	deviceAdapter;
+	::gpk::ptr_com<IDXGIFactory4>	deviceFactory;
+	::gpk::ptr_com<IDXGIAdapter1>	previousDefaultAdapter;
+	::gpk::ptr_com<IDXGIFactory4>	currentFactory;
+	::gpk::ptr_com<IDXGIAdapter1>	currentDefaultAdapter;
 	DXGI_ADAPTER_DESC1						previousDesc				= {};	// First, get the information for the default adapter from when the device was created.
 	DXGI_ADAPTER_DESC1						currentDesc					= {};	// Next, get the information for the current default adapter.
 
-	gpk_hrcall(d3dDevice.As(&dxgiDevice));
+	d3dDevice.as(dxgiDevice);
 	gpk_hrcall(dxgiDevice->GetAdapter(&deviceAdapter));
 	gpk_hrcall(deviceAdapter->GetParent(IID_PPV_ARGS(&deviceFactory)));
 	gpk_hrcall(deviceFactory->EnumAdapters1(0, &previousDefaultAdapter));

@@ -15,8 +15,6 @@
 
 #include <cstdio>
 
-#include "gpk_windows.h"
-
 // Specify sound cone to add directionality to listener for artistic effect:
 // Emitters behind the listener are defined here to be more attenuated,
 // have a lower LPF cutoff frequency,
@@ -114,7 +112,7 @@ HRESULT AUDIO_STATE::InitAudio() {
 	//
 	if( FAILED( hr = pXAudio2->CreateMasteringVoice( &pMasterVoice ) ) )
 	{
-		pXAudio2.Reset();
+		pXAudio2 = {};
 		return hr;
 	}
 
@@ -128,12 +126,12 @@ HRESULT AUDIO_STATE::InitAudio() {
 	pMasterVoice->GetVoiceDetails( &details );
 
 	if( details.InputChannels > OUTPUTCHANNELS ){
-		pXAudio2.Reset();
+		pXAudio2 = {};
 		return E_FAIL;
 	}
 
 	if ( FAILED( hr = pMasterVoice->GetChannelMask( &dwChannelMask ) ) ) {
-		pXAudio2.Reset();
+		pXAudio2 = {};
 		return E_FAIL;
 	}
 
@@ -147,12 +145,12 @@ HRESULT AUDIO_STATE::InitAudio() {
 
 	XAUDIO2_DEVICE_DETAILS details;
 	if( FAILED( hr = pXAudio2->GetDeviceDetails( 0, &details ) ) ) {
-		pXAudio2.Reset();
+		pXAudio2 = {};
 		return hr;
 	}
 
 	if( details.OutputFormat.Format.nChannels > OUTPUTCHANNELS ) {
-		pXAudio2.Reset();
+		pXAudio2 = {};
 		return E_FAIL;
 	}
 
@@ -170,7 +168,7 @@ HRESULT AUDIO_STATE::InitAudio() {
 
 	hr = CreateFX(__uuidof(FXMasteringLimiter), &pVolumeLimiter, &params, sizeof(params));
 	if (FAILED(hr)) {
-		pXAudio2.Reset();
+		pXAudio2 = {};
 		return hr;
 	}
 
@@ -183,8 +181,8 @@ HRESULT AUDIO_STATE::InitAudio() {
 	hr = pMasterVoice->SetEffectChain(&chain);
 	if (FAILED(hr))
 	{
-		pXAudio2.Reset();
-		pVolumeLimiter.Reset();
+		pXAudio2 = {};
+		pVolumeLimiter = {};
 		return hr;
 	}
 #endif // MASTERING_LIMITER
@@ -197,7 +195,7 @@ HRESULT AUDIO_STATE::InitAudio() {
 	rflags |= XAUDIO2FX_DEBUG;
  #endif
 	if( FAILED( hr = XAudio2CreateReverb( &pReverbEffect, rflags ) ) ) {
-		pXAudio2.Reset();
+		pXAudio2 = {};
 		return hr;
 	}
 
@@ -208,12 +206,12 @@ HRESULT AUDIO_STATE::InitAudio() {
 	// Performance tip: you need not run global FX with the sample number
 	// of channels as the final mix.  For example, this sample runs
 	// the reverb in mono mode, thus reducing CPU overhead.
-	XAUDIO2_EFFECT_DESCRIPTOR			effects[]	= { { pReverbEffect.Get(), TRUE, 1 } };
+	XAUDIO2_EFFECT_DESCRIPTOR			effects[]	= { { pReverbEffect, TRUE, 1 } };
 	XAUDIO2_EFFECT_CHAIN				effectChain	= { 1, effects };
 
 	if( FAILED( hr = pXAudio2->CreateSubmixVoice( &pSubmixVoice, 1, nSampleRate, 0, 0, nullptr, &effectChain ) ) ) {
-		pXAudio2.Reset();
-		pReverbEffect.Reset();
+		pXAudio2 = {};
+		pReverbEffect = {};
 		return hr;
 	}
 
@@ -530,7 +528,7 @@ HRESULT EnumerateAudio(_In_ IXAudio2* pXaudio2, _Inout_ ::gpk::array_obj<AudioDe
     if ( FAILED(hr) )
         return hr;
 
-    Microsoft::WRL::ComPtr<IDeviceInformationStatics> diFactory;
+    ::gpk::ptr_com<IDeviceInformationStatics> diFactory;
     hr = ABI::Windows::Foundation::GetActivationFactory( HStringReference(RuntimeClass_Windows_Devices_Enumeration_DeviceInformation).Get(), &diFactory );
     if ( FAILED(hr) )
         return hr;
@@ -546,8 +544,8 @@ HRESULT EnumerateAudio(_In_ IXAudio2* pXaudio2, _Inout_ ::gpk::array_obj<AudioDe
         return S_OK;
     });
 
-    ComPtr<IAsyncOperation<DeviceInformationCollection*>> operation;
-    hr = diFactory->FindAllAsyncDeviceClass( DeviceClass_AudioRender, operation.GetAddressOf() );
+    ::gpk::ptr_com<IAsyncOperation<DeviceInformationCollection*>> operation;
+    hr = diFactory->FindAllAsyncDeviceClass( DeviceClass_AudioRender, &operation);
     if ( FAILED(hr) )
         return hr;
 
@@ -555,8 +553,8 @@ HRESULT EnumerateAudio(_In_ IXAudio2* pXaudio2, _Inout_ ::gpk::array_obj<AudioDe
 
     WaitForSingleObject( findCompleted.Get(), INFINITE );
 
-    ComPtr<IVectorView<DeviceInformation*>> devices;
-    operation->GetResults( devices.GetAddressOf() );
+    ::gpk::ptr_com<IVectorView<DeviceInformation*>> devices;
+    operation->GetResults(&devices);
 
     unsigned int count = 0;
     hr = devices->get_Size( &count );
@@ -568,8 +566,8 @@ HRESULT EnumerateAudio(_In_ IXAudio2* pXaudio2, _Inout_ ::gpk::array_obj<AudioDe
 
     for( unsigned int j = 0; j < count; ++j )
     {
-        ComPtr<IDeviceInformation> deviceInfo;
-        hr = devices->GetAt( j, deviceInfo.GetAddressOf() );
+        ::gpk::ptr_com<IDeviceInformation> deviceInfo;
+        hr = devices->GetAt( j, &deviceInfo);
         if ( SUCCEEDED(hr) )
         {
             HString id;
@@ -592,12 +590,12 @@ HRESULT EnumerateAudio(_In_ IXAudio2* pXaudio2, _Inout_ ::gpk::array_obj<AudioDe
 #elif defined(USING_XAUDIO2_REDIST)
 
     // Enumeration for XAudio 2.9 down-level on Windows 7
-    ComPtr<IMMDeviceEnumerator> devEnum;
+    ::gpk::ptr_com<IMMDeviceEnumerator> devEnum;
     HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(devEnum.GetAddressOf()));
     if (FAILED(hr))
         return hr;
 
-    ComPtr<IMMDeviceCollection> devices;
+    ::gpk::ptr_com<IMMDeviceCollection> devices;
     hr = devEnum->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &devices);
     if (FAILED(hr))
         return hr;
@@ -612,7 +610,7 @@ HRESULT EnumerateAudio(_In_ IXAudio2* pXaudio2, _Inout_ ::gpk::array_obj<AudioDe
 
     for (UINT j = 0; j < count; ++j)
     {
-        ComPtr<IMMDevice> endpoint;
+        ::gpk::ptr_com<IMMDevice> endpoint;
         hr = devices->Item(j, endpoint.GetAddressOf());
         if (FAILED(hr))
             return hr;
@@ -626,7 +624,7 @@ HRESULT EnumerateAudio(_In_ IXAudio2* pXaudio2, _Inout_ ::gpk::array_obj<AudioDe
         device.deviceId = id;
         CoTaskMemFree(id);
 
-        ComPtr<IPropertyStore> props;
+        ::gpk::ptr_com<IPropertyStore> props;
         hr = endpoint->OpenPropertyStore(STGM_READ, props.GetAddressOf());
         if (FAILED(hr))
             return hr;

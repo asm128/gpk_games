@@ -12,6 +12,7 @@
 #ifndef DEVICERESOURCES_H_2387647892
 #define DEVICERESOURCES_H_2387647892
 
+
 namespace DX 
 {
 	// Converts a length in device-independent pixels (DIPs) to a length in physical pixels.
@@ -52,24 +53,24 @@ namespace DX
 		IDeviceNotify									* m_deviceNotify						= {};	// The IDeviceNotify can be held directly as it owns the DeviceResources.
 
 		// Direct3D objects.
-		Microsoft::WRL::ComPtr<ID3D11Device3>			m_d3dDevice;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext3>	m_d3dContext;
-		Microsoft::WRL::ComPtr<IDXGISwapChain3>			m_swapChain;
+		::gpk::ptr_com<ID3D11Device3>					m_d3dDevice;
+		::gpk::ptr_com<ID3D11DeviceContext3>			m_d3dContext;
+		::gpk::ptr_com<IDXGISwapChain3>					m_swapChain;
 
 		// Direct3D rendering objects. Required for 3D.
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView1>	m_d3dRenderTargetView;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilView>	m_d3dDepthStencilView;
+		::gpk::ptr_com<ID3D11RenderTargetView1>			m_d3dRenderTargetView;
+		::gpk::ptr_com<ID3D11DepthStencilView>			m_d3dDepthStencilView;
 		D3D11_VIEWPORT									m_screenViewport						= {};
 
 		// Direct2D drawing components.
-		Microsoft::WRL::ComPtr<ID2D1Factory3>			m_d2dFactory;
-		Microsoft::WRL::ComPtr<ID2D1Device2>			m_d2dDevice;
-		Microsoft::WRL::ComPtr<ID2D1DeviceContext2>		m_d2dContext;
-		Microsoft::WRL::ComPtr<ID2D1Bitmap1>			m_d2dTargetBitmap;
+		::gpk::ptr_com<ID2D1Factory3>					m_d2dFactory;
+		::gpk::ptr_com<ID2D1Device2>					m_d2dDevice;
+		::gpk::ptr_com<ID2D1DeviceContext2>				m_d2dContext;
+		::gpk::ptr_com<ID2D1Bitmap1>					m_d2dTargetBitmap;
 
 		// DirectWrite drawing components.
-		Microsoft::WRL::ComPtr<IDWriteFactory3>			m_dwriteFactory;
-		Microsoft::WRL::ComPtr<IWICImagingFactory2>		m_wicFactory;
+		::gpk::ptr_com<IDWriteFactory3>					m_dwriteFactory;
+		::gpk::ptr_com<IWICImagingFactory2>				m_wicFactory;
 
 		// Cached device properties.
 		D3D_FEATURE_LEVEL								m_d3dFeatureLevel						= D3D_FEATURE_LEVEL_9_1;
@@ -121,8 +122,8 @@ namespace DX
 		#if defined(_DEBUG)
 			options.debugLevel								= D2D1_DEBUG_LEVEL_INFORMATION;		// If the project is in a debug build, enable Direct2D debugging via SDK Layers.
 		#endif
-			DX::ThrowIfFailed(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &options, &m_d2dFactory));	// Initialize the Direct2D Factory.
-			DX::ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory3), &m_dwriteFactory));			// Initialize the DirectWrite Factory.
+			DX::ThrowIfFailed(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &options, (void**)&m_d2dFactory));	// Initialize the Direct2D Factory.
+			DX::ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory3), (IUnknown**)&m_dwriteFactory));			// Initialize the DirectWrite Factory.
 			DX::ThrowIfFailed(CoCreateInstance(CLSID_WICImagingFactory2, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_wicFactory)));	// Initialize the Windows Imaging Component (WIC) Factory.
 		}
 
@@ -145,22 +146,22 @@ namespace DX
 		float											GetDpi									()	const									{ return m_effectiveDpi; }
 
 		// D3D Accessors.
-		ID3D11Device3*									GetD3DDevice							()	const									{ return m_d3dDevice.Get(); }
-		ID3D11DeviceContext3*							GetD3DDeviceContext						()	const									{ return m_d3dContext.Get(); }
-		IDXGISwapChain3*								GetSwapChain							()	const									{ return m_swapChain.Get(); }
+		ID3D11Device3*									GetD3DDevice							()	const									{ return m_d3dDevice.get(); }
+		ID3D11DeviceContext3*							GetD3DDeviceContext						()	const									{ return m_d3dContext.get(); }
+		IDXGISwapChain3*								GetSwapChain							()	const									{ return m_swapChain.get(); }
 		D3D_FEATURE_LEVEL								GetDeviceFeatureLevel					()	const									{ return m_d3dFeatureLevel; }
-		ID3D11RenderTargetView1*						GetBackBufferRenderTargetView			()	const									{ return m_d3dRenderTargetView.Get(); }
-		ID3D11DepthStencilView*							GetDepthStencilView						()	const									{ return m_d3dDepthStencilView.Get(); }
+		ID3D11RenderTargetView1*						GetBackBufferRenderTargetView			()	const									{ return m_d3dRenderTargetView.get(); }
+		ID3D11DepthStencilView*							GetDepthStencilView						()	const									{ return m_d3dDepthStencilView.get(); }
 		D3D11_VIEWPORT									GetScreenViewport						()	const									{ return m_screenViewport; }
 		DirectX::XMFLOAT4X4								GetOrientationTransform3D				()	const									{ return m_orientationTransform3D; }
 
 		// D2D Accessors.
-		ID2D1Factory3*									GetD2DFactory							()	const									{ return m_d2dFactory.Get(); }
-		ID2D1Device2*									GetD2DDevice							()	const									{ return m_d2dDevice.Get(); }
-		ID2D1DeviceContext2*							GetD2DDeviceContext						()	const									{ return m_d2dContext.Get(); }
-		ID2D1Bitmap1*									GetD2DTargetBitmap						()	const									{ return m_d2dTargetBitmap.Get(); }
-		IDWriteFactory3*								GetDWriteFactory						()	const									{ return m_dwriteFactory.Get(); }
-		IWICImagingFactory2*							GetWicImagingFactory					()	const									{ return m_wicFactory.Get(); }
+		ID2D1Factory3*									GetD2DFactory							()	const									{ return m_d2dFactory.get(); }
+		ID2D1Device2*									GetD2DDevice							()	const									{ return m_d2dDevice.get(); }
+		ID2D1DeviceContext2*							GetD2DDeviceContext						()	const									{ return m_d2dContext.get(); }
+		ID2D1Bitmap1*									GetD2DTargetBitmap						()	const									{ return m_d2dTargetBitmap.get(); }
+		IDWriteFactory3*								GetDWriteFactory						()	const									{ return m_dwriteFactory.get(); }
+		IWICImagingFactory2*							GetWicImagingFactory					()	const									{ return m_wicFactory.get(); }
 		D2D1::Matrix3x2F								GetOrientationTransform2D				()	const									{ return m_orientationTransform2D; }
 
 		void											RegisterDeviceNotify					(DX::IDeviceNotify* deviceNotify)			{ m_deviceNotify = deviceNotify; }
@@ -179,8 +180,8 @@ namespace DX
 
 		// Call this method when the app suspends. It provides a hint to the driver that the app is entering an idle state and that temporary buffers can be reclaimed for use by other apps.
 		void											Trim									() {
-			Microsoft::WRL::ComPtr<IDXGIDevice3>				dxgiDevice;
-			m_d3dDevice.As(&dxgiDevice);
+			::gpk::ptr_com<IDXGIDevice3>						dxgiDevice;
+			m_d3dDevice.as(&dxgiDevice);
 			dxgiDevice->Trim();
 		}
 
@@ -216,8 +217,8 @@ namespace DX
 		void											Present									() {
 			DXGI_PRESENT_PARAMETERS								parameters								= {};
 			HRESULT												hr										= m_swapChain->Present1(1, 0, &parameters);	// The first argument instructs DXGI to block until VSync, putting the application to sleep until the next VSync. This ensures we don't waste any cycles rendering frames that will never be displayed to the screen.
-			m_d3dContext->DiscardView1(m_d3dRenderTargetView.Get(), nullptr, 0);	// Discard the contents of the render target. This is a valid operation only when the existing contents will be entirely overwritten. If dirty or scroll rects are used, this call should be removed.
-			m_d3dContext->DiscardView1(m_d3dDepthStencilView.Get(), nullptr, 0);	// Discard the contents of the depth stencil.
+			m_d3dContext->DiscardView1(m_d3dRenderTargetView, nullptr, 0);	// Discard the contents of the render target. This is a valid operation only when the existing contents will be entirely overwritten. If dirty or scroll rects are used, this call should be removed.
+			m_d3dContext->DiscardView1(m_d3dDepthStencilView, nullptr, 0);	// Discard the contents of the depth stencil.
 			if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
 				HandleDeviceLost();	// If the device was removed either by a disconnection or a driver upgrade, we  must recreate all device resources.
 			else

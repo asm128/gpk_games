@@ -5,7 +5,7 @@
 #include "gpk_array.h"
 #include "gpk_coord.h"
 #include "gpk_ptr.h"
-#include "gpk_windows.h"
+#include "gpk_complus.h"
 
 #include <wrl/client.h>
 
@@ -116,13 +116,13 @@ struct AUDIO_STATE
 #ifdef USING_XAUDIO2_7_DIRECTX
 	HMODULE								mXAudioDLL;
 #endif
-	Microsoft::WRL::ComPtr<IXAudio2>	pXAudio2				= {};
+	::gpk::ptr_com<IXAudio2>			pXAudio2				= {};
 
 	IXAudio2MasteringVoice				* pMasterVoice			= 0;
 	IXAudio2SubmixVoice					* pSubmixVoice			= 0;
 
-	Microsoft::WRL::ComPtr<IUnknown>	pVolumeLimiter;
-	Microsoft::WRL::ComPtr<IUnknown>	pReverbEffect;
+	::gpk::ptr_com<IUnknown>			pVolumeLimiter;
+	::gpk::ptr_com<IUnknown>			pReverbEffect;
 	// 3D
 	X3DAUDIO_HANDLE						x3DInstance				= {};
 	int									nFrameToApply3DAudio	= 0;
