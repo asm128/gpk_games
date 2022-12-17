@@ -18,6 +18,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "The One");
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
 	const ::gpk::SCoord2<uint32_t>												newSize										= app.Framework.MainDisplay.Size;
 	::gpk::updateSizeDependentTarget(app.Framework.MainDisplayOffscreen->Color, newSize);
+	app.DeviceResources->SetLogicalSize(newSize.Cast<float>());
+	app.D3DScene.CreateWindowSizeDependentResources(); 
 	return 0;
 }
 
@@ -45,7 +47,6 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	
 	gpk_necs(app.D3DScene.Initialize(app.DeviceResources));
 	gpk_necs(app.D3DText.Initialize(app.DeviceResources));
-	app.D3DScene.CreateWindowSizeDependentResources(); 
 	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	return 0;
 }
@@ -54,11 +55,6 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::gpk::SFramework									& framework									= app.Framework;
 	::gpk::SFrameInfo									& frameInfo									= framework.FrameInfo;
 	::gpk::SWindow										& mainWindow								= app.Framework.MainDisplay;
-	if(mainWindow.Resized) {
-		app.DeviceResources->SetLogicalSize(mainWindow.Size.Cast<float>());
-		app.D3DScene.CreateWindowSizeDependentResources();
-	}
-
 	{
 		::gpk::STimer										timer;
 		::the1::theOneUpdate(app.TheOne, frameInfo.Seconds.LastFrame, framework.Input, framework.MainDisplay.EventQueue);
@@ -66,14 +62,20 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 		timer.Frame();
 		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
-
+	if(mainWindow.Resized) {
+		ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
+	}
 
 	retval_ginfo_if(1, systemRequestedExit, "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 
 	::gpk::error_t											frameworkResult								= ::gpk::updateFramework(app.Framework);
 	ree_if(errored(frameworkResult), "Unknown error.");
 	rvi_if(1, frameworkResult == 1, "Framework requested close. Terminating execution.");
-	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
+
+	if(mainWindow.Resized) {
+		ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
+	}
+
 	//-----------------------------
 	::gpk::STimer																& timer										= app.Framework.Timer;
 	char																		buffer		[256]							= {};
@@ -89,6 +91,10 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
+	if(framework.MainDisplay.Resized) {
+		ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
+	}
+
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer	= framework.MainDisplayOffscreen;
 	//framework.MainDisplayOffscreen = {};
 	backBuffer->resize(framework.MainDisplayOffscreen->Color.metrics(), 0xFF000030, (uint32_t)-1);

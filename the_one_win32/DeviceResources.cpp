@@ -31,7 +31,7 @@ static constexpr XMFLOAT4X4
 	);
 
 // Configures the Direct3D device, and stores handles to it and the device context.
-::gpk::error_t DX::DeviceResources::CreateDeviceResources() {
+::gpk::error_t DX::D3DDeviceResources::CreateDeviceResources() {
 	// This flag adds support for surfaces with a different color channel ordering
 	// than the API default. It is required for compatibility with Direct2D.
 	UINT								creationFlags					= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
@@ -74,7 +74,7 @@ static constexpr XMFLOAT4X4
 }
 
 // These resources need to be recreated every time the window size is changed.
-::gpk::error_t DX::DeviceResources::CreateWindowSizeDependentResources() {
+::gpk::error_t DX::D3DDeviceResources::CreateWindowSizeDependentResources() {
 	// Clear the previous window size specific context.
 	ID3D11RenderTargetView				* nullViews[]					= {{}};
 	m_d3dContext->OMSetRenderTargets(ARRAYSIZE(nullViews), nullViews, nullptr);

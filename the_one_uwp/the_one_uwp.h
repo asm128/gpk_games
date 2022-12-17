@@ -15,14 +15,14 @@ namespace the_one_uwp
 		::the1::STheOne								TheOneApp			;
 		::gpk::ptr_obj<::gpk::SInput>				Input				;
 
-		::std::shared_ptr<::DX::DeviceResources>	DeviceResources		;
+		::std::shared_ptr<::DX::D3DDeviceResources>	DeviceResources		;
 		::the_one_uwp::Sample3DSceneRenderer		SceneRenderer		;
 		::the_one_uwp::SampleFpsTextRenderer		FpsTextRenderer		;
 		::DX::StepTimer								Timer				;
 	public:
 													~STheOneUWP								()	{ DeviceResources->RegisterDeviceNotify(nullptr); }
 
-													STheOneUWP								(const std::shared_ptr<DX::DeviceResources>& deviceResources)	
+													STheOneUWP								(const std::shared_ptr<DX::D3DDeviceResources>& deviceResources)	
 			: DeviceResources	(deviceResources)
 			, SceneRenderer		(deviceResources)
 			, FpsTextRenderer	(deviceResources) {
@@ -32,6 +32,9 @@ namespace the_one_uwp
 		void										Update									();
 		bool										Render									();
 
+		void										CreateWindowSizeDependentResources		() {
+			SceneRenderer	.CreateWindowSizeDependentResources();		// TODO: Replace this with the size-dependent initialization of your app's content.
+		}
 		virtual void								OnDeviceLost							() {
 			SceneRenderer	.ReleaseDeviceDependentResources();
 			FpsTextRenderer	.ReleaseDeviceDependentResources();
@@ -40,7 +43,7 @@ namespace the_one_uwp
 		virtual void								OnDeviceRestored						() {
 			SceneRenderer	.CreateDeviceDependentResources();
 			FpsTextRenderer	.CreateDeviceDependentResources();
-			SceneRenderer	.CreateWindowSizeDependentResources();		// TODO: Replace this with the size-dependent initialization of your app's content.
+			CreateWindowSizeDependentResources();		// TODO: Replace this with the size-dependent initialization of your app's content.
 		}
 	};
 }

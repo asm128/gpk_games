@@ -12,7 +12,7 @@ namespace the_one_uwp
 	// Renders the current FPS value in the bottom right corner of the screen using Direct2D and DirectWrite.
 	struct SampleFpsTextRenderer {
 		// Cached pointer to device resources.
-		std::shared_ptr<DX::DeviceResources>			DeviceResources					= {};
+		std::shared_ptr<DX::D3DDeviceResources>			DeviceResources					= {};
 
 		// Resources related to text rendering.
 		std::wstring									Text							= {};
@@ -26,7 +26,7 @@ namespace the_one_uwp
 		void											ReleaseDeviceDependentResources	() { WhiteBrush.Reset(); }
 
 		// Initializes D2D resources used for text rendering.
-														SampleFpsTextRenderer			(const std::shared_ptr<DX::DeviceResources>& deviceResources) : DeviceResources(deviceResources) {
+														SampleFpsTextRenderer			(const std::shared_ptr<DX::D3DDeviceResources>& deviceResources) : DeviceResources(deviceResources) {
 			// Create device independent resources
 			Microsoft::WRL::ComPtr<IDWriteTextFormat>			textFormat						= {};
 			DX::ThrowIfFailed(DeviceResources->GetDWriteFactory()->CreateTextFormat(L"Segoe UI", nullptr, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 32.0f, L"en-US", &textFormat));

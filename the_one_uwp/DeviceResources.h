@@ -64,7 +64,7 @@ namespace DX
 	};
 
 	// Controls all the DirectX device resources.
-	struct DeviceResources {
+	struct D3DDeviceResources {
 		Platform::Agile<Windows::UI::Core::CoreWindow>	m_window;	// Cached reference to the Window.
 
 		IDeviceNotify									* m_deviceNotify						= {};	// The IDeviceNotify can be held directly as it owns the DeviceResources.
@@ -153,7 +153,7 @@ namespace DX
 			m_outputSize.y									= std::max(1.0f, DX::ConvertDipsToPixels(m_logicalSize.y, m_effectiveDpi));
 		}
 
-														DeviceResources							()									{
+														D3DDeviceResources							()									{
 			CreateDeviceIndependentResources();
 			CreateDeviceResources();
 		}

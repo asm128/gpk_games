@@ -23,7 +23,7 @@ namespace the_one_uwp
 	// This sample renderer instantiates a basic rendering pipeline.
 	class Sample3DSceneRenderer {
 		// Cached pointer to device resources.
-		std::shared_ptr<DX::DeviceResources>		m_deviceResources;
+		std::shared_ptr<DX::D3DDeviceResources>		m_deviceResources;
 
 		// Direct3D resources for cube geometry.
 		Microsoft::WRL::ComPtr<ID3D11InputLayout>	m_inputLayout;
@@ -46,7 +46,7 @@ namespace the_one_uwp
 		void										Rotate									(float radians)		{ XMStoreFloat4x4(&m_constantBufferData.model, DirectX::XMMatrixTranspose(DirectX::XMMatrixRotationY(radians))); }
 
 	public:
-													Sample3DSceneRenderer					(const std::shared_ptr<DX::DeviceResources>& deviceResources) : m_deviceResources(deviceResources) {
+													Sample3DSceneRenderer					(const std::shared_ptr<DX::D3DDeviceResources>& deviceResources) : m_deviceResources(deviceResources) {
 			CreateDeviceDependentResources();
 			CreateWindowSizeDependentResources();
 		}

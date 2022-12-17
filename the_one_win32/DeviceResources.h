@@ -45,7 +45,7 @@ namespace DX
 	};
 
 	// Controls all the DirectX device resources.
-	struct DeviceResources {
+	struct D3DDeviceResources {
 		HWND											m_window								= 0;	// Cached reference to the Window.
 		DEVMODE											DeviceMode								= {sizeof(DEVMODE)};
 
@@ -73,9 +73,9 @@ namespace DX
 
 		// Cached device properties.
 		D3D_FEATURE_LEVEL								m_d3dFeatureLevel						= D3D_FEATURE_LEVEL_9_1;
-		::gpk::SCoord2<float>							m_d3dRenderTargetSize					= {1280, 720};
-		::gpk::SCoord2<float>							m_outputSize							= {1280, 720};
-		::gpk::SCoord2<float>							m_logicalSize							= {1, 1};
+		::gpk::SCoord2<float>							m_d3dRenderTargetSize					= {};
+		::gpk::SCoord2<float>							m_outputSize							= {};
+		::gpk::SCoord2<float>							m_logicalSize							= {};
 		::gpk::GRID_ROTATION							m_nativeOrientation						= ::gpk::GRID_ROTATION_0;
 		::gpk::GRID_ROTATION							m_currentOrientation					= ::gpk::GRID_ROTATION_0;
 		float											m_dpi									= 96.0f;
@@ -85,7 +85,7 @@ namespace DX
 		D2D1::Matrix3x2F								m_orientationTransform2D				= {};
 		DirectX::XMFLOAT4X4								m_orientationTransform3D				= {};
 
-														DeviceResources							()									{
+														D3DDeviceResources							()									{
 			CreateDeviceIndependentResources();
 			CreateDeviceResources();
 		}
