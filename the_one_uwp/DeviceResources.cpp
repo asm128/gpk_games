@@ -189,37 +189,10 @@ void DX::DeviceResources::CreateWindowSizeDependentResources() {
 	m_d2dContext->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);	// Grayscale text anti-aliasing is recommended for all Microsoft Store apps.
 }
 
-static int32_t validationFailed(Microsoft::WRL::ComPtr<ID3D11Device3> d3dDevice) {
-	// The D3D Device is no longer valid if the default adapter changed since the device was created or if the device has been removed. 
-	Microsoft::WRL::ComPtr<IDXGIDevice3>	dxgiDevice;
-	Microsoft::WRL::ComPtr<IDXGIAdapter>	deviceAdapter;
-	Microsoft::WRL::ComPtr<IDXGIFactory4>	deviceFactory;
-	Microsoft::WRL::ComPtr<IDXGIAdapter1>	previousDefaultAdapter;
-	Microsoft::WRL::ComPtr<IDXGIFactory4>	currentFactory;
-	Microsoft::WRL::ComPtr<IDXGIAdapter1>	currentDefaultAdapter;
-	DXGI_ADAPTER_DESC1						previousDesc				= {};	// First, get the information for the default adapter from when the device was created.
-	DXGI_ADAPTER_DESC1						currentDesc					= {};	// Next, get the information for the current default adapter.
-
-	DX::ThrowIfFailed(d3dDevice.As(&dxgiDevice));
-	DX::ThrowIfFailed(dxgiDevice->GetAdapter(&deviceAdapter));
-	DX::ThrowIfFailed(deviceAdapter->GetParent(IID_PPV_ARGS(&deviceFactory)));
-	DX::ThrowIfFailed(deviceFactory->EnumAdapters1(0, &previousDefaultAdapter));
-	DX::ThrowIfFailed(previousDefaultAdapter->GetDesc1(&previousDesc));
-
-	DX::ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&currentFactory)));
-	DX::ThrowIfFailed(currentFactory->EnumAdapters1(0, &currentDefaultAdapter));
-	DX::ThrowIfFailed(currentDefaultAdapter->GetDesc1(&currentDesc));
-
-	if (0 == memcmp(&previousDesc.AdapterLuid, &currentDesc.AdapterLuid, sizeof(LUID)) && !FAILED(d3dDevice->GetDeviceRemovedReason())) 
-		return 0;
-
-	return -1;
-}
-
 // This method is called in the event handler for the DisplayContentsInvalidated event.
 void DX::DeviceResources::ValidateDevice() { 
 	// If the adapter LUIDs don't match, or if the device reports that it has been removed, a new D3D device must be created. Release references to resources related to the old device.
-	if(validationFailed(m_d3dDevice))
+	if(::gpk::d3dDeviceValidate(m_d3dDevice))
 		HandleDeviceLost();	// Create a new device and swap chain.
 }
 

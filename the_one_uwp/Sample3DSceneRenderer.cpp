@@ -1,7 +1,5 @@
 ﻿#include "Sample3DSceneRenderer.h"
 
-#include "..\Common\DirectXHelper.h"
-
 using namespace the_one_uwp;
 
 using namespace DirectX;

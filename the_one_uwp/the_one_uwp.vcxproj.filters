@@ -1,43 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Common">
-      <UniqueIdentifier>cdc65f22-e37f-4762-8aed-26e6492d1271</UniqueIdentifier>
-    </Filter>
     <Filter Include="Assets">
       <UniqueIdentifier>a33b48ce-077d-4dd0-85c1-c878769d0d52</UniqueIdentifier>
       <Extensions>bmp;fbx;gif;jpg;jpeg;tga;tiff;tif;png</Extensions>
     </Filter>
-    <Filter Include="Content">
-      <UniqueIdentifier>8cd61d04-d50b-4c48-8405-68ccad46bc3c</UniqueIdentifier>
-    </Filter>
-    <ClInclude Include="Common\DirectXHelper.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\StepTimer.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\DeviceResources.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClCompile Include="Common\DeviceResources.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClInclude Include="Content\Sample3DSceneRenderer.h">
-      <Filter>Content</Filter>
-    </ClInclude>
-    <ClInclude Include="Content\SampleFpsTextRenderer.h">
-      <Filter>Content</Filter>
-    </ClInclude>
-    <ClCompile Include="Content\Sample3DSceneRenderer.cpp">
-      <Filter>Content</Filter>
-    </ClCompile>
-    <FxCompile Include="Content\SamplePixelShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Content\SampleVertexShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
     <Image Include="Assets\LockScreenLogo.scale-200.png">
       <Filter>Assets</Filter>
     </Image>
@@ -60,10 +27,19 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="the_one_uwp.cpp" />
+    <ClCompile Include="DeviceResources.cpp" />
+    <ClCompile Include="Sample3DSceneRenderer.cpp" />
+    <ClCompile Include="gpk_d3d.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="the_one_uwp.h" />
+    <ClInclude Include="DeviceResources.h" />
+    <ClInclude Include="DirectXHelper.h" />
+    <ClInclude Include="Sample3DSceneRenderer.h" />
+    <ClInclude Include="SampleFpsTextRenderer.h" />
+    <ClInclude Include="StepTimer.h" />
+    <ClInclude Include="gpk_d3d.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">
@@ -74,8 +50,10 @@
     <AppxManifest Include="Package.appxmanifest" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Content\ShaderShared.hlsli">
-      <Filter>Content</Filter>
-    </None>
+    <None Include="ShaderShared.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="SamplePixelShader.hlsl" />
+    <FxCompile Include="SampleVertexShader.hlsl" />
   </ItemGroup>
 </Project>

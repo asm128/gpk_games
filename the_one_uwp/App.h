@@ -1,6 +1,6 @@
 ﻿#include "the_one_uwp.h"
 
-#include "Common\DeviceResources.h"
+#include "DeviceResources.h"
 
 #include <ppltasks.h>
 

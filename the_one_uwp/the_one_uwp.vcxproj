@@ -307,18 +307,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
-    <ClInclude Include="Common\DeviceResources.h" />
+    <ClInclude Include="DeviceResources.h" />
+    <ClInclude Include="DirectXHelper.h" />
+    <ClInclude Include="gpk_d3d.h" />
+    <ClInclude Include="Sample3DSceneRenderer.h" />
+    <ClInclude Include="SampleFpsTextRenderer.h" />
+    <ClInclude Include="StepTimer.h" />
     <ClInclude Include="the_one_uwp.h" />
-    <ClInclude Include="Common\DirectXHelper.h" />
-    <ClInclude Include="Common\StepTimer.h" />
-    <ClInclude Include="Content\Sample3DSceneRenderer.h" />
-    <ClInclude Include="Content\SampleFpsTextRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
-    <ClCompile Include="Common\DeviceResources.cpp" />
+    <ClCompile Include="DeviceResources.cpp" />
+    <ClCompile Include="gpk_d3d.cpp" />
+    <ClCompile Include="Sample3DSceneRenderer.cpp" />
     <ClCompile Include="the_one_uwp.cpp" />
-    <ClCompile Include="Content\Sample3DSceneRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -326,15 +328,29 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Content\SamplePixelShader.hlsl">
-      <ShaderType>Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Content\SampleVertexShader.hlsl">
-      <ShaderType>Vertex</ShaderType>
-    </FxCompile>
+    <None Include="ShaderShared.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Content\ShaderShared.hlsli" />
+    <FxCompile Include="SamplePixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="SampleVertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

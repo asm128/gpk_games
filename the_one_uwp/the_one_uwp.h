@@ -1,9 +1,9 @@
 ﻿#include "gpk_the_one.h"
 
-#include "Common\StepTimer.h"
-#include "Common\DeviceResources.h"
-#include "Content\Sample3DSceneRenderer.h"
-#include "Content\SampleFpsTextRenderer.h"
+#include "StepTimer.h"
+#include "DeviceResources.h"
+#include "Sample3DSceneRenderer.h"
+#include "SampleFpsTextRenderer.h"
 
 #ifndef THE_ONE_UWPMAIN_H_98274
 #define THE_ONE_UWPMAIN_H_98274

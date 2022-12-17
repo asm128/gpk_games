@@ -1,11 +1,11 @@
-﻿#pragma once
+﻿#include "DeviceResources.h"
+#include "StepTimer.h"
 
-#include <string>
-#include "..\Common\DeviceResources.h"
-#include "..\Common\StepTimer.h"
 #include <memory>
+#include <string>
 
-#include "Common/DirectXHelper.h"
+#ifndef SAMPLEFPSTEXTRENDERER_H_9238679823
+#define SAMPLEFPSTEXTRENDERER_H_9238679823
 
 namespace the_one_uwp
 {
@@ -75,3 +75,5 @@ namespace the_one_uwp
 
 	};
 }
+
+#endif // SAMPLEFPSTEXTRENDERER_H_9238679823

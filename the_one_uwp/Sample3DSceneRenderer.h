@@ -1,8 +1,9 @@
-﻿#pragma once
-
-#include "..\Common\DeviceResources.h"
-#include "..\Common\StepTimer.h"
+﻿#include "DeviceResources.h"
+#include "StepTimer.h"
 #include <memory>
+
+#ifndef SAMPLE3DSCENERENDERER_H_293468238
+#define SAMPLE3DSCENERENDERER_H_293468238
 
 namespace the_one_uwp
 {
@@ -78,3 +79,4 @@ namespace the_one_uwp
 	};
 }
 
+#endif // SAMPLE3DSCENERENDERER_H_293468238
