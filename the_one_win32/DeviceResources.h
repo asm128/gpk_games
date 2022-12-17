@@ -187,6 +187,7 @@ namespace DX
 		// Recreate all device resources and set them back to the current state.
 		void											ValidateDevice							()											{ if(::gpk::d3dDeviceValidate(m_d3dDevice)) HandleDeviceLost();	}
 		void											HandleDeviceLost						()											{
+			m_swapChain->SetFullscreenState(FALSE, 0);
 			m_swapChain										= nullptr;
 			if (m_deviceNotify) 
 				m_deviceNotify->OnDeviceLost();

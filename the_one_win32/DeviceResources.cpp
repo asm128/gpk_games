@@ -41,7 +41,7 @@ static constexpr XMFLOAT4X4
 #endif
 
 	// This array defines the set of DirectX hardware feature levels this app will support. Note the ordering should be preserved. Don't forget to declare your application's minimum required feature level in its description. All applications are assumed to support 9.1 unless otherwise stated.
-	D3D_FEATURE_LEVEL					featureLevels	[]				=
+	static constexpr D3D_FEATURE_LEVEL	featureLevels	[]				=
 		{ D3D_FEATURE_LEVEL_12_1
 		, D3D_FEATURE_LEVEL_12_0
 		, D3D_FEATURE_LEVEL_11_1
@@ -137,7 +137,7 @@ static constexpr XMFLOAT4X4
 		gpk_hrcall(m_d3dDevice.As(&dxgiDevice));
 		gpk_hrcall(dxgiDevice->GetAdapter(&dxgiAdapter));
 		gpk_hrcall(dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory)));
-		gpk_hrcall(dxgiFactory->CreateSwapChainForHwnd(m_d3dDevice.Get(), m_window, &swapChainDesc, 0, nullptr, &swapChain));
+		gpk_hrcall(dxgiFactory->CreateSwapChainForHwnd(m_d3dDevice.Get(), m_window, &swapChainDesc, &swapChainDescFS, nullptr, &swapChain));
 		gpk_hrcall(swapChain.As(&m_swapChain));
 		gpk_hrcall(dxgiDevice->SetMaximumFrameLatency(1));	// Ensure that DXGI does not queue more than one frame at a time. This both reduces latency and ensures that the application will only render after each VSync, minimizing power consumption.
 	}

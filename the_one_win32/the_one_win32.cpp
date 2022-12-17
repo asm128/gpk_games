@@ -23,6 +23,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 // --- Cleanup application resources.
 					::gpk::error_t										cleanup										(::SApplication& app)											{
+	app.DeviceResources->m_swapChain->SetFullscreenState(FALSE, 0);
 	app.D3DScene			= {};	
 	app.D3DText				= {};
 	app.DeviceResources		= {};
@@ -34,7 +35,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 }
 
 					::gpk::error_t										setup										(::SApplication& app)											{
-						CoInitializeEx(nullptr, COINIT_MULTITHREADED);;
+	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::SWindow																& mainWindow								= framework.MainDisplay;
 	mainWindow.Size															= {1280, 720};
@@ -52,12 +53,18 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 ::gpk::error_t										update										(::SApplication& app, bool systemRequestedExit)					{
 	::gpk::SFramework									& framework									= app.Framework;
 	::gpk::SFrameInfo									& frameInfo									= framework.FrameInfo;
+	::gpk::SWindow										& mainWindow								= app.Framework.MainDisplay;
+	if(mainWindow.Resized) {
+		app.DeviceResources->SetLogicalSize(mainWindow.Size.Cast<float>());
+		app.D3DScene.CreateWindowSizeDependentResources();
+	}
+
 	{
 		::gpk::STimer										timer;
 		::the1::theOneUpdate(app.TheOne, frameInfo.Seconds.LastFrame, framework.Input, framework.MainDisplay.EventQueue);
 
 		timer.Frame();
-		info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
+		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
 
 
@@ -69,7 +76,6 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	//-----------------------------
 	::gpk::STimer																& timer										= app.Framework.Timer;
-	::gpk::SWindow																& mainWindow								= app.Framework.MainDisplay;
 	char																		buffer		[256]							= {};
 	sprintf_s(buffer, "[%u x %u]. FPS: %g. Last frame seconds: %g.", mainWindow.Size.x, mainWindow.Size.y, 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
 	::HWND																		windowHandle								= mainWindow.PlatformDetail.WindowHandle;
@@ -84,7 +90,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer	= framework.MainDisplayOffscreen;
-	framework.MainDisplayOffscreen = {};
+	//framework.MainDisplayOffscreen = {};
 	backBuffer->resize(framework.MainDisplayOffscreen->Color.metrics(), 0xFF000030, (uint32_t)-1);
 
 	auto								context				= app.DeviceResources->GetD3DDeviceContext();
@@ -100,7 +106,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	app.D3DScene.Render();
 	app.DeviceResources->Present();
 
-	::the1::theOneDraw(app.TheOne, *backBuffer, framework.FrameInfo.Seconds.Total);
+	//::the1::theOneDraw(app.TheOne, *backBuffer, framework.FrameInfo.Seconds.Total);
 	//memcpy(framework.MainDisplayOffscreen->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	//::gpk::grid_mirror_y(framework.MainDisplayOffscreen->Color.View, backBuffer->Color.View);
 	//framework.MainDisplayOffscreen = backBuffer;
