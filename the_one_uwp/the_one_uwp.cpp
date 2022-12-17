@@ -15,11 +15,56 @@ void the_one_uwp::STheOneUWP::CreateWindowSizeDependentResources() {
 
 // Updates the application state once per frame.
 void the_one_uwp::STheOneUWP::Update() {
+	if(!Input)
+		Input.create();
+
 	// Update scene objects.
 	Timer.Tick([&]() {
+		::gpk::array_obj<::gpk::SSysEvent>			sysEvents;
+		::gpk::SSysEvent							newEvent;
+
+		Input->KeyboardPrevious					= Input->KeyboardCurrent;
+		Input->MousePrevious					= Input->MouseCurrent;
+		Input->KeyboardCurrent					= {};
+		Input->MouseCurrent						= {};
+		for(uint32_t iVK = 0; iVK < 256; ++iVK) {
+			if(iVK == 1 || iVK == 2 || iVK == 4) {
+				Input->MouseCurrent.ButtonState[iVK - 1]	= (DeviceResources->m_window->GetAsyncKeyState((Windows::System::VirtualKey)iVK) == Windows::UI::Core::CoreVirtualKeyStates(0))? 0 : 1;
+				if(Input->MouseCurrent.ButtonState[iVK - 1] && !Input->MousePrevious.ButtonState[iVK - 1]) {
+					newEvent.Type = ::gpk::SYSEVENT_MOUSE_DOWN; 
+					newEvent.Data.resize(sizeof(WPARAM)); 
+					*(WPARAM*)&newEvent.Data[0] = iVK - 1; 
+					sysEvents.push_back(newEvent);
+				}
+				else if(!Input->MouseCurrent.ButtonState[iVK - 1] && Input->MousePrevious.ButtonState[iVK - 1]) {
+					newEvent.Type = ::gpk::SYSEVENT_MOUSE_UP; 
+					newEvent.Data.resize(sizeof(WPARAM)); 
+					*(WPARAM*)&newEvent.Data[0] = iVK - 1; 
+					sysEvents.push_back(newEvent);
+				}
+			}
+			else {
+				Input->KeyboardCurrent.KeyState[iVK]	= (DeviceResources->m_window->GetAsyncKeyState((Windows::System::VirtualKey)iVK) == Windows::UI::Core::CoreVirtualKeyStates(0))? 0 : 1;
+				if(Input->KeyboardCurrent.KeyState[iVK] && !Input->KeyboardPrevious.KeyState[iVK]) {
+					newEvent.Type = ::gpk::SYSEVENT_KEY_DOWN; 
+					newEvent.Data.resize(sizeof(WPARAM)); 
+					*(WPARAM*)&newEvent.Data[0] = iVK; 
+					sysEvents.push_back(newEvent);
+				}
+				else if(!Input->KeyboardCurrent.KeyState[iVK] && Input->KeyboardPrevious.KeyState[iVK]) {
+					newEvent.Type = ::gpk::SYSEVENT_KEY_UP; 
+					newEvent.Data.resize(sizeof(WPARAM)); 
+					*(WPARAM*)&newEvent.Data[0] = iVK; 
+					sysEvents.push_back(newEvent);
+				}
+			}
+		}
+		::the1::theOneUpdate(this->TheOneApp, Timer.GetElapsedSeconds(), Input, sysEvents);
+
 		SceneRenderer	.Update(Timer);	// Replace this with your app's content update functions.
 		FpsTextRenderer	.Update(Timer);
 	});
+
 }
 
 // Renders the current frame according to the current application state. Returns true if the frame was rendered and is ready to be displayed.

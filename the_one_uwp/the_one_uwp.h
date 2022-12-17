@@ -13,6 +13,7 @@ namespace the_one_uwp
 {
 	class STheOneUWP : public DX::IDeviceNotify {
 		::the1::STheOne								TheOneApp			;
+		::gpk::ptr_obj<::gpk::SInput>				Input				;
 
 		::std::shared_ptr<::DX::DeviceResources>	DeviceResources		;
 		::the_one_uwp::Sample3DSceneRenderer		SceneRenderer		;

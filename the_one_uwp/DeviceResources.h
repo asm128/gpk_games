@@ -61,7 +61,9 @@ namespace DX
 	};
 
 	// Controls all the DirectX device resources.
-	class DeviceResources {
+	struct DeviceResources {
+		Platform::Agile<Windows::UI::Core::CoreWindow>	m_window;	// Cached reference to the Window.
+
 		IDeviceNotify									* m_deviceNotify						= {};	// The IDeviceNotify can be held directly as it owns the DeviceResources.
 
 		// Direct3D objects.
@@ -83,8 +85,6 @@ namespace DX
 		// DirectWrite drawing components.
 		Microsoft::WRL::ComPtr<IDWriteFactory3>			m_dwriteFactory;
 		Microsoft::WRL::ComPtr<IWICImagingFactory2>		m_wicFactory;
-
-		Platform::Agile<Windows::UI::Core::CoreWindow>	m_window;	// Cached reference to the Window.
 
 		// Cached device properties.
 		D3D_FEATURE_LEVEL								m_d3dFeatureLevel						= D3D_FEATURE_LEVEL_9_1;
@@ -150,7 +150,6 @@ namespace DX
 			m_outputSize.Height								= std::max(1.0f, DX::ConvertDipsToPixels(m_logicalSize.Height, m_effectiveDpi));
 		}
 
-	public:
 														DeviceResources							()									{
 			CreateDeviceIndependentResources();
 			CreateDeviceResources();

@@ -9,6 +9,32 @@ using namespace Windows::UI::Core;
 using namespace Windows::UI::Xaml::Controls;
 using namespace Platform;
 
+
+// Set the proper orientation for the swap chain, and generate 2D and 3D matrix transformations for rendering to the rotated swap chain. Note the rotation angle for the 2D and 3D transforms are different.
+// This is due to the difference in coordinate spaces. Additionally, the 3D matrix is specified explicitly to avoid rounding errors.
+static constexpr XMFLOAT4X4				
+	ZRotation0
+		( 1.0f, 0.0f, 0.0f, 0.0f
+		, 0.0f, 1.0f, 0.0f, 0.0f
+		, 0.0f, 0.0f, 1.0f, 0.0f
+		, 0.0f, 0.0f, 0.0f, 1.0f
+	), ZRotation90
+		( 0.0f, 1.0f, 0.0f, 0.0f
+		, -1.0f, 0.0f, 0.0f, 0.0f
+		, 0.0f, 0.0f, 1.0f, 0.0f
+		, 0.0f, 0.0f, 0.0f, 1.0f
+	), ZRotation180
+		( -1.0f, 0.0f, 0.0f, 0.0f
+		, 0.0f, -1.0f, 0.0f, 0.0f
+		, 0.0f, 0.0f, 1.0f, 0.0f
+		, 0.0f, 0.0f, 0.0f, 1.0f
+	), ZRotation270
+		( 0.0f, -1.0f, 0.0f, 0.0f
+		, 1.0f, 0.0f, 0.0f, 0.0f
+		, 0.0f, 0.0f, 1.0f, 0.0f
+		, 0.0f, 0.0f, 0.0f, 1.0f
+	);
+
 // Configures the Direct3D device, and stores handles to it and the device context.
 void DX::DeviceResources::CreateDeviceResources() {
 	// This flag adds support for surfaces with a different color channel ordering
@@ -36,20 +62,8 @@ void DX::DeviceResources::CreateDeviceResources() {
 	ComPtr<ID3D11Device>				device;
 	ComPtr<ID3D11DeviceContext>			context;
 
-	HRESULT								hr								= D3D11CreateDevice
-		( nullptr								// Specify nullptr to use the default adapter.
-		, D3D_DRIVER_TYPE_HARDWARE				// Create a device using the hardware graphics driver.
-		, 0										// Should be 0 unless the driver is D3D_DRIVER_TYPE_SOFTWARE.
-		, creationFlags							// Set debug and Direct2D compatibility flags.
-		, featureLevels							// List of feature levels this app can support.
-		, (uint32_t)std::size(featureLevels)	// Size of the list above.
-		, D3D11_SDK_VERSION						// Always set this to D3D11_SDK_VERSION for Microsoft Store apps.
-		, &device								// Returns the Direct3D device created.
-		, &m_d3dFeatureLevel					// Returns feature level of device created.
-		, &context								// Returns the device immediate context.
-		);
-
-	if (FAILED(hr)) // If the initialization fails, fall back to the WARP device. For more information on WARP, see: https://go.microsoft.com/fwlink/?LinkId=286690. 
+	 // If the initialization fails, fall back to the WARP device. For more information on WARP, see: https://go.microsoft.com/fwlink/?LinkId=286690. 
+	if (FAILED(D3D11CreateDevice(0, D3D_DRIVER_TYPE_HARDWARE, 0, creationFlags, featureLevels, (uint32_t)std::size(featureLevels), D3D11_SDK_VERSION, &device, &m_d3dFeatureLevel, &context)))
 		DX::ThrowIfFailed(D3D11CreateDevice(nullptr,D3D_DRIVER_TYPE_WARP, 0, creationFlags, featureLevels, ARRAYSIZE(featureLevels), D3D11_SDK_VERSION, &device, &m_d3dFeatureLevel, &context));
 
 	// Store pointers to the Direct3D 11.3 API device and immediate context.
@@ -96,7 +110,6 @@ void DX::DeviceResources::CreateWindowSizeDependentResources() {
 		// Otherwise, create a new one using the same adapter as the existing Direct3D device.
 		DXGI_SCALING							scaling						= DisplayMetrics::SupportHighResolutions ? DXGI_SCALING_NONE : DXGI_SCALING_STRETCH;
 		DXGI_SWAP_CHAIN_DESC1					swapChainDesc				= {0};
-
 		swapChainDesc.Width					= lround(m_d3dRenderTargetSize.Width);		// Match the size of the window.
 		swapChainDesc.Height				= lround(m_d3dRenderTargetSize.Height);
 		swapChainDesc.Format				= DXGI_FORMAT_B8G8R8A8_UNORM;				// This is the most common swap chain format.
@@ -122,29 +135,6 @@ void DX::DeviceResources::CreateWindowSizeDependentResources() {
 		DX::ThrowIfFailed(swapChain.As(&m_swapChain));
 		DX::ThrowIfFailed(dxgiDevice->SetMaximumFrameLatency(1));	// Ensure that DXGI does not queue more than one frame at a time. This both reduces latency and ensures that the application will only render after each VSync, minimizing power consumption.
 	}
-	// Set the proper orientation for the swap chain, and generate 2D and 3D matrix transformations for rendering to the rotated swap chain. Note the rotation angle for the 2D and 3D transforms are different.
-	// This is due to the difference in coordinate spaces. Additionally, the 3D matrix is specified explicitly to avoid rounding errors.
-	static constexpr XMFLOAT4X4 ZRotation0
-		( 1.0f, 0.0f, 0.0f, 0.0f
-		, 0.0f, 1.0f, 0.0f, 0.0f
-		, 0.0f, 0.0f, 1.0f, 0.0f
-		, 0.0f, 0.0f, 0.0f, 1.0f
-	), ZRotation90
-		( 0.0f, 1.0f, 0.0f, 0.0f
-		, -1.0f, 0.0f, 0.0f, 0.0f
-		, 0.0f, 0.0f, 1.0f, 0.0f
-		, 0.0f, 0.0f, 0.0f, 1.0f
-	), ZRotation180
-		( -1.0f, 0.0f, 0.0f, 0.0f
-		, 0.0f, -1.0f, 0.0f, 0.0f
-		, 0.0f, 0.0f, 1.0f, 0.0f
-		, 0.0f, 0.0f, 0.0f, 1.0f
-	), ZRotation270
-		( 0.0f, -1.0f, 0.0f, 0.0f
-		, 1.0f, 0.0f, 0.0f, 0.0f
-		, 0.0f, 0.0f, 1.0f, 0.0f
-		, 0.0f, 0.0f, 0.0f, 1.0f
-	);
 	switch (displayRotation) {
 	case DXGI_MODE_ROTATION_IDENTITY	: m_orientationTransform3D = ZRotation0		; m_orientationTransform2D = Matrix3x2F::Identity(); break;
 	case DXGI_MODE_ROTATION_ROTATE90	: m_orientationTransform3D = ZRotation270	; m_orientationTransform2D = Matrix3x2F::Rotation(90.0f) * Matrix3x2F::Translation(m_logicalSize.Height, 0.0f); break;

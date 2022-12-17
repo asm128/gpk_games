@@ -76,7 +76,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources() {
 		DX::ThrowIfFailed(m_deviceResources->GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &m_vertexBuffer));
 
 		// Load mesh indices. Each trio of indices represents a triangle to be rendered on the screen. For example: 0,2,1 means that the vertices with indexes 0, 2 and 1 from the vertex buffer compose the first triangle of this mesh.
-		static const uint16_t					cubeIndices []			= 
+		static constexpr uint16_t				cubeIndices []			= 
 			{ 0,2,1, 1,2,3	// -x
 			, 4,5,6, 5,7,6	// +x
 			, 0,1,5, 0,5,4	// -y
