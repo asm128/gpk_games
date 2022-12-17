@@ -11,6 +11,8 @@
 #include "gpk_app_impl.h"
 #include "gpk_bitmap_target.h"
 
+#include <DirectXColors.h>
+
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "The One");
 
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
@@ -37,10 +39,12 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::gpk::SWindow																& mainWindow								= framework.MainDisplay;
 	mainWindow.Size															= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
+	app.DeviceResources->RegisterDeviceNotify(&app);
 	app.DeviceResources->SetWindow(mainWindow.PlatformDetail.WindowHandle);
+	
 	gpk_necs(app.D3DScene.Initialize(app.DeviceResources));
 	gpk_necs(app.D3DText.Initialize(app.DeviceResources));
-
+	app.D3DScene.CreateWindowSizeDependentResources(); 
 	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	return 0;
 }
@@ -72,6 +76,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	SetWindowTextA(windowHandle, buffer);
 
 
+	app.D3DScene.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total);
 	
 	return 0;
 }
@@ -79,10 +84,23 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer	= framework.MainDisplayOffscreen;
+	framework.MainDisplayOffscreen = {};
 	backBuffer->resize(framework.MainDisplayOffscreen->Color.metrics(), 0xFF000030, (uint32_t)-1);
 
-	::the1::theOneDraw(app.TheOne, *backBuffer, framework.FrameInfo.Seconds.Total);
+	auto								context				= app.DeviceResources->GetD3DDeviceContext();
+	auto								viewport			= app.DeviceResources->GetScreenViewport();	// Reset the viewport to target the whole screen.
+	context->RSSetViewports(1, &viewport);
 
+	ID3D11RenderTargetView *			targets	[]			= { app.DeviceResources->GetBackBufferRenderTargetView(), };	// Reset render targets to the screen.
+	context->OMSetRenderTargets(1, targets, app.DeviceResources->GetDepthStencilView());
+
+	context->ClearRenderTargetView(app.DeviceResources->GetBackBufferRenderTargetView(), DirectX::Colors::DarkBlue);	// Clear the back buffer and depth stencil view.
+	context->ClearDepthStencilView(app.DeviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);	
+
+	app.D3DScene.Render();
+	app.DeviceResources->Present();
+
+	::the1::theOneDraw(app.TheOne, *backBuffer, framework.FrameInfo.Seconds.Total);
 	//memcpy(framework.MainDisplayOffscreen->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	//::gpk::grid_mirror_y(framework.MainDisplayOffscreen->Color.View, backBuffer->Color.View);
 	//framework.MainDisplayOffscreen = backBuffer;

@@ -7,12 +7,6 @@ using namespace Windows::Foundation;
 using namespace Windows::System::Threading;
 using namespace Concurrency;
 
-
-// Updates application state when the window size changes (e.g. device orientation change)
-void the_one_uwp::STheOneUWP::CreateWindowSizeDependentResources() {
-	SceneRenderer.CreateWindowSizeDependentResources();		// TODO: Replace this with the size-dependent initialization of your app's content.
-}
-
 // Updates the application state once per frame.
 void the_one_uwp::STheOneUWP::Update() {
 	if(!Input)

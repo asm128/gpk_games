@@ -78,8 +78,8 @@ namespace DX
 		::gpk::SCoord2<float>							m_logicalSize							= {1, 1};
 		::gpk::GRID_ROTATION							m_nativeOrientation						= ::gpk::GRID_ROTATION_0;
 		::gpk::GRID_ROTATION							m_currentOrientation					= ::gpk::GRID_ROTATION_0;
-		float											m_dpi									= -1.0f;
-		float											m_effectiveDpi							= -1.0f;	// This is the DPI that will be reported back to the app. It takes into account whether the app supports high resolution screens or not.
+		float											m_dpi									= 96.0f;
+		float											m_effectiveDpi							= 96.0f;	// This is the DPI that will be reported back to the app. It takes into account whether the app supports high resolution screens or not.
 
 		// Transforms used for display orientation.
 		D2D1::Matrix3x2F								m_orientationTransform2D				= {};

@@ -29,7 +29,6 @@ namespace the_one_uwp
 			DeviceResources->RegisterDeviceNotify(this);
 		}
 
-		void										CreateWindowSizeDependentResources		();
 		void										Update									();
 		bool										Render									();
 
@@ -41,7 +40,7 @@ namespace the_one_uwp
 		virtual void								OnDeviceRestored						() {
 			SceneRenderer	.CreateDeviceDependentResources();
 			FpsTextRenderer	.CreateDeviceDependentResources();
-			CreateWindowSizeDependentResources();
+			SceneRenderer	.CreateWindowSizeDependentResources();		// TODO: Replace this with the size-dependent initialization of your app's content.
 		}
 	};
 }

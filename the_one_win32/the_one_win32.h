@@ -27,7 +27,7 @@ namespace gpk
 #ifndef APPLICATION_H_098273498237423
 #define APPLICATION_H_098273498237423
 
-struct SApplication {
+struct SApplication : DX::IDeviceNotify {
 	::gpk::SFramework								Framework				;
 
 	::gpk::SGUI										GUI						= {};
@@ -46,6 +46,19 @@ struct SApplication {
 	::the_one_uwp::Sample3DSceneRenderer			D3DScene				;
 	::the_one_uwp::SampleFpsTextRenderer			D3DText					;
 	::gpk::ptr_obj<::DX::DeviceResources>			DeviceResources			;
+
+	// Notifies renderers that device resources need to be released.
+	virtual void									OnDeviceLost			() {
+		D3DScene.ReleaseDeviceDependentResources();
+		D3DText.ReleaseDeviceDependentResources();
+	}
+
+	// Notifies renderers that device resources may now be recreated.
+	virtual void									OnDeviceRestored		() {
+		D3DScene.CreateDeviceDependentResources();
+		D3DText.CreateDeviceDependentResources();
+		D3DScene.CreateWindowSizeDependentResources();
+	}
 
 													SApplication			(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
 };

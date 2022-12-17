@@ -37,9 +37,7 @@ void Sample3DSceneRenderer::CreateWindowSizeDependentResources() {
 void Sample3DSceneRenderer::CreateDeviceDependentResources() {
 	// Load shaders asynchronously.
 	::gpk::array_pod<byte_t>	fileVS;
-	::gpk::array_pod<byte_t>	filePS;
 	::gpk::fileToMemory("SampleVertexShader.cso", fileVS);
-	::gpk::fileToMemory("SamplePixelShader.cso" , filePS);
 
 	// After the vertex shader file is loaded, create the shader and input layout.
 	DX::ThrowIfFailed(DeviceResources->GetD3DDevice()->CreateVertexShader(&fileVS[0], fileVS.size(), nullptr, &m_vertexShader));
@@ -50,6 +48,8 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources() {
 	DX::ThrowIfFailed(DeviceResources->GetD3DDevice()->CreateInputLayout(vertexDesc, ARRAYSIZE(vertexDesc), &fileVS[0], fileVS.size(), &m_inputLayout));
 
 	// After the pixel shader file is loaded, create the shader and constant buffer.
+	::gpk::array_pod<byte_t>	filePS;
+	::gpk::fileToMemory("SamplePixelShader.cso" , filePS);
 	DX::ThrowIfFailed(DeviceResources->GetD3DDevice()->CreatePixelShader(&filePS[0], filePS.size(), nullptr, &m_pixelShader));
 	CD3D11_BUFFER_DESC						constantBufferDesc		(sizeof(ModelViewProjectionConstantBuffer) , D3D11_BIND_CONSTANT_BUFFER);
 	DX::ThrowIfFailed(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &m_constantBuffer));

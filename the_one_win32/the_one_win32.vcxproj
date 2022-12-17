@@ -99,7 +99,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>llc.lib; gpk_engine.lib; zlibvc.lib; the_one.lib; user32.lib; gdi32.lib; d2d1.lib; d3d11.lib; dxgi.lib; windowscodecs.lib; dwrite.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk_engine.lib; zlibvc.lib; the_one.lib; user32.lib; gdi32.lib; d2d1.lib; d3d11.lib; dxgi.lib; shcore.lib; windowscodecs.lib; dwrite.lib; </AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
@@ -121,7 +121,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>llc.lib; gpk_engine.lib; zlibvc.lib; the_one.lib; user32.lib; gdi32.lib; d2d1.lib; d3d11.lib; dxgi.lib; windowscodecs.lib; dwrite.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk_engine.lib; zlibvc.lib; the_one.lib; user32.lib; gdi32.lib; d2d1.lib; d3d11.lib; dxgi.lib; shcore.lib; windowscodecs.lib; dwrite.lib; </AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
@@ -139,7 +139,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>llc.lib; gpk_engine.lib; zlibvc.lib; the_one.lib; user32.lib; gdi32.lib; d2d1.lib; d3d11.lib; dxgi.lib; windowscodecs.lib; dwrite.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk_engine.lib; zlibvc.lib; the_one.lib; user32.lib; gdi32.lib; d2d1.lib; d3d11.lib; dxgi.lib; shcore.lib; windowscodecs.lib; dwrite.lib; </AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
@@ -161,7 +161,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>llc.lib; gpk_engine.lib; zlibvc.lib; the_one.lib; user32.lib; gdi32.lib; d2d1.lib; d3d11.lib; dxgi.lib; windowscodecs.lib; dwrite.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk_engine.lib; zlibvc.lib; the_one.lib; user32.lib; gdi32.lib; d2d1.lib; d3d11.lib; dxgi.lib; shcore.lib; windowscodecs.lib; dwrite.lib; </AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
