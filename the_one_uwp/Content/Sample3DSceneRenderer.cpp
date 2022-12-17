@@ -34,27 +34,6 @@ void Sample3DSceneRenderer::CreateWindowSizeDependentResources() {
 	XMStoreFloat4x4(&m_constantBufferData.view, XMMatrixTranspose(XMMatrixLookAtRH(eye, at, up)));
 }
 
-// When tracking, the 3D cube can be rotated around its Y axis by tracking pointer position relative to the output screen width. Renders one frame using the vertex and pixel shaders.
-void Sample3DSceneRenderer::Render() {
-	if (!m_loadingComplete)	// Loading is asynchronous. Only draw geometry after it's loaded.
-		return;
-
-	auto									context					= m_deviceResources->GetD3DDeviceContext();
-	context->UpdateSubresource1(m_constantBuffer.Get(), 0, NULL, &m_constantBufferData, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
-
-	// Each vertex is one instance of the VertexPositionColor struct.
-	UINT									stride					= sizeof(VertexPositionColor);
-	UINT									offset					= 0;
-	context->IASetVertexBuffers		(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer		(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);// Each index is one 16-bit unsigned integer (short).
-	context->IASetPrimitiveTopology	(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	context->IASetInputLayout		(m_inputLayout.Get());
-	context->VSSetShader			(m_vertexShader.Get(), nullptr, 0);	// Attach our vertex shader.
-	context->VSSetConstantBuffers1	(0, 1, m_constantBuffer.GetAddressOf(), nullptr, nullptr);	// Send the constant buffer to the graphics device.
-	context->PSSetShader			(m_pixelShader.Get(), nullptr, 0);	// Attach our pixel shader.
-	context->DrawIndexed			(m_indexCount, 0, 0);	// Draw the objects.
-}
-
 void Sample3DSceneRenderer::CreateDeviceDependentResources() {
 	// Load shaders asynchronously.
 	Concurrency::task<std::vector<byte>>	loadVSTask				= DX::ReadDataAsync(L"SampleVertexShader.cso");
@@ -121,3 +100,23 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources() {
 	createCubeTask.then([this] () { m_loadingComplete = true; });		// Once the cube is loaded, the object is ready to be rendered.
 }
 
+// When tracking, the 3D cube can be rotated around its Y axis by tracking pointer position relative to the output screen width. Renders one frame using the vertex and pixel shaders.
+void Sample3DSceneRenderer::Render() {
+	if (!m_loadingComplete)	// Loading is asynchronous. Only draw geometry after it's loaded.
+		return;
+
+	auto									context					= m_deviceResources->GetD3DDeviceContext();
+	context->UpdateSubresource1(m_constantBuffer.Get(), 0, NULL, &m_constantBufferData, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
+
+	// Each vertex is one instance of the VertexPositionColor struct.
+	UINT									stride					= sizeof(VertexPositionColor);
+	UINT									offset					= 0;
+	context->IASetVertexBuffers		(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
+	context->IASetIndexBuffer		(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);// Each index is one 16-bit unsigned integer (short).
+	context->IASetPrimitiveTopology	(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->IASetInputLayout		(m_inputLayout.Get());
+	context->VSSetShader			(m_vertexShader.Get(), nullptr, 0);	// Attach our vertex shader.
+	context->VSSetConstantBuffers1	(0, 1, m_constantBuffer.GetAddressOf(), nullptr, nullptr);	// Send the constant buffer to the graphics device.
+	context->PSSetShader			(m_pixelShader.Get(), nullptr, 0);	// Attach our pixel shader.
+	context->DrawIndexed			(m_indexCount, 0, 0);	// Draw the objects.
+}

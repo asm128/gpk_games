@@ -64,7 +64,6 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="the_one_uwp.h" />
-    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\StoreLogo.png">
@@ -73,5 +72,10 @@
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Content\ShaderShared.hlsli">
+      <Filter>Content</Filter>
+    </None>
   </ItemGroup>
 </Project>

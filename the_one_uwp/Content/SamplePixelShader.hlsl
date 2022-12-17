@@ -1,8 +1,4 @@
-struct PixelShaderInput
-{
-	float4 pos : SV_POSITION;
-	float3 color : COLOR0;
-};
+#include "ShaderShared.hlsli"
 
 float4 main(PixelShaderInput input) : SV_TARGET
 {
