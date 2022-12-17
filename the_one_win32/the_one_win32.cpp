@@ -21,6 +21,10 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 // --- Cleanup application resources.
 					::gpk::error_t										cleanup										(::SApplication& app)											{
+	app.D3DScene			= {};	
+	app.D3DText				= {};
+	app.DeviceResources		= {};
+
 	::gpk::SWindowPlatformDetail												& displayDetail								= app.Framework.MainDisplay.PlatformDetail;
 	::gpk::mainWindowDestroy(app.Framework.MainDisplay);
 	::UnregisterClass(displayDetail.WindowClassName, displayDetail.WindowClass.hInstance);
@@ -28,26 +32,14 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 }
 
 					::gpk::error_t										setup										(::SApplication& app)											{
+						CoInitializeEx(nullptr, COINIT_MULTITHREADED);;
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::SWindow																& mainWindow								= framework.MainDisplay;
 	mainWindow.Size															= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
-
-	//::the1::theOneSetup(app.TheOne);
-
-	//app.EntityCamera					= app.Engine.CreateCamera	();
-	//app.EntityLightDirectional		= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Directional	);
-	//app.EntityLightPoint				= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Point		);
-	//app.EntityLightSpot				= app.Engine.CreateLight	(::gpk::LIGHT_TYPE_Spot			);
-	//app.EntityBox					= app.Engine.CreateBox		();
-	//app.EntitySphere				= app.Engine.CreateSphere	();
-
-	//if(-1 != app.EntityCamera				)	app.Engine.SetPosition(app.EntityCamera				, {0, 0, 0});
-	//if(-1 != app.EntityLightDirectional		)	app.Engine.SetPosition(app.EntityLightDirectional	, {0, 0, 0});
-	//if(-1 != app.EntityLightPoint			)	app.Engine.SetPosition(app.EntityLightPoint			, {0, 0, 0});
-	//if(-1 != app.EntityLightSpot			)	app.Engine.SetPosition(app.EntityLightSpot			, {0, 0, 0});
-	//if(-1 != app.EntityBox					)	app.Engine.SetPosition(app.EntityBox				, {0, 0.5f, 0});
-	//if(-1 != app.EntitySphere				)	app.Engine.SetPosition(app.EntitySphere				, {0, 0.5f, 2});
+	app.DeviceResources->SetWindow(mainWindow.PlatformDetail.WindowHandle);
+	gpk_necs(app.D3DScene.Initialize(app.DeviceResources));
+	gpk_necs(app.D3DText.Initialize(app.DeviceResources));
 
 	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	return 0;

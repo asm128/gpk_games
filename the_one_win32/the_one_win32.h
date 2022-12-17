@@ -1,4 +1,7 @@
 #include "gpk_the_one.h"
+#include "Sample3DSceneRenderer.h"
+#include "SampleFpsTextRenderer.h"
+
 
 #ifndef TEST_GPK_MESH_H_324234234
 #define TEST_GPK_MESH_H_324234234
@@ -40,6 +43,9 @@ struct SApplication {
 	::gpk::SImage<::gpk::SColorBGRA>				ImageAlpha;
 
 	::the1::STheOne									TheOne					= {};
+	::the_one_uwp::Sample3DSceneRenderer			D3DScene				;
+	::the_one_uwp::SampleFpsTextRenderer			D3DText					;
+	::gpk::ptr_obj<::DX::DeviceResources>			DeviceResources			;
 
 													SApplication			(::gpk::SRuntimeValues& runtimeValues)			noexcept	: Framework(runtimeValues) {}
 };

@@ -9,8 +9,8 @@ using namespace Windows::Foundation;
 
 // Initializes view parameters when the window size changes.
 void Sample3DSceneRenderer::CreateWindowSizeDependentResources() {
-	Size									outputSize				= m_deviceResources->GetOutputSize();
-	float									aspectRatio				= outputSize.Width / outputSize.Height;
+	::gpk::SCoord2<float>					outputSize				= m_deviceResources->GetOutputSize();
+	const float								aspectRatio				= outputSize.x / outputSize.y;
 	float									fovAngleY				= 70.0f * XM_PI / 180.0f;
 
 	// This is a simple example of change that can be made when the app is in portrait or snapped view.

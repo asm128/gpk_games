@@ -1,38 +1,19 @@
 ﻿#include "gpk_d3d.h"
-#include "gpk_coord.h"
+#include "gpk_view_grid.h"
 
 #include <dxgi1_4.h>
 #include <DirectXMath.h>
 #include <d2d1_3.h>
 #include <dwrite_3.h>
 #include <wincodec.h>
-#include <agile.h>
 
 #include <ppltasks.h>
-
-
 
 #ifndef DEVICERESOURCES_H_2387647892
 #define DEVICERESOURCES_H_2387647892
 
-namespace DX
+namespace DX 
 {
-	// Function that reads from a binary file asynchronously.
-	inline Concurrency::task<std::vector<byte>>		ReadDataAsync			(const std::wstring& filename) {
-		using namespace										Windows::Storage;
-		using namespace										Concurrency;
-
-		Windows::Storage::StorageFolder						^ folder				= Windows::ApplicationModel::Package::Current->InstalledLocation;
-		return create_task(folder->GetFileAsync(Platform::StringReference(filename.c_str()))).then([] (StorageFile^ file) { return FileIO::ReadBufferAsync(file); }).then([] 
-			(Streams::IBuffer^ fileBuffer) -> std::vector<byte> {
-				std::vector<byte>									returnBuffer;
-				returnBuffer.resize(fileBuffer->Length);
-				Streams::DataReader::FromBuffer(fileBuffer)->ReadBytes(Platform::ArrayReference<byte>(returnBuffer.data(), fileBuffer->Length));
-				return returnBuffer; 
-			}
-		);
-	}
-
 	// Converts a length in device-independent pixels (DIPs) to a length in physical pixels.
 	static inline float								ConvertDipsToPixels		(float dips, float dpi) {
 		static constexpr float								dipsPerInch				= 96.0f;
@@ -45,7 +26,7 @@ namespace DX
 #endif
 	static inline void								ThrowIfFailed			(HRESULT hr) {
 		if (FAILED(hr))
-			throw Platform::Exception::CreateException(hr);	// Set a breakpoint on this line to catch Win32 API errors.
+			throw("");	// Set a breakpoint on this line to catch Win32 API errors.
 	}
 
 	namespace DisplayMetrics
@@ -65,7 +46,8 @@ namespace DX
 
 	// Controls all the DirectX device resources.
 	struct DeviceResources {
-		Platform::Agile<Windows::UI::Core::CoreWindow>	m_window;	// Cached reference to the Window.
+		HWND											m_window								= 0;	// Cached reference to the Window.
+		DEVMODE											DeviceMode								= {sizeof(DEVMODE)};
 
 		IDeviceNotify									* m_deviceNotify						= {};	// The IDeviceNotify can be held directly as it owns the DeviceResources.
 
@@ -91,11 +73,11 @@ namespace DX
 
 		// Cached device properties.
 		D3D_FEATURE_LEVEL								m_d3dFeatureLevel						= D3D_FEATURE_LEVEL_9_1;
-		::gpk::SCoord2<float>							m_d3dRenderTargetSize					= {};
-		::gpk::SCoord2<float>							m_outputSize							= {};
-		::gpk::SCoord2<float>							m_logicalSize							= {};
-		Windows::Graphics::Display::DisplayOrientations	m_nativeOrientation						= {};
-		Windows::Graphics::Display::DisplayOrientations	m_currentOrientation					= {};
+		::gpk::SCoord2<float>							m_d3dRenderTargetSize					= {1280, 720};
+		::gpk::SCoord2<float>							m_outputSize							= {1280, 720};
+		::gpk::SCoord2<float>							m_logicalSize							= {1, 1};
+		::gpk::GRID_ROTATION							m_nativeOrientation						= ::gpk::GRID_ROTATION_0;
+		::gpk::GRID_ROTATION							m_currentOrientation					= ::gpk::GRID_ROTATION_0;
 		float											m_dpi									= -1.0f;
 		float											m_effectiveDpi							= -1.0f;	// This is the DPI that will be reported back to the app. It takes into account whether the app supports high resolution screens or not.
 
@@ -103,26 +85,31 @@ namespace DX
 		D2D1::Matrix3x2F								m_orientationTransform2D				= {};
 		DirectX::XMFLOAT4X4								m_orientationTransform3D				= {};
 
-		void											CreateDeviceResources					();
-		void											CreateWindowSizeDependentResources		();
+														DeviceResources							()									{
+			CreateDeviceIndependentResources();
+			CreateDeviceResources();
+		}
+
+		::gpk::error_t									CreateDeviceResources					();
+		::gpk::error_t 									CreateWindowSizeDependentResources		();
 		// This method determines the rotation between the display device's native orientation and the current display orientation.
 		DXGI_MODE_ROTATION								ComputeDisplayRotation					() {
 			DXGI_MODE_ROTATION									rotation								= DXGI_MODE_ROTATION_UNSPECIFIED;	// Note: NativeOrientation can only be Landscape or Portrait even though the DisplayOrientations enum has other values.
 			switch (m_nativeOrientation) {
-			case Windows::Graphics::Display::DisplayOrientations::Landscape:
+			case ::gpk::GRID_ROTATION_0:
 				switch (m_currentOrientation) {
-				case Windows::Graphics::Display::DisplayOrientations::Landscape			: rotation = DXGI_MODE_ROTATION_IDENTITY; break; 
-				case Windows::Graphics::Display::DisplayOrientations::Portrait			: rotation = DXGI_MODE_ROTATION_ROTATE270; break; 
-				case Windows::Graphics::Display::DisplayOrientations::LandscapeFlipped	: rotation = DXGI_MODE_ROTATION_ROTATE180; break; 
-				case Windows::Graphics::Display::DisplayOrientations::PortraitFlipped	: rotation = DXGI_MODE_ROTATION_ROTATE90; break; 
+				case ::gpk::GRID_ROTATION_0		: rotation = DXGI_MODE_ROTATION_IDENTITY; break; 
+				case ::gpk::GRID_ROTATION_90	: rotation = DXGI_MODE_ROTATION_ROTATE270; break; 
+				case ::gpk::GRID_ROTATION_180	: rotation = DXGI_MODE_ROTATION_ROTATE180; break; 
+				case ::gpk::GRID_ROTATION_270	: rotation = DXGI_MODE_ROTATION_ROTATE90; break; 
 				}
 				break;
-			case Windows::Graphics::Display::DisplayOrientations::Portrait:
+			case ::gpk::GRID_ROTATION_90:
 				switch (m_currentOrientation) {
-				case Windows::Graphics::Display::DisplayOrientations::Landscape			: rotation = DXGI_MODE_ROTATION_ROTATE90; break;
-				case Windows::Graphics::Display::DisplayOrientations::Portrait			: rotation = DXGI_MODE_ROTATION_IDENTITY; break; 
-				case Windows::Graphics::Display::DisplayOrientations::LandscapeFlipped	: rotation = DXGI_MODE_ROTATION_ROTATE270; break; 
-				case Windows::Graphics::Display::DisplayOrientations::PortraitFlipped	: rotation = DXGI_MODE_ROTATION_ROTATE180; break;
+				case ::gpk::GRID_ROTATION_0		: rotation = DXGI_MODE_ROTATION_ROTATE90; break;
+				case ::gpk::GRID_ROTATION_90	: rotation = DXGI_MODE_ROTATION_IDENTITY; break; 
+				case ::gpk::GRID_ROTATION_180	: rotation = DXGI_MODE_ROTATION_ROTATE270; break; 
+				case ::gpk::GRID_ROTATION_270	: rotation = DXGI_MODE_ROTATION_ROTATE180; break;
 				}
 				break;
 			}
@@ -153,11 +140,6 @@ namespace DX
 			m_outputSize.y									= std::max(1.0f, DX::ConvertDipsToPixels(m_logicalSize.y, m_effectiveDpi));
 		}
 
-														DeviceResources							()									{
-			CreateDeviceIndependentResources();
-			CreateDeviceResources();
-		}
-
 		::gpk::SCoord2<float>							GetOutputSize							()	const									{ return m_outputSize; }	// The size of the render target, in pixels.
 		::gpk::SCoord2<float>							GetLogicalSize							()	const									{ return m_logicalSize; }	// The size of the render target, in dips.
 		float											GetDpi									()	const									{ return m_effectiveDpi; }
@@ -181,13 +163,15 @@ namespace DX
 		IWICImagingFactory2*							GetWicImagingFactory					()	const									{ return m_wicFactory.Get(); }
 		D2D1::Matrix3x2F								GetOrientationTransform2D				()	const									{ return m_orientationTransform2D; }
 
-		void											RegisterDeviceNotify					(DX::IDeviceNotify* deviceNotify)										{ m_deviceNotify = deviceNotify; }
-		void											SetLogicalSize							(const ::gpk::SCoord2<float> & logicalSize)								{ if (m_logicalSize			== logicalSize			) return; m_logicalSize			= logicalSize;			CreateWindowSizeDependentResources(); } 
-		void											SetCurrentOrientation					(Windows::Graphics::Display::DisplayOrientations currentOrientation)	{ if (m_currentOrientation	== currentOrientation	) return; m_currentOrientation	= currentOrientation;	CreateWindowSizeDependentResources(); } 
-		void											SetDpi									(float dpi)																{
+		void											RegisterDeviceNotify					(DX::IDeviceNotify* deviceNotify)			{ m_deviceNotify = deviceNotify; }
+		void											SetLogicalSize							(const ::gpk::SCoord2<float> & logicalSize)	{ if (m_logicalSize			== logicalSize			) return; m_logicalSize			= logicalSize;			CreateWindowSizeDependentResources(); } 
+		void											SetCurrentOrientation					(::gpk::GRID_ROTATION currentOrientation)	{ if (m_currentOrientation	== currentOrientation	) return; m_currentOrientation	= currentOrientation;	CreateWindowSizeDependentResources(); } 
+		void											SetDpi									(float dpi)									{
 			if (dpi != m_dpi) {
 				m_dpi											= dpi;
-				m_logicalSize									= {m_window->Bounds.Width, m_window->Bounds.Height};	// When the display DPI changes, the logical size of the window (measured in Dips) also changes and needs to be updated.
+				RECT												rect									= {};
+				GetClientRect(m_window, &rect);
+				m_logicalSize									= {float(rect.right - rect.left), float(rect.bottom - rect.top)};	// When the display DPI changes, the logical size of the window (measured in Dips) also changes and needs to be updated.
 				m_d2dContext->SetDpi(m_dpi, m_dpi);
 				CreateWindowSizeDependentResources();
 			}
@@ -213,13 +197,16 @@ namespace DX
 				m_deviceNotify->OnDeviceRestored();
 		}
 
-		void											SetWindow								(Windows::UI::Core::CoreWindow^ window)		{
-			Windows::Graphics::Display::DisplayInformation		^ currentDisplayInformation				= Windows::Graphics::Display::DisplayInformation::GetForCurrentView();
+		void											SetWindow								(HWND window)		{
 			m_window										= window;
-			m_logicalSize									= {window->Bounds.Width, window->Bounds.Height};
-			m_nativeOrientation								= currentDisplayInformation->NativeOrientation;
-			m_currentOrientation							= currentDisplayInformation->CurrentOrientation;
-			m_dpi											= currentDisplayInformation->LogicalDpi;
+
+			RECT												rect									= {};
+			GetClientRect(m_window, &rect);
+			m_logicalSize									= {float(rect.right - rect.left), float(rect.bottom - rect.top)};	// When the display DPI changes, the logical size of the window (measured in Dips) also changes and needs to be updated.
+			m_nativeOrientation								= ScreenRotation();
+			m_currentOrientation							= ScreenRotation();
+			uint32_t											dpi										= GetDpiForWindow(m_window);
+			m_dpi											= float(dpi);
 			m_d2dContext->SetDpi(m_dpi, m_dpi);
 			CreateWindowSizeDependentResources();
 		}
@@ -234,6 +221,18 @@ namespace DX
 				HandleDeviceLost();	// If the device was removed either by a disconnection or a driver upgrade, we  must recreate all device resources.
 			else
 				DX::ThrowIfFailed(hr);
+		}
+		::gpk::GRID_ROTATION							ScreenRotation							()	{
+			DeviceMode											= {sizeof(DEVMODE)};
+			EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &DeviceMode);	// returned rotation is relative to the natural (default) rotation for this display
+
+			switch(DeviceMode.dmDisplayOrientation) {
+			default:
+			case DMDO_DEFAULT	: return ::gpk::GRID_ROTATION_0			;
+			case DMDO_90		: return ::gpk::GRID_ROTATION_90		;
+			case DMDO_180		: return ::gpk::GRID_ROTATION_180		;
+			case DMDO_270		: return ::gpk::GRID_ROTATION_270		;
+			}
 		}
 	};
 }

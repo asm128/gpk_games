@@ -3,11 +3,6 @@
 using namespace D2D1;
 using namespace DirectX;
 using namespace Microsoft::WRL;
-using namespace Windows::Foundation;
-using namespace Windows::Graphics::Display;
-using namespace Windows::UI::Core;
-using namespace Windows::UI::Xaml::Controls;
-using namespace Platform;
 
 
 // Set the proper orientation for the swap chain, and generate 2D and 3D matrix transformations for rendering to the rotated swap chain. Note the rotation angle for the 2D and 3D transforms are different.
@@ -36,7 +31,7 @@ static constexpr XMFLOAT4X4
 	);
 
 // Configures the Direct3D device, and stores handles to it and the device context.
-void DX::DeviceResources::CreateDeviceResources() {
+::gpk::error_t DX::DeviceResources::CreateDeviceResources() {
 	// This flag adds support for surfaces with a different color channel ordering
 	// than the API default. It is required for compatibility with Direct2D.
 	UINT								creationFlags					= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
@@ -75,10 +70,11 @@ void DX::DeviceResources::CreateDeviceResources() {
 	DX::ThrowIfFailed(m_d3dDevice.As(&dxgiDevice));
 	DX::ThrowIfFailed(m_d2dFactory->CreateDevice(dxgiDevice.Get(), &m_d2dDevice));
 	DX::ThrowIfFailed(m_d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_d2dContext));
+	return 0;
 }
 
 // These resources need to be recreated every time the window size is changed.
-void DX::DeviceResources::CreateWindowSizeDependentResources() {
+::gpk::error_t DX::DeviceResources::CreateWindowSizeDependentResources() {
 	// Clear the previous window size specific context.
 	ID3D11RenderTargetView				* nullViews[]					= {{}};
 	m_d3dContext->OMSetRenderTargets(ARRAYSIZE(nullViews), nullViews, nullptr);
@@ -104,7 +100,7 @@ void DX::DeviceResources::CreateWindowSizeDependentResources() {
 			DX::ThrowIfFailed(hr);
 		else {
 			HandleDeviceLost();	// If the device was removed for any reason, a new device and swap chain will need to be created.
-			return;	// Everything is set up now. Do not continue execution of this method. HandleDeviceLost will reenter this method and correctly set up the new device.
+			return 0;	// Everything is set up now. Do not continue execution of this method. HandleDeviceLost will reenter this method and correctly set up the new device.
 		}
 	} else {
 		// Otherwise, create a new one using the same adapter as the existing Direct3D device.
@@ -123,25 +119,35 @@ void DX::DeviceResources::CreateWindowSizeDependentResources() {
 		swapChainDesc.Scaling				= scaling;
 		swapChainDesc.AlphaMode				= DXGI_ALPHA_MODE_IGNORE;
 
+
+		DXGI_SWAP_CHAIN_FULLSCREEN_DESC			swapChainDescFS				= {0};
+		MONITORINFO								monitor_info				= {sizeof(monitor_info)};
+		ree_if(FALSE == GetMonitorInfoA(MonitorFromWindow(m_window, MONITOR_DEFAULTTOPRIMARY), &monitor_info), "Cannot get MONITORINFO for hWnd(0x%x)", m_window);
+
+		swapChainDescFS.Scaling				= DisplayMetrics::SupportHighResolutions ? DXGI_MODE_SCALING_UNSPECIFIED : DXGI_MODE_SCALING_STRETCHED;;
+		swapChainDescFS.ScanlineOrdering	= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		swapChainDescFS.RefreshRate			= {1, 60};
+		swapChainDescFS.Windowed			= true;
+
 		// This sequence obtains the DXGI factory that was used to create the Direct3D device above.
 		ComPtr<IDXGIDevice3>					dxgiDevice;
 		ComPtr<IDXGIAdapter>					dxgiAdapter;
 		ComPtr<IDXGIFactory4>					dxgiFactory;
 		ComPtr<IDXGISwapChain1>					swapChain;
-		DX::ThrowIfFailed(m_d3dDevice.As(&dxgiDevice));
-		DX::ThrowIfFailed(dxgiDevice->GetAdapter(&dxgiAdapter));
-		DX::ThrowIfFailed(dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory)));
-		DX::ThrowIfFailed(dxgiFactory->CreateSwapChainForCoreWindow(m_d3dDevice.Get(), (IUnknown*)m_window.Get(), &swapChainDesc, nullptr, &swapChain));
-		DX::ThrowIfFailed(swapChain.As(&m_swapChain));
-		DX::ThrowIfFailed(dxgiDevice->SetMaximumFrameLatency(1));	// Ensure that DXGI does not queue more than one frame at a time. This both reduces latency and ensures that the application will only render after each VSync, minimizing power consumption.
+		gpk_hrcall(m_d3dDevice.As(&dxgiDevice));
+		gpk_hrcall(dxgiDevice->GetAdapter(&dxgiAdapter));
+		gpk_hrcall(dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory)));
+		gpk_hrcall(dxgiFactory->CreateSwapChainForHwnd(m_d3dDevice.Get(), m_window, &swapChainDesc, &swapChainDescFS, nullptr, &swapChain));
+		gpk_hrcall(swapChain.As(&m_swapChain));
+		gpk_hrcall(dxgiDevice->SetMaximumFrameLatency(1));	// Ensure that DXGI does not queue more than one frame at a time. This both reduces latency and ensures that the application will only render after each VSync, minimizing power consumption.
 	}
+
 	switch (displayRotation) {
+	default:
 	case DXGI_MODE_ROTATION_IDENTITY	: m_orientationTransform3D = ZRotation0		; m_orientationTransform2D = Matrix3x2F::Identity(); break;
 	case DXGI_MODE_ROTATION_ROTATE90	: m_orientationTransform3D = ZRotation270	; m_orientationTransform2D = Matrix3x2F::Rotation(90.0f) * Matrix3x2F::Translation(m_logicalSize.y, 0.0f); break;
 	case DXGI_MODE_ROTATION_ROTATE180	: m_orientationTransform3D = ZRotation180	; m_orientationTransform2D = Matrix3x2F::Rotation(180.f) * Matrix3x2F::Translation(m_logicalSize.x, m_logicalSize.y); break;
 	case DXGI_MODE_ROTATION_ROTATE270	: m_orientationTransform3D = ZRotation90	; m_orientationTransform2D = Matrix3x2F::Rotation(270.f) * Matrix3x2F::Translation(0.0f, m_logicalSize.x); break;
-	default:
-		throw ref new FailureException();
 	}
 	DX::ThrowIfFailed(m_swapChain->SetRotation(displayRotation));
 
@@ -166,4 +172,6 @@ void DX::DeviceResources::CreateWindowSizeDependentResources() {
 	m_d2dContext->SetTarget(m_d2dTargetBitmap.Get());
 	m_d2dContext->SetDpi(m_effectiveDpi, m_effectiveDpi);
 	m_d2dContext->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);	// Grayscale text anti-aliasing is recommended for all Microsoft Store apps.
+
+	return 0;
 }
