@@ -43,8 +43,8 @@ struct SApplication : DX::IDeviceNotify {
 	::gpk::SImage<::gpk::SColorBGRA>				ImageAlpha;
 
 	::the1::STheOne									TheOne					= {};
-	::the_one_uwp::Sample3DSceneRenderer			D3DScene				;
-	::the_one_uwp::SampleFpsTextRenderer			D3DText					;
+	::the_one_win32::Sample3DSceneRenderer			D3DScene				;
+	::the_one_win32::SampleFpsTextRenderer			D3DText					;
 	::gpk::ptr_obj<::DX::D3DDeviceResources>		DeviceResources			;
 
 	// Notifies renderers that device resources need to be released.

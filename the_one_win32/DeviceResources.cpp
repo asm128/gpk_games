@@ -1,11 +1,8 @@
 ﻿#include "DeviceResources.h"
 
-using namespace D2D1;
-using namespace DirectX;
-
 // Set the proper orientation for the swap chain, and generate 2D and 3D matrix transformations for rendering to the rotated swap chain. Note the rotation angle for the 2D and 3D transforms are different.
 // This is due to the difference in coordinate spaces. Additionally, the 3D matrix is specified explicitly to avoid rounding errors.
-static constexpr XMFLOAT4X4				
+static constexpr DirectX::XMFLOAT4X4				
 	ZRotation0
 		( 1.0f, 0.0f, 0.0f, 0.0f
 		, 0.0f, 1.0f, 0.0f, 0.0f
@@ -32,7 +29,7 @@ static constexpr XMFLOAT4X4
 ::gpk::error_t DX::D3DDeviceResources::CreateDeviceResources() {
 	// This flag adds support for surfaces with a different color channel ordering
 	// than the API default. It is required for compatibility with Direct2D.
-	UINT								creationFlags					= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+	uint32_t							creationFlags					= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #if defined(_DEBUG)
 	if (DX::SdkLayersAvailable()) // If the project is in a debug build, enable debugging via SDK Layers with this flag.
 		creationFlags					|= D3D11_CREATE_DEVICE_DEBUG;
@@ -142,14 +139,14 @@ static constexpr XMFLOAT4X4
 
 	switch (displayRotation) {
 	default:
-	case DXGI_MODE_ROTATION_IDENTITY	: m_orientationTransform3D = ZRotation0		; m_orientationTransform2D = Matrix3x2F::Identity(); break;
-	case DXGI_MODE_ROTATION_ROTATE90	: m_orientationTransform3D = ZRotation270	; m_orientationTransform2D = Matrix3x2F::Rotation(90.0f) * Matrix3x2F::Translation(m_logicalSize.y, 0.0f); break;
-	case DXGI_MODE_ROTATION_ROTATE180	: m_orientationTransform3D = ZRotation180	; m_orientationTransform2D = Matrix3x2F::Rotation(180.f) * Matrix3x2F::Translation(m_logicalSize.x, m_logicalSize.y); break;
-	case DXGI_MODE_ROTATION_ROTATE270	: m_orientationTransform3D = ZRotation90	; m_orientationTransform2D = Matrix3x2F::Rotation(270.f) * Matrix3x2F::Translation(0.0f, m_logicalSize.x); break;
+	case DXGI_MODE_ROTATION_IDENTITY	: m_orientationTransform3D = ZRotation0		; m_orientationTransform2D = D2D1::Matrix3x2F::Identity(); break;
+	case DXGI_MODE_ROTATION_ROTATE90	: m_orientationTransform3D = ZRotation270	; m_orientationTransform2D = D2D1::Matrix3x2F::Rotation(90.0f) * D2D1::Matrix3x2F::Translation(m_logicalSize.y, 0.0f); break;
+	case DXGI_MODE_ROTATION_ROTATE180	: m_orientationTransform3D = ZRotation180	; m_orientationTransform2D = D2D1::Matrix3x2F::Rotation(180.f) * D2D1::Matrix3x2F::Translation(m_logicalSize.x, m_logicalSize.y); break;
+	case DXGI_MODE_ROTATION_ROTATE270	: m_orientationTransform3D = ZRotation90	; m_orientationTransform2D = D2D1::Matrix3x2F::Rotation(270.f) * D2D1::Matrix3x2F::Translation(0.0f, m_logicalSize.x); break;
 	}
 	DX::ThrowIfFailed(m_swapChain->SetRotation(displayRotation));
 
-	::gpk::ptr_com<ID3D11Texture2D1>				backBuffer;
+	::gpk::ptr_com<ID3D11Texture2D1>		backBuffer;
 	DX::ThrowIfFailed(m_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer)));
 	DX::ThrowIfFailed(m_d3dDevice->CreateRenderTargetView1(backBuffer, nullptr, &m_d3dRenderTargetView));	// Create a render target view of the swap chain back buffer.
 	
