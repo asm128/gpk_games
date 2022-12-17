@@ -9,17 +9,6 @@ using namespace Windows::UI::Core;
 using namespace Windows::UI::Xaml::Controls;
 using namespace Platform;
 
-// Constructor for DeviceResources. Configures resources that don't depend on the Direct3D device.
-void DX::DeviceResources::CreateDeviceIndependentResources() {
-	D2D1_FACTORY_OPTIONS				options							= {};	// Initialize Direct2D resources.
-#if defined(_DEBUG)
-	options.debugLevel				= D2D1_DEBUG_LEVEL_INFORMATION;		// If the project is in a debug build, enable Direct2D debugging via SDK Layers.
-#endif
-	DX::ThrowIfFailed(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &options, &m_d2dFactory));	// Initialize the Direct2D Factory.
-	DX::ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory3), &m_dwriteFactory));			// Initialize the DirectWrite Factory.
-	DX::ThrowIfFailed(CoCreateInstance(CLSID_WICImagingFactory2, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_wicFactory)));	// Initialize the Windows Imaging Component (WIC) Factory.
-}
-
 // Configures the Direct3D device, and stores handles to it and the device context.
 void DX::DeviceResources::CreateDeviceResources() {
 	// This flag adds support for surfaces with a different color channel ordering
@@ -187,36 +176,4 @@ void DX::DeviceResources::CreateWindowSizeDependentResources() {
 	m_d2dContext->SetTarget(m_d2dTargetBitmap.Get());
 	m_d2dContext->SetDpi(m_effectiveDpi, m_effectiveDpi);
 	m_d2dContext->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);	// Grayscale text anti-aliasing is recommended for all Microsoft Store apps.
-}
-
-// This method is called in the event handler for the DisplayContentsInvalidated event.
-void DX::DeviceResources::ValidateDevice() { 
-	// If the adapter LUIDs don't match, or if the device reports that it has been removed, a new D3D device must be created. Release references to resources related to the old device.
-	if(::gpk::d3dDeviceValidate(m_d3dDevice))
-		HandleDeviceLost();	// Create a new device and swap chain.
-}
-
-// This method determines the rotation between the display device's native orientation and the
-// current display orientation.
-DXGI_MODE_ROTATION DX::DeviceResources::ComputeDisplayRotation() {
-	DXGI_MODE_ROTATION						rotation					= DXGI_MODE_ROTATION_UNSPECIFIED;	// Note: NativeOrientation can only be Landscape or Portrait even though the DisplayOrientations enum has other values.
-	switch (m_nativeOrientation) {
-	case DisplayOrientations::Landscape:
-		switch (m_currentOrientation) {
-		case DisplayOrientations::Landscape			: rotation = DXGI_MODE_ROTATION_IDENTITY; break; 
-		case DisplayOrientations::Portrait			: rotation = DXGI_MODE_ROTATION_ROTATE270; break; 
-		case DisplayOrientations::LandscapeFlipped	: rotation = DXGI_MODE_ROTATION_ROTATE180; break; 
-		case DisplayOrientations::PortraitFlipped	: rotation = DXGI_MODE_ROTATION_ROTATE90; break; 
-		}
-		break;
-	case DisplayOrientations::Portrait:
-		switch (m_currentOrientation) {
-		case DisplayOrientations::Landscape			: rotation = DXGI_MODE_ROTATION_ROTATE90; break;
-		case DisplayOrientations::Portrait			: rotation = DXGI_MODE_ROTATION_IDENTITY; break; 
-		case DisplayOrientations::LandscapeFlipped	: rotation = DXGI_MODE_ROTATION_ROTATE270; break; 
-		case DisplayOrientations::PortraitFlipped	: rotation = DXGI_MODE_ROTATION_ROTATE180; break;
-		}
-		break;
-	}
-	return rotation;
 }

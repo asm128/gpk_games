@@ -13,7 +13,7 @@
 	DXGI_ADAPTER_DESC1						previousDesc				= {};	// First, get the information for the default adapter from when the device was created.
 	DXGI_ADAPTER_DESC1						currentDesc					= {};	// Next, get the information for the current default adapter.
 
-	d3dDevice.As(&dxgiDevice);
+	gpk_hrcall(d3dDevice.As(&dxgiDevice));
 	gpk_hrcall(dxgiDevice->GetAdapter(&deviceAdapter));
 	gpk_hrcall(deviceAdapter->GetParent(IID_PPV_ARGS(&deviceFactory)));
 	gpk_hrcall(deviceFactory->EnumAdapters1(0, &previousDefaultAdapter));
@@ -23,8 +23,9 @@
 	gpk_hrcall(currentFactory->EnumAdapters1(0, &currentDefaultAdapter));
 	gpk_hrcall(currentDefaultAdapter->GetDesc1(&currentDesc));
 
+	// If the adapter LUIDs don't match, or if the device reports that it has been removed, a new D3D device must be created. Release references to resources related to the old device.
 	if (0 == memcmp(&previousDesc.AdapterLuid, &currentDesc.AdapterLuid, sizeof(LUID)) && !FAILED(d3dDevice->GetDeviceRemovedReason())) 
 		return 0;
 
-	return -1;
+	return 1;
 }

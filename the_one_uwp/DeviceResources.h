@@ -7,24 +7,55 @@
 #include <wincodec.h>
 #include <agile.h>
 
-#include "DirectXHelper.h"
+#include <ppltasks.h>
 
 #ifndef DEVICERESOURCES_H_2387647892
 #define DEVICERESOURCES_H_2387647892
 
 namespace DX
 {
+	// Function that reads from a binary file asynchronously.
+	inline Concurrency::task<std::vector<byte>>		ReadDataAsync			(const std::wstring& filename) {
+		using namespace										Windows::Storage;
+		using namespace										Concurrency;
+
+		Windows::Storage::StorageFolder						^ folder				= Windows::ApplicationModel::Package::Current->InstalledLocation;
+		return create_task(folder->GetFileAsync(Platform::StringReference(filename.c_str()))).then([] (StorageFile^ file) { return FileIO::ReadBufferAsync(file); }).then([] 
+			(Streams::IBuffer^ fileBuffer) -> std::vector<byte> {
+				std::vector<byte>									returnBuffer;
+				returnBuffer.resize(fileBuffer->Length);
+				Streams::DataReader::FromBuffer(fileBuffer)->ReadBytes(Platform::ArrayReference<byte>(returnBuffer.data(), fileBuffer->Length));
+				return returnBuffer; 
+			}
+		);
+	}
+
+	// Converts a length in device-independent pixels (DIPs) to a length in physical pixels.
+	static inline float								ConvertDipsToPixels		(float dips, float dpi) {
+		static constexpr float								dipsPerInch				= 96.0f;
+		return floorf(dips * dpi / dipsPerInch + 0.5f); // Round to nearest integer.
+	}
+#if defined(_DEBUG)
+	static inline bool								SdkLayersAvailable		() {		// Check for SDK Layer support.
+		return SUCCEEDED(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_NULL, 0, D3D11_CREATE_DEVICE_DEBUG, nullptr, 0, D3D11_SDK_VERSION, nullptr, nullptr, nullptr));
+	}
+#endif
+	static inline void								ThrowIfFailed			(HRESULT hr) {
+		if (FAILED(hr))
+			throw Platform::Exception::CreateException(hr);	// Set a breakpoint on this line to catch Win32 API errors.
+	}
+
 	namespace DisplayMetrics
 	{
 		static constexpr	bool						SupportHighResolutions					= false;	// High resolution displays can require a lot of GPU and battery power to render. High resolution phones, for example, may suffer from poor battery life if games attempt to render at 60 frames per second at full fidelity. The decision to render at full fidelity across all platforms and form factors should be deliberate.
-		static constexpr	float						DpiThreshold							= 192.0f;		// 200% of standard desktop display.
-		static constexpr	float						WidthThreshold							= 1920.0f;	// 1080p width.
-		static constexpr	float						HeightThreshold							= 1080.0f;	// 1080p height.
+		static constexpr	float						DpiThreshold							= 192.0f;	// 200% of standard desktop display.
+		static constexpr	float						WidthThreshold							= 1920.f;	// 1080p width.
+		static constexpr	float						HeightThreshold							= 1080.f;	// 1080p height.
 		// The default thresholds that define a "high resolution" display. If the thresholds are exceeded and SupportHighResolutions is false, the dimensions will be scaled by 50%.
 	};
 
 	// Provides an interface for an application that owns DeviceResources to be notified of the device being lost or created.
-	interface IDeviceNotify {
+	struct IDeviceNotify {
 		virtual void									OnDeviceLost							() = 0;
 		virtual void									OnDeviceRestored						() = 0;
 	};
@@ -69,10 +100,41 @@ namespace DX
 		D2D1::Matrix3x2F								m_orientationTransform2D				= {};
 		DirectX::XMFLOAT4X4								m_orientationTransform3D				= {};
 
-		void											CreateDeviceIndependentResources		();
 		void											CreateDeviceResources					();
 		void											CreateWindowSizeDependentResources		();
-		DXGI_MODE_ROTATION								ComputeDisplayRotation					();
+		// This method determines the rotation between the display device's native orientation and the current display orientation.
+		DXGI_MODE_ROTATION								ComputeDisplayRotation					() {
+			DXGI_MODE_ROTATION									rotation								= DXGI_MODE_ROTATION_UNSPECIFIED;	// Note: NativeOrientation can only be Landscape or Portrait even though the DisplayOrientations enum has other values.
+			switch (m_nativeOrientation) {
+			case Windows::Graphics::Display::DisplayOrientations::Landscape:
+				switch (m_currentOrientation) {
+				case Windows::Graphics::Display::DisplayOrientations::Landscape			: rotation = DXGI_MODE_ROTATION_IDENTITY; break; 
+				case Windows::Graphics::Display::DisplayOrientations::Portrait			: rotation = DXGI_MODE_ROTATION_ROTATE270; break; 
+				case Windows::Graphics::Display::DisplayOrientations::LandscapeFlipped	: rotation = DXGI_MODE_ROTATION_ROTATE180; break; 
+				case Windows::Graphics::Display::DisplayOrientations::PortraitFlipped	: rotation = DXGI_MODE_ROTATION_ROTATE90; break; 
+				}
+				break;
+			case Windows::Graphics::Display::DisplayOrientations::Portrait:
+				switch (m_currentOrientation) {
+				case Windows::Graphics::Display::DisplayOrientations::Landscape			: rotation = DXGI_MODE_ROTATION_ROTATE90; break;
+				case Windows::Graphics::Display::DisplayOrientations::Portrait			: rotation = DXGI_MODE_ROTATION_IDENTITY; break; 
+				case Windows::Graphics::Display::DisplayOrientations::LandscapeFlipped	: rotation = DXGI_MODE_ROTATION_ROTATE270; break; 
+				case Windows::Graphics::Display::DisplayOrientations::PortraitFlipped	: rotation = DXGI_MODE_ROTATION_ROTATE180; break;
+				}
+				break;
+			}
+			return rotation;
+		}
+
+		void											CreateDeviceIndependentResources		() {
+			D2D1_FACTORY_OPTIONS								options									= {};	// Initialize Direct2D resources.
+		#if defined(_DEBUG)
+			options.debugLevel								= D2D1_DEBUG_LEVEL_INFORMATION;		// If the project is in a debug build, enable Direct2D debugging via SDK Layers.
+		#endif
+			DX::ThrowIfFailed(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &options, &m_d2dFactory));	// Initialize the Direct2D Factory.
+			DX::ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory3), &m_dwriteFactory));			// Initialize the DirectWrite Factory.
+			DX::ThrowIfFailed(CoCreateInstance(CLSID_WICImagingFactory2, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_wicFactory)));	// Initialize the Windows Imaging Component (WIC) Factory.
+		}
 
 		// Determine the dimensions of the render target and whether it will be scaled down.
 		void											UpdateRenderTargetSize					() {
@@ -93,7 +155,6 @@ namespace DX
 			CreateDeviceIndependentResources();
 			CreateDeviceResources();
 		}
-
 
 		Windows::Foundation::Size						GetOutputSize							()	const									{ return m_outputSize; }	// The size of the render target, in pixels.
 		Windows::Foundation::Size						GetLogicalSize							()	const									{ return m_logicalSize; }	// The size of the render target, in dips.
@@ -124,7 +185,7 @@ namespace DX
 		void											SetDpi									(float dpi)																{
 			if (dpi != m_dpi) {
 				m_dpi											= dpi;
-				m_logicalSize									= Windows::Foundation::Size(m_window->Bounds.Width, m_window->Bounds.Height);	// When the display DPI changes, the logical size of the window (measured in Dips) also changes and needs to be updated.
+				m_logicalSize									= {m_window->Bounds.Width, m_window->Bounds.Height};	// When the display DPI changes, the logical size of the window (measured in Dips) also changes and needs to be updated.
 				m_d2dContext->SetDpi(m_dpi, m_dpi);
 				CreateWindowSizeDependentResources();
 			}
@@ -137,19 +198,8 @@ namespace DX
 			dxgiDevice->Trim();
 		}
 
-		void											SetWindow								(Windows::UI::Core::CoreWindow^ window)						{
-			Windows::Graphics::Display::DisplayInformation		^ currentDisplayInformation				= Windows::Graphics::Display::DisplayInformation::GetForCurrentView();
-			m_window										= window;
-			m_logicalSize									= Windows::Foundation::Size(window->Bounds.Width, window->Bounds.Height);
-			m_nativeOrientation								= currentDisplayInformation->NativeOrientation;
-			m_currentOrientation							= currentDisplayInformation->CurrentOrientation;
-			m_dpi											= currentDisplayInformation->LogicalDpi;
-			m_d2dContext->SetDpi(m_dpi, m_dpi);
-			CreateWindowSizeDependentResources();
-		}
-
-		void ValidateDevice();
 		// Recreate all device resources and set them back to the current state.
+		void											ValidateDevice							()											{ if(::gpk::d3dDeviceValidate(m_d3dDevice)) HandleDeviceLost();	}
 		void											HandleDeviceLost						()											{
 			m_swapChain										= nullptr;
 			if (m_deviceNotify) 
@@ -159,6 +209,17 @@ namespace DX
 			CreateWindowSizeDependentResources();
 			if (m_deviceNotify) 
 				m_deviceNotify->OnDeviceRestored();
+		}
+
+		void											SetWindow								(Windows::UI::Core::CoreWindow^ window)		{
+			Windows::Graphics::Display::DisplayInformation		^ currentDisplayInformation				= Windows::Graphics::Display::DisplayInformation::GetForCurrentView();
+			m_window										= window;
+			m_logicalSize									= {window->Bounds.Width, window->Bounds.Height};
+			m_nativeOrientation								= currentDisplayInformation->NativeOrientation;
+			m_currentOrientation							= currentDisplayInformation->CurrentOrientation;
+			m_dpi											= currentDisplayInformation->LogicalDpi;
+			m_d2dContext->SetDpi(m_dpi, m_dpi);
+			CreateWindowSizeDependentResources();
 		}
 
 		// Present the contents of the swap chain to the screen.

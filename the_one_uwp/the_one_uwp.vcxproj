@@ -306,9 +306,7 @@
     <Image Include="Assets\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="App.h" />
     <ClInclude Include="DeviceResources.h" />
-    <ClInclude Include="DirectXHelper.h" />
     <ClInclude Include="gpk_d3d.h" />
     <ClInclude Include="Sample3DSceneRenderer.h" />
     <ClInclude Include="SampleFpsTextRenderer.h" />

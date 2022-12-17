@@ -6,6 +6,9 @@
 namespace DX
 {
 	// Helper class for animation and simulation timing.
+	// Change the timer settings if you want something other than the default variable timestep mode.// e.g. for 60 FPS fixed timestep update logic, call:
+	// Timer.SetFixedTimeStep(true);
+	// Timer.SetTargetElapsedSeconds(1.0 / 60);
 	class StepTimer {
 	public:
 		// Source timing data uses QPC units.
@@ -63,13 +66,13 @@ namespace DX
 
 		// Update timer state, calling the specified Update function the appropriate number of times.
 		template<typename TUpdate>
-		void						Tick		(const TUpdate& update)	{
+		void						Tick							(const TUpdate& update)	{
 			// Query the current time.
-			LARGE_INTEGER					currentTime			= {};
+			LARGE_INTEGER					currentTime						= {};
 			if (!QueryPerformanceCounter(&currentTime))
 				throw ref new Platform::FailureException();
 
-			uint64_t						timeDelta			= currentTime.QuadPart - m_qpcLastTime.QuadPart;
+			uint64_t						timeDelta						= currentTime.QuadPart - m_qpcLastTime.QuadPart;
 			m_qpcLastTime				= currentTime;
 			m_qpcSecondCounter			+= timeDelta;
 
@@ -80,7 +83,7 @@ namespace DX
 			timeDelta					*= TicksPerSecond;
 			timeDelta					/= m_qpcFrequency.QuadPart;
 
-			uint32_t						lastFrameCount		= m_frameCount;
+			uint32_t						lastFrameCount					= m_frameCount;
 			if (m_isFixedTimeStep) { // Fixed timestep update logic
 				// If the app is running very close to the target elapsed time (within 1/4 of a millisecond) just clamp the clock to exactly match the target value. This prevents tiny and irrelevant errors
 				// from accumulating over time. Without this clamping, a game that requested a 60 fps fixed update, running with vsync enabled on a 59.94 NTSC display, would eventually
