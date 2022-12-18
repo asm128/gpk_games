@@ -17,7 +17,8 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "The One");
 
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
 	const ::gpk::SCoord2<uint32_t>												newSize										= app.Framework.RootWindow.Size;
-	::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->Color, newSize);
+	//::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->Color, newSize);
+	//::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->DepthStencil, newSize);
 	app.DeviceResources->SetLogicalSize(newSize.Cast<float>());
 	app.D3DScene.CreateWindowSizeDependentResources(); 
 	app.Framework.RootWindow.Resized										= false;
@@ -94,10 +95,6 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 		ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	}
 
-	::gpk::ptr_obj<::gpk::SWindow::TOffscreen>									backBuffer									= framework.RootWindow.BackBuffer;
-	//framework.BackBuffer = {};
-	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), 0xFF000030, (uint32_t)-1);
-
 	auto								context				= app.DeviceResources->GetD3DDeviceContext();
 	auto								viewport			= app.DeviceResources->GetScreenViewport();	// Reset the viewport to target the whole screen.
 	context->RSSetViewports(1, &viewport);
@@ -112,6 +109,9 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	app.D3DText.Render();
 	app.DeviceResources->Present();
 
+	//::gpk::ptr_obj<::gpk::SWindow::TOffscreen>									backBuffer									= framework.RootWindow.BackBuffer;
+	framework.RootWindow.BackBuffer											= {};
+	//backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), 0xFF000030, (uint32_t)-1);
 	//::the1::theOneDraw(app.TheOne, *backBuffer, framework.FrameInfo.Seconds.Total);
 	//memcpy(framework.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	//::gpk::grid_mirror_y(framework.BackBuffer->Color.View, backBuffer->Color.View);
