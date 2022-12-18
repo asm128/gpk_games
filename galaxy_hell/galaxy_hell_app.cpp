@@ -11,7 +11,7 @@
 	for(uint32_t iEvent = 0; iEvent < systemEvents.size(); ++iEvent) {
 		const ::gpk::SSysEvent				& eventToProcess				= systemEvents[iEvent];
 		switch(eventToProcess.Type) {
-		case gpk::SYSEVENT_RESIZE: {
+		case gpk::SYSEVENT_WINDOW_RESIZE: {
 			::gpk::SCoord2<uint16_t>			newMetrics						= *(const ::gpk::SCoord2<uint16_t>*)eventToProcess.Data.begin();
 			::gpk::guiUpdateMetrics(*app.DialogDesktop.GUI, newMetrics.Cast<uint32_t>(), true);
 			for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) {
@@ -60,8 +60,8 @@
 				}
 			}
 			break;
-		case ::gpk::SYSEVENT_CLOSE:
-		case ::gpk::SYSEVENT_DEACTIVATE: 
+		case ::gpk::SYSEVENT_WINDOW_CLOSE:
+		case ::gpk::SYSEVENT_WINDOW_DEACTIVATE: 
 			if(app.ActiveState != ::ghg::APP_STATE_Welcome) {
 				app.Save(::ghg::SAVE_MODE_AUTO);
 				app.ActiveState						= ::ghg::APP_STATE_Home;

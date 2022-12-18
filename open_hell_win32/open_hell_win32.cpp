@@ -186,9 +186,9 @@ int										update				(SApplication & app, bool exitSignal)	{
 
 	for(uint32_t iEvent = 0; iEvent < framework.RootWindow.EventQueue.size(); ++iEvent) {
 		switch(framework.RootWindow.EventQueue[iEvent].Type) {
-		case ::gpk::SYSEVENT_ACTIVATE:
+		case ::gpk::SYSEVENT_WINDOW_ACTIVATE:
 			break;
-		case ::gpk::SYSEVENT_DEACTIVATE:
+		case ::gpk::SYSEVENT_WINDOW_DEACTIVATE:
 			break;
 		case ::gpk::SYSEVENT_SYSKEY_DOWN:
 		case ::gpk::SYSEVENT_KEY_DOWN:

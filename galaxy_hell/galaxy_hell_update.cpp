@@ -487,7 +487,7 @@ int													ghg::solarSystemUpdate				(::ghg::SGalaxyHell & solarSystem, dou
 	for(uint32_t iSysEvent = 0; iSysEvent < frameEvents.size(); ++iSysEvent) {
 		const ::gpk::SSysEvent									& eventToProcess					= frameEvents[iSysEvent];
 		switch(eventToProcess.Type) {
-		case ::gpk::SYSEVENT_RESIZE:
+		case ::gpk::SYSEVENT_WINDOW_RESIZE:
 			break;
 		}
 	}
