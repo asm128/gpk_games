@@ -209,8 +209,8 @@ int										update				(SApplication & app, bool exitSignal)	{
 	//	if(app.OpenHellApp.RenderTargetQueue.size()) {
 	//		::std::lock_guard<::std::mutex>			lockRTPool	(app.OpenHellApp.RenderTargetLockPool);
 	//
-	//		app.OpenHellApp.RenderTargetPool.push_back(app.Framework.MainDisplayOffscreen);
-	//		app.Framework.MainDisplayOffscreen	= app.OpenHellApp.RenderTargetQueue[app.OpenHellApp.RenderTargetQueue.size() - 1];
+	//		app.OpenHellApp.RenderTargetPool.push_back(app.Framework.BackBuffer);
+	//		app.Framework.BackBuffer	= app.OpenHellApp.RenderTargetQueue[app.OpenHellApp.RenderTargetQueue.size() - 1];
 	//		app.OpenHellApp.RenderTargetQueue.pop_back(0);
 	//		for(uint32_t iRT = 0; iRT < app.OpenHellApp.RenderTargetQueue.size(); ++iRT) {
 	//			app.OpenHellApp.RenderTargetPool.push_back(app.OpenHellApp.RenderTargetQueue[iRT]);

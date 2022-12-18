@@ -17,9 +17,10 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "The One");
 
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
 	const ::gpk::SCoord2<uint32_t>												newSize										= app.Framework.MainDisplay.Size;
-	::gpk::updateSizeDependentTarget(app.Framework.MainDisplayOffscreen->Color, newSize);
+	::gpk::updateSizeDependentTarget(app.Framework.BackBuffer->Color, newSize);
 	app.DeviceResources->SetLogicalSize(newSize.Cast<float>());
 	app.D3DScene.CreateWindowSizeDependentResources(); 
+	app.Framework.MainDisplay.Resized										= false;
 	return 0;
 }
 
@@ -47,7 +48,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	
 	gpk_necs(app.D3DScene.Initialize(app.DeviceResources));
 	gpk_necs(app.D3DText.Initialize(app.DeviceResources));
-	ree_if	(errored(::updateSizeDependentResources	(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
+	ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and textures and this could cause an invalid memory access later on.");
 	return 0;
 }
 
@@ -95,9 +96,9 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 		ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	}
 
-	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer	= framework.MainDisplayOffscreen;
-	//framework.MainDisplayOffscreen = {};
-	backBuffer->resize(framework.MainDisplayOffscreen->Color.metrics(), 0xFF000030, (uint32_t)-1);
+	::gpk::ptr_obj<::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>>			backBuffer	= framework.BackBuffer;
+	//framework.BackBuffer = {};
+	backBuffer->resize(framework.BackBuffer->Color.metrics(), 0xFF000030, (uint32_t)-1);
 
 	auto								context				= app.DeviceResources->GetD3DDeviceContext();
 	auto								viewport			= app.DeviceResources->GetScreenViewport();	// Reset the viewport to target the whole screen.
@@ -114,9 +115,9 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	app.DeviceResources->Present();
 
 	//::the1::theOneDraw(app.TheOne, *backBuffer, framework.FrameInfo.Seconds.Total);
-	//memcpy(framework.MainDisplayOffscreen->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
-	//::gpk::grid_mirror_y(framework.MainDisplayOffscreen->Color.View, backBuffer->Color.View);
-	//framework.MainDisplayOffscreen = backBuffer;
+	//memcpy(framework.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
+	//::gpk::grid_mirror_y(framework.BackBuffer->Color.View, backBuffer->Color.View);
+	//framework.BackBuffer = backBuffer;
 	//------------------------------------------------
 	return 0;
 }
