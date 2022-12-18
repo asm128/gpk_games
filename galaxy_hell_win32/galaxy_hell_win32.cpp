@@ -36,7 +36,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Galaxy Hell v0.4");
 
 ::gpk::error_t							cleanup							(::SApplication & app)						{ 
 	::gpk::SFramework							& framework						= app.Framework;
-	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.Input, framework.MainDisplay.EventQueue);
+	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.Input, framework.RootWindow.EventQueue);
 	app.AudioState.CleanupAudio(); 
 
 
@@ -52,7 +52,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Galaxy Hell v0.4");
 #endif
 	//::gpk::clientDisconnect(app.Client);
 	//::gpk::tcpipShutdown();
-	return ::gpk::mainWindowDestroy(app.Framework.MainDisplay); 
+	return ::gpk::mainWindowDestroy(app.Framework.RootWindow); 
 }
 
 #ifdef USE_STEAM_CLIENT
@@ -134,7 +134,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	//gpk_necall(::gpk::tcpipInitialize(), "Failed to initialize network subsystem: '%s'.", "Unknown error");
 
 	::gpk::SFramework							& framework						= app.Framework;
-	::gpk::SWindow								& mainWindow					= framework.MainDisplay;
+	::gpk::SWindow								& mainWindow					= framework.RootWindow;
 
 	mainWindow.Size							= {1280, 720};
 
@@ -158,16 +158,16 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 
 	//joySetThreshold(JOYSTICKID1, 1);
 	//joySetThreshold(JOYSTICKID2, 1);
-	//joySetCapture(framework.MainDisplay.PlatformDetail.WindowHandle, JOYSTICKID1, 10, 0);
-	//joySetCapture(framework.MainDisplay.PlatformDetail.WindowHandle, JOYSTICKID2, 10, 0);
+	//joySetCapture(framework.RootWindow.PlatformDetail.WindowHandle, JOYSTICKID1, 10, 0);
+	//joySetCapture(framework.RootWindow.PlatformDetail.WindowHandle, JOYSTICKID2, 10, 0);
 
-	framework.MainDisplay.Input->JoystickCurrent.resize(4, {});
+	framework.RootWindow.Input->JoystickCurrent.resize(4, {});
 	//for(uint32_t i = 0; i < 4; ++i) 
 	//	app.GamePad.Resume();
 
 
 	// create a rendering context  
-	app.DrawingContext				= GetDC(framework.MainDisplay.PlatformDetail.WindowHandle);
+	app.DrawingContext				= GetDC(framework.RootWindow.PlatformDetail.WindowHandle);
 	app.GLRenderContext				= wglCreateContext(app.DrawingContext); 
  
 	// make it the calling thread's current rendering context 
@@ -184,24 +184,24 @@ int										update				(SApplication & app, bool exitSignal)	{
 	//::gpk::STimer								timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 
-	for(uint32_t iEvent = 0; iEvent < framework.MainDisplay.EventQueue.size(); ++iEvent) {
-		switch(framework.MainDisplay.EventQueue[iEvent].Type) {
+	for(uint32_t iEvent = 0; iEvent < framework.RootWindow.EventQueue.size(); ++iEvent) {
+		switch(framework.RootWindow.EventQueue[iEvent].Type) {
 		case ::gpk::SYSEVENT_ACTIVATE:
 			break;
 		case ::gpk::SYSEVENT_DEACTIVATE:
 			break;
 		case ::gpk::SYSEVENT_SYSKEY_DOWN:
 		case ::gpk::SYSEVENT_KEY_DOWN:
-			switch(framework.MainDisplay.EventQueue[iEvent].Data[0]) {
+			switch(framework.RootWindow.EventQueue[iEvent].Data[0]) {
 			case VK_RETURN:
 				if(GetAsyncKeyState(VK_MENU) & 0xFFF0)
-					gpk_necs(::gpk::fullScreenToggle(app.Framework.MainDisplay));
+					gpk_necs(::gpk::fullScreenToggle(app.Framework.RootWindow));
 				break;
 			}
 		}
 	}
 
-	if(1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.Input, framework.MainDisplay.EventQueue))
+	if(1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.Input, framework.RootWindow.EventQueue))
 		return ::gpk::APPLICATION_STATE_EXIT;
 
 	{
@@ -256,13 +256,13 @@ int										update				(SApplication & app, bool exitSignal)	{
 	//	if(false == padState.IsConnected())
 	//		warning_printf("Pad %i not connected", i);
 	//	if(padState.IsLeftThumbStickDown	()) { 
-	//		framework.MainDisplay.Input->JoystickCurrent[i].Deltas.y = -1; }
+	//		framework.RootWindow.Input->JoystickCurrent[i].Deltas.y = -1; }
 	//	if(padState.IsLeftThumbStickLeft	()) { 
-	//		framework.MainDisplay.Input->JoystickCurrent[i].Deltas.x = -1; }
+	//		framework.RootWindow.Input->JoystickCurrent[i].Deltas.x = -1; }
 	//	if(padState.IsLeftThumbStickUp		()) { 
-	//		framework.MainDisplay.Input->JoystickCurrent[i].Deltas.y = +1; }
+	//		framework.RootWindow.Input->JoystickCurrent[i].Deltas.y = +1; }
 	//	if(padState.IsLeftThumbStickRight	()) { 
-	//		framework.MainDisplay.Input->JoystickCurrent[i].Deltas.x = +1; }
+	//		framework.RootWindow.Input->JoystickCurrent[i].Deltas.x = +1; }
 	//}
 	
 	//const GLubyte *	glGetString(GL_EXTENSIONS);
@@ -281,5 +281,5 @@ int														draw					(SApplication & app) {
     //glVertex2i(1, -1);
     //glEnd();
     //glFlush();
-	return ::ghg::galaxyHellDraw(app.GalaxyHellApp, app.Framework.MainDisplay.Size.Cast<uint16_t>());
+	return ::ghg::galaxyHellDraw(app.GalaxyHellApp, app.Framework.RootWindow.Size.Cast<uint16_t>());
 }

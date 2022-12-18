@@ -16,11 +16,11 @@
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "The One");
 
 static				::gpk::error_t										updateSizeDependentResources				(::SApplication& app)											{
-	const ::gpk::SCoord2<uint32_t>												newSize										= app.Framework.MainDisplay.Size;
+	const ::gpk::SCoord2<uint32_t>												newSize										= app.Framework.RootWindow.Size;
 	::gpk::updateSizeDependentTarget(app.Framework.BackBuffer->Color, newSize);
 	app.DeviceResources->SetLogicalSize(newSize.Cast<float>());
 	app.D3DScene.CreateWindowSizeDependentResources(); 
-	app.Framework.MainDisplay.Resized										= false;
+	app.Framework.RootWindow.Resized										= false;
 	return 0;
 }
 
@@ -31,8 +31,8 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	app.D3DText				= {};
 	app.DeviceResources		= {};
 
-	::gpk::SWindowPlatformDetail												& displayDetail								= app.Framework.MainDisplay.PlatformDetail;
-	::gpk::mainWindowDestroy(app.Framework.MainDisplay);
+	::gpk::SWindowPlatformDetail												& displayDetail								= app.Framework.RootWindow.PlatformDetail;
+	::gpk::mainWindowDestroy(app.Framework.RootWindow);
 	::UnregisterClass(displayDetail.WindowClassName, displayDetail.WindowClass.hInstance);
 	return 0;
 }
@@ -40,7 +40,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 					::gpk::error_t										setup										(::SApplication& app)											{
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	::gpk::SFramework															& framework									= app.Framework;
-	::gpk::SWindow																& mainWindow								= framework.MainDisplay;
+	::gpk::SWindow																& mainWindow								= framework.RootWindow;
 	mainWindow.Size															= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
 	app.DeviceResources->RegisterDeviceNotify(&app);
@@ -55,10 +55,10 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 ::gpk::error_t										update										(::SApplication& app, bool systemRequestedExit)					{
 	::gpk::SFramework									& framework									= app.Framework;
 	::gpk::SFrameInfo									& frameInfo									= framework.FrameInfo;
-	::gpk::SWindow										& mainWindow								= app.Framework.MainDisplay;
+	::gpk::SWindow										& mainWindow								= app.Framework.RootWindow;
 	{
 		::gpk::STimer										timer;
-		::the1::theOneUpdate(app.TheOne, frameInfo.Seconds.LastFrame, framework.Input, framework.MainDisplay.EventQueue);
+		::the1::theOneUpdate(app.TheOne, frameInfo.Seconds.LastFrame, framework.Input, framework.RootWindow.EventQueue);
 
 		timer.Frame();
 		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
@@ -92,7 +92,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 					::gpk::error_t										draw										(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	::gpk::SFramework															& framework									= app.Framework;
-	if(framework.MainDisplay.Resized) {
+	if(framework.RootWindow.Resized) {
 		ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	}
 
