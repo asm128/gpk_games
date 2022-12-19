@@ -40,9 +40,7 @@ namespace the_one_uwp
 		uint32_t									m_indexCount							= {};
 
 		// Variables used with the rendering loop.
-		float										m_degreesPerSecond						= 45;
 		bool										m_loadingComplete						= false;
-		bool										m_tracking								= false;
 		double										TotalSecondsElapsed						= 0;
 		
 													~Sample3DSceneRenderer					()		{ ReleaseDeviceDependentResources(); }
@@ -56,14 +54,6 @@ namespace the_one_uwp
 
 		// Rotate the 3D cube model a set amount of radians.
 		void										Rotate									(float radians)		{ DirectX::XMStoreFloat4x4(&m_constantBufferData.model, DirectX::XMMatrixTranspose(DirectX::XMMatrixRotationY(radians))); }
-		inline	constexpr	bool					IsTracking								()	const			{ return m_tracking; }
-		inline				void					StartTracking							()					{ m_tracking = true; }
-		inline				void					StopTracking							()					{ m_tracking = false; }
-							void					TrackingUpdate							(float positionX)	{
-			if (m_tracking) 
-				Rotate(DirectX::XM_2PI * 2.0f * positionX / DeviceResources->GetOutputSize().x);
-		}
-
 		void										ReleaseDeviceDependentResources			() {
 			m_loadingComplete							= false;
 			VertexShader	.clear();
@@ -76,8 +66,8 @@ namespace the_one_uwp
 
 		void										Update									(double secondsElapsed) {
 			TotalSecondsElapsed							+= secondsElapsed;
-			if (!m_tracking)  // Convert degrees to radians, then convert seconds to rotation angle
-				Rotate((float)fmod(DirectX::XMConvertToRadians(m_degreesPerSecond) * TotalSecondsElapsed, DirectX::XM_2PI));
+			constexpr float									degreesPerSecond						= 45;
+			Rotate((float)fmod(DirectX::XMConvertToRadians(degreesPerSecond) * TotalSecondsElapsed, DirectX::XM_2PI));	 // Convert degrees to radians, then convert seconds to rotation angle
 		}
 
 		void										Render									() {
@@ -196,8 +186,6 @@ namespace the_one_uwp
 			m_loadingComplete							= true;		// Once the cube is loaded, the object is ready to be rendered.
 			return 0;
 		}
-
-
 	};
 }
 

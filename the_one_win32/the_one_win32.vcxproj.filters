@@ -18,9 +18,6 @@
     <ClCompile Include="the_one_win32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DeviceResources.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="gpk_d3d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
