@@ -24,11 +24,6 @@ namespace DX
 		static constexpr float								dipsPerInch				= 96.0f;
 		return floorf(dips * dpi / dipsPerInch + 0.5f); // Round to nearest integer.
 	}
-	static inline HRESULT							ThrowIfFailed			(HRESULT hr) {
-		if (FAILED(hr))
-			throw("");	// Set a breakpoint on this line to catch Win32 API errors.
-		return hr;
-	}
 
 	namespace DisplayMetrics
 	{
@@ -86,9 +81,10 @@ namespace DX
 		D2D1::Matrix3x2F								m_orientationTransform2D				= {};
 		DirectX::XMFLOAT4X4								m_orientationTransform3D				= {};
 
-														D3DDeviceResources							()									{
-			CreateDeviceIndependentResources();
-			CreateDeviceResources();
+		::gpk::error_t									Initialize								()									{
+			gpk_necs(CreateDeviceIndependentResources());
+			gpk_necs(CreateDeviceResources());
+			return 0;
 		}
 
 		::gpk::error_t									CreateDeviceResources					();
@@ -118,14 +114,15 @@ namespace DX
 			return rotation;
 		}
 
-		void											CreateDeviceIndependentResources		() {
+		::gpk::error_t									CreateDeviceIndependentResources		() {
 			D2D1_FACTORY_OPTIONS								options									= {};	// Initialize Direct2D resources.
 		#if defined(_DEBUG)
 			options.debugLevel								= D2D1_DEBUG_LEVEL_INFORMATION;		// If the project is in a debug build, enable Direct2D debugging via SDK Layers.
 		#endif
-			DX::ThrowIfFailed(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &options, (void**)&m_d2dFactory));	// Initialize the Direct2D Factory.
-			DX::ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory3), (IUnknown**)&m_dwriteFactory));			// Initialize the DirectWrite Factory.
-			DX::ThrowIfFailed(CoCreateInstance(CLSID_WICImagingFactory2, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_wicFactory)));	// Initialize the Windows Imaging Component (WIC) Factory.
+			gpk_hrcall(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &options, (void**)&m_d2dFactory));	// Initialize the Direct2D Factory.
+			gpk_hrcall(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory3), (IUnknown**)&m_dwriteFactory));			// Initialize the DirectWrite Factory.
+			gpk_hrcall(CoCreateInstance(CLSID_WICImagingFactory2, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_wicFactory)));	// Initialize the Windows Imaging Component (WIC) Factory.
+			return 0;
 		}
 
 		// Determine the dimensions of the render target and whether it will be scaled down.
@@ -166,41 +163,43 @@ namespace DX
 		D2D1::Matrix3x2F								GetOrientationTransform2D				()	const									{ return m_orientationTransform2D; }
 
 		void											RegisterDeviceNotify					(DX::IDeviceNotify* deviceNotify)			{ m_deviceNotify = deviceNotify; }
-		void											SetLogicalSize							(const ::gpk::SCoord2<float> & logicalSize)	{ if (m_logicalSize			== logicalSize			) return; m_logicalSize			= logicalSize;			CreateWindowSizeDependentResources(); } 
-		void											SetCurrentOrientation					(::gpk::GRID_ROTATION currentOrientation)	{ if (m_currentOrientation	== currentOrientation	) return; m_currentOrientation	= currentOrientation;	CreateWindowSizeDependentResources(); } 
-		void											SetDpi									(float dpi)									{
+		::gpk::error_t									SetLogicalSize							(const ::gpk::SCoord2<float> & logicalSize)	{ if (m_logicalSize			!= logicalSize			) { m_logicalSize			= logicalSize;			gpk_hrcall(CreateWindowSizeDependentResources()); } return 0; } 
+		::gpk::error_t									SetCurrentOrientation					(::gpk::GRID_ROTATION currentOrientation)	{ if (m_currentOrientation	!= currentOrientation	) { m_currentOrientation	= currentOrientation;	gpk_hrcall(CreateWindowSizeDependentResources()); } return 0; } 
+		::gpk::error_t									SetDpi									(float dpi)									{
 			if (dpi != m_dpi) {
 				m_dpi											= dpi;
 				RECT												rect									= {};
 				GetClientRect(m_window, &rect);
 				m_logicalSize									= {float(rect.right - rect.left), float(rect.bottom - rect.top)};	// When the display DPI changes, the logical size of the window (measured in Dips) also changes and needs to be updated.
 				m_d2dContext->SetDpi(m_dpi, m_dpi);
-				CreateWindowSizeDependentResources();
+				gpk_necs(CreateWindowSizeDependentResources());
 			}
+			return 0;
 		}
 
 		// Call this method when the app suspends. It provides a hint to the driver that the app is entering an idle state and that temporary buffers can be reclaimed for use by other apps.
-		void											Trim									() {
+		::gpk::error_t									Trim									() {
 			::gpk::ptr_com<IDXGIDevice3>						dxgiDevice;
-			m_d3dDevice.as(&dxgiDevice);
+			gpk_necs(m_d3dDevice.as(&dxgiDevice));
 			dxgiDevice->Trim();
 		}
 
 		// Recreate all device resources and set them back to the current state.
-		void											ValidateDevice							()											{ if(::gpk::d3dDeviceValidate(m_d3dDevice)) HandleDeviceLost();	}
-		void											HandleDeviceLost						()											{
-			m_swapChain->SetFullscreenState(FALSE, 0);
+		::gpk::error_t									ValidateDevice							()											{ return ::gpk::d3dDeviceValidate(m_d3dDevice) ? HandleDeviceLost() : 0; }
+		::gpk::error_t									HandleDeviceLost						()											{
 			m_swapChain										= nullptr;
 			if (m_deviceNotify) 
 				m_deviceNotify->OnDeviceLost();
-			CreateDeviceResources();
+			gpk_necs(CreateDeviceResources());
 			m_d2dContext->SetDpi(m_dpi, m_dpi);
-			CreateWindowSizeDependentResources();
+			gpk_necs(CreateWindowSizeDependentResources());
 			if (m_deviceNotify) 
 				m_deviceNotify->OnDeviceRestored();
+
+			return 0;
 		}
 
-		void											SetWindow								(HWND window)		{
+		::gpk::error_t									SetWindow								(HWND window)		{
 			m_window										= window;
 
 			RECT												rect									= {};
@@ -208,10 +207,12 @@ namespace DX
 			m_logicalSize									= {float(rect.right - rect.left), float(rect.bottom - rect.top)};	// When the display DPI changes, the logical size of the window (measured in Dips) also changes and needs to be updated.
 			m_nativeOrientation								= ScreenRotation();
 			m_currentOrientation							= ScreenRotation();
+
 			uint32_t											dpi										= GetDpiForWindow(m_window);
 			m_dpi											= float(dpi);
 			m_d2dContext->SetDpi(m_dpi, m_dpi);
-			CreateWindowSizeDependentResources();
+			gpk_necs(CreateWindowSizeDependentResources());
+			return 0;
 		}
 
 		// Present the contents of the swap chain to the screen.
@@ -221,11 +222,12 @@ namespace DX
 			m_d3dContext->DiscardView1(m_d3dRenderTargetView, nullptr, 0);	// Discard the contents of the render target. This is a valid operation only when the existing contents will be entirely overwritten. If dirty or scroll rects are used, this call should be removed.
 			m_d3dContext->DiscardView1(m_d3dDepthStencilView, nullptr, 0);	// Discard the contents of the depth stencil.
 			if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
-				HandleDeviceLost();	// If the device was removed either by a disconnection or a driver upgrade, we  must recreate all device resources.
+				gpk_necs(HandleDeviceLost());	// If the device was removed either by a disconnection or a driver upgrade, we  must recreate all device resources.
 			else 
-				gpk_hrcall(DX::ThrowIfFailed(hr));
+				gpk_hrcall(hr);
 			return 0;
 		}
+
 		::gpk::GRID_ROTATION							ScreenRotation							()	{
 			DeviceMode										= {sizeof(DEVMODE)};
 			EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &DeviceMode);	// returned rotation is relative to the natural (default) rotation for this display

@@ -22,7 +22,7 @@ namespace the_one_win32
 		::gpk::ptr_com<IDWriteTextLayout3>				TextLayout						= {};
 		::gpk::ptr_com<IDWriteTextFormat2>				TextFormat						= {};
 
-		void											CreateDeviceDependentResources	() { DX::ThrowIfFailed(DeviceResources->GetD2DDeviceContext()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &WhiteBrush)); }
+		::gpk::error_t									CreateDeviceDependentResources	() { gpk_hrcall(DeviceResources->GetD2DDeviceContext()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &WhiteBrush)); return 0; }
 		void											ReleaseDeviceDependentResources	() { WhiteBrush = {}; }
 
 		// Initializes D2D resources used for text rendering.
@@ -30,17 +30,15 @@ namespace the_one_win32
 			DeviceResources									= deviceResources;
 			// Create device independent resources
 			::gpk::ptr_com<IDWriteTextFormat>					textFormat						= {};
-			DX::ThrowIfFailed(DeviceResources->GetDWriteFactory()->CreateTextFormat(L"Segoe UI", nullptr, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 32.0f, L"en-US", &textFormat));
-			textFormat.as(TextFormat);
-			DX::ThrowIfFailed(TextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR));
-			DX::ThrowIfFailed(DeviceResources->GetD2DFactory()->CreateDrawingStateBlock(&StateBlock));
-
-			CreateDeviceDependentResources();
-			return 0;
+			gpk_hrcall(DeviceResources->GetDWriteFactory()->CreateTextFormat(L"Segoe UI", nullptr, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 32.0f, L"en-US", &textFormat));
+			gpk_necs(textFormat.as(TextFormat));
+			gpk_hrcall(TextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR));
+			gpk_hrcall(DeviceResources->GetD2DFactory()->CreateDrawingStateBlock(&StateBlock));
+			return CreateDeviceDependentResources();
 		}
 
 		// Updates the text to be displayed.
-		void											Update							(double /*frameSeconds*/, double /*totalSeconds*/, uint32_t framesPerSecond) {
+		::gpk::error_t									Update							(double /*frameSeconds*/, double /*totalSeconds*/, uint32_t framesPerSecond) {
 			// Update display text.
 			uint32_t											fps								= framesPerSecond;
 			Text											= (fps > 0) ? std::to_wstring(fps) + L" FPS" : L" - FPS";
@@ -48,13 +46,14 @@ namespace the_one_win32
 			::gpk::ptr_com<IDWriteTextLayout>			textLayout;
 			constexpr float										w								= 240.0f; // Max width of the input text.
 			constexpr float										h								= 50.0f;// Max height of the input text.
-			DX::ThrowIfFailed(DeviceResources->GetDWriteFactory()->CreateTextLayout(Text.c_str(), (uint32_t) Text.length(), TextFormat, w, h, &textLayout));
-			textLayout.as(TextLayout);
-			DX::ThrowIfFailed(TextLayout->GetMetrics(&TextMetrics));
+			gpk_hrcall(DeviceResources->GetDWriteFactory()->CreateTextLayout(Text.c_str(), (uint32_t) Text.length(), TextFormat, w, h, &textLayout));
+			gpk_necs(textLayout.as(TextLayout));
+			gpk_hrcall(TextLayout->GetMetrics(&TextMetrics));
+			return 0;
 		}
 
 		// Renders a frame to the screen.
-		void											Render							() {
+		::gpk::error_t									Render							() {
 			ID2D1DeviceContext									* context						= DeviceResources->GetD2DDeviceContext();
 			const ::gpk::SCoord2<float>							logicalSize						= DeviceResources->GetLogicalSize();
 
@@ -64,15 +63,16 @@ namespace the_one_win32
 			// Position on the bottom right corner
 			D2D1::Matrix3x2F									screenTranslation				= D2D1::Matrix3x2F::Translation(logicalSize.x - TextMetrics.layoutWidth, logicalSize.y - TextMetrics.height);
 			context->SetTransform(screenTranslation * DeviceResources->GetOrientationTransform2D());
-			DX::ThrowIfFailed(TextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING));
+			gpk_hrcall(TextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING));
 
 			context->DrawTextLayout(D2D1::Point2F(0.f, 0.f), TextLayout, WhiteBrush);
 	
 			HRESULT												hr								= context->EndDraw();
 			if (hr != D2DERR_RECREATE_TARGET)	// Ignore D2DERR_RECREATE_TARGET here. This error indicates that the device is lost. It will be handled during the next call to Present.
-				DX::ThrowIfFailed(hr);
+				gpk_hrcall(hr);
 
 			context->RestoreDrawingState(StateBlock);
+			return 0;
 		}
 
 	};

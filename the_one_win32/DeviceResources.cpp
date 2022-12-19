@@ -54,7 +54,7 @@ static constexpr DirectX::XMFLOAT4X4
 
 	 // If the initialization fails, fall back to the WARP device. For more information on WARP, see: https://go.microsoft.com/fwlink/?LinkId=286690. 
 	if (FAILED(D3D11CreateDevice(0, D3D_DRIVER_TYPE_HARDWARE, 0, creationFlags, featureLevels, (uint32_t)std::size(featureLevels), D3D11_SDK_VERSION, &device, &m_d3dFeatureLevel, &context)))
-		DX::ThrowIfFailed(D3D11CreateDevice(nullptr,D3D_DRIVER_TYPE_WARP, 0, creationFlags, featureLevels, ARRAYSIZE(featureLevels), D3D11_SDK_VERSION, &device, &m_d3dFeatureLevel, &context));
+		gpk_hrcall(D3D11CreateDevice(nullptr,D3D_DRIVER_TYPE_WARP, 0, creationFlags, featureLevels, ARRAYSIZE(featureLevels), D3D11_SDK_VERSION, &device, &m_d3dFeatureLevel, &context));
 
 	// Store pointers to the Direct3D 11.3 API device and immediate context.
 	device.as(m_d3dDevice);
@@ -62,9 +62,9 @@ static constexpr DirectX::XMFLOAT4X4
 
 	// Create the Direct2D device object and a corresponding context.
 	::gpk::ptr_com<IDXGIDevice3>				dxgiDevice;
-	m_d3dDevice.as(dxgiDevice);
-	DX::ThrowIfFailed(m_d2dFactory->CreateDevice(dxgiDevice, &m_d2dDevice));
-	DX::ThrowIfFailed(m_d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_d2dContext));
+	gpk_necs(m_d3dDevice.as(dxgiDevice));
+	gpk_hrcall(m_d2dFactory->CreateDevice(dxgiDevice, &m_d2dDevice));
+	gpk_hrcall(m_d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_d2dContext));
 	return 0;
 }
 
@@ -92,7 +92,7 @@ static constexpr DirectX::XMFLOAT4X4
 	if (m_swapChain) { // If the swap chain already exists, resize it.
 		HRESULT								hr								= m_swapChain->ResizeBuffers(2, lround(m_d3dRenderTargetSize.x), lround(m_d3dRenderTargetSize.y), DXGI_FORMAT_B8G8R8A8_UNORM, 0); // Double-buffered swap chain.
 		if (hr != DXGI_ERROR_DEVICE_REMOVED && hr != DXGI_ERROR_DEVICE_RESET) 
-			DX::ThrowIfFailed(hr);
+			gpk_hrcall(hr);
 		else {
 			HandleDeviceLost();	// If the device was removed for any reason, a new device and swap chain will need to be created.
 			return 0;	// Everything is set up now. Do not continue execution of this method. HandleDeviceLost will reenter this method and correctly set up the new device.
@@ -100,69 +100,64 @@ static constexpr DirectX::XMFLOAT4X4
 	} else {
 		// Otherwise, create a new one using the same adapter as the existing Direct3D device.
 		DXGI_SCALING							scaling						= DisplayMetrics::SupportHighResolutions ? DXGI_SCALING_NONE : DXGI_SCALING_STRETCH;
-		DXGI_SWAP_CHAIN_DESC1					swapChainDesc				= {0};
+		DXGI_SWAP_CHAIN_DESC1					swapChainDesc				= {};
 		swapChainDesc.Width					= lround(m_d3dRenderTargetSize.x);		// Match the size of the window.
 		swapChainDesc.Height				= lround(m_d3dRenderTargetSize.y);
 		swapChainDesc.Format				= DXGI_FORMAT_B8G8R8A8_UNORM;				// This is the most common swap chain format.
-		swapChainDesc.Stereo				= false;
 		swapChainDesc.SampleDesc.Count		= 1;								// Don't use multi-sampling.
-		swapChainDesc.SampleDesc.Quality	= 0;
 		swapChainDesc.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.BufferCount			= 2;									// Use double-buffering to minimize latency.
 		swapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;	// All Microsoft Store apps must use this SwapEffect.
-		swapChainDesc.Flags					= 0;
 		swapChainDesc.Scaling				= scaling;
 		swapChainDesc.AlphaMode				= DXGI_ALPHA_MODE_IGNORE;
 
 
-		DXGI_SWAP_CHAIN_FULLSCREEN_DESC			swapChainDescFS				= {0};
-		MONITORINFO								monitor_info				= {sizeof(monitor_info)};
-		ree_if(FALSE == GetMonitorInfoA(MonitorFromWindow(m_window, MONITOR_DEFAULTTOPRIMARY), &monitor_info), "Cannot get MONITORINFO for hWnd(0x%x)", m_window);
+		//DXGI_SWAP_CHAIN_FULLSCREEN_DESC			swapChainDescFS				= {0};
+		//MONITORINFO								monitor_info				= {sizeof(monitor_info)};
+		//ree_if(FALSE == GetMonitorInfoA(MonitorFromWindow(m_window, MONITOR_DEFAULTTOPRIMARY), &monitor_info), "Cannot get MONITORINFO for hWnd(0x%x)", m_window);
 
-		swapChainDescFS.Scaling				= DisplayMetrics::SupportHighResolutions ? DXGI_MODE_SCALING_UNSPECIFIED : DXGI_MODE_SCALING_STRETCHED;;
-		swapChainDescFS.ScanlineOrdering	= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-		swapChainDescFS.RefreshRate			= {1, 60};
-		swapChainDescFS.Windowed			= true;
+		//swapChainDescFS.Scaling				= DisplayMetrics::SupportHighResolutions ? DXGI_MODE_SCALING_UNSPECIFIED : DXGI_MODE_SCALING_STRETCHED;;
+		//swapChainDescFS.Windowed			= true;
 
 		// This sequence obtains the DXGI factory that was used to create the Direct3D device above.
 		::gpk::ptr_com<IDXGIDevice3>					dxgiDevice;
 		::gpk::ptr_com<IDXGIAdapter>					dxgiAdapter;
 		::gpk::ptr_com<IDXGIFactory4>					dxgiFactory;
 		::gpk::ptr_com<IDXGISwapChain1>					swapChain;
-		m_d3dDevice.as(&dxgiDevice);
+		gpk_necs(m_d3dDevice.as(&dxgiDevice));
 		gpk_hrcall(dxgiDevice->GetAdapter(&dxgiAdapter));
 		gpk_hrcall(dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory)));
-		gpk_hrcall(dxgiFactory->CreateSwapChainForHwnd(m_d3dDevice, m_window, &swapChainDesc, &swapChainDescFS, nullptr, &swapChain));
-		swapChain.as(m_swapChain);
+		gpk_hrcall(dxgiFactory->CreateSwapChainForHwnd(m_d3dDevice, m_window, &swapChainDesc, /*&swapChainDescFS*/0, nullptr, &swapChain));
+		gpk_necs(swapChain.as(m_swapChain));
 		gpk_hrcall(dxgiDevice->SetMaximumFrameLatency(1));	// Ensure that DXGI does not queue more than one frame at a time. This both reduces latency and ensures that the application will only render after each VSync, minimizing power consumption.
 	}
 
 	switch (displayRotation) {
 	default:
 	case DXGI_MODE_ROTATION_IDENTITY	: m_orientationTransform3D = ZRotation0		; m_orientationTransform2D = D2D1::Matrix3x2F::Identity(); break;
+	case DXGI_MODE_ROTATION_ROTATE270	: m_orientationTransform3D = ZRotation90	; m_orientationTransform2D = D2D1::Matrix3x2F::Rotation(270.f) * D2D1::Matrix3x2F::Translation(0.0f, m_logicalSize.x); break;
 	case DXGI_MODE_ROTATION_ROTATE90	: m_orientationTransform3D = ZRotation270	; m_orientationTransform2D = D2D1::Matrix3x2F::Rotation(90.0f) * D2D1::Matrix3x2F::Translation(m_logicalSize.y, 0.0f); break;
 	case DXGI_MODE_ROTATION_ROTATE180	: m_orientationTransform3D = ZRotation180	; m_orientationTransform2D = D2D1::Matrix3x2F::Rotation(180.f) * D2D1::Matrix3x2F::Translation(m_logicalSize.x, m_logicalSize.y); break;
-	case DXGI_MODE_ROTATION_ROTATE270	: m_orientationTransform3D = ZRotation90	; m_orientationTransform2D = D2D1::Matrix3x2F::Rotation(270.f) * D2D1::Matrix3x2F::Translation(0.0f, m_logicalSize.x); break;
 	}
-	DX::ThrowIfFailed(m_swapChain->SetRotation(displayRotation));
+	gpk_hrcall(m_swapChain->SetRotation(displayRotation));
 
 	::gpk::ptr_com<ID3D11Texture2D1>		backBuffer;
-	DX::ThrowIfFailed(m_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer)));
-	DX::ThrowIfFailed(m_d3dDevice->CreateRenderTargetView1(backBuffer, nullptr, &m_d3dRenderTargetView));	// Create a render target view of the swap chain back buffer.
+	gpk_hrcall(m_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer)));
+	gpk_hrcall(m_d3dDevice->CreateRenderTargetView1(backBuffer, nullptr, &m_d3dRenderTargetView));	// Create a render target view of the swap chain back buffer.
 	
 	CD3D11_TEXTURE2D_DESC1					depthStencilDesc			(DXGI_FORMAT_D24_UNORM_S8_UINT, lround(m_d3dRenderTargetSize.x), lround(m_d3dRenderTargetSize.y), 1, 1, D3D11_BIND_DEPTH_STENCIL);
 	::gpk::ptr_com<ID3D11Texture2D1>		depthStencil;
 	CD3D11_DEPTH_STENCIL_VIEW_DESC			depthStencilViewDesc		(D3D11_DSV_DIMENSION_TEXTURE2D);
-	DX::ThrowIfFailed(m_d3dDevice->CreateTexture2D1(&depthStencilDesc, nullptr, &depthStencil));
-	DX::ThrowIfFailed(m_d3dDevice->CreateDepthStencilView(depthStencil, &depthStencilViewDesc, &m_d3dDepthStencilView));		// Create a depth stencil view for use with 3D rendering if needed. This depth stencil view has only one texture. use a single mipmap level
+	gpk_hrcall(m_d3dDevice->CreateTexture2D1(&depthStencilDesc, nullptr, &depthStencil));
+	gpk_hrcall(m_d3dDevice->CreateDepthStencilView(depthStencil, &depthStencilViewDesc, &m_d3dDepthStencilView));		// Create a depth stencil view for use with 3D rendering if needed. This depth stencil view has only one texture. use a single mipmap level
 	
 	m_screenViewport					= CD3D11_VIEWPORT(0.0f, 0.0f, m_d3dRenderTargetSize.x, m_d3dRenderTargetSize.y);
 	m_d3dContext->RSSetViewports(1, &m_screenViewport);	// Set the 3D rendering viewport to target the entire window.
 
 	D2D1_BITMAP_PROPERTIES1					bitmapProperties			= D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), m_dpi, m_dpi);
 	::gpk::ptr_com<IDXGISurface2>			dxgiBackBuffer;
-	DX::ThrowIfFailed(m_swapChain->GetBuffer(0, IID_PPV_ARGS(&dxgiBackBuffer)));
-	DX::ThrowIfFailed(m_d2dContext->CreateBitmapFromDxgiSurface(dxgiBackBuffer, &bitmapProperties, &m_d2dTargetBitmap));	// Create a Direct2D target bitmap associated with the swap chain back buffer and set it as the current target.
+	gwarn_if(errored(m_swapChain->GetBuffer(0, IID_PPV_ARGS(&dxgiBackBuffer))), "%s", "");
+	gpk_hrcall(m_d2dContext->CreateBitmapFromDxgiSurface(dxgiBackBuffer, &bitmapProperties, &m_d2dTargetBitmap));	// Create a Direct2D target bitmap associated with the swap chain back buffer and set it as the current target.
 
 	m_d2dContext->SetTarget(m_d2dTargetBitmap);
 	m_d2dContext->SetDpi(m_effectiveDpi, m_effectiveDpi);

@@ -42,7 +42,7 @@ namespace the_one_uwp
 
 		// DisplayInformation event handlers.
 		void			OnDpiChanged					(DisplayInformation^ sender, Object^ args)							{ DeviceResources->SetDpi(sender->LogicalDpi); UserUWP->CreateWindowSizeDependentResources(); }
-		void			OnOrientationChanged			(DisplayInformation^ sender, Object^ args)							{ DeviceResources->SetCurrentOrientation(sender->CurrentOrientation); UserUWP->CreateWindowSizeDependentResources(); }
+		void			OnOrientationChanged			(DisplayInformation^ sender, Object^ args)							{ DeviceResources->SetCurrentOrientation((::gpk::GRID_ROTATION)sender->CurrentOrientation); UserUWP->CreateWindowSizeDependentResources(); }
 		void			OnDisplayContentsInvalidated	(DisplayInformation^ sender, Object^ args)							{ DeviceResources->ValidateDevice(); }
 
 	public:
@@ -60,7 +60,7 @@ namespace the_one_uwp
 			applicationView->Activated						+= ref new TypedEventHandler<CoreApplicationView^, IActivatedEventArgs^>	(this, &App::OnActivated	);
 			CoreApplication::Suspending						+= ref new EventHandler<SuspendingEventArgs^>								(this, &App::OnSuspending	);
 			CoreApplication::Resuming						+= ref new EventHandler<Object^>											(this, &App::OnResuming		);
-			DeviceResources.create();		// At this point we have access to the device. We can create the device-dependent resources.
+			DeviceResources->Initialize();		// At this point we have access to the device. We can create the device-dependent resources.
 		}
 
 		virtual void	SetWindow						(CoreWindow^ window)												{

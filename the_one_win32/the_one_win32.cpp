@@ -20,6 +20,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	//::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->Color, newSize);
 	//::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->DepthStencil, newSize);
 	app.DeviceResources->SetLogicalSize(newSize.Cast<float>());
+	app.D3DScene.CreateWindowSizeDependentResources();
 	app.Framework.RootWindow.Resized										= false;
 	return 0;
 }
@@ -42,8 +43,9 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	::gpk::SWindow																& mainWindow								= framework.RootWindow;
 	mainWindow.Size															= {1280, 720};
 	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window why?!");
+	gpk_necs(app.DeviceResources->Initialize());
 	app.DeviceResources->RegisterDeviceNotify(&app);
-	app.DeviceResources->SetWindow(mainWindow.PlatformDetail.WindowHandle);
+	gpk_necs(app.DeviceResources->SetWindow(mainWindow.PlatformDetail.WindowHandle));
 	
 	gpk_necs(app.D3DScene.Initialize(app.DeviceResources));
 	gpk_necs(app.D3DText.Initialize(app.DeviceResources));

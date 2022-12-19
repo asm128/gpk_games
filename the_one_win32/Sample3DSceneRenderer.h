@@ -49,8 +49,8 @@ namespace the_one_win32
 
 		::gpk::error_t								Initialize								(const ::gpk::ptr_obj<DX::D3DDeviceResources> & deviceResources)  {
 			DeviceResources								= deviceResources;
-			CreateDeviceDependentResources();
-			CreateWindowSizeDependentResources();
+			gpk_necs(CreateDeviceDependentResources());
+			gpk_necs(CreateWindowSizeDependentResources());
 			return 0;
 		}
 
@@ -101,7 +101,7 @@ namespace the_one_win32
 			context->DrawIndexed			(m_indexCount, 0, 0);	// Draw the objects.
 		}
 
-		void										CreateWindowSizeDependentResources		() {
+		::gpk::error_t								CreateWindowSizeDependentResources		() {
 			::gpk::SCoord2<float>							outputSize				= DeviceResources->GetOutputSize();
 			const float										aspectRatio				= outputSize.x / outputSize.y;
 			float											fovAngleY				= 70.0f * DirectX::XM_PI / 180.0f;
@@ -123,9 +123,10 @@ namespace the_one_win32
 			static const DirectX::XMVECTORF32				at						= { 0.0f, -0.1f, 0.0f, 0.0f };
 			static const DirectX::XMVECTORF32				up						= { 0.0f, 1.0f, 0.0f, 0.0f };
 			DirectX::XMStoreFloat4x4(&m_constantBufferData.view, DirectX::XMMatrixTranspose(DirectX::XMMatrixLookAtRH(eye, at, up)));
+			return 0;
 		}
 
-		void										CreateDeviceDependentResources			()	{
+		::gpk::error_t								CreateDeviceDependentResources			()	{
 			// Load shaders asynchronously.
 			::gpk::ptr_com<ID3D11InputLayout>				inputLayout;
 			::gpk::ptr_com<ID3D11Buffer>					vertexBuffer;
@@ -135,23 +136,23 @@ namespace the_one_win32
 			::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
 
 			::gpk::array_pod<byte_t>						fileVS;
-			::gpk::fileToMemory("SampleVertexShader.cso", fileVS);
+			gpk_necs(::gpk::fileToMemory("SampleVertexShader.cso", fileVS));
 			static constexpr D3D11_INPUT_ELEMENT_DESC		vertexDesc []			=
 				{	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 00, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 				,	{ "COLOR"	, 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 				};
 			// After the vertex shader file is loaded, create the shader and input layout.
-			DX::ThrowIfFailed(DeviceResources->GetD3DDevice()->CreateVertexShader(&fileVS[0], fileVS.size(), nullptr, &vertexShader));
-			DX::ThrowIfFailed(DeviceResources->GetD3DDevice()->CreateInputLayout(vertexDesc, ARRAYSIZE(vertexDesc), &fileVS[0], fileVS.size(), &inputLayout)); 
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateVertexShader(&fileVS[0], fileVS.size(), nullptr, &vertexShader));
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateInputLayout(vertexDesc, ARRAYSIZE(vertexDesc), &fileVS[0], fileVS.size(), &inputLayout)); 
 
 			// After the pixel shader file is loaded, create the shader and constant buffer.
 			::gpk::array_pod<byte_t>						filePS;
-			::gpk::fileToMemory("SamplePixelShader.cso" , filePS);
-			DX::ThrowIfFailed(DeviceResources->GetD3DDevice()->CreatePixelShader(&filePS[0], filePS.size(), nullptr, &pixelShader));
+			gpk_necs(::gpk::fileToMemory("SamplePixelShader.cso" , filePS));
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreatePixelShader(&filePS[0], filePS.size(), nullptr, &pixelShader));
 
 			D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(ModelViewProjectionConstantBuffer)};
 			constantBufferDesc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
-			DX::ThrowIfFailed(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
 		
 			static constexpr VertexPositionColor			cubeVertices[]			=	// Once both shaders are loaded, create the mesh. Load mesh vertices. Each vertex has a position and a color.
 				{ {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 0.0f}}
@@ -167,7 +168,7 @@ namespace the_one_win32
 			D3D11_SUBRESOURCE_DATA							vertexBufferData		= {cubeVertices};
 			D3D11_BUFFER_DESC								vertexBufferDesc		= {sizeof(cubeVertices)};
 			vertexBufferDesc.BindFlags					= D3D11_BIND_VERTEX_BUFFER;
-			DX::ThrowIfFailed(DeviceResources->GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &vertexBuffer));
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &vertexBuffer));
 
 			// Load mesh indices. Each trio of indices represents a triangle to be rendered on the screen. For example: 0,2,1 means that the vertices with indexes 0, 2 and 1 from the vertex buffer compose the first triangle of this mesh.
 			static constexpr uint16_t						cubeIndices []			= 
@@ -183,7 +184,7 @@ namespace the_one_win32
 			D3D11_SUBRESOURCE_DATA							indexBufferData			= {cubeIndices};
 			D3D11_BUFFER_DESC								indexBufferDesc			= {sizeof(cubeIndices)};
 			indexBufferDesc.BindFlags					= D3D11_BIND_INDEX_BUFFER;
-			DX::ThrowIfFailed(DeviceResources->GetD3DDevice()->CreateBuffer(&indexBufferDesc, &indexBufferData, &indexBuffer));
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&indexBufferDesc, &indexBufferData, &indexBuffer));
 	
 			InputLayout		.push_back(inputLayout);
 			VertexBuffer	.push_back(vertexBuffer);
@@ -193,9 +194,8 @@ namespace the_one_win32
 			ConstantBuffer	.push_back(constantBuffer);
 
 			m_loadingComplete							= true;		// Once the cube is loaded, the object is ready to be rendered.
+			return 0;
 		}
-
-
 	};
 }
 
