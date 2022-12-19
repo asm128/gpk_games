@@ -84,7 +84,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	SetWindowTextA(windowHandle, buffer);
 
 	app.D3DText.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (uint32_t)frameInfo.FramesPerSecond);
-	app.D3DScene.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total);
+	app.D3DScene.Update(frameInfo.Seconds.LastFrame);
 	
 	return 0;
 }

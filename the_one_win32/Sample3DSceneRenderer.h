@@ -7,7 +7,7 @@
 #ifndef SAMPLE3DSCENERENDERER_H_293468238
 #define SAMPLE3DSCENERENDERER_H_293468238
 
-namespace the_one_uwp
+namespace the_one_win32
 {
 	// Constant buffer used to send MVP matrices to the vertex shader.
 	struct ModelViewProjectionConstantBuffer {
