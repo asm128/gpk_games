@@ -20,7 +20,6 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 	//::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->Color, newSize);
 	//::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->DepthStencil, newSize);
 	app.DeviceResources->SetLogicalSize(newSize.Cast<float>());
-	app.D3DScene.CreateWindowSizeDependentResources(); 
 	app.Framework.RootWindow.Resized										= false;
 	return 0;
 }
@@ -38,6 +37,7 @@ static				::gpk::error_t										updateSizeDependentResources				(::SApplicatio
 
 					::gpk::error_t										setup										(::SApplication& app)											{
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
 	::gpk::SFramework															& framework									= app.Framework;
 	::gpk::SWindow																& mainWindow								= framework.RootWindow;
 	mainWindow.Size															= {1280, 720};

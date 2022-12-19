@@ -15,16 +15,15 @@
 
 namespace DX 
 {
+#if defined(_DEBUG)
+	// Check for SDK Layer support.
+	static inline bool								SdkLayersAvailable		() { return SUCCEEDED(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_NULL, 0, D3D11_CREATE_DEVICE_DEBUG, nullptr, 0, D3D11_SDK_VERSION, nullptr, nullptr, nullptr)); }
+#endif
 	// Converts a length in device-independent pixels (DIPs) to a length in physical pixels.
 	static inline float								ConvertDipsToPixels		(float dips, float dpi) {
 		static constexpr float								dipsPerInch				= 96.0f;
 		return floorf(dips * dpi / dipsPerInch + 0.5f); // Round to nearest integer.
 	}
-#if defined(_DEBUG)
-	static inline bool								SdkLayersAvailable		() {		// Check for SDK Layer support.
-		return SUCCEEDED(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_NULL, 0, D3D11_CREATE_DEVICE_DEBUG, nullptr, 0, D3D11_SDK_VERSION, nullptr, nullptr, nullptr));
-	}
-#endif
 	static inline HRESULT							ThrowIfFailed			(HRESULT hr) {
 		if (FAILED(hr))
 			throw("");	// Set a breakpoint on this line to catch Win32 API errors.
@@ -94,6 +93,7 @@ namespace DX
 
 		::gpk::error_t									CreateDeviceResources					();
 		::gpk::error_t 									CreateWindowSizeDependentResources		();
+
 		// This method determines the rotation between the display device's native orientation and the current display orientation.
 		DXGI_MODE_ROTATION								ComputeDisplayRotation					() {
 			DXGI_MODE_ROTATION									rotation								= DXGI_MODE_ROTATION_UNSPECIFIED;	// Note: NativeOrientation can only be Landscape or Portrait even though the DisplayOrientations enum has other values.

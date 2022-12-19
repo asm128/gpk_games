@@ -55,8 +55,8 @@ void the_one_uwp::STheOneUWP::Update() {
 		}
 		::the1::theOneUpdate(this->TheOneApp, Timer.GetElapsedSeconds(), Input, sysEvents);
 
-		SceneRenderer	.Update(Timer);	// Replace this with your app's content update functions.
-		FpsTextRenderer	.Update(Timer);
+		SceneRenderer	.Update(Timer.GetElapsedSeconds());	// Replace this with your app's content update functions.
+		FpsTextRenderer	.Update(Timer.GetElapsedSeconds(), Timer.GetTotalSeconds(), Timer.GetFramesPerSecond());
 	});
 
 }

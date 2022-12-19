@@ -7,7 +7,7 @@
 #ifndef SAMPLE3DSCENERENDERER_H_293468238
 #define SAMPLE3DSCENERENDERER_H_293468238
 
-namespace the_one_win32
+namespace the_one_uwp
 {
 	// Constant buffer used to send MVP matrices to the vertex shader.
 	struct ModelViewProjectionConstantBuffer {
@@ -43,6 +43,7 @@ namespace the_one_win32
 		float										m_degreesPerSecond						= 45;
 		bool										m_loadingComplete						= false;
 		bool										m_tracking								= false;
+		double										TotalSecondsElapsed						= 0;
 		
 													~Sample3DSceneRenderer					()		{ ReleaseDeviceDependentResources(); }
 
@@ -73,9 +74,10 @@ namespace the_one_win32
 			IndexBuffer		.clear();
 		}
 
-		void										Update									(double /*secondsElapsed*/, double totalSecondsElapsed) {
+		void										Update									(double secondsElapsed) {
+			TotalSecondsElapsed							+= secondsElapsed;
 			if (!m_tracking)  // Convert degrees to radians, then convert seconds to rotation angle
-				Rotate((float)fmod(DirectX::XMConvertToRadians(m_degreesPerSecond) * totalSecondsElapsed, DirectX::XM_2PI));
+				Rotate((float)fmod(DirectX::XMConvertToRadians(m_degreesPerSecond) * TotalSecondsElapsed, DirectX::XM_2PI));
 		}
 
 		void										Render									() {
@@ -134,7 +136,7 @@ namespace the_one_win32
 
 			::gpk::array_pod<byte_t>						fileVS;
 			::gpk::fileToMemory("SampleVertexShader.cso", fileVS);
-			static const D3D11_INPUT_ELEMENT_DESC			vertexDesc []			=
+			static constexpr D3D11_INPUT_ELEMENT_DESC		vertexDesc []			=
 				{	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 00, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 				,	{ "COLOR"	, 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 				};

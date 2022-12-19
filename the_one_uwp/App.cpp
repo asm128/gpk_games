@@ -16,10 +16,11 @@ namespace the_one_uwp
 {
 	// Main entry point for our app. Connects the app with the Windows shell and handles application lifecycle events.
 	ref class App sealed : public IFrameworkView {
-		std::shared_ptr<DX::D3DDeviceResources>			DeviceResources			= {};
-		std::unique_ptr<STheOneUWP>						UserUWP					= {};
-		bool											WindowClosed			= false;
-		bool											WindowVisible			= true;
+		::gpk::ptr_obj<DX::D3DDeviceResources>	DeviceResources			= {};
+
+		::gpk::ptr_obj<STheOneUWP>				UserUWP					= {};
+		bool									WindowClosed			= false;
+		bool									WindowVisible			= true;
 	//private:
 	protected:
 		// Application lifecycle event handlers.
@@ -48,8 +49,8 @@ namespace the_one_uwp
 		// IFrameworkView Methods.
 		virtual void	Uninitialize					()																	{}
 		virtual void	Load							(String^ entryPoint)												{
-			if (UserUWP == nullptr) {
-				UserUWP			= std::unique_ptr<STheOneUWP>(new STheOneUWP(DeviceResources));
+			if (!UserUWP) {
+				UserUWP->Initialize(DeviceResources);
 			}
 		}
 
@@ -59,7 +60,7 @@ namespace the_one_uwp
 			applicationView->Activated						+= ref new TypedEventHandler<CoreApplicationView^, IActivatedEventArgs^>	(this, &App::OnActivated	);
 			CoreApplication::Suspending						+= ref new EventHandler<SuspendingEventArgs^>								(this, &App::OnSuspending	);
 			CoreApplication::Resuming						+= ref new EventHandler<Object^>											(this, &App::OnResuming		);
-			DeviceResources									= std::make_shared<DX::D3DDeviceResources>();		// At this point we have access to the device. We can create the device-dependent resources.
+			DeviceResources.create();		// At this point we have access to the device. We can create the device-dependent resources.
 		}
 
 		virtual void	SetWindow						(CoreWindow^ window)												{

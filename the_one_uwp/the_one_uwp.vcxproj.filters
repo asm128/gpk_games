@@ -28,7 +28,6 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="the_one_uwp.cpp" />
     <ClCompile Include="DeviceResources.cpp" />
-    <ClCompile Include="Sample3DSceneRenderer.cpp" />
     <ClCompile Include="gpk_d3d.cpp" />
   </ItemGroup>
   <ItemGroup>

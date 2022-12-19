@@ -1,7 +1,7 @@
 ﻿#include "DeviceResources.h"
-#include "StepTimer.h"
 
-#include <memory>
+#include "gpk_ptr.h"
+
 #include <string>
 
 #ifndef SAMPLEFPSTEXTRENDERER_H_9238679823
@@ -11,7 +11,8 @@ namespace the_one_uwp
 {
 	// Renders the current FPS value in the bottom right corner of the screen using Direct2D and DirectWrite.
 	struct SampleFpsTextRenderer {
-		std::shared_ptr<DX::D3DDeviceResources>			DeviceResources					= {};	// Cached pointer to device resources.
+		// Cached pointer to device resources.
+		::gpk::ptr_obj<::DX::D3DDeviceResources>		DeviceResources					= {};
 
 		// Resources related to text rendering.
 		std::wstring									Text							= {};
@@ -25,27 +26,29 @@ namespace the_one_uwp
 		void											ReleaseDeviceDependentResources	() { WhiteBrush = {}; }
 
 		// Initializes D2D resources used for text rendering.
-														SampleFpsTextRenderer			(const std::shared_ptr<DX::D3DDeviceResources>& deviceResources) : DeviceResources(deviceResources) {
+		::gpk::error_t									Initialize						(const ::gpk::ptr_obj<DX::D3DDeviceResources> & deviceResources)  {
+			DeviceResources									= deviceResources;
 			// Create device independent resources
-			::gpk::ptr_com<IDWriteTextFormat>			textFormat						= {};
+			::gpk::ptr_com<IDWriteTextFormat>					textFormat						= {};
 			DX::ThrowIfFailed(DeviceResources->GetDWriteFactory()->CreateTextFormat(L"Segoe UI", nullptr, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 32.0f, L"en-US", &textFormat));
 			textFormat.as(TextFormat);
 			DX::ThrowIfFailed(TextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR));
 			DX::ThrowIfFailed(DeviceResources->GetD2DFactory()->CreateDrawingStateBlock(&StateBlock));
 
 			CreateDeviceDependentResources();
+			return 0;
 		}
 
 		// Updates the text to be displayed.
-		void											Update							(DX::StepTimer const& timer) {
+		void											Update							(double /*frameSeconds*/, double /*totalSeconds*/, uint32_t framesPerSecond) {
 			// Update display text.
-			uint32_t											fps								= timer.GetFramesPerSecond();
+			uint32_t											fps								= framesPerSecond;
 			Text											= (fps > 0) ? std::to_wstring(fps) + L" FPS" : L" - FPS";
 
 			::gpk::ptr_com<IDWriteTextLayout>			textLayout;
 			constexpr float										w								= 240.0f; // Max width of the input text.
 			constexpr float										h								= 50.0f;// Max height of the input text.
-			DX::ThrowIfFailed(DeviceResources->GetDWriteFactory()->CreateTextLayout(Text.c_str(), (uint32) Text.length(), TextFormat, w, h, &textLayout));
+			DX::ThrowIfFailed(DeviceResources->GetDWriteFactory()->CreateTextLayout(Text.c_str(), (uint32_t) Text.length(), TextFormat, w, h, &textLayout));
 			textLayout.as(TextLayout);
 			DX::ThrowIfFailed(TextLayout->GetMetrics(&TextMetrics));
 		}

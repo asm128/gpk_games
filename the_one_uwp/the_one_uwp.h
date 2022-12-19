@@ -15,18 +15,19 @@ namespace the_one_uwp
 		::the1::STheOne								TheOneApp			;
 		::gpk::ptr_obj<::gpk::SInput>				Input				;
 
-		::std::shared_ptr<::DX::D3DDeviceResources>	DeviceResources		;
+		::gpk::ptr_obj<::DX::D3DDeviceResources>	DeviceResources		;
 		::the_one_uwp::Sample3DSceneRenderer		SceneRenderer		;
 		::the_one_uwp::SampleFpsTextRenderer		FpsTextRenderer		;
 		::DX::StepTimer								Timer				;
 	public:
 													~STheOneUWP								()	{ DeviceResources->RegisterDeviceNotify(nullptr); }
 
-													STheOneUWP								(const std::shared_ptr<DX::D3DDeviceResources>& deviceResources)	
-			: DeviceResources	(deviceResources)
-			, SceneRenderer		(deviceResources)
-			, FpsTextRenderer	(deviceResources) {
+		::gpk::error_t								Initialize			(const ::gpk::ptr_obj<DX::D3DDeviceResources>& deviceResources) {
+			DeviceResources = deviceResources;
+			gpk_necs(SceneRenderer		.Initialize(deviceResources));
+			gpk_necs(FpsTextRenderer	.Initialize(deviceResources));
 			DeviceResources->RegisterDeviceNotify(this);
+			return 0;
 		}
 
 		void										Update									();
