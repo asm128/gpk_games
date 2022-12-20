@@ -37,10 +37,11 @@ namespace the_one_uwp
 			FpsTextRenderer	.ReleaseDeviceDependentResources();
 		}
 
-		virtual void								OnDeviceRestored						() {
-			SceneRenderer	.CreateDeviceDependentResources();
-			FpsTextRenderer	.CreateDeviceDependentResources();
+		virtual ::gpk::error_t						OnDeviceRestored						() {
+			gpk_necs(SceneRenderer	.CreateDeviceDependentResources());
+			gpk_necs(FpsTextRenderer.CreateDeviceDependentResources());
 			CreateWindowSizeDependentResources();		// TODO: Replace this with the size-dependent initialization of your app's content.
+			return 0;
 		}
 
 		void										CreateWindowSizeDependentResources		() { SceneRenderer.CreateWindowSizeDependentResources(); }
@@ -54,7 +55,7 @@ namespace the_one_uwp
 			auto											viewport								= DeviceResources->GetScreenViewport();	// Reset the viewport to target the whole screen.
 			context->RSSetViewports(1, &viewport);
 
-			ID3D11RenderTargetView *						targets	[]							= { DeviceResources->GetBackBufferRenderTargetView(), };	// Reset render targets to the screen.
+			ID3D11RenderTargetView *						targets	[]								= { DeviceResources->GetBackBufferRenderTargetView(), };	// Reset render targets to the screen.
 			context->OMSetRenderTargets(1, targets, DeviceResources->GetDepthStencilView());
 
 			context->ClearRenderTargetView(DeviceResources->GetBackBufferRenderTargetView(), DirectX::Colors::DarkBlue);	// Clear the back buffer and depth stencil view.

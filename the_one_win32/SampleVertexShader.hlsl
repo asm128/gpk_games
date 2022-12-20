@@ -1,26 +1,20 @@
 #include "ShaderShared.hlsli"
 
 cbuffer ModelViewProjectionConstantBuffer : register(b0) {
+	matrix mvp;
 	matrix model;
+	matrix modelInverseTranspose;
 	matrix view;
 	matrix projection;
 };
 
-struct VertexShaderInput {
-	float3 pos : POSITION;
-	float3 color : COLOR0;
-};
+PixelShaderInput			main			(VertexShaderInput input) {
+	PixelShaderInput				output;
+	//output.position				= mul(float4(input.position, 1.0f), mul(model, mul(view, projection)));
+	output.position				= mul(float4(input.position, 1.0f), mvp);
 
-PixelShaderInput main(VertexShaderInput input) {
-	PixelShaderInput output;
-	float4 pos = float4(input.pos, 1.0f);
-
-	pos = mul(pos, model);
-	pos = mul(pos, view);
-	pos = mul(pos, projection);
-	output.pos = pos;
-
-	output.color = input.color;
-
+	output.world.position		= mul(float4(input.position, 1.0f), model).xyz;
+	output.world.normal			= mul(float4(input.normal, 0.0f), modelInverseTranspose).xyz;
+	output.world.uv				= input.uv;
 	return output;
 }

@@ -119,8 +119,6 @@ namespace the_one_uwp
 		::gpk::error_t								CreateDeviceDependentResources			()	{
 			// Load shaders asynchronously.
 			::gpk::ptr_com<ID3D11InputLayout>				inputLayout;
-			::gpk::ptr_com<ID3D11Buffer>					vertexBuffer;
-			::gpk::ptr_com<ID3D11Buffer>					indexBuffer;
 			::gpk::ptr_com<ID3D11VertexShader>				vertexShader;
 			::gpk::ptr_com<ID3D11PixelShader>				pixelShader;
 			::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
@@ -155,6 +153,7 @@ namespace the_one_uwp
 				, {{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}}
 				};
 
+			::gpk::ptr_com<ID3D11Buffer>					vertexBuffer;
 			D3D11_SUBRESOURCE_DATA							vertexBufferData		= {cubeVertices};
 			D3D11_BUFFER_DESC								vertexBufferDesc		= {sizeof(cubeVertices)};
 			vertexBufferDesc.BindFlags					= D3D11_BIND_VERTEX_BUFFER;
@@ -170,6 +169,7 @@ namespace the_one_uwp
 				, 1,3,7, 1,7,5	// +z
 				};
 
+			::gpk::ptr_com<ID3D11Buffer>					indexBuffer;
 			m_indexCount								= ARRAYSIZE(cubeIndices);
 			D3D11_SUBRESOURCE_DATA							indexBufferData			= {cubeIndices};
 			D3D11_BUFFER_DESC								indexBufferDesc			= {sizeof(cubeIndices)};

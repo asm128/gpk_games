@@ -11,9 +11,11 @@ namespace the_one_win32
 {
 	// Constant buffer used to send MVP matrices to the vertex shader.
 	struct ModelViewProjectionConstantBuffer {
-		DirectX::XMFLOAT4X4							model;
-		DirectX::XMFLOAT4X4							view;
-		DirectX::XMFLOAT4X4							projection;
+		DirectX::XMMATRIX							mvp;
+		DirectX::XMMATRIX							model;
+		DirectX::XMMATRIX							modelInverseTranspose;
+		DirectX::XMMATRIX							view;
+		DirectX::XMMATRIX							projection;
 	};
 
 	// Used to send per-vertex data to the vertex shader.
@@ -37,7 +39,6 @@ namespace the_one_win32
 
 		// System resources for cube geometry.
 		ModelViewProjectionConstantBuffer			m_constantBufferData					= {};
-		uint32_t									m_indexCount							= {};
 
 		// Variables used with the rendering loop.
 		bool										m_loadingComplete						= false;
@@ -53,7 +54,12 @@ namespace the_one_win32
 		}
 
 		// Rotate the 3D cube model a set amount of radians.
-		void										Rotate									(float radians)		{ DirectX::XMStoreFloat4x4(&m_constantBufferData.model, DirectX::XMMatrixTranspose(DirectX::XMMatrixRotationY(radians))); }
+		void										Rotate									(float radians)		{ 
+			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m_constantBufferData.model, DirectX::XMMatrixTranspose(DirectX::XMMatrixRotationY(radians))); 
+			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m_constantBufferData.modelInverseTranspose, DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(0, m_constantBufferData.model))); 
+			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m_constantBufferData.mvp, DirectX::XMMatrixMultiply(m_constantBufferData.projection, DirectX::XMMatrixMultiply(m_constantBufferData.view, m_constantBufferData.model))); 
+		}
+
 		void										ReleaseDeviceDependentResources			() {
 			m_loadingComplete							= false;
 			VertexShader	.clear();
@@ -67,6 +73,11 @@ namespace the_one_win32
 		void										Update									(double secondsElapsed) {
 			TotalSecondsElapsed							+= secondsElapsed;
 			constexpr float									degreesPerSecond						= 45;
+			const DirectX::XMVECTORF32						eye										= { 0.0f, (float)sin(TotalSecondsElapsed) * 5, 5.5f, 0.0f };
+			const DirectX::XMVECTORF32						at										= { 0.0f, -0.1f, 0.0f, 0.0f };
+			const DirectX::XMVECTORF32						up										= { 0.0f, 1.0f, 0.0f, 0.0f };
+			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m_constantBufferData.view, DirectX::XMMatrixTranspose(DirectX::XMMatrixLookAtRH(eye, at, up)));
+
 			Rotate((float)fmod(DirectX::XMConvertToRadians(degreesPerSecond) * TotalSecondsElapsed, DirectX::XM_2PI));	 // Convert degrees to radians, then convert seconds to rotation angle
 		}
 
@@ -78,17 +89,29 @@ namespace the_one_win32
 			context->UpdateSubresource1(ConstantBuffer[0], 0, NULL, &m_constantBufferData, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
 
 			// Each vertex is one instance of the VertexPositionColor struct.
-			UINT											stride					= sizeof(VertexPositionColor);
+			UINT											stride					= sizeof(::gpk::SCoord3<float>) * 2 + sizeof(::gpk::SCoord2<float>);
 			UINT											offset					= 0;
 
-			context->IASetVertexBuffers		(0, 1, &VertexBuffer[0], &stride, &offset);
-			context->IASetIndexBuffer		(IndexBuffer[0], DXGI_FORMAT_R16_UINT, 0);// Each index is one 16-bit unsigned integer (short).
+			::gpk::ptr_com<ID3D11Buffer>					vb						= VertexBuffer[0];
+			::gpk::ptr_com<ID3D11Buffer>					ib						= IndexBuffer [0];
+			context->IASetVertexBuffers		(0, 1, &vb, &stride, &offset);
+			context->IASetIndexBuffer		(ib, DXGI_FORMAT_R16_UINT, 0);// Each index is one 16-bit unsigned integer (short).
 			context->IASetPrimitiveTopology	(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			context->IASetInputLayout		(InputLayout[0]);
 			context->VSSetShader			(VertexShader[0], nullptr, 0);	// Attach our vertex shader.
 			context->VSSetConstantBuffers1	(0, 1, &ConstantBuffer[0], nullptr, nullptr);	// Send the constant buffer to the graphics device.
 			context->PSSetShader			(PixelShader[0], nullptr, 0);	// Attach our pixel shader.
-			context->DrawIndexed			(m_indexCount, 0, 0);	// Draw the objects.
+			D3D11_BUFFER_DESC								desc;
+			ib->GetDesc(&desc);
+
+			D3D11_RASTERIZER_DESC							rs						= {};
+			rs.FillMode									= D3D11_FILL_WIREFRAME; 
+			rs.CullMode									= D3D11_CULL_BACK;
+			rs.DepthClipEnable							= TRUE;
+			::gpk::ptr_com<ID3D11RasterizerState>			prs;
+			DeviceResources->GetD3DDevice()->CreateRasterizerState(&rs, &prs);
+			context->RSSetState(prs);
+			context->DrawIndexed(desc.ByteWidth / 2, 0, 0);	// Draw the objects.
 		}
 
 		::gpk::error_t								CreateWindowSizeDependentResources		() {
@@ -106,21 +129,19 @@ namespace the_one_win32
 			DirectX::XMMATRIX								perspectiveMatrix		= DirectX::XMMatrixPerspectiveFovRH(fovAngleY, aspectRatio, 0.01f, 100.0f);
 			DirectX::XMFLOAT4X4								orientation				= DeviceResources->GetOrientationTransform3D();
 			DirectX::XMMATRIX								orientationMatrix		= DirectX::XMLoadFloat4x4(&orientation);
-			DirectX::XMStoreFloat4x4(&m_constantBufferData.projection, DirectX::XMMatrixTranspose(perspectiveMatrix * orientationMatrix));
+			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m_constantBufferData.projection, DirectX::XMMatrixTranspose(perspectiveMatrix * orientationMatrix));
 
 			// Eye is at (0,0.7,1.5), looking at point (0,-0.1,0) with the up-vector along the y-axis.
-			static const DirectX::XMVECTORF32				eye						= { 0.0f, 0.7f, 1.5f, 0.0f };
+			static const DirectX::XMVECTORF32				eye						= { 0.0f, (float)sin(TotalSecondsElapsed) * 5, 5.5f, 0.0f };
 			static const DirectX::XMVECTORF32				at						= { 0.0f, -0.1f, 0.0f, 0.0f };
 			static const DirectX::XMVECTORF32				up						= { 0.0f, 1.0f, 0.0f, 0.0f };
-			DirectX::XMStoreFloat4x4(&m_constantBufferData.view, DirectX::XMMatrixTranspose(DirectX::XMMatrixLookAtRH(eye, at, up)));
+			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m_constantBufferData.view, DirectX::XMMatrixTranspose(DirectX::XMMatrixLookAtRH(eye, at, up)));
 			return 0;
 		}
 
 		::gpk::error_t								CreateDeviceDependentResources			()	{
 			// Load shaders asynchronously.
 			::gpk::ptr_com<ID3D11InputLayout>				inputLayout;
-			::gpk::ptr_com<ID3D11Buffer>					vertexBuffer;
-			::gpk::ptr_com<ID3D11Buffer>					indexBuffer;
 			::gpk::ptr_com<ID3D11VertexShader>				vertexShader;
 			::gpk::ptr_com<ID3D11PixelShader>				pixelShader;
 			::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
@@ -129,7 +150,8 @@ namespace the_one_win32
 			gpk_necs(::gpk::fileToMemory("SampleVertexShader.cso", fileVS));
 			static constexpr D3D11_INPUT_ELEMENT_DESC		vertexDesc []			=
 				{	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 00, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-				,	{ "COLOR"	, 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				,	{ "NORMAL"	, 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				,	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 				};
 			// After the vertex shader file is loaded, create the shader and input layout.
 			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateVertexShader(&fileVS[0], fileVS.size(), nullptr, &vertexShader));
@@ -143,42 +165,8 @@ namespace the_one_win32
 			D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(ModelViewProjectionConstantBuffer)};
 			constantBufferDesc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
 			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
-		
-			static constexpr VertexPositionColor			cubeVertices[]			=	// Once both shaders are loaded, create the mesh. Load mesh vertices. Each vertex has a position and a color.
-				{ {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 0.0f}}
-				, {{-0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}}
-				, {{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}}
-				, {{-0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 1.0f}}
-				, {{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}}
-				, {{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 1.0f}}
-				, {{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 0.0f}}
-				, {{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}}
-				};
 
-			D3D11_SUBRESOURCE_DATA							vertexBufferData		= {cubeVertices};
-			D3D11_BUFFER_DESC								vertexBufferDesc		= {sizeof(cubeVertices)};
-			vertexBufferDesc.BindFlags					= D3D11_BIND_VERTEX_BUFFER;
-			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &vertexBuffer));
-
-			// Load mesh indices. Each trio of indices represents a triangle to be rendered on the screen. For example: 0,2,1 means that the vertices with indexes 0, 2 and 1 from the vertex buffer compose the first triangle of this mesh.
-			static constexpr uint16_t						cubeIndices []			= 
-				{ 0,2,1, 1,2,3	// -x
-				, 4,5,6, 5,7,6	// +x
-				, 0,1,5, 0,5,4	// -y
-				, 2,6,7, 2,7,3	// +y
-				, 0,4,6, 0,6,2	// -z
-				, 1,3,7, 1,7,5	// +z
-				};
-
-			m_indexCount								= ARRAYSIZE(cubeIndices);
-			D3D11_SUBRESOURCE_DATA							indexBufferData			= {cubeIndices};
-			D3D11_BUFFER_DESC								indexBufferDesc			= {sizeof(cubeIndices)};
-			indexBufferDesc.BindFlags					= D3D11_BIND_INDEX_BUFFER;
-			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&indexBufferDesc, &indexBufferData, &indexBuffer));
-	
 			InputLayout		.push_back(inputLayout);
-			VertexBuffer	.push_back(vertexBuffer);
-			IndexBuffer		.push_back(indexBuffer);
 			VertexShader	.push_back(vertexShader);
 			PixelShader		.push_back(pixelShader);
 			ConstantBuffer	.push_back(constantBuffer);

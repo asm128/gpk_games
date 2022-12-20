@@ -312,7 +312,7 @@ int32_t												the1::shaderBall
 	, int32_t								iRenderNode
 	) {
 	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-	const ::gpk::SRenderMesh								& mesh					= *scene.Graphics->Meshes[renderNode.Mesh];
+	const ::gpk::SGeometryMesh								& mesh					= *scene.Graphics->Meshes[renderNode.Mesh];
 	::gpk::vcc												meshName				= scene.Graphics->Meshes.Names[renderNode.Mesh];
 
 	info_printf("Drawing node %i, mesh %i, slice %i, mesh name: %s", iRenderNode, renderNode.Mesh, renderNode.Slice, meshName.begin());
@@ -353,7 +353,7 @@ int32_t												the1::shaderHole
 	, int32_t								iRenderNode
 	) {
 	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-	const ::gpk::SRenderMesh								& mesh					= *scene.Graphics->Meshes[renderNode.Mesh];
+	const ::gpk::SGeometryMesh								& mesh					= *scene.Graphics->Meshes[renderNode.Mesh];
 	::gpk::vcc												meshName				= scene.Graphics->Meshes.Names[renderNode.Mesh];
 
 	info_printf("Drawing node %i, mesh %i, slice %i, mesh name: %s", iRenderNode, renderNode.Mesh, renderNode.Slice, meshName.begin());
@@ -389,7 +389,7 @@ int32_t												the1::shaderStick
 	, int32_t								iRenderNode
 	) {
 	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-	const ::gpk::SRenderMesh								& mesh					= *scene.Graphics->Meshes[renderNode.Mesh];
+	const ::gpk::SGeometryMesh								& mesh					= *scene.Graphics->Meshes[renderNode.Mesh];
 	::gpk::vcc												meshName				= scene.Graphics->Meshes.Names[renderNode.Mesh];
 
 	info_printf("Drawing node %i, mesh %i, slice %i, mesh name: %s", iRenderNode, renderNode.Mesh, renderNode.Slice, meshName.begin());
@@ -424,7 +424,7 @@ int32_t												the1::shaderCloth
 	, int32_t								iRenderNode
 	) {
 	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-	const ::gpk::SRenderMesh								& mesh					= *scene.Graphics->Meshes[renderNode.Mesh];
+	const ::gpk::SGeometryMesh								& mesh					= *scene.Graphics->Meshes[renderNode.Mesh];
 	::gpk::vcc												meshName				= scene.Graphics->Meshes.Names[renderNode.Mesh];
 
 	info_printf("Drawing node %i, mesh %i, slice %i, mesh name: %s", iRenderNode, renderNode.Mesh, renderNode.Slice, meshName.begin());
