@@ -20,10 +20,9 @@
 	::gpk::SCoord3<float>							cameraFront						= (cameraTarget - cameraPosition).Normalize();
 
 	::gpk::SEngineSceneConstants					constants						= {};
-	constants.NearFar							= {0.01f, 10.0f};
 	constants.CameraPosition					= cameraPosition;
 	constants.CameraFront						= cameraFront;
-	constants.LightPosition						= pool.LightPos;
+	constants.LightPosition						= {0, 10, 0};
 	constants.LightDirection					= {0, -1, 0};
 
 	constants.View.LookAt(cameraPosition, cameraTarget, cameraUp);

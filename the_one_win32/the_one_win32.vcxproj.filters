@@ -50,7 +50,6 @@
     <None Include="PixelShaderShared.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="SamplePixelShader.hlsl" />
     <FxCompile Include="SampleVertexShader.hlsl" />
     <FxCompile Include="psBallCue.hlsl" />
     <FxCompile Include="psBallSolid.hlsl" />

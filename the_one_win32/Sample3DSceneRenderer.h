@@ -9,20 +9,13 @@
 
 namespace the_one_win32
 {
-	// Constant buffer used to send MVP matrices to the vertex shader.
-	struct ViewPerspectiveConstantBuffer {
-		DirectX::XMMATRIX							View;
-		DirectX::XMMATRIX							Perspective;
-		DirectX::XMMATRIX							Screen;
-		DirectX::XMMATRIX							VP;
-		DirectX::XMMATRIX							VPS;
-	};
-
+#pragma pack(push, 1)
 	struct ModelConstantBuffer {
 		DirectX::XMMATRIX							Model;
 		DirectX::XMMATRIX							ModelInverseTranspose;
 		DirectX::XMMATRIX							MVP;
 	};
+#pragma pack(pop)
 
 	// This sample renderer instantiates a basic rendering pipeline.
 	struct Sample3DSceneRenderer {
@@ -41,7 +34,7 @@ namespace the_one_win32
 
 		// System resources for cube geometry.
 		ModelConstantBuffer							ConstantBufferModel		= {};
-		ViewPerspectiveConstantBuffer				ConstantBufferScene		= {};
+		::gpk::SEngineSceneConstants				ConstantBufferScene		= {};
 
 		// Variables used with the rendering loop.
 		bool										m_loadingComplete						= false;
@@ -56,13 +49,6 @@ namespace the_one_win32
 			return 0;
 		}
 
-		// Rotate the 3D cube model a set amount of radians.
-		void										Rotate									(float radians)		{ 
-			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&ConstantBufferModel.Model, DirectX::XMMatrixRotationY(radians)); 
-			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&ConstantBufferModel.ModelInverseTranspose, DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(0, ConstantBufferModel.Model))); 
-			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&ConstantBufferModel.MVP, DirectX::XMMatrixMultiply(ConstantBufferScene.Perspective, DirectX::XMMatrixMultiply(ConstantBufferScene.View, ConstantBufferModel.Model))); 
-		}
-
 		void										ReleaseDeviceDependentResources			() {
 			m_loadingComplete							= false;
 			VertexShader	.clear();
@@ -73,24 +59,13 @@ namespace the_one_win32
 			IndexBuffer		.clear();
 		}
 
-		void										Update									(double secondsElapsed) {
-			TotalSecondsElapsed							+= secondsElapsed;
-			constexpr float									degreesPerSecond						= 45;
-			const DirectX::XMVECTORF32						eye										= { 0.0f, (float)sin(TotalSecondsElapsed) * 5, 5.5f, 0.0f };
-			const DirectX::XMVECTORF32						at										= { 0.0f, -0.1f, 0.0f, 0.0f };
-			const DirectX::XMVECTORF32						up										= { 0.0f, 1.0f, 0.0f, 0.0f };
-			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&ConstantBufferScene.View, DirectX::XMMatrixTranspose(DirectX::XMMatrixLookAtLH(eye, at, up)));
-
-			Rotate((float)fmod(DirectX::XMConvertToRadians(degreesPerSecond) * TotalSecondsElapsed, DirectX::XM_2PI));	 // Convert degrees to radians, then convert seconds to rotation angle
-		}
-
 		void										Render									() {
 			if (!m_loadingComplete)	// Loading is asynchronous. Only draw geometry after it's loaded.
 				return;
 
 			auto											context					= DeviceResources->GetD3DDeviceContext();
-			context->UpdateSubresource1(ConstantBuffer[0], 0, NULL, &ConstantBufferScene, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
-			context->UpdateSubresource1(ConstantBuffer[1], 0, NULL, &ConstantBufferModel, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
+			context->UpdateSubresource1(ConstantBuffer[0], 0, NULL, &ConstantBufferModel, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
+			context->UpdateSubresource1(ConstantBuffer[1], 0, NULL, &ConstantBufferScene, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
 
 			// Each vertex is one instance of the VertexPositionColor struct.
 			UINT											stride					= sizeof(::gpk::SCoord3<float>) * 2 + sizeof(::gpk::SCoord2<float>);
@@ -104,7 +79,7 @@ namespace the_one_win32
 			context->IASetInputLayout		(InputLayout[0]);
 			context->VSSetShader			(VertexShader[0], nullptr, 0);	// Attach our vertex shader.
 			context->VSSetConstantBuffers1	(0, 1, &ConstantBuffer[0], nullptr, nullptr);	// Send the constant buffer to the graphics device.
-			context->VSSetConstantBuffers1	(1, 1, &ConstantBuffer[1], nullptr, nullptr);	// Send the constant buffer to the graphics device.
+			context->PSSetConstantBuffers1	(1, 1, &ConstantBuffer[1], nullptr, nullptr);	// Send the constant buffer to the graphics device.
 			context->PSSetShader			(PixelShader[0], nullptr, 0);	// Attach our pixel shader.
 
 			D3D11_BUFFER_DESC								desc					= {};
@@ -184,14 +159,14 @@ namespace the_one_win32
 
 				{
 					::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
-					D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(ViewPerspectiveConstantBuffer)};
+					D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(ModelConstantBuffer)};
 					constantBufferDesc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
 					gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
 					ConstantBuffer.push_back(constantBuffer);
 				}
 				{
 					::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
-					D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(ModelConstantBuffer)};
+					D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(::gpk::SEngineSceneConstants)};
 					constantBufferDesc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
 					gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
 					ConstantBuffer.push_back(constantBuffer);

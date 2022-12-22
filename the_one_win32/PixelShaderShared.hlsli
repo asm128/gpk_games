@@ -1,8 +1,9 @@
 #include "ShaderShared.hlsli"
 
-Texture2D				texDiffuse		: register( t0 );
-SamplerState			samplerLinear	: register( s0 );
-static const float4		PIXEL_BLACK_NUMBER		= float4(0, 0, 0, 1);
+Texture2D				texDiffuse						: register( t0 );
+SamplerState			samplerLinear					: register( s0 );
+
+static const float4		PIXEL_BLACK_NUMBER				= float4(0, 0, 0, 1);
 static const float		LIGHT_FACTOR_AMBIENT			= .025f;
 static const float		LIGHT_FACTOR_SPECULAR_POWER		= 30.0f;
 
@@ -26,7 +27,8 @@ float4					lightCalcSpecular		(float4 specularMaterial, float4 specularLight, fl
 	const float					reflectedFactor			= max(dot(reflected, pointToEye), 0.0f);
 	if(0 >= reflectedFactor) 
 		return float4(PIXEL_BLACK_NUMBER.rgb, specularMaterial.a);
-
-	const float					factor					= pow(reflectedFactor, specularPower);
-	return specularMaterial * specularLight * factor;
+	else {
+		const float					factor					= pow(reflectedFactor, specularPower);
+		return specularMaterial * specularLight * factor;
+	}
 }

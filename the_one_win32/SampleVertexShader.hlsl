@@ -1,19 +1,6 @@
 #include "ShaderShared.hlsli"
 
-cbuffer ViewProjectionConstantBuffer : register(b0) {
-	matrix						View;
-	matrix						Perspective;
-	matrix						Screen;
-	matrix						VP;
-	matrix						VPS;
-
-	float3						CameraPosition	; 
-	float3						CameraFront		; 
-	float3						LightPosition	; 
-	float3						LightDirection	; 
-};
-
-cbuffer ModelConstantBuffer : register(b1) {
+cbuffer ModelConstantBuffer : register(b0) {
 	matrix						Model;
 	matrix						ModelInverseTranspose;
 	matrix						MVP;
