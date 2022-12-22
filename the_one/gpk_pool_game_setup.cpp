@@ -161,7 +161,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	engine.SetMeshScale(pool.StateStart.Ball[0].Entity, {pool.StateStart.BallRadius * 2, pool.StateStart.BallRadius * 2, pool.StateStart.BallRadius * 2});
 	engine.SetShader(pool.StateStart.Ball[0].Entity, ::the1::shaderBall, "shaderBall");
 	for(uint32_t iBall = 1; iBall < ::the1::MAX_BALLS; ++iBall) {
-		gpk_necs(pool.StateStart.Ball[iBall].Entity = engine.Clone(pool.StateStart.Ball[0].Entity, true, true));
+		gpk_necs(pool.StateStart.Ball[iBall].Entity = engine.Clone(pool.StateStart.Ball[0].Entity, true, true, true));
 	}
 
 	// table
@@ -177,7 +177,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	engine.SetMeshScale(pool.StateStart.Table.Pockets[0].Entity, {pool.StateStart.Table.PocketRadius * 2, pool.StateStart.Table.PocketRadius * 2, pool.StateStart.Table.PocketRadius * 2});
 	engine.SetShader(iPocketEntity, ::the1::shaderHole, "shaderHole");
 	for(uint32_t iPocket = 1; iPocket < 6; ++iPocket) {
-		gpk_necs(pool.StateStart.Table.Pockets[iPocket].Entity = engine.Clone(pool.StateStart.Table.Pockets[0].Entity, false, false));
+		gpk_necs(pool.StateStart.Table.Pockets[iPocket].Entity = engine.Clone(pool.StateStart.Table.Pockets[0].Entity, false, false, false));
 	}
 
 	for(uint32_t iPocket = 0; iPocket < 6; ++iPocket) {
@@ -198,7 +198,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	engine.Scene->ManagedRenderNodes.BaseTransforms[engine.ManagedEntities.Entities[pool.StateStart.Player[0].Stick.Entity].RenderNode].World *= mRotation;
 	engine.SetMeshPosition	(pool.StateStart.Player[0].Stick.Entity, {-pool.StateStart.BallRadius * 2, 0, 0});
 	for(uint32_t iPlayer = 1; iPlayer < ::gpk::size(pool.StateStart.Player); ++iPlayer) {
-		gpk_necs(pool.StateStart.Player[iPlayer].Stick.Entity = engine.Clone(pool.StateStart.Player[0].Stick.Entity, true, true));
+		gpk_necs(pool.StateStart.Player[iPlayer].Stick.Entity = engine.Clone(pool.StateStart.Player[0].Stick.Entity, true, true, false));
 		engine.SetHidden(pool.StateStart.Player[iPlayer].Stick.Entity, true);
 	}
 	::the1::poolGameReset(pool, mode);

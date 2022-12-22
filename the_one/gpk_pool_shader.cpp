@@ -6,74 +6,7 @@ static constexpr float							LIGHT_FACTOR_AMBIENT			= .025f;
 static constexpr float							LIGHT_FACTOR_SPECULAR_POWER		= 30.0f;
 static constexpr ::gpk::SColorBGRA				PIXEL_BLACK_NUMBER				= ::gpk::SColorBGRA{0, 0, 0, 255};
 
-
-static	::gpk::error_t							transformTrianglesBall					
-	( ::gpk::SVSOutput									& output
-	, ::gpk::view_array<const uint16_t>					indices			
-	, ::gpk::view_array<const ::gpk::SCoord3<float>>	positions	
-	, ::gpk::view_array<const ::gpk::SCoord3<float>>	normals		
-	, ::gpk::view_array<const ::gpk::SCoord2<float>>	uv			
-	, const ::gpk::SMatrix4<float>						& projection		
-	, const ::gpk::SMatrix4<float>						& worldTransform	
-	, const ::gpk::SCoord3<float>						& cameraFront
-)	{ 
-	::gpk::view_array<const ::gpk::STriangle<uint16_t>>		view_indices		= {(const ::gpk::STriangle<uint16_t>*)indices.begin(), indices.size() / 3};
-
-	const ::gpk::SMatrix4<float>							mWVPS				= worldTransform * projection;
-	for(uint32_t iTriangle = 0; iTriangle < view_indices.size(); ++iTriangle) {
-		const ::gpk::STriangle<uint16_t>											vertexIndices								= view_indices[iTriangle];
-		::gpk::STriangle3<float>													transformedNormals							= {normals[vertexIndices.A], normals[vertexIndices.B], normals[vertexIndices.C]};
-		::gpk::transformDirection(transformedNormals, worldTransform);
-		transformedNormals.A.Normalize();
-		transformedNormals.B.Normalize();
-		transformedNormals.C.Normalize();
-		double																		directionFactorA							= transformedNormals.A.Dot(cameraFront);
-		double																		directionFactorB							= transformedNormals.B.Dot(cameraFront);
-		double																		directionFactorC							= transformedNormals.C.Dot(cameraFront);
-		if(directionFactorA > .35 && directionFactorB > .35 && directionFactorC > .35)
-			continue;
-
-		output.Normals.push_back(transformedNormals);
-
-		::gpk::STriangle3<float>													transformedPositions						= {positions[vertexIndices.A], positions[vertexIndices.B], positions[vertexIndices.C]};
-		::gpk::transform(transformedPositions, worldTransform);
-		output.PositionsWorld.push_back(transformedPositions);
-		
-		::gpk::transform(transformedPositions, projection);
-		output.PositionsScreen.push_back(transformedPositions);
-		
-		::gpk::STriangle2<float>													transformedUVs								= {uv[vertexIndices.A], uv[vertexIndices.B], uv[vertexIndices.C]};
-		if( transformedUVs.A.x > 1.0f
-		 || transformedUVs.A.y > 1.0f
-		 || transformedUVs.B.x > 1.0f
-		 || transformedUVs.B.y > 1.0f
-		 || transformedUVs.C.x > 1.0f
-		 || transformedUVs.C.y > 1.0f
-		) 
-			_CrtDbgBreak();
-		output.UVs.push_back(transformedUVs);
-	}
-	return 0; 
-}
-
-namespace gpk
-{
-	struct SPSIn {
-		::gpk::SCoord3<float>							WeightedPosition	;
-		::gpk::SCoord3<float>							WeightedNormal		;
-		::gpk::SCoord2<float>							WeightedUV			;
-		::gpk::SRenderMaterial							Material			;
-		::gpk::view_grid<const ::gpk::SColorBGRA>		Surface				; 
-	};
-
-	typedef ::gpk::error_t								(TFuncPixelShader)
-		( const ::gpk::SEngineSceneConstants					& constants
-		, const ::gpk::SPSIn									& inPS
-		, ::gpk::SColorBGRA										& outputPixel
-		);
-}
-
-static	::gpk::error_t								psTableCloth
+::gpk::error_t										the1::psTableCloth
 	( const ::gpk::SEngineSceneConstants					& constants
 	, const ::gpk::SPSIn									& inPS
 	, ::gpk::SColorBGRA										& outputPixel
@@ -84,7 +17,7 @@ static	::gpk::error_t								psTableCloth
 	return 0; 
 }
 
-static	::gpk::error_t								psPocket
+::gpk::error_t										the1::psPocket
 	( const ::gpk::SEngineSceneConstants					& constants
 	, const ::gpk::SPSIn									& inPS
 	, ::gpk::SColorBGRA										& outputPixel
@@ -95,7 +28,7 @@ static	::gpk::error_t								psPocket
 	return 0; 
 }
 
-static	::gpk::error_t								psStick
+::gpk::error_t										the1::psStick
 	( const ::gpk::SEngineSceneConstants					& constants
 	, const ::gpk::SPSIn									& inPS
 	, ::gpk::SColorBGRA										& outputPixel
@@ -110,7 +43,7 @@ static	::gpk::error_t								psStick
 }
 
 
-static	::gpk::error_t								psBallCue				
+::gpk::error_t										the1::psBallCue				
 	( const ::gpk::SEngineSceneConstants					& constants
 	, const ::gpk::SPSIn									& inPS
 	, ::gpk::SColorBGRA										& outputPixel
@@ -137,7 +70,7 @@ static	::gpk::error_t								psBallCue
 	return 0; 
 }
 
-static	::gpk::error_t								psBallSolid				
+::gpk::error_t										the1::psBallSolid				
 	( const ::gpk::SEngineSceneConstants					& constants
 	, const ::gpk::SPSIn									& inPS
 	, ::gpk::SColorBGRA										& outputPixel
@@ -191,7 +124,7 @@ static	::gpk::error_t								psBallSolid
 	return 0; 
 }
 
-static	::gpk::error_t								psBallStripped			
+::gpk::error_t										the1::psBallStripped			
 	( const ::gpk::SEngineSceneConstants	& constants
 	, const ::gpk::SPSIn					& inPS
 	, ::gpk::SColorBGRA						& outputPixel
@@ -249,24 +182,16 @@ static	::gpk::error_t								psBallStripped
 	return 0; 
 }
 
-static	::gpk::error_t								drawBuffersBall							
+static	::gpk::error_t								drawBuffers
 	( ::gpk::view_grid<::gpk::SColorBGRA>					& backBufferColors
-	, ::gpk::view_grid<uint32_t>							& backBufferDepth
+	, ::gpk::view2d_uint32									backBufferDepth
 	, ::gpk::SVSOutput										& outVS
 	, ::gpk::SVSCache										& cacheVS
-	, ::gpk::view_array<const uint16_t>						indices		
-	, ::gpk::view_array<const ::gpk::SCoord3<float>>		positions	
-	, ::gpk::view_array<const ::gpk::SCoord3<float>>		normals		
-	, ::gpk::view_array<const ::gpk::SCoord2<float>>		uv			
 	, const ::gpk::SRenderMaterial							& material
 	, ::gpk::view_grid<const ::gpk::SColorBGRA>				surface
-	, const ::gpk::SMatrix4<float>							& worldTransform	 
 	, const ::gpk::SEngineSceneConstants					& constants
 	, ::gpk::TFuncPixelShader								& ps
 	) {	// 
-	(void)uv;(void)surface;
-	outVS												= {};
-	::transformTrianglesBall(outVS, indices, positions, normals, uv, constants.Projection, worldTransform, constants.CameraFront);
 	::gpk::array_pod<::gpk::STriangle<float>>					& triangleWeights			= cacheVS.TriangleWeights		;
 	::gpk::array_pod<::gpk::SCoord2<int16_t>>					& trianglePixelCoords		= cacheVS.SolidPixelCoords		;
 	const ::gpk::SCoord2<uint16_t>								offscreenMetrics			= backBufferColors.metrics().Cast<uint16_t>();
@@ -303,149 +228,114 @@ static	::gpk::error_t								drawBuffersBall
 	return 0;
 }
 
+
 int32_t												the1::shaderBall				
 	( ::gpk::view_grid<::gpk::SColorBGRA>	backBufferColors
-	, ::gpk::view_grid<uint32_t>			backBufferDepth
+	, ::gpk::view2d_uint32					backBufferDepth
 	, ::gpk::SEngineRenderCache				& renderCache
 	, const ::gpk::SEngineScene				& scene
 	, const ::gpk::SEngineSceneConstants	& constants
 	, int32_t								iRenderNode
 	) {
-	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-	const ::gpk::SGeometryMesh								& mesh					= *scene.Graphics->Meshes[renderNode.Mesh];
-	::gpk::vcc												meshName				= scene.Graphics->Meshes.Names[renderNode.Mesh];
-
-	info_printf("Drawing node %i, mesh %i, slice %i, mesh name: %s", iRenderNode, renderNode.Mesh, renderNode.Slice, meshName.begin());
-
-	const ::gpk::SRenderNodeTransforms						& transforms				= scene.ManagedRenderNodes.Transforms[iRenderNode];
-	const ::gpk::SMatrix4<float>							& worldTransform			= transforms.World;
-	const ::gpk::view_array<const uint16_t>					indices						= (mesh.GeometryBuffers.size() > 0) ? ::gpk::view_array<const uint16_t>					{(const uint16_t				*)scene.Graphics->Buffers[mesh.GeometryBuffers[0]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[0]]->Data.size() / sizeof(const uint16_t)}				: ::gpk::view_array<const uint16_t>					{};
-	const ::gpk::view_array<const ::gpk::SCoord3<float>>	positions					= (mesh.GeometryBuffers.size() > 1) ? ::gpk::view_array<const ::gpk::SCoord3<float>>	{(const ::gpk::SCoord3<float>	*)scene.Graphics->Buffers[mesh.GeometryBuffers[1]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[1]]->Data.size() / sizeof(const ::gpk::SCoord3<float>)}	: ::gpk::view_array<const ::gpk::SCoord3<float>>	{};
-	const ::gpk::view_array<const ::gpk::SCoord3<float>>	normals						= (mesh.GeometryBuffers.size() > 2) ? ::gpk::view_array<const ::gpk::SCoord3<float>>	{(const ::gpk::SCoord3<float>	*)scene.Graphics->Buffers[mesh.GeometryBuffers[2]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[2]]->Data.size() / sizeof(const ::gpk::SCoord3<float>)}	: ::gpk::view_array<const ::gpk::SCoord3<float>>	{};
-	const ::gpk::view_array<const ::gpk::SCoord2<float>>	uv							= (mesh.GeometryBuffers.size() > 3) ? ::gpk::view_array<const ::gpk::SCoord2<float>>	{(const ::gpk::SCoord2<float>	*)scene.Graphics->Buffers[mesh.GeometryBuffers[3]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[3]]->Data.size() / sizeof(const ::gpk::SCoord2<float>)}	: ::gpk::view_array<const ::gpk::SCoord2<float>>	{};
+	const ::gpk::SRenderNode								& renderNode				= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
 	const ::gpk::SSkin										& skin						= *scene.Graphics->Skins.Elements[renderNode.Skin];
 	const ::gpk::SRenderMaterial							& material					= skin.Material;
 	const uint32_t											tex							= skin.Textures[0];
 	const ::gpk::SSurface									& surface					= *scene.Graphics->Surfaces[tex];
-
-	const ::gpk::SGeometrySlice								slice						= (renderNode.Slice < mesh.GeometrySlices.size()) ? mesh.GeometrySlices[renderNode.Slice] : ::gpk::SGeometrySlice{{0, indices.size() / 3}};
-
 	::gpk::TFuncPixelShader									& ps						
-		= (0 == iRenderNode) ? psBallCue
-		: (8 >= iRenderNode) ? psBallSolid
-		: psBallStripped
+		= (0 == iRenderNode) ? ::the1::psBallCue
+		: (8 >= iRenderNode) ? ::the1::psBallSolid
+		: ::the1::psBallStripped
 		;
-	drawBuffersBall(backBufferColors, backBufferDepth, renderCache.OutputVertexShader, renderCache.CacheVertexShader
-		, {&indices[slice.Slice.Offset], slice.Slice.Count}, positions, normals, uv, material, {(const ::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()}
-		, worldTransform, constants, ps
-	);
 
+	drawBuffers(backBufferColors
+		, backBufferDepth
+		, renderCache.OutputVertexShader
+		, renderCache.CacheVertexShader
+		, material
+		, {(const ::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()}
+		, constants
+		, ps
+	);
 	return 0;
 }
 
 
 int32_t												the1::shaderHole
 	( ::gpk::view_grid<::gpk::SColorBGRA>	backBufferColors
-	, ::gpk::view_grid<uint32_t>			backBufferDepth
+	, ::gpk::view2d_uint32					backBufferDepth
 	, ::gpk::SEngineRenderCache				& renderCache
 	, const ::gpk::SEngineScene				& scene
 	, const ::gpk::SEngineSceneConstants	& constants
 	, int32_t								iRenderNode
 	) {
-	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-	const ::gpk::SGeometryMesh								& mesh					= *scene.Graphics->Meshes[renderNode.Mesh];
-	::gpk::vcc												meshName				= scene.Graphics->Meshes.Names[renderNode.Mesh];
-
-	info_printf("Drawing node %i, mesh %i, slice %i, mesh name: %s", iRenderNode, renderNode.Mesh, renderNode.Slice, meshName.begin());
-
-	const ::gpk::SRenderNodeTransforms						& transforms				= scene.ManagedRenderNodes.Transforms[iRenderNode];
-	const ::gpk::SMatrix4<float>							& worldTransform			= transforms.World;
-	const ::gpk::view_array<const uint16_t>					indices						= (mesh.GeometryBuffers.size() > 0) ? ::gpk::view_array<const uint16_t>					{(const uint16_t				*)scene.Graphics->Buffers[mesh.GeometryBuffers[0]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[0]]->Data.size() / sizeof(const uint16_t)}					: ::gpk::view_array<const uint16_t>					{};
-	const ::gpk::view_array<const ::gpk::SCoord3<float>>	positions					= (mesh.GeometryBuffers.size() > 1) ? ::gpk::view_array<const ::gpk::SCoord3<float>>	{(const ::gpk::SCoord3<float>	*)scene.Graphics->Buffers[mesh.GeometryBuffers[1]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[1]]->Data.size() / sizeof(const ::gpk::SCoord3<float>)}	: ::gpk::view_array<const ::gpk::SCoord3<float>>	{};
-	const ::gpk::view_array<const ::gpk::SCoord3<float>>	normals						= (mesh.GeometryBuffers.size() > 2) ? ::gpk::view_array<const ::gpk::SCoord3<float>>	{(const ::gpk::SCoord3<float>	*)scene.Graphics->Buffers[mesh.GeometryBuffers[2]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[2]]->Data.size() / sizeof(const ::gpk::SCoord3<float>)}	: ::gpk::view_array<const ::gpk::SCoord3<float>>	{};
-	const ::gpk::view_array<const ::gpk::SCoord2<float>>	uv							= (mesh.GeometryBuffers.size() > 3) ? ::gpk::view_array<const ::gpk::SCoord2<float>>	{(const ::gpk::SCoord2<float>	*)scene.Graphics->Buffers[mesh.GeometryBuffers[3]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[3]]->Data.size() / sizeof(const ::gpk::SCoord2<float>)}	: ::gpk::view_array<const ::gpk::SCoord2<float>>	{};
+	const ::gpk::SRenderNode								& renderNode				= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
 	const ::gpk::SSkin										& skin						= *scene.Graphics->Skins.Elements[renderNode.Skin];
 	const ::gpk::SRenderMaterial							& material					= skin.Material;
 	const uint32_t											tex							= skin.Textures[0];
 	const ::gpk::SSurface									& surface					= *scene.Graphics->Surfaces[tex];
 
-	const ::gpk::SGeometrySlice								slice						= (renderNode.Slice < mesh.GeometrySlices.size()) ? mesh.GeometrySlices[renderNode.Slice] : ::gpk::SGeometrySlice{{0, indices.size() / 3}};
-
-	drawBuffersBall(backBufferColors, backBufferDepth, renderCache.OutputVertexShader, renderCache.CacheVertexShader
-		, {&indices[slice.Slice.Offset], slice.Slice.Count}, positions, normals, uv, material, {(const ::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()}
-		, worldTransform, constants, ::psPocket
+	drawBuffers(backBufferColors
+		, backBufferDepth
+		, renderCache.OutputVertexShader
+		, renderCache.CacheVertexShader
+		, material
+		, {(const ::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()}
+		, constants
+		, ::the1::psPocket
 	);
-
 	return 0;
 }
 
 
 int32_t												the1::shaderStick
 	( ::gpk::view_grid<::gpk::SColorBGRA>	backBufferColors
-	, ::gpk::view_grid<uint32_t>			backBufferDepth
+	, ::gpk::view2d_uint32					backBufferDepth
 	, ::gpk::SEngineRenderCache				& renderCache
 	, const ::gpk::SEngineScene				& scene
 	, const ::gpk::SEngineSceneConstants	& constants
 	, int32_t								iRenderNode
 	) {
-	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-	const ::gpk::SGeometryMesh								& mesh					= *scene.Graphics->Meshes[renderNode.Mesh];
-	::gpk::vcc												meshName				= scene.Graphics->Meshes.Names[renderNode.Mesh];
-
-	info_printf("Drawing node %i, mesh %i, slice %i, mesh name: %s", iRenderNode, renderNode.Mesh, renderNode.Slice, meshName.begin());
-
-	const ::gpk::SRenderNodeTransforms						& transforms				= scene.ManagedRenderNodes.Transforms[iRenderNode];
-	const ::gpk::SMatrix4<float>							& worldTransform			= transforms.World;
-	const ::gpk::view_array<const uint16_t>					indices						= (mesh.GeometryBuffers.size() > 0) ? ::gpk::view_array<const uint16_t>					{(const uint16_t				*)scene.Graphics->Buffers[mesh.GeometryBuffers[0]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[0]]->Data.size() / sizeof(const uint16_t)}					: ::gpk::view_array<const uint16_t>					{};
-	const ::gpk::view_array<const ::gpk::SCoord3<float>>	positions					= (mesh.GeometryBuffers.size() > 1) ? ::gpk::view_array<const ::gpk::SCoord3<float>>	{(const ::gpk::SCoord3<float>	*)scene.Graphics->Buffers[mesh.GeometryBuffers[1]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[1]]->Data.size() / sizeof(const ::gpk::SCoord3<float>)}	: ::gpk::view_array<const ::gpk::SCoord3<float>>	{};
-	const ::gpk::view_array<const ::gpk::SCoord3<float>>	normals						= (mesh.GeometryBuffers.size() > 2) ? ::gpk::view_array<const ::gpk::SCoord3<float>>	{(const ::gpk::SCoord3<float>	*)scene.Graphics->Buffers[mesh.GeometryBuffers[2]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[2]]->Data.size() / sizeof(const ::gpk::SCoord3<float>)}	: ::gpk::view_array<const ::gpk::SCoord3<float>>	{};
-	const ::gpk::view_array<const ::gpk::SCoord2<float>>	uv							= (mesh.GeometryBuffers.size() > 3) ? ::gpk::view_array<const ::gpk::SCoord2<float>>	{(const ::gpk::SCoord2<float>	*)scene.Graphics->Buffers[mesh.GeometryBuffers[3]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[3]]->Data.size() / sizeof(const ::gpk::SCoord2<float>)}	: ::gpk::view_array<const ::gpk::SCoord2<float>>	{};
+	const ::gpk::SRenderNode								& renderNode				= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
 	const ::gpk::SSkin										& skin						= *scene.Graphics->Skins.Elements[renderNode.Skin];
 	const ::gpk::SRenderMaterial							& material					= skin.Material;
 	const uint32_t											tex							= skin.Textures[0];
 	const ::gpk::SSurface									& surface					= *scene.Graphics->Surfaces[tex];
 
-	const ::gpk::SGeometrySlice								slice						= (renderNode.Slice < mesh.GeometrySlices.size()) ? mesh.GeometrySlices[renderNode.Slice] : ::gpk::SGeometrySlice{{0, indices.size() / 3}};
-
-	drawBuffersBall(backBufferColors, backBufferDepth, renderCache.OutputVertexShader, renderCache.CacheVertexShader
-		, {&indices[slice.Slice.Offset], slice.Slice.Count}, positions, normals, uv, material, {(const ::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()}
-		, worldTransform, constants, ::psStick
+	drawBuffers(backBufferColors
+		, backBufferDepth
+		, renderCache.OutputVertexShader
+		, renderCache.CacheVertexShader
+		, material
+		, {(const ::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()}
+		, constants
+		, ::the1::psStick
 	);
-
 	return 0;
 }
 
 int32_t												the1::shaderCloth
 	( ::gpk::view_grid<::gpk::SColorBGRA>	backBufferColors
-	, ::gpk::view_grid<uint32_t>			backBufferDepth
+	, ::gpk::view2d_uint32					backBufferDepth
 	, ::gpk::SEngineRenderCache				& renderCache
 	, const ::gpk::SEngineScene				& scene
 	, const ::gpk::SEngineSceneConstants	& constants
 	, int32_t								iRenderNode
 	) {
-	const ::gpk::SRenderNode								& renderNode			= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
-	const ::gpk::SGeometryMesh								& mesh					= *scene.Graphics->Meshes[renderNode.Mesh];
-	::gpk::vcc												meshName				= scene.Graphics->Meshes.Names[renderNode.Mesh];
-
-	info_printf("Drawing node %i, mesh %i, slice %i, mesh name: %s", iRenderNode, renderNode.Mesh, renderNode.Slice, meshName.begin());
-
-	const ::gpk::SRenderNodeTransforms						& transforms				= scene.ManagedRenderNodes.Transforms[iRenderNode];
-	const ::gpk::SMatrix4<float>							& worldTransform			= transforms.World;
-	const ::gpk::view_array<const uint16_t>					indices						= (mesh.GeometryBuffers.size() > 0) ? ::gpk::view_array<const uint16_t>					{(const uint16_t				*)scene.Graphics->Buffers[mesh.GeometryBuffers[0]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[0]]->Data.size() / sizeof(const uint16_t)}				: ::gpk::view_array<const uint16_t>					{};
-	const ::gpk::view_array<const ::gpk::SCoord3<float>>	positions					= (mesh.GeometryBuffers.size() > 1) ? ::gpk::view_array<const ::gpk::SCoord3<float>>	{(const ::gpk::SCoord3<float>	*)scene.Graphics->Buffers[mesh.GeometryBuffers[1]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[1]]->Data.size() / sizeof(const ::gpk::SCoord3<float>)}	: ::gpk::view_array<const ::gpk::SCoord3<float>>	{};
-	const ::gpk::view_array<const ::gpk::SCoord3<float>>	normals						= (mesh.GeometryBuffers.size() > 2) ? ::gpk::view_array<const ::gpk::SCoord3<float>>	{(const ::gpk::SCoord3<float>	*)scene.Graphics->Buffers[mesh.GeometryBuffers[2]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[2]]->Data.size() / sizeof(const ::gpk::SCoord3<float>)}	: ::gpk::view_array<const ::gpk::SCoord3<float>>	{};
-	const ::gpk::view_array<const ::gpk::SCoord2<float>>	uv							= (mesh.GeometryBuffers.size() > 3) ? ::gpk::view_array<const ::gpk::SCoord2<float>>	{(const ::gpk::SCoord2<float>	*)scene.Graphics->Buffers[mesh.GeometryBuffers[3]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[3]]->Data.size() / sizeof(const ::gpk::SCoord2<float>)}	: ::gpk::view_array<const ::gpk::SCoord2<float>>	{};
+	const ::gpk::SRenderNode								& renderNode				= scene.ManagedRenderNodes.RenderNodes[iRenderNode];
 	const ::gpk::SSkin										& skin						= *scene.Graphics->Skins.Elements[renderNode.Skin];
 	const ::gpk::SRenderMaterial							& material					= skin.Material;
 	const uint32_t											tex							= skin.Textures[0];
 	const ::gpk::SSurface									& surface					= *scene.Graphics->Surfaces[tex];
 
-	const ::gpk::SGeometrySlice								slice						= (renderNode.Slice < mesh.GeometrySlices.size()) ? mesh.GeometrySlices[renderNode.Slice] : ::gpk::SGeometrySlice{{0, indices.size() / 3}};
-
-	drawBuffersBall(backBufferColors, backBufferDepth, renderCache.OutputVertexShader, renderCache.CacheVertexShader
-		, {&indices[slice.Slice.Offset], slice.Slice.Count}, positions, normals, uv, material, {(const ::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()}
-		, worldTransform, constants, ::psTableCloth
+	drawBuffers(backBufferColors
+		, backBufferDepth
+		, renderCache.OutputVertexShader
+		, renderCache.CacheVertexShader
+		, material
+		, {(const ::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()}
+		, constants
+		, ::the1::psTableCloth
 	);
-
 	return 0;
 }

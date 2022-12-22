@@ -5,42 +5,17 @@
 
 namespace the1
 {
-	int32_t												shaderBall				
-		( ::gpk::view_grid<::gpk::SColorBGRA>	backBufferColors
-		, ::gpk::view_grid<uint32_t>			backBufferDepth
-		, ::gpk::SEngineRenderCache				& renderCache
-		, const ::gpk::SEngineScene				& scene
-		, const ::gpk::SEngineSceneConstants	& constants
-		, int32_t								iRenderNode
-		);
+	::gpk::error_t	shaderBall		(::gpk::view_grid<::gpk::SColorBGRA> targetColors, ::gpk::view2d_uint32 targetDepth, ::gpk::SEngineRenderCache &cache, const ::gpk::SEngineScene &scene, const ::gpk::SEngineSceneConstants &constants, int32_t iRenderNode);
+	::gpk::error_t	shaderHole		(::gpk::view_grid<::gpk::SColorBGRA> targetColors, ::gpk::view2d_uint32 targetDepth, ::gpk::SEngineRenderCache &cache, const ::gpk::SEngineScene &scene, const ::gpk::SEngineSceneConstants &constants, int32_t iRenderNode);
+	::gpk::error_t	shaderStick		(::gpk::view_grid<::gpk::SColorBGRA> targetColors, ::gpk::view2d_uint32 targetDepth, ::gpk::SEngineRenderCache &cache, const ::gpk::SEngineScene &scene, const ::gpk::SEngineSceneConstants &constants, int32_t iRenderNode);
+	::gpk::error_t	shaderCloth		(::gpk::view_grid<::gpk::SColorBGRA> targetColors, ::gpk::view2d_uint32 targetDepth, ::gpk::SEngineRenderCache &cache, const ::gpk::SEngineScene &scene, const ::gpk::SEngineSceneConstants &constants, int32_t iRenderNode);
 
-	int32_t												shaderHole
-		( ::gpk::view_grid<::gpk::SColorBGRA>	backBufferColors
-		, ::gpk::view_grid<uint32_t>			backBufferDepth
-		, ::gpk::SEngineRenderCache				& renderCache
-		, const ::gpk::SEngineScene				& scene
-		, const ::gpk::SEngineSceneConstants	& constants
-		, int32_t								iRenderNode
-		);
-
-	int32_t												shaderStick
-		( ::gpk::view_grid<::gpk::SColorBGRA>	backBufferColors
-		, ::gpk::view_grid<uint32_t>			backBufferDepth
-		, ::gpk::SEngineRenderCache				& renderCache
-		, const ::gpk::SEngineScene				& scene
-		, const ::gpk::SEngineSceneConstants	& constants
-		, int32_t								iRenderNode
-		);
-
-	int32_t												shaderCloth
-		( ::gpk::view_grid<::gpk::SColorBGRA>	backBufferColors
-		, ::gpk::view_grid<uint32_t>			backBufferDepth
-		, ::gpk::SEngineRenderCache				& renderCache
-		, const ::gpk::SEngineScene				& scene
-		, const ::gpk::SEngineSceneConstants	& constants
-		, int32_t								iRenderNode
-		);
-
+	::gpk::error_t	psTableCloth	(const ::gpk::SEngineSceneConstants & constants, const ::gpk::SPSIn & inPS, ::gpk::SColorBGRA & outputPixel);
+	::gpk::error_t	psPocket		(const ::gpk::SEngineSceneConstants & constants, const ::gpk::SPSIn & inPS, ::gpk::SColorBGRA & outputPixel);
+	::gpk::error_t	psStick			(const ::gpk::SEngineSceneConstants & constants, const ::gpk::SPSIn & inPS, ::gpk::SColorBGRA & outputPixel);
+	::gpk::error_t	psBallCue		(const ::gpk::SEngineSceneConstants & constants, const ::gpk::SPSIn & inPS, ::gpk::SColorBGRA & outputPixel);
+	::gpk::error_t	psBallSolid		(const ::gpk::SEngineSceneConstants & constants, const ::gpk::SPSIn & inPS, ::gpk::SColorBGRA & outputPixel);
+	::gpk::error_t	psBallStripped	(const ::gpk::SEngineSceneConstants & constants, const ::gpk::SPSIn & inPS, ::gpk::SColorBGRA & outputPixel);
 } // namespace 
 
 #endif // GPK_POOL_DRAW_H_098273498237423
