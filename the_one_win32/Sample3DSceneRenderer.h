@@ -165,8 +165,6 @@ namespace the_one_win32
 				// Load shaders asynchronously.
 				::gpk::ptr_com<ID3D11InputLayout>				inputLayout;
 				::gpk::ptr_com<ID3D11VertexShader>				vertexShader;
-				::gpk::ptr_com<ID3D11PixelShader>				pixelShader;
-				::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
 
 				::gpk::array_pod<byte_t>						fileVS;
 				gpk_necs(::gpk::fileToMemory("SampleVertexShader.cso", fileVS));
@@ -178,20 +176,14 @@ namespace the_one_win32
 				// After the vertex shader file is loaded, create the shader and input layout.
 				gpk_hrcall(DeviceResources->GetD3DDevice()->CreateVertexShader(&fileVS[0], fileVS.size(), nullptr, &vertexShader));
 				gpk_hrcall(DeviceResources->GetD3DDevice()->CreateInputLayout(vertexDesc, ARRAYSIZE(vertexDesc), &fileVS[0], fileVS.size(), &inputLayout)); 
+				InputLayout		.push_back(inputLayout);
+				VertexShader	.push_back(vertexShader);
 
-				// After the pixel shader file is loaded, create the shader and constant buffer.
-				::gpk::array_pod<byte_t>						filePS;
-				gpk_necs(::gpk::fileToMemory("SamplePixelShader.cso" , filePS));
-				gpk_hrcall(DeviceResources->GetD3DDevice()->CreatePixelShader(&filePS[0], filePS.size(), nullptr, &pixelShader));
-
+				::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
 				D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(ModelViewProjectionConstantBuffer)};
 				constantBufferDesc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
 				gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
-
-				InputLayout		.push_back(inputLayout);
-				VertexShader	.push_back(vertexShader);
-				PixelShader		.push_back(pixelShader);
-				ConstantBuffer	.push_back(constantBuffer);
+				ConstantBuffer.push_back(constantBuffer);
 			}
 	
 			m_loadingComplete							= true;		// Once the cube is loaded, the object is ready to be rendered.

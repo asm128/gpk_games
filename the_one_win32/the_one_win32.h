@@ -70,7 +70,7 @@ struct SApplication : DX::IDeviceNotify {
 		::gpk::SEngine									& engine				= TheOne.MainGame.Game.Engine;
 		gpk_necs(::gpk::d3dCreateBuffersFromEngineMeshes		(DeviceResources->GetD3DDevice(), engine.Scene->Graphics->Meshes, engine.Scene->Graphics->Buffers, D3DScene.IndexBuffer, D3DScene.VertexBuffer));
 		gpk_necs(::gpk::d3dCreateTexturesFromEngineSurfaces		(DeviceResources->GetD3DDevice(), engine.Scene->Graphics->Surfaces, D3DScene.ShaderResourceView));
-		//gpk_necs(::gpk::d3dCreatePixelShadersFromEngineShaders	(DeviceResources->GetD3DDevice(), engine.Scene->Graphics->Shaders, D3DScene.PixelShader));
+		gpk_necs(::gpk::d3dCreatePixelShadersFromEngineShaders	(DeviceResources->GetD3DDevice(), engine.Scene->Graphics->Shaders, D3DScene.PixelShader));
 		return 0; 
 	}
 

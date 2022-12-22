@@ -2,24 +2,22 @@
 
 float4 main(PixelShaderInput input) : SV_TARGET
 {
-	//::gpk::SCoord2<float>								relativeToCenter			= ::gpk::SCoord2<float>{inPS.WeightedUV.x, inPS.WeightedUV.y} - ::gpk::SCoord2<float>{.5f, .5f};
-	//relativeToCenter.x								*= 2;
-	//
-	//const ::gpk::SColorBGRA								surfacecolor				
-	//	= ((::gpk::SCoord2<float>{ 0.0f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
-	//	: ((::gpk::SCoord2<float>{ 1.0f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
-	//	: ((::gpk::SCoord2<float>{-1.0f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
-	//	: ((::gpk::SCoord2<float>{ 0.5f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
-	//	: ((::gpk::SCoord2<float>{-0.5f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
-	//	: (( 0.5f - relativeToCenter.y) <  .05f) ? ::gpk::RED 
-	//	: ((-0.5f - relativeToCenter.y) > -.05f) ? ::gpk::RED 
-	//	: ::gpk::WHITE;
-	//::gpk::SColorFloat									materialcolor				= surfacecolor;		
-	//const ::gpk::SCoord3<float>							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
-	//const ::gpk::SColorFloat							specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, ::LIGHT_FACTOR_SPECULAR_POWER, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
-	//const ::gpk::SColorFloat							diffuse						= ::gpk::lightCalcDiffuse(materialcolor, inPS.WeightedNormal, lightVecW);
-	//const ::gpk::SColorFloat							ambient						= materialcolor * ::LIGHT_FACTOR_AMBIENT;
-	//
-	//outputPixel										= (0 == surfacecolor.g) ? ::gpk::RED : ::gpk::SColorFloat(ambient + diffuse + specular).Clamp();
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+	float2								relativeToCenter			= input.world.uv - float2(.5f, .5f);
+	relativeToCenter.x				*= 2;
+	
+	const float4						surfacecolor				
+		= (distance(float2( 0.0f, 0.0f), relativeToCenter) < .05f) ? float4(1, 0, 0, 1)
+		: (distance(float2( 1.0f, 0.0f), relativeToCenter) < .05f) ? float4(1, 0, 0, 1)
+		: (distance(float2(-1.0f, 0.0f), relativeToCenter) < .05f) ? float4(1, 0, 0, 1)
+		: (distance(float2( 0.5f, 0.0f), relativeToCenter) < .05f) ? float4(1, 0, 0, 1)
+		: (distance(float2(-0.5f, 0.0f), relativeToCenter) < .05f) ? float4(1, 0, 0, 1)
+		: (( 0.5f - relativeToCenter.y) <  .05f) ? float4(1, 0, 0, 1)
+		: ((-0.5f - relativeToCenter.y) > -.05f) ? float4(1, 0, 0, 1)
+		: float4(1, 1, 1, 1);
+	float3			lightVecW					= normalize(/*constants.LightPosition*/float3(0, 3, 0) - input.world.position);
+	float4			specular					= lightCalcSpecular(float4(1, 1, 1, 1), float4(1, 1, 1, 1), float3(-3, 3, -2)/*constants.CameraPosition*/, LIGHT_FACTOR_SPECULAR_POWER, input.world.position, input.world.normal, lightVecW);
+	float4			diffuse						= lightCalcDiffuse(surfacecolor, input.world.normal, lightVecW);
+	float4			ambient						= surfacecolor * .1f;
+	
+	return (0 == surfacecolor.g) ? float4(1, 0, 0, 1) : float4((ambient + diffuse + specular).rgb, surfacecolor.a);
 }

@@ -1,4 +1,5 @@
 #include "gpk_engine_d3d.h"
+#include "gpk_storage.h"
 
 ::gpk::error_t								gpk::d3dCreateBuffersFromEngineMeshes		(ID3D11Device* pDevice, const ::gpk::SMeshManager & engineMeshes, const ::gpk::SRenderBufferManager & engineBuffers, ::gpk::array_com<ID3D11Buffer> & indexBuffers, ::gpk::array_com<ID3D11Buffer> & vertexBuffers)	{
 	for(uint32_t iMesh = 0; iMesh < engineMeshes.size(); ++iMesh) {
@@ -77,9 +78,19 @@
 }
 
 //
-//::gpk::error_t								gpk::d3dCreatePixelShadersFromEngineShaders	(ID3D11Device* pDevice, const ::gpk::SShaderManager & engineShaders, ::gpk::array_com<ID3D11PixelShader> & pixelShaders) {
-//	for(uint32_t iShader = 0; iShader < engineShaders.size(); ++iShader) {
-//		engineShaders.Names[iShader];
-//	}
-//	return 0;
-//}
+::gpk::error_t								gpk::d3dCreatePixelShadersFromEngineShaders	(ID3D11Device* pDevice, const ::gpk::SShaderManager & engineShaders, ::gpk::array_com<ID3D11PixelShader> & pixelShaders) {
+	for(uint32_t iShader = 0; iShader < engineShaders.size(); ++iShader) {
+		const ::gpk::vcc								shaderName				= engineShaders.Names[iShader];
+
+		// After the pixel shader file is loaded, create the shader.
+		char											shaderFileName	[1024]	= {};
+		sprintf_s(shaderFileName, "%s.cso", shaderName.begin());
+		::gpk::array_pod<byte_t>						filePS;
+		gpk_necs(::gpk::fileToMemory(::gpk::vcs{shaderFileName}, filePS));
+
+		::gpk::ptr_com<ID3D11PixelShader>				pixelShader;
+		gpk_hrcall(pDevice->CreatePixelShader(&filePS[0], filePS.size(), nullptr, &pixelShader));
+		pixelShaders.push_back(pixelShader);
+	}
+	return 0;
+}

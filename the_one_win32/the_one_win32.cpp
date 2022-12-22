@@ -15,7 +15,7 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "The One");
 
-#define DISABLE_D3D11
+//#define DISABLE_D3D11
 
 static				::gpk::error_t					updateSizeDependentResources				(::SApplication& app)											{
 	const ::gpk::SCoord2<uint32_t>							newSize										= app.Framework.RootWindow.Size;

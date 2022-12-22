@@ -58,5 +58,7 @@
     <FxCompile Include="psTableCloth.hlsl" />
     <FxCompile Include="psStick.hlsl" />
     <FxCompile Include="psPocket.hlsl" />
+    <FxCompile Include="psSolid.hlsl" />
+    <FxCompile Include="psHidden.hlsl" />
   </ItemGroup>
 </Project>
