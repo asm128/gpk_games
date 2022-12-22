@@ -21,6 +21,9 @@
     <ClCompile Include="gpk_d3d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gpk_engine_d3d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="the_one_win32.h">
@@ -38,12 +41,22 @@
     <ClInclude Include="gpk_d3d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gpk_engine_d3d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderShared.hlsli" />
+    <None Include="PixelShaderShared.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="SamplePixelShader.hlsl" />
     <FxCompile Include="SampleVertexShader.hlsl" />
+    <FxCompile Include="psBallCue.hlsl" />
+    <FxCompile Include="psBallSolid.hlsl" />
+    <FxCompile Include="psBallStripped.hlsl" />
+    <FxCompile Include="psTableCloth.hlsl" />
+    <FxCompile Include="psStick.hlsl" />
+    <FxCompile Include="psPocket.hlsl" />
   </ItemGroup>
 </Project>

@@ -36,6 +36,8 @@ namespace the_one_win32
 		::gpk::array_com<ID3D11VertexShader	>		VertexShader;
 		::gpk::array_com<ID3D11PixelShader	>		PixelShader;
 		::gpk::array_com<ID3D11Buffer		>		ConstantBuffer;
+		::gpk::array_com<ID3D11SamplerState	>		SamplerStates;
+		::gpk::array_com<ID3D11ShaderResourceView>	ShaderResourceView;
 
 		// System resources for cube geometry.
 		ModelViewProjectionConstantBuffer			m_constantBufferData					= {};
@@ -101,16 +103,20 @@ namespace the_one_win32
 			context->VSSetShader			(VertexShader[0], nullptr, 0);	// Attach our vertex shader.
 			context->VSSetConstantBuffers1	(0, 1, &ConstantBuffer[0], nullptr, nullptr);	// Send the constant buffer to the graphics device.
 			context->PSSetShader			(PixelShader[0], nullptr, 0);	// Attach our pixel shader.
-			D3D11_BUFFER_DESC								desc;
+
+			D3D11_BUFFER_DESC								desc					= {};
 			ib->GetDesc(&desc);
 
 			D3D11_RASTERIZER_DESC							rs						= {};
-			rs.FillMode									= D3D11_FILL_WIREFRAME; 
+			rs.FillMode									= D3D11_FILL_SOLID; //D3D11_FILL_WIREFRAME; 
 			rs.CullMode									= D3D11_CULL_BACK;
 			rs.DepthClipEnable							= TRUE;
+
 			::gpk::ptr_com<ID3D11RasterizerState>			prs;
 			DeviceResources->GetD3DDevice()->CreateRasterizerState(&rs, &prs);
 			context->RSSetState(prs);
+		    context->PSSetSamplers( 0, 1, &SamplerStates[0] );
+			context->PSSetShaderResources( 0, 1, &ShaderResourceView[0] );
 			context->DrawIndexed(desc.ByteWidth / 2, 0, 0);	// Draw the objects.
 		}
 
@@ -140,37 +146,54 @@ namespace the_one_win32
 		}
 
 		::gpk::error_t								CreateDeviceDependentResources			()	{
-			// Load shaders asynchronously.
-			::gpk::ptr_com<ID3D11InputLayout>				inputLayout;
-			::gpk::ptr_com<ID3D11VertexShader>				vertexShader;
-			::gpk::ptr_com<ID3D11PixelShader>				pixelShader;
-			::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
+			{
+				// Create a sampler state
+				D3D11_SAMPLER_DESC								samDesc				= {};
+				samDesc.Filter								= D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+				samDesc.AddressU							= D3D11_TEXTURE_ADDRESS_WRAP;
+				samDesc.AddressV							= D3D11_TEXTURE_ADDRESS_WRAP;
+				samDesc.AddressW							= D3D11_TEXTURE_ADDRESS_WRAP;
+				samDesc.MaxAnisotropy						= 1;
+				samDesc.ComparisonFunc						= D3D11_COMPARISON_ALWAYS;
+				samDesc.MaxLOD								= D3D11_FLOAT32_MAX;
 
-			::gpk::array_pod<byte_t>						fileVS;
-			gpk_necs(::gpk::fileToMemory("SampleVertexShader.cso", fileVS));
-			static constexpr D3D11_INPUT_ELEMENT_DESC		vertexDesc []			=
-				{	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 00, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-				,	{ "NORMAL"	, 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-				,	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-				};
-			// After the vertex shader file is loaded, create the shader and input layout.
-			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateVertexShader(&fileVS[0], fileVS.size(), nullptr, &vertexShader));
-			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateInputLayout(vertexDesc, ARRAYSIZE(vertexDesc), &fileVS[0], fileVS.size(), &inputLayout)); 
+				::gpk::ptr_com<ID3D11SamplerState>				samplerState;
+				gpk_hrcall(DeviceResources->GetD3DDevice()->CreateSamplerState(&samDesc, &samplerState));
+				SamplerStates.push_back(samplerState);
+			}
+			{
+				// Load shaders asynchronously.
+				::gpk::ptr_com<ID3D11InputLayout>				inputLayout;
+				::gpk::ptr_com<ID3D11VertexShader>				vertexShader;
+				::gpk::ptr_com<ID3D11PixelShader>				pixelShader;
+				::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
 
-			// After the pixel shader file is loaded, create the shader and constant buffer.
-			::gpk::array_pod<byte_t>						filePS;
-			gpk_necs(::gpk::fileToMemory("SamplePixelShader.cso" , filePS));
-			gpk_hrcall(DeviceResources->GetD3DDevice()->CreatePixelShader(&filePS[0], filePS.size(), nullptr, &pixelShader));
+				::gpk::array_pod<byte_t>						fileVS;
+				gpk_necs(::gpk::fileToMemory("SampleVertexShader.cso", fileVS));
+				static constexpr D3D11_INPUT_ELEMENT_DESC		vertexDesc []			=
+					{	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 00, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+					,	{ "NORMAL"	, 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+					,	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+					};
+				// After the vertex shader file is loaded, create the shader and input layout.
+				gpk_hrcall(DeviceResources->GetD3DDevice()->CreateVertexShader(&fileVS[0], fileVS.size(), nullptr, &vertexShader));
+				gpk_hrcall(DeviceResources->GetD3DDevice()->CreateInputLayout(vertexDesc, ARRAYSIZE(vertexDesc), &fileVS[0], fileVS.size(), &inputLayout)); 
 
-			D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(ModelViewProjectionConstantBuffer)};
-			constantBufferDesc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
-			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
+				// After the pixel shader file is loaded, create the shader and constant buffer.
+				::gpk::array_pod<byte_t>						filePS;
+				gpk_necs(::gpk::fileToMemory("SamplePixelShader.cso" , filePS));
+				gpk_hrcall(DeviceResources->GetD3DDevice()->CreatePixelShader(&filePS[0], filePS.size(), nullptr, &pixelShader));
 
-			InputLayout		.push_back(inputLayout);
-			VertexShader	.push_back(vertexShader);
-			PixelShader		.push_back(pixelShader);
-			ConstantBuffer	.push_back(constantBuffer);
+				D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(ModelViewProjectionConstantBuffer)};
+				constantBufferDesc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
+				gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
 
+				InputLayout		.push_back(inputLayout);
+				VertexShader	.push_back(vertexShader);
+				PixelShader		.push_back(pixelShader);
+				ConstantBuffer	.push_back(constantBuffer);
+			}
+	
 			m_loadingComplete							= true;		// Once the cube is loaded, the object is ready to be rendered.
 			return 0;
 		}

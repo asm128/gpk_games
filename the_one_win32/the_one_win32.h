@@ -1,4 +1,5 @@
 #include "gpk_the_one.h"
+#include "gpk_engine_d3d.h"
 #include "Sample3DSceneRenderer.h"
 #include "SampleFpsTextRenderer.h"
 
@@ -27,10 +28,7 @@ namespace gpk
 #ifndef APPLICATION_H_098273498237423
 #define APPLICATION_H_098273498237423
 
-struct SGeometryMeshToD3DMap {
-	uint32_t		Indices;
-	uint32_t		Vertices;
-};
+
 
 struct SApplication : DX::IDeviceNotify {
 	::gpk::SFramework							Framework				;
@@ -70,57 +68,8 @@ struct SApplication : DX::IDeviceNotify {
 
 	::gpk::error_t								CreateDeviceDependentResources	()	{
 		::gpk::SEngine									& engine				= TheOne.MainGame.Game.Engine;
-		for(uint32_t iMesh = 0; iMesh < engine.Scene->Graphics->Meshes.size(); ++iMesh) {
-			const ::gpk::ptr_obj<::gpk::SGeometryMesh>		& mesh					= engine.Scene->Graphics->Meshes[iMesh];
-			if(!mesh)
-				continue;
-
-			::gpk::ptr_obj<::gpk::SRenderBuffer>			engineBufferIndices;
-			::gpk::array_pobj<::gpk::SRenderBuffer>			engineBufferVertices;
-			::gpk::array_pod<uint32_t>						layoutOffsets;
-
-			uint32_t										vertexSize					= 0;
-			for(uint32_t iBuffer = 0; iBuffer < mesh->GeometryBuffers.size(); ++iBuffer) {
-				const ::gpk::ptr_obj<::gpk::SRenderBuffer>		& buffer					= engine.Scene->Graphics->Buffers[mesh->GeometryBuffers[iBuffer]];
-				if(buffer->Desc.Usage == ::gpk::BUFFER_USAGE_Index) {
-					engineBufferIndices							= buffer;
-					continue;
-				}
-				gpk_necs(engineBufferVertices.push_back(buffer));
-				gpk_necs(layoutOffsets.push_back(vertexSize));
-				vertexSize									+= buffer->Desc.Format.TotalBytes();
-
-			}
-			::gpk::array_pod<ubyte_t>						packed;
-			for(uint32_t iValue = 0, valueCount = engineBufferVertices[0]->Data.size() / engineBufferVertices[0]->Desc.Format.TotalBytes(); iValue < valueCount; ++iValue) {
-				for(uint32_t iBuffer = 0; iBuffer < engineBufferVertices.size(); ++iBuffer) {
-					 const ::gpk::SRenderBuffer						& buffer					= *engineBufferVertices[iBuffer];
-					::gpk::view_const_ubyte							value						= {&buffer.Data[iValue * buffer.Desc.Format.TotalBytes()], buffer.Desc.Format.TotalBytes()};
-					packed.append(value);
-				}
-			}
-			{
-				D3D11_SUBRESOURCE_DATA							vertexBufferData			= {packed.begin()};
-				D3D11_BUFFER_DESC								vertexBufferDesc			= {packed.size()};
-				vertexBufferDesc.BindFlags					= D3D11_BIND_VERTEX_BUFFER;
-				{
-					::gpk::ptr_com<ID3D11Buffer>					d3dBuffer;
-					gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &d3dBuffer));
-					D3DScene.VertexBuffer.push_back(d3dBuffer);
-				}
-			}
-			{
-				D3D11_SUBRESOURCE_DATA							indexBufferData			= {engineBufferIndices->Data.begin()};
-				D3D11_BUFFER_DESC								indexBufferDesc			= {engineBufferIndices->Data.size()};
-				indexBufferDesc.BindFlags					= D3D11_BIND_INDEX_BUFFER;
-				{
-					::gpk::ptr_com<ID3D11Buffer>					d3dBuffer;
-					gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&indexBufferDesc, &indexBufferData, &d3dBuffer));
-					D3DScene.IndexBuffer.push_back(d3dBuffer);
-				}
-			}
-		}
-
+		gpk_necs(::gpk::d3dCreateBuffersFromEngineMeshes(engine.Scene->Graphics->Meshes, engine.Scene->Graphics->Buffers, DeviceResources->GetD3DDevice(), D3DScene.IndexBuffer, D3DScene.VertexBuffer));
+		gpk_necs(::gpk::d3dCreateTexturesFromEngineSurfaces(engine.Scene->Graphics->Surfaces, DeviceResources->GetD3DDevice(), D3DScene.ShaderResourceView));
 		return 0; 
 	}
 
