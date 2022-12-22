@@ -41,7 +41,7 @@ static	::gpk::error_t					poolGameResetBall10		(::the1::SPoolGame & pool) { (voi
 static	::gpk::error_t					poolGameResetBall9		(::the1::SPoolGame & pool) { (void)pool; return 0; }
 static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	pool.StateStart.BallCount				= 16;
-	::gpk::SEngine								& engine					= pool.Engine;
+	::gpk::SEngine								& engine				= pool.Engine;
 	const ::gpk::SRasterFont					& font					= *engine.Scene->Graphics->Fonts.Fonts[9];
 	for(uint32_t iBall = 0; iBall < pool.StateStart.BallCount; ++iBall) {
 		//const bool									stripped				= iBall && iBall > 8;
@@ -50,7 +50,18 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		engine.SetHidden			(pool.StateStart.Ball[iBall].Entity, false);
 		engine.SetOrientation		(pool.StateStart.Ball[iBall].Entity, {0, 0, 1, -1});
 		engine.Integrator.BodyFlags[engine.ManagedEntities.Entities[pool.StateStart.Ball[iBall].Entity].RigidBody].Collides	= true;
+		::gpk::TFuncPixelShader						& ps
+			= (0 == iBall) ? ::the1::psBallCue
+			: (8 >= iBall) ? ::the1::psBallSolid
+			: ::the1::psBallStripped
+			;
+		const ::gpk::vcc							psName
+			= (0 == iBall) ? ::gpk::vcs{"psBallCue"}
+			: (8 >= iBall) ? ::gpk::vcs{"psBallSolid"}
+			: ::gpk::vcs{"psBallStripped"}
+			;
 
+		engine.SetShader			(pool.StateStart.Ball[iBall].Entity, ps, psName);
 		const ::gpk::SVirtualEntity					& entity				= engine.ManagedEntities.Entities[pool.StateStart.Ball[iBall].Entity];
 		const ::gpk::SRenderNode					& renderNode			= engine.Scene->ManagedRenderNodes.RenderNodes[entity.RenderNode];
 		::gpk::SSkin								& skin					= *engine.Scene->Graphics->Skins[renderNode.Skin];
@@ -159,7 +170,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	// balls
 	gpk_necs(pool.StateStart.Ball[0].Entity = engine.CreateSphere());
 	engine.SetMeshScale(pool.StateStart.Ball[0].Entity, {pool.StateStart.BallRadius * 2, pool.StateStart.BallRadius * 2, pool.StateStart.BallRadius * 2});
-	engine.SetShader(pool.StateStart.Ball[0].Entity, ::the1::shaderBall, "shaderBall");
+	engine.SetShader(pool.StateStart.Ball[0].Entity, ::the1::psBallSolid, "psBallSolid");
 	for(uint32_t iBall = 1; iBall < ::the1::MAX_BALLS; ++iBall) {
 		gpk_necs(pool.StateStart.Ball[iBall].Entity = engine.Clone(pool.StateStart.Ball[0].Entity, true, true, true));
 	}
@@ -167,15 +178,15 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	// table
 	gpk_necs(pool.StateStart.Table.Entity = engine.CreateBox());
 	engine.SetMeshScale(pool.StateStart.Table.Entity, {pool.StateStart.Table.Dimensions.Slate.x, pool.StateStart.Table.Dimensions.Slate.y * .25f, pool.StateStart.Table.Dimensions.Slate.y});
-	engine.SetShader((*engine.ManagedEntities.Children[pool.StateStart.Table.Entity])[0], ::the1::shaderCloth, "shaderCloth");
+	engine.SetShader((*engine.ManagedEntities.Children[pool.StateStart.Table.Entity])[0], ::the1::psTableCloth, "psTableCloth");
 	for(uint32_t iFace = 1; iFace < 6; ++iFace)
-		engine.SetShader((*engine.ManagedEntities.Children[pool.StateStart.Table.Entity])[iFace], ::gpk::shaderHidden, "shaderHidden");
+		engine.SetShader((*engine.ManagedEntities.Children[pool.StateStart.Table.Entity])[iFace], ::gpk::psHidden, "psHidden");
 
 	// pockets
 	uint32_t									iPocketEntity				= engine.CreateCylinder(8, true, 0.5f);
 	gpk_necs(pool.StateStart.Table.Pockets[0].Entity = iPocketEntity);
 	engine.SetMeshScale(pool.StateStart.Table.Pockets[0].Entity, {pool.StateStart.Table.PocketRadius * 2, pool.StateStart.Table.PocketRadius * 2, pool.StateStart.Table.PocketRadius * 2});
-	engine.SetShader(iPocketEntity, ::the1::shaderHole, "shaderHole");
+	engine.SetShader(iPocketEntity, ::the1::psPocket, "psPocket");
 	for(uint32_t iPocket = 1; iPocket < 6; ++iPocket) {
 		gpk_necs(pool.StateStart.Table.Pockets[iPocket].Entity = engine.Clone(pool.StateStart.Table.Pockets[0].Entity, false, false, false));
 	}
@@ -191,7 +202,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 
 	// sticks
 	gpk_necs(pool.StateStart.Player[0].Stick.Entity = engine.CreateCylinder(8, false, 1.0f));
-	engine.SetShader(pool.StateStart.Player[0].Stick.Entity, ::the1::shaderStick, "shaderStick");
+	engine.SetShader(pool.StateStart.Player[0].Stick.Entity, ::the1::psStick, "psStick");
 	engine.SetMeshScale(pool.StateStart.Player[0].Stick.Entity, {.01f, pool.StateStart.Table.Dimensions.Slate.y, .01f});
 	::gpk::SMatrix4<float>				mRotation;
 	mRotation.SetOrientation(::gpk::SQuaternion<float>{0, 0, 1, 1}.Normalize());
