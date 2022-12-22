@@ -1,3 +1,12 @@
+cbuffer ModelConstantBuffer : register(b0) {
+	matrix						Model;
+	matrix						ModelInverseTranspose;
+	matrix						MVP;
+	float4						Diffuse;
+	float4						Ambient;
+	float4						Specular;
+	float						SpecularPower;
+};
 
 cbuffer ViewProjectionConstantBuffer : register(b1) {
 	matrix						View;

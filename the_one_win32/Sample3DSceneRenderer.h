@@ -14,6 +14,7 @@ namespace the_one_win32
 		DirectX::XMMATRIX							Model;
 		DirectX::XMMATRIX							ModelInverseTranspose;
 		DirectX::XMMATRIX							MVP;
+		::gpk::SRenderMaterial						Material;
 	};
 #pragma pack(pop)
 
@@ -59,9 +60,11 @@ namespace the_one_win32
 			IndexBuffer		.clear();
 		}
 
-		void										Render									() {
+		void										Render									(uint32_t iMesh, uint32_t iShader, uint32_t startIndex, uint32_t countIndices, const ::gpk::SRenderMaterial & material) {
 			if (!m_loadingComplete)	// Loading is asynchronous. Only draw geometry after it's loaded.
 				return;
+
+			ConstantBufferModel.Material				= material;
 
 			auto											context					= DeviceResources->GetD3DDeviceContext();
 			context->UpdateSubresource1(ConstantBuffer[0], 0, NULL, &ConstantBufferModel, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
@@ -71,16 +74,17 @@ namespace the_one_win32
 			UINT											stride					= sizeof(::gpk::SCoord3<float>) * 2 + sizeof(::gpk::SCoord2<float>);
 			UINT											offset					= 0;
 
-			::gpk::ptr_com<ID3D11Buffer>					vb						= VertexBuffer[0];
-			::gpk::ptr_com<ID3D11Buffer>					ib						= IndexBuffer [0];
+			::gpk::ptr_com<ID3D11Buffer>					vb						= VertexBuffer[iMesh];
+			::gpk::ptr_com<ID3D11Buffer>					ib						= IndexBuffer [iMesh];
 			context->IASetVertexBuffers		(0, 1, &vb, &stride, &offset);
 			context->IASetIndexBuffer		(ib, DXGI_FORMAT_R16_UINT, 0);// Each index is one 16-bit unsigned integer (short).
 			context->IASetPrimitiveTopology	(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			context->IASetInputLayout		(InputLayout[0]);
 			context->VSSetShader			(VertexShader[0], nullptr, 0);	// Attach our vertex shader.
 			context->VSSetConstantBuffers1	(0, 1, &ConstantBuffer[0], nullptr, nullptr);	// Send the constant buffer to the graphics device.
+			context->PSSetConstantBuffers1	(0, 1, &ConstantBuffer[0], nullptr, nullptr);	// Send the constant buffer to the graphics device.
 			context->PSSetConstantBuffers1	(1, 1, &ConstantBuffer[1], nullptr, nullptr);	// Send the constant buffer to the graphics device.
-			context->PSSetShader			(PixelShader[0], nullptr, 0);	// Attach our pixel shader.
+			context->PSSetShader			(PixelShader[iShader], nullptr, 0);	// Attach our pixel shader.
 
 			D3D11_BUFFER_DESC								desc					= {};
 			ib->GetDesc(&desc);
@@ -95,7 +99,7 @@ namespace the_one_win32
 			context->RSSetState(prs);
 		    context->PSSetSamplers( 0, 1, &SamplerStates[0] );
 			context->PSSetShaderResources( 0, 1, &ShaderResourceView[0] );
-			context->DrawIndexed(desc.ByteWidth / 2, 0, 0);	// Draw the objects.
+			context->DrawIndexed(countIndices, startIndex, 0);	// Draw the objects.
 		}
 
 		::gpk::error_t								CreateWindowSizeDependentResources		() {

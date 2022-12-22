@@ -2,51 +2,46 @@
 
 float4 main(PixelShaderInput input) : SV_TARGET
 {
-	//const ::gpk::SCoord2<uint32_t>							& surfaceSize							= inPS.Surface.metrics();
-	//::gpk::SCoord2<float>								relativeToCenter			= ::gpk::SCoord2<float>{inPS.WeightedUV.x, inPS.WeightedUV.y} - ::gpk::SCoord2<float>{.5f, .5f};
-	//relativeToCenter.x								*= 2;
-	//
-	//::gpk::SColorFloat									materialColor;
-	//bool												shade						= false;
-	//float												ambientFactor				= ::LIGHT_FACTOR_AMBIENT;
-	//if((::gpk::SCoord2<float>{0.0f, 0.0f} - relativeToCenter).LengthSquared() >= .0225f) {
-	//	materialColor									= inPS.Material.Color.Diffuse;
-	//	shade											= true;
-	//}
-	//else {
-	//	const ::gpk::SCoord2<uint32_t>							fetchCoord					= 
-	//		{ (uint32_t)(relativeToCenter.x * 2.f * surfaceSize.x + surfaceSize.x / 2)
-	//		, (uint32_t)(relativeToCenter.y * 4.f * surfaceSize.y + surfaceSize.y / 2)
-	//		};
-	//	const ::gpk::SColorBGRA									surfacecolor				= inPS.Surface
-	//		[fetchCoord.y % surfaceSize.y]
-	//		[fetchCoord.x % surfaceSize.x]
-	//		;
-	//	if(surfacecolor != PIXEL_BLACK_NUMBER) {
-	//		materialColor									= ::gpk::WHITE;
-	//		shade											= rand() % 2;
-	//		ambientFactor									= .65f;
-	//	}
-	//	else {
-	//		materialColor									= gpk::BLACK;
-	//		shade											= true;
-	//	}
-	//}
-	//
-	//if(shade) {
-	//	const ::gpk::SCoord3<float>								lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
-	//	double													diffuseFactor				= inPS.WeightedNormal.Dot(lightVecW);
-	//	if(diffuseFactor < 0) {
-	//		ambientFactor									+= (rand() % 256) / 255.0f * float(diffuseFactor) * -.25f;
-	//		materialColor									= (materialColor * ambientFactor).Clamp();
-	//	}
-	//	else {
-	//		const ::gpk::SColorFloat								specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, ::LIGHT_FACTOR_SPECULAR_POWER, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
-	//		const ::gpk::SColorFloat								diffuse						= materialColor * ::gpk::max(0.0, diffuseFactor);
-	//		const ::gpk::SColorFloat								ambient						= materialColor * ambientFactor;
-	//		materialColor									= ::gpk::SColorFloat(ambient + diffuse + specular).Clamp();
-	//	}
-	//}
-	//outputPixel										= materialColor;
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+	float2								relativeToCenter			= input.world.uv - float2(.5f, .5f);
+	relativeToCenter.x				*= 2;
+	float4								materialColor				= Diffuse;
+	bool								shade						= false;
+	float								ambientFactor				= LIGHT_FACTOR_AMBIENT;
+	const float3						lightVecW					= normalize(LightPosition.xyz - input.world.position);
+	const float3						normal						= normalize(input.world.normal);
+	const float							diffuseFactor				= dot(normal, lightVecW);
+	if(distance(float2(0.0f, 0.0f), relativeToCenter) >= .175f) {
+		materialColor					= Diffuse;
+		shade							= true;
+	}
+	else {
+		const float2							fetchCoord					= 
+			{ relativeToCenter.x * 2.f + .5f
+			, relativeToCenter.y * 4.f + .5f
+			};
+		float4									surfacecolor				= texDiffuse.Sample(samplerLinear, fetchCoord);
+	
+		if((surfacecolor.r + surfacecolor.g + surfacecolor.b) != 0) {
+			materialColor										= GPK_WHITE;
+			shade												= true; //uint(rand(input.world.uv * diffuseFactor) / 10) % 2;
+			ambientFactor										= .35f;
+		}
+		else {
+			materialColor										= GPK_BLACK;
+			shade												= true;
+		} 
+	}
+	if(shade) {
+		if(diffuseFactor < 0) {
+			ambientFactor										+= rand(input.world.uv * diffuseFactor) * diffuseFactor * -.25f;
+			materialColor										= float4(saturate(materialColor * ambientFactor).xyz, 1.0f);
+		}
+		else {
+			const float4											specular					= lightCalcSpecular(GPK_WHITE, GPK_WHITE, CameraPosition.xyz, LIGHT_FACTOR_SPECULAR_POWER, input.world.position, normal, lightVecW);
+			const float4											diffuse						= materialColor * max(0.0, diffuseFactor);
+			const float4											ambient						= materialColor * ambientFactor;
+			materialColor										= float4(saturate(ambient + diffuse + specular).xyz, 1.0f);
+		}
+	}
+	return materialColor;
 }

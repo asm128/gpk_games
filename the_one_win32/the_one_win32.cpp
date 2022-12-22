@@ -146,17 +146,38 @@ static				::gpk::error_t					updateSizeDependentResources				(::SApplication& ap
 	constants.VP								= constants.View * constants.Perspective;
 	constants.VPS								= constants.VP * constants.Screen;
 
-	const ::gpk::SRenderNodeTransforms						& transforms				= app.TheOne.MainGame.Game.Engine.Scene->ManagedRenderNodes.Transforms[0];
-	::gpk::SMatrix4<float>									worldTransform				= transforms.World;
-	const ::gpk::SMatrix4<float>							mvp							= (worldTransform * constants.View * constants.Perspective).GetTranspose();
-	memcpy(&app.D3DScene.ConstantBufferModel.MVP, &mvp, sizeof(::gpk::SMatrix4<float>));
+	const ::gpk::SEngine							& engine		= app.TheOne.MainGame.Game.Engine;
+	const ::gpk::SEngineScene						& scene			= *engine.Scene;
+	for(uint32_t iNode = 0; iNode < scene.ManagedRenderNodes.RenderNodes.size(); ++iNode) {
+		const ::gpk::SRenderNodeFlags					& flags						= scene.ManagedRenderNodes.Flags[iNode];
+		const ::gpk::SRenderNode						& node						= scene.ManagedRenderNodes.RenderNodes[iNode];
+		if(flags.NoDraw)
+			continue;
 
-	worldTransform										= worldTransform.GetTranspose();
-	::gpk::SMatrix4<float>									worldIT						= transforms.WorldInverseTranspose.GetTranspose();
-	memcpy(&app.D3DScene.ConstantBufferModel.Model, &worldTransform, sizeof(::gpk::SMatrix4<float>));
-	memcpy(&app.D3DScene.ConstantBufferModel.ModelInverseTranspose, &worldIT, sizeof(::gpk::SMatrix4<float>));
+		if(node.Mesh >= scene.Graphics->Meshes.size())
+			continue;
+		const ::gpk::SRenderNodeTransforms						& transforms				= scene.ManagedRenderNodes.Transforms[iNode];
+		const ::gpk::SMatrix4<float>							mvp							= (transforms.World * constants.View * constants.Perspective).GetTranspose();
+		memcpy(&app.D3DScene.ConstantBufferModel.MVP, &mvp, sizeof(::gpk::SMatrix4<float>));
 
-	app.D3DScene.Render();
+		const ::gpk::SMatrix4<float>							worldTransform				= transforms.World.GetTranspose();
+		::gpk::SMatrix4<float>									worldIT						= transforms.WorldInverseTranspose.GetTranspose();
+		memcpy(&app.D3DScene.ConstantBufferModel.Model, &worldTransform, sizeof(::gpk::SMatrix4<float>));
+		memcpy(&app.D3DScene.ConstantBufferModel.ModelInverseTranspose, &worldIT, sizeof(::gpk::SMatrix4<float>));
+		const ::gpk::SGeometryMesh								& mesh						= *scene.Graphics->Meshes[node.Mesh];
+		verbose_printf("Drawing node %i, mesh %i, slice %i, mesh name: %s", iNode, node.Mesh, node.Slice, scene.Graphics->Meshes.Names[node.Mesh].begin());
+
+		const ::gpk::view_array<const uint16_t>					indices						
+			= (mesh.GeometryBuffers.size() > 0) ? ::gpk::view_array<const uint16_t>{(const uint16_t*)scene.Graphics->Buffers[mesh.GeometryBuffers[0]]->Data.begin(), scene.Graphics->Buffers[mesh.GeometryBuffers[0]]->Data.size() / sizeof(const uint16_t)} 
+			: ::gpk::view_array<const uint16_t>{}
+			;
+
+		const ::gpk::SSkin										& skin						= *scene.Graphics->Skins.Elements[node.Skin];
+		const ::gpk::SGeometrySlice								slice						= (node.Slice < mesh.GeometrySlices.size()) ? mesh.GeometrySlices[node.Slice] : ::gpk::SGeometrySlice{{0, indices.size() / 3}};
+		const ::gpk::SRenderMaterial							& material					= skin.Material;
+
+		app.D3DScene.Render(node.Mesh, node.Shader, slice.Slice.Offset, slice.Slice.Count, material);
+	}
 	app.D3DText.Render();
 	app.DeviceResources->Present();
 	framework.RootWindow.BackBuffer						= {};

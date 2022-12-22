@@ -1,9 +1,7 @@
 #include "PixelShaderShared.hlsli"
 
-float4 main(PixelShaderInput input) : SV_TARGET
-{
-	//const ::gpk::SCoord3<float>							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
-	//const ::gpk::SColorFloat							diffuse						= ::gpk::lightCalcDiffuse(::gpk::DARKGREEN, inPS.WeightedNormal, lightVecW);
-	//outputPixel										= ::gpk::SColorFloat(diffuse).Clamp();
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+float4 main(PixelShaderInput input) : SV_TARGET {
+	float3												lightVecW					= normalize(LightPosition.xyz - input.world.position);
+	float4												diffuse						= lightCalcDiffuse(float4(0.25f, .25f, .25f, 1), normalize(input.world.normal), lightVecW);
+	return float4(saturate(diffuse).xyz, diffuse.a);
 }

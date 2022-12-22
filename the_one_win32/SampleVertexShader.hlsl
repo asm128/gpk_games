@@ -1,11 +1,5 @@
 #include "ShaderShared.hlsli"
 
-cbuffer ModelConstantBuffer : register(b0) {
-	matrix						Model;
-	matrix						ModelInverseTranspose;
-	matrix						MVP;
-};
-
 PixelShaderInput			main			(VertexShaderInput input) {
 	PixelShaderInput				output;
 	output.position				= mul(float4(input.position, 1.0f), MVP);
