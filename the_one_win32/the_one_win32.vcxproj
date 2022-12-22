@@ -167,14 +167,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="gpk_d3d.cpp" />
-    <ClCompile Include="gpk_engine_d3d.cpp" />
     <ClCompile Include="the_one_win32.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeviceResources.h" />
-    <ClInclude Include="gpk_d3d.h" />
-    <ClInclude Include="gpk_engine_d3d.h" />
     <ClInclude Include="Sample3DSceneRenderer.h" />
     <ClInclude Include="SampleFpsTextRenderer.h" />
     <ClInclude Include="the_one_win32.h" />
