@@ -14,8 +14,6 @@
 	, const ::gpk::SCoord3<float>						& cameraUp
 	, double											totalSeconds
 	) {
-	::gpk::SCoord3<float>							lightPos						= {15, 10, 0};
-	lightPos.RotateY(-totalSeconds);
 
 	const ::gpk::SCoord2<uint16_t>					offscreenMetrics				= backBuffer.Color.View.metrics().Cast<uint16_t>();
 
@@ -25,7 +23,7 @@
 	constants.NearFar							= {0.01f, 10.0f};
 	constants.CameraPosition					= cameraPosition;
 	constants.CameraFront						= cameraFront;
-	constants.LightPosition						= lightPos;
+	constants.LightPosition						= pool.LightPos;
 	constants.LightDirection					= {0, -1, 0};
 
 	constants.View.LookAt(cameraPosition, cameraTarget, cameraUp);

@@ -152,6 +152,7 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 	if(false == playActive)
 		app.MainGame.Game.Engine.SetHidden(app.MainGame.Game.StateCurrent.Player[0].Stick.Entity, false);
 
+	app.MainGame.LightPos.RotateY(secondsElapsed);
 
 	return 0; 
 }

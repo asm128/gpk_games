@@ -124,6 +124,30 @@ static				::gpk::error_t					updateSizeDependentResources				(::SApplication& ap
 	context->ClearRenderTargetView(app.DeviceResources->GetBackBufferRenderTargetView(), DirectX::Colors::DarkBlue);	// Clear the back buffer and depth stencil view.
 	context->ClearDepthStencilView(app.DeviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);	
 
+	
+	const ::the1::SPlayerUI									& playerUI									= app.TheOne.MainGame.PlayerUI[app.TheOne.MainGame.CurrentPlayer];
+	const ::the1::SCamera									& cameraSelected		
+		= (playerUI.Cameras.Selected == 0				) ? playerUI.Cameras.Free 
+		: (playerUI.Cameras.Selected > the1::MAX_BALLS	) ? playerUI.Cameras.Stick
+		: playerUI.Cameras.Balls[playerUI.Cameras.Selected - 1] 
+		;
+
+	::gpk::SCoord3<float>							cameraFront						= (cameraSelected.Target - cameraSelected.Position).Normalize();
+
+	::gpk::SEngineSceneConstants					constants						= {};
+	constants.NearFar							= {0.01f, 10.0f};
+	constants.CameraPosition					= cameraSelected.Position;
+	constants.CameraFront						= cameraFront;
+	constants.LightPosition						= app.TheOne.MainGame.LightPos;
+	constants.LightDirection					= {0, -1, 0};
+
+	const ::gpk::SCoord2<uint16_t>					offscreenMetrics				= framework.RootWindow.Size.Cast<uint16_t>();
+	constants.View.LookAt(cameraSelected.Position, cameraSelected.Target, {0, 1, 0});
+	constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, constants.NearFar.Near, constants.NearFar.Far);
+	constants.Screen.ViewportLH(offscreenMetrics);
+	constants.VP								= constants.View * constants.Perspective;
+	constants.VPS								= constants.VP * constants.Screen;
+
 	app.D3DScene.Render();
 	app.D3DText.Render();
 	app.DeviceResources->Present();
@@ -136,13 +160,6 @@ static				::gpk::error_t					updateSizeDependentResources				(::SApplication& ap
 	memcpy(framework.RootWindow.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	//::gpk::grid_mirror_y(framework.RootWindow.BackBuffer->Color.View, backBuffer->Color.View);
 	//framework.RootWindow.BackBuffer = backBuffer;
-	//------------------------------------------------
-	//const ::the1::SPlayerUI									& playerUI									= app.TheOne.MainGame.PlayerUI[app.TheOne.MainGame.CurrentPlayer];
-	//const ::the1::SCamera									& cameraSelected		
-	//	= (playerUI.Cameras.Selected == 0				) ? playerUI.Cameras.Free 
-	//	: (playerUI.Cameras.Selected > the1::MAX_BALLS	) ? playerUI.Cameras.Stick
-	//	: playerUI.Cameras.Balls[playerUI.Cameras.Selected - 1] 
-	//	;
 	return 0;
 }
 //

@@ -10,18 +10,18 @@
 namespace the_one_win32
 {
 	// Constant buffer used to send MVP matrices to the vertex shader.
-	struct ModelViewProjectionConstantBuffer {
-		DirectX::XMMATRIX							mvp;
-		DirectX::XMMATRIX							model;
-		DirectX::XMMATRIX							modelInverseTranspose;
-		DirectX::XMMATRIX							view;
-		DirectX::XMMATRIX							projection;
+	struct ViewPerspectiveConstantBuffer {
+		DirectX::XMMATRIX							View;
+		DirectX::XMMATRIX							Perspective;
+		DirectX::XMMATRIX							Screen;
+		DirectX::XMMATRIX							VP;
+		DirectX::XMMATRIX							VPS;
 	};
 
-	// Used to send per-vertex data to the vertex shader.
-	struct VertexPositionColor {
-		DirectX::XMFLOAT3							pos;
-		DirectX::XMFLOAT3							color;
+	struct ModelConstantBuffer {
+		DirectX::XMMATRIX							Model;
+		DirectX::XMMATRIX							ModelInverseTranspose;
+		DirectX::XMMATRIX							MVP;
 	};
 
 	// This sample renderer instantiates a basic rendering pipeline.
@@ -40,7 +40,8 @@ namespace the_one_win32
 		::gpk::array_com<ID3D11ShaderResourceView>	ShaderResourceView;
 
 		// System resources for cube geometry.
-		ModelViewProjectionConstantBuffer			m_constantBufferData					= {};
+		ModelConstantBuffer							ConstantBufferModel		= {};
+		ViewPerspectiveConstantBuffer				ConstantBufferScene		= {};
 
 		// Variables used with the rendering loop.
 		bool										m_loadingComplete						= false;
@@ -57,9 +58,9 @@ namespace the_one_win32
 
 		// Rotate the 3D cube model a set amount of radians.
 		void										Rotate									(float radians)		{ 
-			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m_constantBufferData.model, DirectX::XMMatrixTranspose(DirectX::XMMatrixRotationY(radians))); 
-			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m_constantBufferData.modelInverseTranspose, DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(0, m_constantBufferData.model))); 
-			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m_constantBufferData.mvp, DirectX::XMMatrixMultiply(m_constantBufferData.projection, DirectX::XMMatrixMultiply(m_constantBufferData.view, m_constantBufferData.model))); 
+			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&ConstantBufferModel.Model, DirectX::XMMatrixRotationY(radians)); 
+			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&ConstantBufferModel.ModelInverseTranspose, DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(0, ConstantBufferModel.Model))); 
+			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&ConstantBufferModel.MVP, DirectX::XMMatrixMultiply(ConstantBufferScene.Perspective, DirectX::XMMatrixMultiply(ConstantBufferScene.View, ConstantBufferModel.Model))); 
 		}
 
 		void										ReleaseDeviceDependentResources			() {
@@ -78,7 +79,7 @@ namespace the_one_win32
 			const DirectX::XMVECTORF32						eye										= { 0.0f, (float)sin(TotalSecondsElapsed) * 5, 5.5f, 0.0f };
 			const DirectX::XMVECTORF32						at										= { 0.0f, -0.1f, 0.0f, 0.0f };
 			const DirectX::XMVECTORF32						up										= { 0.0f, 1.0f, 0.0f, 0.0f };
-			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m_constantBufferData.view, DirectX::XMMatrixTranspose(DirectX::XMMatrixLookAtRH(eye, at, up)));
+			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&ConstantBufferScene.View, DirectX::XMMatrixTranspose(DirectX::XMMatrixLookAtLH(eye, at, up)));
 
 			Rotate((float)fmod(DirectX::XMConvertToRadians(degreesPerSecond) * TotalSecondsElapsed, DirectX::XM_2PI));	 // Convert degrees to radians, then convert seconds to rotation angle
 		}
@@ -88,7 +89,8 @@ namespace the_one_win32
 				return;
 
 			auto											context					= DeviceResources->GetD3DDeviceContext();
-			context->UpdateSubresource1(ConstantBuffer[0], 0, NULL, &m_constantBufferData, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
+			context->UpdateSubresource1(ConstantBuffer[0], 0, NULL, &ConstantBufferScene, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
+			context->UpdateSubresource1(ConstantBuffer[1], 0, NULL, &ConstantBufferModel, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
 
 			// Each vertex is one instance of the VertexPositionColor struct.
 			UINT											stride					= sizeof(::gpk::SCoord3<float>) * 2 + sizeof(::gpk::SCoord2<float>);
@@ -102,6 +104,7 @@ namespace the_one_win32
 			context->IASetInputLayout		(InputLayout[0]);
 			context->VSSetShader			(VertexShader[0], nullptr, 0);	// Attach our vertex shader.
 			context->VSSetConstantBuffers1	(0, 1, &ConstantBuffer[0], nullptr, nullptr);	// Send the constant buffer to the graphics device.
+			context->VSSetConstantBuffers1	(1, 1, &ConstantBuffer[1], nullptr, nullptr);	// Send the constant buffer to the graphics device.
 			context->PSSetShader			(PixelShader[0], nullptr, 0);	// Attach our pixel shader.
 
 			D3D11_BUFFER_DESC								desc					= {};
@@ -132,16 +135,16 @@ namespace the_one_win32
 			// Note that the OrientationTransform3D matrix is post-multiplied here in order to correctly orient the scene to match the display orientation.
 			// This post-multiplication step is required for any draw calls that are made to the swap chain render target. For draw calls to other targets, this transform should not be applied.
 			// This sample makes use of a right-handed coordinate system using row-major matrices.
-			DirectX::XMMATRIX								perspectiveMatrix		= DirectX::XMMatrixPerspectiveFovRH(fovAngleY, aspectRatio, 0.01f, 100.0f);
+			DirectX::XMMATRIX								perspectiveMatrix		= DirectX::XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, 0.01f, 100.0f);
 			DirectX::XMFLOAT4X4								orientation				= DeviceResources->GetOrientationTransform3D();
 			DirectX::XMMATRIX								orientationMatrix		= DirectX::XMLoadFloat4x4(&orientation);
-			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m_constantBufferData.projection, DirectX::XMMatrixTranspose(perspectiveMatrix * orientationMatrix));
+			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&ConstantBufferScene.Perspective, DirectX::XMMatrixTranspose(perspectiveMatrix * orientationMatrix));
 
 			// Eye is at (0,0.7,1.5), looking at point (0,-0.1,0) with the up-vector along the y-axis.
 			static const DirectX::XMVECTORF32				eye						= { 0.0f, (float)sin(TotalSecondsElapsed) * 5, 5.5f, 0.0f };
 			static const DirectX::XMVECTORF32				at						= { 0.0f, -0.1f, 0.0f, 0.0f };
 			static const DirectX::XMVECTORF32				up						= { 0.0f, 1.0f, 0.0f, 0.0f };
-			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m_constantBufferData.view, DirectX::XMMatrixTranspose(DirectX::XMMatrixLookAtRH(eye, at, up)));
+			DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&ConstantBufferScene.View, DirectX::XMMatrixTranspose(DirectX::XMMatrixLookAtLH(eye, at, up)));
 			return 0;
 		}
 
@@ -179,11 +182,20 @@ namespace the_one_win32
 				InputLayout		.push_back(inputLayout);
 				VertexShader	.push_back(vertexShader);
 
-				::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
-				D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(ModelViewProjectionConstantBuffer)};
-				constantBufferDesc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
-				gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
-				ConstantBuffer.push_back(constantBuffer);
+				{
+					::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
+					D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(ViewPerspectiveConstantBuffer)};
+					constantBufferDesc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
+					gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
+					ConstantBuffer.push_back(constantBuffer);
+				}
+				{
+					::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
+					D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(ModelConstantBuffer)};
+					constantBufferDesc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
+					gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
+					ConstantBuffer.push_back(constantBuffer);
+				}
 			}
 	
 			m_loadingComplete							= true;		// Once the cube is loaded, the object is ready to be rendered.

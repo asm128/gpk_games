@@ -39,6 +39,8 @@ namespace the1
 		uint32_t										CurrentPlayer				= 0;
 		float											TimeScale					= 1;
 
+		::gpk::SCoord3<float>							LightPos					= {15, 10, 0};
+
 		::gpk::SDialog									Dialog						= {};
 		::the1::SPlayerUI								PlayerUI[::the1::MAX_BALLS]	= {};
 

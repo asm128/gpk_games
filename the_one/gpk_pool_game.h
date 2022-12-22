@@ -140,12 +140,12 @@ namespace the1
 		bool										Cancel							= false;
 	};
 
-	struct SPoolControllerCamera {
-		::gpk::SCoord3<float>						Position						= {};
-		::gpk::SCoord3<float>						Target							= {};
-		bool										ToggleLockPosition				= false;
-		bool										ToggleLockTarget				= false;
-	};
+	//struct SPoolControllerCamera {
+	//	::gpk::SCoord3<float>						Position						= {};
+	//	::gpk::SCoord3<float>						Target							= {};
+	//	bool										ToggleLockPosition				= false;
+	//	bool										ToggleLockTarget				= false;
+	//};
 #pragma pack(pop)
 
 	struct SPoolGame {
@@ -153,7 +153,7 @@ namespace the1
 		::the1::SPoolStartState						StateCurrent					= {};
 
 		::the1::SPoolControllerStick				ControlStick					= {};
-		::the1::SPoolControllerCamera				ControlCamera					= {};
+		//::the1::SPoolControllerCamera				ControlCamera					= {};
 
 		::gpk::array_pod<::gpk::SLine3<float>>		PositionDeltas	[MAX_BALLS]		= {};
 		::gpk::array_pod<::the1::SContactBall>		LastFrameContactsBall			= {};
