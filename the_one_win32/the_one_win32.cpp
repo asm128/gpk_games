@@ -176,7 +176,7 @@ static				::gpk::error_t					updateSizeDependentResources				(::SApplication& ap
 		const ::gpk::SGeometrySlice								slice						= (node.Slice < mesh.GeometrySlices.size()) ? mesh.GeometrySlices[node.Slice] : ::gpk::SGeometrySlice{{0, indices.size() / 3}};
 		const ::gpk::SRenderMaterial							& material					= skin.Material;
 
-		app.D3DScene.Render(node.Mesh, node.Shader, slice.Slice.Offset, slice.Slice.Count, material);
+		app.D3DScene.Render(node.Mesh, slice.Slice.Offset, slice.Slice.Count, material, skin.Textures[0], node.Shader);
 	}
 	app.D3DText.Render();
 	app.DeviceResources->Present();

@@ -23,7 +23,7 @@ float4 main(PixelShaderInput input) : SV_TARGET
 	
 		if((surfacecolor.r + surfacecolor.g + surfacecolor.b) != 0) {
 			materialColor										= GPK_WHITE;
-			shade												= true; //uint(rand(input.world.uv * diffuseFactor) / 10) % 2;
+			shade												= uint(rand(input.world.uv * diffuseFactor) * 10) % 2;
 			ambientFactor										= .35f;
 		}
 		else {

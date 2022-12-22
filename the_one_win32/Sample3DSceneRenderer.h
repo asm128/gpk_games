@@ -60,7 +60,7 @@ namespace the_one_win32
 			IndexBuffer		.clear();
 		}
 
-		void										Render									(uint32_t iMesh, uint32_t iShader, uint32_t startIndex, uint32_t countIndices, const ::gpk::SRenderMaterial & material) {
+		void										Render									(uint32_t iMesh, uint32_t startIndex, uint32_t countIndices, const ::gpk::SRenderMaterial & material, uint32_t iTexture, uint32_t iShader) {
 			if (!m_loadingComplete)	// Loading is asynchronous. Only draw geometry after it's loaded.
 				return;
 
@@ -98,7 +98,7 @@ namespace the_one_win32
 			DeviceResources->GetD3DDevice()->CreateRasterizerState(&rs, &prs);
 			context->RSSetState(prs);
 		    context->PSSetSamplers( 0, 1, &SamplerStates[0] );
-			context->PSSetShaderResources( 0, 1, &ShaderResourceView[0] );
+			context->PSSetShaderResources( 0, 1, &ShaderResourceView[iTexture] );
 			context->DrawIndexed(countIndices, startIndex, 0);	// Draw the objects.
 		}
 
@@ -131,7 +131,7 @@ namespace the_one_win32
 			{
 				// Create a sampler state
 				D3D11_SAMPLER_DESC								samDesc				= {};
-				samDesc.Filter								= D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+				samDesc.Filter								= D3D11_FILTER_MIN_MAG_MIP_POINT;
 				samDesc.AddressU							= D3D11_TEXTURE_ADDRESS_WRAP;
 				samDesc.AddressV							= D3D11_TEXTURE_ADDRESS_WRAP;
 				samDesc.AddressW							= D3D11_TEXTURE_ADDRESS_WRAP;
