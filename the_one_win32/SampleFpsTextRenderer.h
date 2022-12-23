@@ -12,21 +12,21 @@ namespace the_one_win32
 	// Renders the current FPS value in the bottom right corner of the screen using Direct2D and DirectWrite.
 	struct SampleFpsTextRenderer {
 		// Cached pointer to device resources.
-		::gpk::ptr_obj<::DX::D3DDeviceResources>		DeviceResources					= {};
+		::gpk::pobj<::DX::D3DDeviceResources>		DeviceResources					= {};
 
 		// Resources related to text rendering.
 		std::wstring									Text							= {};
 		DWRITE_TEXT_METRICS								TextMetrics						= {};
-		::gpk::ptr_com<ID2D1SolidColorBrush>			WhiteBrush						= {};
-		::gpk::ptr_com<ID2D1DrawingStateBlock1>			StateBlock						= {};
-		::gpk::ptr_com<IDWriteTextLayout3>				TextLayout						= {};
-		::gpk::ptr_com<IDWriteTextFormat2>				TextFormat						= {};
+		::gpk::pcom<ID2D1SolidColorBrush>				WhiteBrush						= {};
+		::gpk::pcom<ID2D1DrawingStateBlock1>			StateBlock						= {};
+		::gpk::pcom<IDWriteTextLayout3>					TextLayout						= {};
+		::gpk::pcom<IDWriteTextFormat2>					TextFormat						= {};
 
 		::gpk::error_t									CreateDeviceDependentResources	() { gpk_hrcall(DeviceResources->GetD2DDeviceContext()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &WhiteBrush)); return 0; }
 		void											ReleaseDeviceDependentResources	() { WhiteBrush = {}; }
 
 		// Initializes D2D resources used for text rendering.
-		::gpk::error_t									Initialize						(const ::gpk::ptr_obj<DX::D3DDeviceResources> & deviceResources)  {
+		::gpk::error_t									Initialize						(const ::gpk::pobj<DX::D3DDeviceResources> & deviceResources)  {
 			DeviceResources									= deviceResources;
 			// Create device independent resources
 			::gpk::ptr_com<IDWriteTextFormat>					textFormat						= {};
@@ -43,7 +43,7 @@ namespace the_one_win32
 			uint32_t											fps								= framesPerSecond;
 			Text											= (fps > 0) ? std::to_wstring(fps) + L" FPS" : L" - FPS";
 
-			::gpk::ptr_com<IDWriteTextLayout>			textLayout;
+			::gpk::ptr_com<IDWriteTextLayout>					textLayout;
 			constexpr float										w								= 240.0f; // Max width of the input text.
 			constexpr float										h								= 50.0f;// Max height of the input text.
 			gpk_hrcall(DeviceResources->GetDWriteFactory()->CreateTextLayout(Text.c_str(), (uint32_t) Text.length(), TextFormat, w, h, &textLayout));

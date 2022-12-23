@@ -19,8 +19,10 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "The One");
 
 static				::gpk::error_t					updateSizeDependentResources				(::SApplication& app)											{
 	const ::gpk::SCoord2<uint32_t>							newSize										= app.Framework.RootWindow.Size;
-	::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->Color, newSize);
-	::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->DepthStencil, newSize);
+	if(app.Framework.RootWindow.BackBuffer) {
+		::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->Color, newSize);
+		::gpk::updateSizeDependentTarget(app.Framework.RootWindow.BackBuffer->DepthStencil, newSize);
+	}
 #if !defined(DISABLE_D3D11)
 	app.DeviceResources->SetLogicalSize(newSize.Cast<float>());
 	app.D3DScene.CreateWindowSizeDependentResources();
@@ -132,6 +134,7 @@ static				::gpk::error_t					updateSizeDependentResources				(::SApplication& ap
 		;
 
 	::gpk::SCoord3<float>							cameraFront						= (cameraSelected.Target - cameraSelected.Position).Normalize();
+	::gpk::SNearFar									nearFar 						= {.0001f, 10.0f}; 
 
 	::gpk::SEngineSceneConstants					& constants						= app.D3DScene.ConstantBufferScene;
 	constants.CameraPosition					= cameraSelected.Position;
@@ -141,7 +144,7 @@ static				::gpk::error_t					updateSizeDependentResources				(::SApplication& ap
 
 	const ::gpk::SCoord2<uint16_t>					offscreenMetrics				= framework.RootWindow.Size.Cast<uint16_t>();
 	constants.View.LookAt(cameraSelected.Position, cameraSelected.Target, {0, 1, 0});
-	constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, constants.NearFar.Near, constants.NearFar.Far);
+	constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far);
 	constants.Screen.ViewportLH(offscreenMetrics);
 	constants.VP								= constants.View * constants.Perspective;
 	constants.VPS								= constants.VP * constants.Screen;
@@ -182,7 +185,7 @@ static				::gpk::error_t					updateSizeDependentResources				(::SApplication& ap
 	app.DeviceResources->Present();
 	framework.RootWindow.BackBuffer						= {};
 #else 
-	::gpk::ptr_obj<::gpk::SWindow::TOffscreen>			backBuffer									= framework.RootWindow.BackBuffer;
+	::gpk::pobj<::gpk::SWindow::TOffscreen>			backBuffer									= framework.RootWindow.BackBuffer;
 	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), 0xFF000030, (uint32_t)-1);
 	::the1::theOneDraw(app.TheOne, *backBuffer, framework.FrameInfo.Seconds.Total);
 	memcpy(framework.RootWindow.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());

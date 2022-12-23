@@ -16,7 +16,7 @@ float4 main(PixelShaderInput input) : SV_TARGET
 		: ((-0.5f - relativeToCenter.y) > -.05f) ? float4(1, 0, 0, 1)
 		: float4(1, 1, 1, 1);
 	float3			lightVecW					= normalize(LightPosition.xyz - input.world.position);
-	float4			specular					= lightCalcSpecular(float4(1, 1, 1, 1), float4(1, 1, 1, 1), CameraPosition.xyz, LIGHT_FACTOR_SPECULAR_POWER, input.world.position, normal, lightVecW);
+	float4			specular					= lightCalcSpecular(float4(1, 1, 1, 1), float4(1, 1, 1, 1), CameraPositionAndAngle.xyz, LIGHT_FACTOR_SPECULAR_POWER, input.world.position, normal, lightVecW);
 	float4			diffuse						= lightCalcDiffuse(surfacecolor, normal, lightVecW);
 	float4			ambient						= surfacecolor * .1f;
 	

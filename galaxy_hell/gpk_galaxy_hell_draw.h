@@ -30,7 +30,7 @@ namespace ghg
 
 		// Gameplay render target. I decided the world will have its own rendertarget to facilitate reuse of the code.
 		::gpk::SCoord2<uint16_t>							RenderTargetMetrics		= {1280, 720};
-		::gpk::ptr_obj<::ghg::TRenderTarget>				RenderTarget			= {};
+		::gpk::pobj<::ghg::TRenderTarget>				RenderTarget			= {};
 
 		::gpk::error_t										Clear					() {
 			::gpk::clear

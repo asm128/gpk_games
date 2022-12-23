@@ -48,7 +48,7 @@ HRESULT EnumerateAudio(_In_ IXAudio2* pXaudio2, _Inout_ ::gpk::array_obj<AudioDe
 
 struct WAVE_STATE
 {
-	::gpk::ptr_obj<::gpk::array_pod<uint8_t>>	WaveData;
+	::gpk::pobj<::gpk::array_pod<uint8_t>>	WaveData;
 	IXAudio2SourceVoice							* pSourceVoice			= 0;
 
 	X3DAUDIO_EMITTER							Emitter					= {};

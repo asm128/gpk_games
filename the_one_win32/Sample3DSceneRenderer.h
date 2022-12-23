@@ -9,19 +9,10 @@
 
 namespace the_one_win32
 {
-#pragma pack(push, 1)
-	struct ModelConstantBuffer {
-		DirectX::XMMATRIX							Model;
-		DirectX::XMMATRIX							ModelInverseTranspose;
-		DirectX::XMMATRIX							MVP;
-		::gpk::SRenderMaterial						Material;
-	};
-#pragma pack(pop)
 
 	// This sample renderer instantiates a basic rendering pipeline.
 	struct Sample3DSceneRenderer {
-		// Cached pointer to device resources.
-		::gpk::ptr_obj<DX::D3DDeviceResources>		DeviceResources;
+		::gpk::pobj<DX::D3DDeviceResources>		DeviceResources;
 
 		// Direct3D resources for cube geometry
 		::gpk::array_com<ID3D11InputLayout	>		InputLayout;
@@ -34,8 +25,8 @@ namespace the_one_win32
 		::gpk::array_com<ID3D11ShaderResourceView>	ShaderResourceView;
 
 		// System resources for cube geometry.
-		ModelConstantBuffer							ConstantBufferModel		= {};
-		::gpk::SEngineSceneConstants				ConstantBufferScene		= {};
+		::gpk::SRenderNodeConstants					ConstantBufferModel						= {};
+		::gpk::SEngineSceneConstants				ConstantBufferScene						= {};
 
 		// Variables used with the rendering loop.
 		bool										m_loadingComplete						= false;
@@ -43,7 +34,7 @@ namespace the_one_win32
 		
 													~Sample3DSceneRenderer					()		{ ReleaseDeviceDependentResources(); }
 
-		::gpk::error_t								Initialize								(const ::gpk::ptr_obj<DX::D3DDeviceResources> & deviceResources)  {
+		::gpk::error_t								Initialize								(const ::gpk::pobj<DX::D3DDeviceResources> & deviceResources)  {
 			DeviceResources								= deviceResources;
 			gpk_necs(CreateDeviceDependentResources());
 			gpk_necs(CreateWindowSizeDependentResources());
@@ -163,7 +154,7 @@ namespace the_one_win32
 
 				{
 					::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
-					D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(ModelConstantBuffer)};
+					D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(::gpk::SRenderNodeConstants)};
 					constantBufferDesc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
 					gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
 					ConstantBuffer.push_back(constantBuffer);

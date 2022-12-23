@@ -609,7 +609,7 @@ static	int											drawExplosion
 
 int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & mutexUpdate)	{
 	drawCache.RenderTarget->resize(drawCache.RenderTargetMetrics);
-	::gpk::ptr_obj<::ghg::TRenderTarget>					renderTarget				= drawCache.RenderTarget;
+	::gpk::pobj<::ghg::TRenderTarget>					renderTarget				= drawCache.RenderTarget;
 	::gpk::view_grid<::gpk::SColorBGRA>						targetPixels				= renderTarget->Color			; 
 	::gpk::view_grid<uint32_t>								depthBuffer					= renderTarget->DepthStencil	;
 

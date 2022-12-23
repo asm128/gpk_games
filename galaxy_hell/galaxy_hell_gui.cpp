@@ -13,13 +13,13 @@ static	::gpk::error_t			guiSetupCommon				(::gpk::SGUI & gui) {
 	gui.ColorModeDefault			= ::gpk::GUI_COLOR_MODE_3D;
 	gui.ThemeDefault				= ::gpk::ASCII_COLOR_DARKRED * 16 + 10;
 	gui.SelectedFont				= 7;
-	::gpk::ptr_obj<::gpk::SGUIColors>		colors;
+	::gpk::pobj<::gpk::SGUIColors>		colors;
 	colors.create(*gui.Colors);
 	gui.Colors = colors;
 	return 0;
 }
 
-static	::gpk::error_t			dialogCreateCommon			(::gpk::SDialog & dialogLoad, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::SCoord2<float> & cursorPos) { 
+static	::gpk::error_t			dialogCreateCommon			(::gpk::SDialog & dialogLoad, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::SCoord2<float> & cursorPos) { 
 	dialogLoad						= {};
 	dialogLoad.Input				= inputState;
 	dialogLoad.GUI->CursorPos		= cursorPos;
@@ -30,7 +30,7 @@ static	::gpk::error_t			dialogCreateCommon			(::gpk::SDialog & dialogLoad, const
 }
 
 // -------------------------------- Set up player GUI for home screen
-static ::gpk::error_t			uiPlayerSetupHome			(::ghg::SUIPlayer & uiPlayer, ::gpk::ptr_obj<::gpk::SInput> input, ::gpk::SCoord2<float> cursorPos, uint32_t iPlayer, const ::gpk::vcc playerName) {
+static ::gpk::error_t			uiPlayerSetupHome			(::ghg::SUIPlayer & uiPlayer, ::gpk::pobj<::gpk::SInput> input, ::gpk::SCoord2<float> cursorPos, uint32_t iPlayer, const ::gpk::vcc playerName) {
 	::gpk::ALIGN						playerAlign		;
 	::gpk::SCoord2<int16_t>				playerPosition	;
 	switch(iPlayer) {
@@ -50,7 +50,7 @@ static ::gpk::error_t			uiPlayerSetupHome			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 	::gpk::SDialog				& playerDialog		= uiPlayer.DialogHome;
 	gpk_necs(::dialogCreateCommon(playerDialog, input, cursorPos));
 	::gpk::SGUI					& playerGUI			= *playerDialog.GUI;
-	::gpk::ptr_obj<::gpk::array_pod<::gpk::SColorBGRA>>		palette;
+	::gpk::pobj<::gpk::array_pod<::gpk::SColorBGRA>>		palette;
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
@@ -83,7 +83,7 @@ static ::gpk::error_t			uiPlayerSetupHome			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 }
 
 // -------------------------------- Set up player GUI for in-stage display
-static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk::ptr_obj<::gpk::SInput> input, ::gpk::SCoord2<float> cursorPos, uint32_t iPlayer, const ::gpk::vcc pilotName, uint32_t nShipParts) {
+static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk::pobj<::gpk::SInput> input, ::gpk::SCoord2<float> cursorPos, uint32_t iPlayer, const ::gpk::vcc pilotName, uint32_t nShipParts) {
 	::gpk::SCoord2<int16_t>				playerPosition;
 	::gpk::ALIGN						playerAlign		;
 	switch(iPlayer) {
@@ -103,7 +103,7 @@ static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 	::gpk::SDialog						& playerDialog				= uiPlayer.DialogPlay;
 	gpk_necs(::dialogCreateCommon(playerDialog, input, cursorPos));
 	::gpk::SGUI							& playerGUI					= *playerDialog.GUI;
-	::gpk::ptr_obj<::gpk::array_pod<::gpk::SColorBGRA>>		palette;
+	::gpk::pobj<::gpk::array_pod<::gpk::SColorBGRA>>		palette;
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
@@ -233,7 +233,7 @@ static	::gpk::error_t			guiSetupProfile				(::gpk::SDialog & dialog) { return ::
 static	::gpk::error_t			guiSetupShop				(::gpk::SDialog & dialog) { 
 	::gpk::SGUI							& gui						= *dialog.GUI;
 	gpk_necall(::gpk::guiSetupButtonList<::ghg::UI_SHOP>(gui, dialog.Root, 60, 0, ::gpk::ALIGN_BOTTOM_RIGHT), "%s", "");
-	::gpk::ptr_obj<::gpk::SDialogViewport>	viewport									= {};
+	::gpk::pobj<::gpk::SDialogViewport>	viewport									= {};
 	//int32_t									idViewport					=
 	::gpk::viewportCreate(dialog, viewport);
 	//viewport->Settings.DisplacementLockX	= false;;
@@ -249,7 +249,7 @@ static	::gpk::error_t			guiSetupWelcome				(::ghg::SGalaxyHellApp & app, ::gpk::
 	::gpk::SGUI							& gui						= *dialog.GUI;
 	gpk_necall(::gpk::guiSetupButtonList<::ghg::UI_WELCOME>(gui, dialog.Root, ::gpk::SCoord2<uint16_t>{128, 32}, ::gpk::SCoord2<int16_t>{0, 64}, ::gpk::ALIGN_CENTER), "%s", "");
 	::gpk::viewportCreate(dialog, app.Inputbox);
-	::gpk::ptr_obj<::gpk::SDialogViewport>	viewport				= app.Inputbox;
+	::gpk::pobj<::gpk::SDialogViewport>	viewport				= app.Inputbox;
 	gui.Controls.Controls	[viewport->IdGUIControl	].Align			= ::gpk::ALIGN_CENTER;
 	gui.Controls.Controls	[viewport->IdGUIControl	].Area.Offset	= {};
 	gui.Controls.Controls	[viewport->IdClient		].Area.Size		= {256, 20};
@@ -290,7 +290,7 @@ static	::gpk::error_t			guiSetupSettings			(::gpk::SDialog & dialog) {
 	return 0;
 }
 
-::gpk::error_t					ghg::guiSetup				(::ghg::SGalaxyHellApp & app, const ::gpk::ptr_obj<::gpk::SInput> & input) {
+::gpk::error_t					ghg::guiSetup				(::ghg::SGalaxyHellApp & app, const ::gpk::pobj<::gpk::SInput> & input) {
 	es_if(errored(::dialogCreateCommon(app.DialogDesktop, input, {})));
 
 	for(uint32_t iGUI = 0; iGUI < app.DialogPerState.size(); ++iGUI)
@@ -343,7 +343,7 @@ static	::gpk::error_t			guiHandleLoad				(::ghg::SGalaxyHellApp & app, ::gpk::SG
 	return ::ghg::APP_STATE_Home; 
 }
 
-static	::gpk::error_t			dialogCreateLoad			(::gpk::SDialog & dialogLoad, ::gpk::view_array<::gpk::vcc> pathFileNames, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::SCoord2<float> & cursorPos) { 
+static	::gpk::error_t			dialogCreateLoad			(::gpk::SDialog & dialogLoad, ::gpk::view_array<::gpk::vcc> pathFileNames, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::SCoord2<float> & cursorPos) { 
 	::dialogCreateCommon(dialogLoad, inputState, cursorPos);
 	return ::gpk::guiSetupButtonList(*dialogLoad.GUI, pathFileNames, dialogLoad.Root, 256, (int16_t)(-20 * pathFileNames.size() / 2), ::gpk::ALIGN_CENTER, ::gpk::ALIGN_LEFT);
 }

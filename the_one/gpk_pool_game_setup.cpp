@@ -50,16 +50,8 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		engine.SetHidden			(pool.StateStart.Ball[iBall].Entity, false);
 		engine.SetOrientation		(pool.StateStart.Ball[iBall].Entity, {0, 0, 1, -1});
 		engine.Integrator.BodyFlags[engine.ManagedEntities.Entities[pool.StateStart.Ball[iBall].Entity].RigidBody].Collides	= true;
-		::gpk::TFuncPixelShader						& ps
-			= (0 == iBall) ? ::the1::psBallCue
-			: (8 >= iBall) ? ::the1::psBallSolid
-			: ::the1::psBallStripped
-			;
-		const ::gpk::vcc							psName
-			= (0 == iBall) ? ::gpk::vcs{"psBallCue"}
-			: (8 >= iBall) ? ::gpk::vcs{"psBallSolid"}
-			: ::gpk::vcs{"psBallStripped"}
-			;
+		::gpk::TFuncPixelShader						& ps					= (0 == iBall) ? ::the1::psBallCue			: (8 >= iBall) ? ::the1::psBallSolid		: ::the1::psBallStripped;
+		const ::gpk::vcc							psName					= (0 == iBall) ? ::gpk::vcs{"psBallCue"}	: (8 >= iBall) ? ::gpk::vcs{"psBallSolid"}	: ::gpk::vcs{"psBallStripped"};
 
 		engine.SetShader			(pool.StateStart.Ball[iBall].Entity, ps, psName);
 		const ::gpk::SVirtualEntity					& entity				= engine.ManagedEntities.Entities[pool.StateStart.Ball[iBall].Entity];
@@ -90,8 +82,9 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	pool.StateStart.BallOrder[5]			= ball5;
 	pool.StateStart.BallOrder[11]			= 8;
 
+	constexpr char								ballsToSet	[12]		= {2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15};
 	::gpk::array_pod<uint32_t>					ballPool				= {};
-	for(uint32_t iBall = 0; ballPool.size() < 12; ++iBall) {
+	for(uint32_t iBall = 0; ballPool.size() < ::gpk::size(ballsToSet); ++iBall) {
 		if(iBall == 8)
 			continue;
 		if(iBall == 0)
@@ -103,8 +96,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		ballPool.push_back(iBall);
 	}
 
-	constexpr char								ballsToSet	[12]		= {2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15};
-	for(uint32_t iBallToSet = 0; iBallToSet < 12; ++iBallToSet) { 
+	for(uint32_t iBallToSet = 0; iBallToSet < ::gpk::size(ballsToSet); ++iBallToSet) { 
 		uint32_t index = ::gpk::noise1DBase32((uint32_t)pool.StateStart.Seed + iBallToSet) % ballPool.size(); 
 		pool.StateStart.BallOrder[ballsToSet[iBallToSet]] = ballPool[index]; 
 		ballPool.remove_unordered(index); 

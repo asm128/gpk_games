@@ -78,7 +78,6 @@ namespace the1
 	struct STheOne {
 		::the1::STheOneGame								MainGame					= {};
 		::gpk::array_static<::the1::STheOneGame, 16>	TestGames					= {};
-		::gpk::SDialog									Dialog						= {};
 		::gpk::array_static<::gpk::SDialog
 			, ::the1::APP_STATE_COUNT>					DialogPerState				= {};
 
@@ -87,10 +86,10 @@ namespace the1
 		APP_STATE										ActiveState					= {};
 	};
 
-	::gpk::error_t									theOneUpdate		(::the1::STheOne & app, double secondsElapsed, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents);
+	::gpk::error_t									theOneUpdate		(::the1::STheOne & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents);
 	::gpk::error_t									theOneDraw			(::the1::STheOne & app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds);
 
-	::gpk::error_t									guiSetup			(::the1::STheOne & app, const ::gpk::ptr_obj<::gpk::SInput> & input);
+	::gpk::error_t									guiSetup			(::the1::STheOne & app, const ::gpk::pobj<::gpk::SInput> & input);
 	::gpk::error_t									guiUpdate			(::the1::STheOne & app, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents);
 } // namespace
 

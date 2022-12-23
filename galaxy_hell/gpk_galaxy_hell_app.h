@@ -305,7 +305,7 @@ namespace ghg
 		::ghg::SGalaxyHell											Game;
 		::gpk::array_obj<::ghg::SUserCredentials>					UserCredentials				= {};
 
-		::gpk::ptr_obj<::gpk::SDialogViewport>						Inputbox;
+		::gpk::pobj<::gpk::SDialogViewport>							Inputbox;
 		::gpk::array_pod<char>										InputboxText;
 
 		::gpk::array_obj<::gpk::array_pod<char>>					FileNames					= {};
@@ -356,10 +356,10 @@ namespace ghg
 		}
 	};
 
-	::gpk::error_t												guiSetup					(::ghg::SGalaxyHellApp & gameui, const ::gpk::ptr_obj<::gpk::SInput> & inputState);
+	::gpk::error_t												guiSetup					(::ghg::SGalaxyHellApp & gameui, const ::gpk::pobj<::gpk::SInput> & inputState);
 	::gpk::error_t												guiUpdate					(::ghg::SGalaxyHellApp & gameui, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents);
 	
-	::gpk::error_t												galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents);
+	::gpk::error_t												galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents);
 	::gpk::error_t												galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::SCoord2<uint16_t> renderTargetSize);
 
 	::gpk::error_t												listFilesSavegame			(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::array_obj<::gpk::vcc> & savegameFilenames);

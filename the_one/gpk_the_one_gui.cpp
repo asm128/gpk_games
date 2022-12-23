@@ -13,7 +13,7 @@ static	::gpk::error_t			guiSetupCommon				(::gpk::SGUI & gui) {
 	return 0;
 }
 
-static	::gpk::error_t			dialogCreateCommon			(::gpk::SDialog & dialog, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::SCoord2<float> & cursorPos) { 
+static	::gpk::error_t			dialogCreateCommon			(::gpk::SDialog & dialog, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::SCoord2<float> & cursorPos) { 
 	dialog							= {};
 	dialog.Input					= inputState;
 	dialog.GUI->CursorPos			= cursorPos;
@@ -43,9 +43,7 @@ static	::gpk::error_t			guiSetupSettings			(::the1::STheOne & app) { ::gpk::SDia
 static	::gpk::error_t			guiSetupAbout				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.DialogPerState[::the1::APP_STATE_About		]; (void)dialog; return 0; }
 static	::gpk::error_t			guiSetupLoad				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.DialogPerState[::the1::APP_STATE_Load		]; (void)dialog; return 0; }
 
-::gpk::error_t					the1::guiSetup				(::the1::STheOne & app, const ::gpk::ptr_obj<::gpk::SInput> & input) {
-	es_if(errored(::dialogCreateCommon(app.Dialog, input, {})));
-
+::gpk::error_t					the1::guiSetup				(::the1::STheOne & app, const ::gpk::pobj<::gpk::SInput> & input) {
 	for(uint32_t iGUI = 0; iGUI < app.DialogPerState.size(); ++iGUI)
 		e_if(errored(::dialogCreateCommon(app.DialogPerState[iGUI], input, {})), "iGUI: %i", iGUI);
 
@@ -58,7 +56,7 @@ static	::gpk::error_t			guiSetupLoad				(::the1::STheOne & app) { ::gpk::SDialog
 	es_if(errored(::guiSetupAbout			(app)));
 	es_if(errored(::guiSetupLoad			(app)));
 
-	es_if(errored(::gpk::virtualKeyboardSetup437(*app.Dialog.GUI, app.VirtualKeyboard)));;
+	es_if(errored(::gpk::virtualKeyboardSetup437(*app.DialogPerState[::the1::APP_STATE_Home].GUI, app.VirtualKeyboard)));;
 	return 0;
 }
 
@@ -69,15 +67,6 @@ static	::gpk::error_t			guiHandlePlay				(::the1::STheOne & /*app*/, ::gpk::SGUI
 static	::gpk::error_t			guiHandleHome				(::the1::STheOne & /*app*/, ::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::the1::STheOneGame & /*game*/) { return 0; }
 
 ::gpk::error_t					the1::guiUpdate				(::the1::STheOne & app, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents) {
-	{
-		::gpk::SDialog						& dialog					= app.Dialog;
-		::gpk::SGUI							& gui						= *dialog.GUI;
-		::gpk::SInput						& input						= *dialog.Input;
-		::gpk::guiProcessInput(gui, input, sysEvents); 
-	}
-
-	::the1::STheOneGame					& game						= app.MainGame;
-
 	::the1::APP_STATE					appState					= app.ActiveState; 
 	for(uint32_t iAppState = 0; iAppState < ::the1::APP_STATE_COUNT; ++iAppState) {
 		::gpk::SDialog						& dialog					= app.DialogPerState[iAppState];
@@ -86,6 +75,7 @@ static	::gpk::error_t			guiHandleHome				(::the1::STheOne & /*app*/, ::gpk::SGUI
 		::gpk::guiProcessInput(gui, input, sysEvents); 
 	}
 
+	::the1::STheOneGame					& game						= app.MainGame;
 	for(uint32_t iPlayer = 0; iPlayer < ::std::size(game.PlayerUI); ++iPlayer) {
 		::the1::SPlayerUI					& uiPlayer					= game.PlayerUI[iPlayer];
 		::gpk::guiProcessInput(*uiPlayer.DialogPlay.GUI, *uiPlayer.DialogPlay.Input, sysEvents);

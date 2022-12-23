@@ -24,9 +24,10 @@
 	constants.CameraFront						= cameraFront;
 	constants.LightPosition						= {0, 10, 0};
 	constants.LightDirection					= {0, -1, 0};
+	::gpk::SNearFar									nearFar 						= {.0001f, 10.0f}; 
 
 	constants.View.LookAt(cameraPosition, cameraTarget, cameraUp);
-	constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, constants.NearFar.Near, constants.NearFar.Far);
+	constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Near, nearFar.Far);
 	constants.Screen.ViewportLH(offscreenMetrics);
 	constants.VP								= constants.View * constants.Perspective;
 	constants.VPS								= constants.VP * constants.Screen;
@@ -34,7 +35,7 @@
 	::gpk::STimer									timer;
 	::gpk::SEngine									& engine						= pool.Engine;
 
-	::gpk::array_pod<::gpk::SCoord3<float>>		& wireframePixelCoords			= engine.Scene->RenderCache.CacheVertexShader.WireframePixelCoords;
+	::gpk::array_pod<::gpk::SCoord3<float>>			& wireframePixelCoords			= engine.Scene->RenderCache.CacheVertexShader.WireframePixelCoords;
 	for(uint32_t iBall = 0; iBall < pool.StateCurrent.BallCount; ++iBall) {
 		for(uint32_t iDelta = ::gpk::max(0, (int32_t)pool.PositionDeltas[iBall].size() - 20); iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {
 			::gpk::SLine3<float>							screenDelta				= pool.PositionDeltas[iBall][iDelta];

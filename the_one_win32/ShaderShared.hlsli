@@ -5,7 +5,7 @@ cbuffer ModelConstantBuffer : register(b0) {
 	float4						Diffuse;
 	float4						Ambient;
 	float4						Specular;
-	float						SpecularPower;
+	float4						EmissionaAndSpecularPower;	// .w or .a for the specular power
 };
 
 cbuffer ViewProjectionConstantBuffer : register(b1) {
@@ -15,11 +15,10 @@ cbuffer ViewProjectionConstantBuffer : register(b1) {
 	matrix						VP;
 	matrix						VPS;
 
-	float4						CameraPosition	; 
-	float4						CameraFront		; 
-	float4						LightPosition	; 
-	float4						LightDirection	; 
-	float4						Padding;
+	float4						CameraPositionAndAngle		;	// use .w for the angle
+	float4						CameraFront					; 
+	float4						LightPosition				; 
+	float4						LightDirectionAndSpotPower	;	// use .w for the spot power
 };
 
 struct VertexShaderInput {

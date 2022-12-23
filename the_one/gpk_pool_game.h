@@ -13,7 +13,7 @@ namespace the1
 	GDEFINE_ENUM_VALUE(POOL_GAME_MODE, 10Ball, 2);
 	GDEFINE_ENUM_VALUE(POOL_GAME_MODE, Test2Balls, 3);
 
-	static constexpr	uint8_t					MAX_BALLS						= 16;
+	static constexpr	uint8_t					MAX_BALLS						= 22;
 
 #pragma pack(push, 1)
 	typedef ::gpk::SContactResult	SContactResultBall;
@@ -40,7 +40,6 @@ namespace the1
 	struct SPoolPocket {
 		uint32_t									Entity							= (uint32_t)-1;
 	};
-
 
 	static constexpr float						FOOT_SCALE						= 1.0f / 3.281f;
 	static constexpr float						INCH_SCALE						= 2.54f;

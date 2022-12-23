@@ -495,14 +495,14 @@ int													ghg::solarSystemUpdate				(::ghg::SGalaxyHell & solarSystem, dou
 	double													secondsToProcess				= ::gpk::min(actualSecondsLastFrame, 0.15);
 	for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
 		::gpk::array_pod<uint32_t>								& shipParts				= solarSystem.ShipState.ShipParts[iShip];
-		solarSystem.ShipState.ShipPhysics.BodyFlags[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCores[iShip].Entity].Body].Active				= true;
+		solarSystem.ShipState.ShipPhysics.SetActive(solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCores[iShip].Entity].Body, true);
 		solarSystem.ShipState.ShipPhysics.BodyFlags[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCores[iShip].Entity].Body].UpdatedTransform	= false;
 		for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
-			::ghg::SOrbiter										& shipPart				= solarSystem.ShipState.Orbiters[shipParts[iPart]];
+			::ghg::SOrbiter											& shipPart				= solarSystem.ShipState.Orbiters[shipParts[iPart]];
 			
-			::std::lock_guard<::std::mutex>							lockUpdate			(solarSystem.LockUpdate);
+			::std::lock_guard<::std::mutex>							lockUpdate				(solarSystem.LockUpdate);
 			memcpy(solarSystem.ShipState.Shots[shipPart.Weapon].PositionDraw.begin(), solarSystem.ShipState.Shots[shipPart.Weapon].Particles.Position.begin(), solarSystem.ShipState.Shots[shipPart.Weapon].Particles.Position.size() * sizeof(::gpk::SCoord3<float>));
-			solarSystem.ShipState.ShipPhysics.BodyFlags[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body].Active			= true;
+			solarSystem.ShipState.ShipPhysics.SetActive(solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body, true);
 			solarSystem.ShipState.ShipPhysics.BodyFlags[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body].UpdatedTransform	= false;
 		}
 	}

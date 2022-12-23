@@ -12,7 +12,7 @@ namespace the_one_uwp
 	// Renders the current FPS value in the bottom right corner of the screen using Direct2D and DirectWrite.
 	struct SampleFpsTextRenderer {
 		// Cached pointer to device resources.
-		::gpk::ptr_obj<::DX::D3DDeviceResources>		DeviceResources					= {};
+		::gpk::pobj<::DX::D3DDeviceResources>		DeviceResources					= {};
 
 		// Resources related to text rendering.
 		std::wstring									Text							= {};
@@ -26,7 +26,7 @@ namespace the_one_uwp
 		void											ReleaseDeviceDependentResources	() { WhiteBrush = {}; }
 
 		// Initializes D2D resources used for text rendering.
-		::gpk::error_t									Initialize						(const ::gpk::ptr_obj<DX::D3DDeviceResources> & deviceResources)  {
+		::gpk::error_t									Initialize						(const ::gpk::pobj<DX::D3DDeviceResources> & deviceResources)  {
 			DeviceResources									= deviceResources;
 			// Create device independent resources
 			::gpk::ptr_com<IDWriteTextFormat>					textFormat						= {};

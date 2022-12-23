@@ -1,6 +1,6 @@
 #include "gpk_the_one.h"
 
-static	::gpk::error_t				theOneSetup		(::the1::STheOne & app, const ::gpk::ptr_obj<::gpk::SInput> & inputState, the1::POOL_GAME_MODE mode = the1::POOL_GAME_MODE_8Ball) { 
+static	::gpk::error_t				theOneSetup		(::the1::STheOne & app, const ::gpk::pobj<::gpk::SInput> & inputState, the1::POOL_GAME_MODE mode = the1::POOL_GAME_MODE_8Ball) { 
 	gpk_necs(::the1::poolGameSetup(app.MainGame.Game, mode));
 	//for(uint32_t iGame = 0; iGame < app.TestGames.size(); ++iGame) {
 	//	gpk_necs(::the1::poolGameSetup(app.TestGames[iGame].Game, the1::POOL_GAME_MODE_Test2Balls));
@@ -20,7 +20,7 @@ static	::gpk::error_t				theOneSetup		(::the1::STheOne & app, const ::gpk::ptr_o
 }
 
 
-static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas, ::gpk::view_array<const uint8_t> buttonStates) { 
+static	::gpk::error_t				updateInput				(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas, ::gpk::view_array<const uint8_t> buttonStates) { 
 	if(keyStates[VK_ADD]) 
 		app.MainGame.TimeScale					+= (float)secondsElapsed;
 	else if(keyStates[VK_SUBTRACT]) 
@@ -80,13 +80,11 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 			::gpk::SCoord3<float>						velocity				= {app.MainGame.Game.StateCurrent.Player[0].Stick.Velocity, 0, 0}; //{70.0f + (rand() % 90), 0, 0};
 			velocity.RotateY(app.MainGame.Game.StateCurrent.Player[0].Stick.Angle);
 			app.MainGame.Game.Engine.SetVelocity(app.MainGame.Game.StateCurrent.Ball[0].Entity, velocity);
-			//app.MainGame.Game.Engine.SetRotation(app.MainGame.Game.StartState.Balls[0].Entity, {0, (1.0f + (rand() % 10) * .5f) * -scale, 0});
+			//app.MainGame.Game.Engine.SetRotation(app.MainGame.Game.StateCurrent.Ball[0].Entity, {0, (1.0f + (rand() % 100) * .5f) * -scale, 0});
 			app.MainGame.Game.Engine.SetHidden(app.MainGame.Game.StateCurrent.Player[0].Stick.Entity, true);
 			app.MainGame.Game.StateCurrent.Player[0].Stick.Velocity = 0;
 		}
 	}
-
-
 
 	::the1::SCamera					& cameraSelected		
 		= (playerUI.Cameras.Selected == 0					) ? playerUI.Cameras.Free 
@@ -115,7 +113,7 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 	return 0;
 }
 
-::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & /*systemEvents*/) { 
+::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents) { 
 	switch(app.ActiveState) {
 	case ::the1::APP_STATE_Init		: {
 		::theOneSetup(app, inputState);
@@ -126,6 +124,11 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 	//	app.ActiveState				= ::the1::APP_STATE_Home;
 	//	break;
 	}
+	for(uint32_t iState = 0; iState < ::the1::APP_STATE_COUNT; ++iState) {
+		::gpk::SDialog					& dialog			= app.DialogPerState[iState];
+		::gpk::guiProcessInput(*dialog.GUI, *dialog.Input, systemEvents);
+	}
+
 	::updateInput(app, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.Cast<int16_t>(), inputState->MouseCurrent.ButtonState);
 
 	::the1::SPoolGame				& activeGame			= app.MainGame.Game;
@@ -142,12 +145,12 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 		else {
 			activeGame.GetBallPosition(0, cameraBall.Position);
 			activeGame.GetBallPosition(iBall, cameraBall.Target);
-			auto							distance				=  cameraBall.Target - cameraBall.Position;
-			auto							direction				=  ::gpk::SCoord3<float>{distance}.Normalize();
+			::gpk::SCoord3<float>			distance				=  cameraBall.Target - cameraBall.Position;
+			::gpk::SCoord3<float>			direction				=  ::gpk::SCoord3<float>{distance}.Normalize();
 			cameraBall.Position			+= direction * -2.0f;
 			cameraBall.Position.y		= 1.75f * .35f;
 		}
-		playActive = playActive || activeGame.Engine.Integrator.BodyFlags[activeGame.Engine.ManagedEntities.Entities[activeGame.StateCurrent.Ball[iBall].Entity].RigidBody].Active;
+		playActive = playActive || activeGame.Engine.IsPhysicsActive(activeGame.StateCurrent.Ball[iBall].Entity);
 	}
 	if(false == playActive)
 		app.MainGame.Game.Engine.SetHidden(app.MainGame.Game.StateCurrent.Player[0].Stick.Entity, false);
@@ -165,6 +168,9 @@ static	::gpk::error_t		updateInput				(::the1::STheOne & app, double secondsElap
 		: playerUI.Cameras.Balls[playerUI.Cameras.Selected - 1] 
 		;
 	::the1::poolGameDraw(app.MainGame.Game, backBuffer, cameraSelected.Position, cameraSelected.Target, {0, 1, 0}, totalSeconds);
+
+	::gpk::SDialog					& activeDialog			= app.DialogPerState[app.ActiveState];
+	::gpk::guiDraw(*activeDialog.GUI, backBuffer.Color.View);
 	return 0; 
 }
 

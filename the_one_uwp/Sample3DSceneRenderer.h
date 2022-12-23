@@ -25,7 +25,7 @@ namespace the_one_uwp
 	// This sample renderer instantiates a basic rendering pipeline.
 	struct Sample3DSceneRenderer {
 		// Cached pointer to device resources.
-		::gpk::ptr_obj<DX::D3DDeviceResources>		DeviceResources;
+		::gpk::pobj<DX::D3DDeviceResources>			DeviceResources;
 
 		// Direct3D resources for cube geometry
 		::gpk::array_com<ID3D11InputLayout	>		InputLayout;
@@ -45,7 +45,7 @@ namespace the_one_uwp
 		
 													~Sample3DSceneRenderer					()		{ ReleaseDeviceDependentResources(); }
 
-		::gpk::error_t								Initialize								(const ::gpk::ptr_obj<DX::D3DDeviceResources> & deviceResources)  {
+		::gpk::error_t								Initialize								(const ::gpk::pobj<DX::D3DDeviceResources> & deviceResources)  {
 			DeviceResources								= deviceResources;
 			gpk_necs(CreateDeviceDependentResources());
 			gpk_necs(CreateWindowSizeDependentResources());

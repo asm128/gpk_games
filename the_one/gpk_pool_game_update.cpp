@@ -127,9 +127,9 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 		double							secondsThisStep					= ::gpk::min(step, secondsElapsed);
 		secondsElapsed				-= secondsThisStep;
 
-		//for(uint32_t iBallA = 0; iBallA < pool.StartState.BallCount; ++iBallA) {
-		//	::gpk::SBodyForces				& forces						= engine.Integrator.Forces		[engine.ManagedEntities.Entities[pool.StartState.Balls[iBallA].Entity].RigidBody];
-		//	::gpk::SRigidBodyFrame			& bodyAccum						= engine.Integrator.BodyFrames	[engine.ManagedEntities.Entities[pool.StartState.Balls[iBallA].Entity].RigidBody];
+		//for(uint32_t iBallA = 0; iBallA < pool.StateStart.BallCount; ++iBallA) {
+		//	::gpk::SBodyForces				& forces						= engine.Integrator.Forces		[engine.ManagedEntities.Entities[pool.StateStart.Ball[iBallA].Entity].RigidBody];
+		//	::gpk::SRigidBodyFrame			& bodyAccum						= engine.Integrator.BodyFrames	[engine.ManagedEntities.Entities[pool.StateStart.Ball[iBallA].Entity].RigidBody];
 		//	if(::gpk::SCoord3<float>{forces.Velocity}.Normalize().Dot(::gpk::SCoord3<float>{forces.Rotation.z, 0, -forces.Rotation.x}.Normalize()) < 0) {
 		//		bodyAccum.AccumulatedForce += ::gpk::SCoord3<float>{forces.Rotation.z, 0, -forces.Rotation.x} * secondsElapsed;
 		//	}
@@ -175,7 +175,7 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 			rotationB					= {};
 			rotationA					= {};
 			if(contact.Result.InitialVelocityA.LengthSquared() || contact.Result.InitialRotationA.LengthSquared()) {
-				engine.Integrator.BodyFlags[entityB.RigidBody].Active = true;
+				engine.Integrator.SetActive(entityB.RigidBody, true);
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
 				::resolveCollision(contact.Result.InitialVelocityA.Cast<double>(), contact.Result.InitialRotationA.Cast<double>(), contact.Result.DistanceDirection.Cast<double>(), contact.Result.ForceTransferRatioB, rotationA, rotationB, lvelocityA, lvelocityB);
@@ -184,7 +184,7 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 			}
 
 			if(contact.Result.InitialVelocityB.LengthSquared() || contact.Result.InitialRotationB.LengthSquared()) {
-				engine.Integrator.BodyFlags[entityA.RigidBody].Active = true;
+				engine.Integrator.SetActive(entityA.RigidBody, true);
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
 				::resolveCollision(contact.Result.InitialVelocityB.Cast<double>(), contact.Result.InitialRotationB.Cast<double>(), contact.Result.DistanceDirection.Cast<double>() * -1, contact.Result.ForceTransferRatioA, rotationB, rotationA, lvelocityB, lvelocityA);

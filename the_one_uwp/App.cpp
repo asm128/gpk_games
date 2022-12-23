@@ -16,9 +16,9 @@ namespace the_one_uwp
 {
 	// Main entry point for our app. Connects the app with the Windows shell and handles application lifecycle events.
 	ref class App sealed : public IFrameworkView {
-		::gpk::ptr_obj<DX::D3DDeviceResources>	DeviceResources			= {};
+		::gpk::pobj<DX::D3DDeviceResources>	DeviceResources			= {};
 
-		::gpk::ptr_obj<STheOneUWP>				UserUWP					= {};
+		::gpk::pobj<STheOneUWP>				UserUWP					= {};
 		bool									WindowClosed			= false;
 		bool									WindowVisible			= true;
 	//private:

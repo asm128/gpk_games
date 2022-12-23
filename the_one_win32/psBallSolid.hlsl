@@ -37,7 +37,7 @@ float4 main(PixelShaderInput input) : SV_TARGET
 			materialColor										= float4(saturate(materialColor * ambientFactor).xyz, 1.0f);
 		}
 		else {
-			const float4											specular					= lightCalcSpecular(GPK_WHITE, GPK_WHITE, CameraPosition.xyz, LIGHT_FACTOR_SPECULAR_POWER, input.world.position, normal, lightVecW);
+			const float4											specular					= lightCalcSpecular(GPK_WHITE, GPK_WHITE, CameraPositionAndAngle.xyz, LIGHT_FACTOR_SPECULAR_POWER, input.world.position, normal, lightVecW);
 			const float4											diffuse						= materialColor * max(0.0, diffuseFactor);
 			const float4											ambient						= materialColor * ambientFactor;
 			materialColor										= float4(saturate(ambient + diffuse + specular).xyz, 1.0f);

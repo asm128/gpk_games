@@ -44,7 +44,7 @@ struct SApplication : DX::IDeviceNotify {
 
 	::the1::STheOne								TheOne					= {};
 
-	::gpk::ptr_obj<::DX::D3DDeviceResources>	DeviceResources			;
+	::gpk::pobj<::DX::D3DDeviceResources>	DeviceResources			;
 	::the_one_win32::Sample3DSceneRenderer		D3DScene				;
 	::the_one_win32::SampleFpsTextRenderer		D3DText					;
 

@@ -4,7 +4,7 @@
 #include "gpk_storage.h"
 #include "gpk_deflate.h"
 
-::gpk::error_t					ghg::galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::ptr_obj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents) {
+::gpk::error_t					ghg::galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents) {
 	if(app.ActiveState == ::ghg::APP_STATE_Quit)
 		return 1;
 
@@ -192,7 +192,7 @@
 	if(app.ActiveState < 2)
 		return 0;
 
-	::gpk::ptr_obj<::ghg::TRenderTarget>		target	= {};
+	::gpk::pobj<::ghg::TRenderTarget>		target	= {};
 	{
 		::gpk::mutex_guard			rtLock(app.RenderTargetLockPool);
 		if(app.RenderTargetPool.size()) {
@@ -216,7 +216,7 @@
 	default					: 
 	case APP_STATE_Play		: 
 		::ghg::solarSystemDraw(app.Game, app.Game.DrawCache, app.Game.LockUpdate);
-		::gpk::ptr_obj<::ghg::TRenderTarget>		sourceRT	= {};
+		::gpk::pobj<::ghg::TRenderTarget>		sourceRT	= {};
 		sourceRT								= app.Game.DrawCache.RenderTarget;
 		if(!sourceRT)
 			break;

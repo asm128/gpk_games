@@ -36,7 +36,7 @@ namespace gpkg
 		::gpk::SImage<::gpkg::SMineHellCell>	Board					;	// Single-block board mode (deprecated)
 		::gpkg::SMineHellState					GameState				= {};
 
-		::gpk::array_obj<::gpk::ptr_obj<::gpk::SImage<::gpkg::SMineHellCell>>>
+		::gpk::array_obj<::gpk::pobj<::gpk::SImage<::gpkg::SMineHellCell>>>
 												BoardBlocks				;	// New implementation with support for large boards.
 
 		::gpk::error_t							GetCell					(const ::gpk::SCoord2<uint32_t> & cellCoord, ::gpkg::SMineHellCell ** out_cell);					// These functions return the cell
