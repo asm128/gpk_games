@@ -310,7 +310,7 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 	for(uint32_t iBall = 0; iBall < pool.StateCurrent.BallCount; ++iBall) {
 		::gpk::SLine3<float> & delta = pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1];
 		pool.GetBallPosition(iBall, delta.B);
-		if((delta.B - delta.A).LengthSquared() > 0.0000005) {
+		if(engine.IsPhysicsActive(pool.StateCurrent.Ball[iBall].Entity)) {
 			::gpk::SBodyForces				& forces			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StateCurrent.Ball[iBall].Entity].RigidBody];
 
 			::gpk::SCoord3<float>			rotationResult		= (delta.B - delta.A) / diameter * ::gpk::math_2pi;
@@ -318,7 +318,7 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 		}
 		if(pool.PositionDeltas[iBall].size() > 10)
 			for(uint32_t iDelta = 0; iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {
-				if((delta.B - delta.A).LengthSquared() < 0.00005f) {
+				if(false == engine.IsPhysicsActive(pool.StateCurrent.Ball[iBall].Entity)) {
 					pool.PositionDeltas[iBall].remove_unordered(iDelta--);
 				}
 			}

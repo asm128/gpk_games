@@ -13,7 +13,7 @@ namespace the1
 	GDEFINE_ENUM_VALUE(POOL_GAME_MODE, 10Ball, 2);
 	GDEFINE_ENUM_VALUE(POOL_GAME_MODE, Test2Balls, 3);
 
-	static constexpr	uint8_t					MAX_BALLS						= 22;
+	static constexpr	uint8_t					MAX_BALLS						= 64;
 
 #pragma pack(push, 1)
 	typedef ::gpk::SContactResult	SContactResultBall;

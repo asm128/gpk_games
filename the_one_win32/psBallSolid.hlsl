@@ -17,7 +17,7 @@ float4 main(PixelShaderInput input) : SV_TARGET
 	else {
 		const float2							fetchCoord					= 
 			{ relativeToCenter.x * 2.f + .5f
-			, relativeToCenter.y * 4.f + .5f
+			, relativeToCenter.y * 2.f + .5f
 			};
 		float4									surfacecolor				= texDiffuse.Sample(samplerLinear, fetchCoord);
 	

@@ -51,11 +51,9 @@ namespace the_one_win32
 			IndexBuffer		.clear();
 		}
 
-		void										Render									(uint32_t iMesh, uint32_t startIndex, uint32_t countIndices, const ::gpk::SRenderMaterial & material, uint32_t iTexture, uint32_t iShader) {
+		void										Render									(uint32_t iMesh, ::gpk::SRange<uint32_t> indexRange, uint32_t iTexture, uint32_t iShader) {
 			if (!m_loadingComplete)	// Loading is asynchronous. Only draw geometry after it's loaded.
 				return;
-
-			ConstantBufferModel.Material				= material;
 
 			auto											context					= DeviceResources->GetD3DDeviceContext();
 			context->UpdateSubresource1(ConstantBuffer[0], 0, NULL, &ConstantBufferModel, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
@@ -90,7 +88,7 @@ namespace the_one_win32
 			context->RSSetState(prs);
 		    context->PSSetSamplers( 0, 1, &SamplerStates[0] );
 			context->PSSetShaderResources( 0, 1, &ShaderResourceView[iTexture] );
-			context->DrawIndexed(countIndices, startIndex, 0);	// Draw the objects.
+			context->DrawIndexed(indexRange.Count, indexRange.Offset, 0);	// Draw the objects.
 		}
 
 		::gpk::error_t								CreateWindowSizeDependentResources		() {
@@ -123,9 +121,9 @@ namespace the_one_win32
 				// Create a sampler state
 				D3D11_SAMPLER_DESC								samDesc				= {};
 				samDesc.Filter								= D3D11_FILTER_MIN_MAG_MIP_POINT;
-				samDesc.AddressU							= D3D11_TEXTURE_ADDRESS_WRAP;
-				samDesc.AddressV							= D3D11_TEXTURE_ADDRESS_WRAP;
-				samDesc.AddressW							= D3D11_TEXTURE_ADDRESS_WRAP;
+				samDesc.AddressU							= D3D11_TEXTURE_ADDRESS_CLAMP;
+				samDesc.AddressV							= D3D11_TEXTURE_ADDRESS_CLAMP;
+				samDesc.AddressW							= D3D11_TEXTURE_ADDRESS_CLAMP;
 				samDesc.MaxAnisotropy						= 1;
 				samDesc.ComparisonFunc						= D3D11_COMPARISON_ALWAYS;
 				samDesc.MaxLOD								= D3D11_FLOAT32_MAX;

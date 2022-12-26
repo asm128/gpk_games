@@ -42,7 +42,7 @@ static	::gpk::error_t					poolGameResetBall9		(::the1::SPoolGame & pool) { (void
 static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	pool.StateStart.BallCount				= 16;
 	::gpk::SEngine								& engine				= pool.Engine;
-	const ::gpk::SRasterFont					& font					= *engine.Scene->Graphics->Fonts.Fonts[9];
+	const ::gpk::SRasterFont					& font					= *engine.Scene->Graphics->Fonts.Fonts[8];
 	for(uint32_t iBall = 0; iBall < pool.StateStart.BallCount; ++iBall) {
 		//const bool									stripped				= iBall && iBall > 8;
 		engine.SetDampingLinear	(pool.StateStart.Ball[iBall].Entity, pool.StateStart.Physics.DampingClothDisplacement);
