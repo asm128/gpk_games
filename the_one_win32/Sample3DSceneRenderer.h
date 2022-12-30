@@ -15,21 +15,20 @@ namespace the1_win32
 		::gpk::pobj<DX::D3DDeviceResources>		DeviceResources;
 
 		// Direct3D resources for cube geometry
-		::gpk::array_com<ID3D11InputLayout	>		InputLayout;
-		::gpk::array_com<ID3D11Buffer		>		VertexBuffer;
-		::gpk::array_com<ID3D11Buffer		>		IndexBuffer;
-		::gpk::array_com<ID3D11VertexShader	>		VertexShader;
-		::gpk::array_com<ID3D11PixelShader	>		PixelShader;
-		::gpk::array_com<ID3D11Buffer		>		ConstantBuffer;
-		::gpk::array_com<ID3D11SamplerState	>		SamplerStates;
-		::gpk::array_com<ID3D11ShaderResourceView>	ShaderResourceView;
+		::gpk::acom<ID3D11InputLayout	>		InputLayout;
+		::gpk::acom<ID3D11Buffer		>		VertexBuffer;
+		::gpk::acom<ID3D11Buffer		>		IndexBuffer;
+		::gpk::acom<ID3D11VertexShader	>		VertexShader;
+		::gpk::acom<ID3D11PixelShader	>		PixelShader;
+		::gpk::acom<ID3D11Buffer		>		ConstantBuffer;
+		::gpk::acom<ID3D11SamplerState	>		SamplerStates;
+		::gpk::acom<ID3D11ShaderResourceView>	ShaderResourceView;
 
 		// System resources for cube geometry.
 		::gpk::SRenderNodeConstants					ConstantBufferModel						= {};
 		::gpk::SEngineSceneConstants				ConstantBufferScene						= {};
 
 		// Variables used with the rendering loop.
-		bool										m_loadingComplete						= false;
 		double										TotalSecondsElapsed						= 0;
 		
 													~Sample3DSceneRenderer					()		{ ReleaseDeviceDependentResources(); }
@@ -42,7 +41,6 @@ namespace the1_win32
 		}
 
 		void										ReleaseDeviceDependentResources			() {
-			m_loadingComplete							= false;
 			VertexShader	.clear();
 			InputLayout		.clear();
 			PixelShader		.clear();
@@ -52,9 +50,6 @@ namespace the1_win32
 		}
 
 		void										Render									(uint32_t iMesh, ::gpk::SRange<uint32_t> indexRange, uint32_t iTexture, uint32_t iShader) {
-			if (!m_loadingComplete)	// Loading is asynchronous. Only draw geometry after it's loaded.
-				return;
-
 			auto											context					= DeviceResources->GetD3DDeviceContext();
 			context->UpdateSubresource1(ConstantBuffer[0], 0, NULL, &ConstantBufferModel, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
 			context->UpdateSubresource1(ConstantBuffer[1], 0, NULL, &ConstantBufferScene, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
@@ -128,16 +123,16 @@ namespace the1_win32
 				samDesc.ComparisonFunc						= D3D11_COMPARISON_ALWAYS;
 				samDesc.MaxLOD								= D3D11_FLOAT32_MAX;
 
-				::gpk::ptr_com<ID3D11SamplerState>				samplerState;
+				::gpk::pcom<ID3D11SamplerState>					samplerState;
 				gpk_hrcall(DeviceResources->GetD3DDevice()->CreateSamplerState(&samDesc, &samplerState));
 				SamplerStates.push_back(samplerState);
 			}
 			{
 				// Load shaders asynchronously.
-				::gpk::ptr_com<ID3D11InputLayout>				inputLayout;
-				::gpk::ptr_com<ID3D11VertexShader>				vertexShader;
+				::gpk::pcom<ID3D11InputLayout>					inputLayout;
+				::gpk::pcom<ID3D11VertexShader>					vertexShader;
 
-				::gpk::array_pod<byte_t>						fileVS;
+				::gpk::apod<byte_t>								fileVS;
 				gpk_necs(::gpk::fileToMemory("SampleVertexShader.cso", fileVS));
 				static constexpr D3D11_INPUT_ELEMENT_DESC		vertexDesc []			=
 					{	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 00, D3D11_INPUT_PER_VERTEX_DATA, 0 }
@@ -165,8 +160,6 @@ namespace the1_win32
 					ConstantBuffer.push_back(constantBuffer);
 				}
 			}
-	
-			m_loadingComplete							= true;		// Once the cube is loaded, the object is ready to be rendered.
 			return 0;
 		}
 	};

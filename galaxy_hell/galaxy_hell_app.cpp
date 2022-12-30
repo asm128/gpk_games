@@ -93,10 +93,10 @@
 			}
 
 		}
-		::gpk::tunerSetValue(*app.TunerPlayerCount, app.Game.PlayState.PlayerCount);
-		for(uint32_t iPilot = 0; iPilot < app.Game.PlayState.PlayerCount; ++iPilot) {
+		::gpk::tunerSetValue(*app.TunerPlayerCount, app.Game.PlayState.CountPlayers);
+		for(uint32_t iPilot = 0; iPilot < app.Game.PlayState.CountPlayers; ++iPilot) {
 			const ::gpk::vcc namePilot	= app.Game.Pilots[iPilot].Name;
-			for(uint32_t iPlayer = 0; iPlayer < app.Game.PlayState.PlayerCount; ++iPlayer) {
+			for(uint32_t iPlayer = 0; iPlayer < app.Game.PlayState.CountPlayers; ++iPlayer) {
 				if(iPlayer >= app.Players.size())
 					app.AddNewPlayer(namePilot);
 
@@ -106,7 +106,7 @@
 					break;
 				}
 			}
-			for(uint32_t iPlayer = app.Game.PlayState.PlayerCount; iPlayer < app.Players.size(); ++iPlayer) {
+			for(uint32_t iPlayer = app.Game.PlayState.CountPlayers; iPlayer < app.Players.size(); ++iPlayer) {
 				const ::gpk::vcc namePlayer	= app.Players[iPlayer].Name;
 				if(namePilot == namePlayer) {
 					::std::swap(app.Players[iPlayer], app.Players[iPilot]);
@@ -132,7 +132,7 @@
 
 
 	const ::gpk::SInput								& input				= *app.DialogDesktop.Input;
-	if(controllerPlayer.size() && app.Game.PlayState.PlayerCount == 1) {
+	if(controllerPlayer.size() && app.Game.PlayState.CountPlayers == 1) {
 		controllerPlayer[0].Forward					= input.KeyboardCurrent.KeyState[VK_UP		] || input.KeyboardCurrent.KeyState['W'];
 		controllerPlayer[0].Back					= input.KeyboardCurrent.KeyState[VK_DOWN	] || input.KeyboardCurrent.KeyState['S'];
 		controllerPlayer[0].Left					= input.KeyboardCurrent.KeyState[VK_LEFT	] || input.KeyboardCurrent.KeyState['A'];
@@ -174,7 +174,7 @@
 
 	::ghg::solarSystemUpdate(app.Game, (false == inGame) ? 0 : lastTimeSeconds, *inputState, systemEvents);
 	for(uint32_t iShip = 0; iShip < app.Game.ShipState.ShipOrbiterActionQueue.size(); ++iShip)
-		if(iShip < app.Game.PlayState.PlayerCount) {
+		if(iShip < app.Game.PlayState.CountPlayers) {
 			for(uint32_t iEvent = 0; iEvent < app.Game.ShipState.ShipOrbiterActionQueue[iShip].size(); ++iEvent)
 				if(app.Game.ShipState.ShipOrbiterActionQueue[iShip][iEvent] == ::ghg::SHIP_ACTION_spawn) {
 					::gpk::apod<byte_t>			serialized;

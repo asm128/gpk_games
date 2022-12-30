@@ -36,7 +36,7 @@
 	::gpk::SEngine									& engine						= pool.Engine;
 
 	::gpk::apod<::gpk::SCoord3<float>>				& wireframePixelCoords			= engine.Scene->RenderCache.VertexShaderCache.WireframePixelCoords;
-	for(uint32_t iBall = 0; iBall < pool.StateCurrent.BallCount; ++iBall) {
+	for(uint32_t iBall = 0; iBall < pool.StateCurrent.CountBalls; ++iBall) {
 		for(uint32_t iDelta = ::gpk::max(0, (int32_t)pool.PositionDeltas[iBall].size() - 20); iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {
 			::gpk::SLine3<float>							screenDelta				= pool.PositionDeltas[iBall][iDelta];
 			wireframePixelCoords.clear();

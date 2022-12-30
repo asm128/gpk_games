@@ -111,7 +111,7 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 
 ::gpk::error_t				the1::poolGameUpdate			(::the1::SPoolGame & pool, double secondsElapsed) {
 	::gpk::SEngine					& engine						= pool.Engine;
-	for(uint32_t iBall = 0; iBall < pool.StateCurrent.BallCount; ++iBall) {
+	for(uint32_t iBall = 0; iBall < pool.StateCurrent.CountBalls; ++iBall) {
 		pool.PositionDeltas[iBall].push_back({});
 		pool.GetBallPosition(iBall, pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1].A);
 	}
@@ -127,7 +127,7 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 		double							secondsThisStep					= ::gpk::min(step, secondsElapsed);
 		secondsElapsed				-= secondsThisStep;
 
-		//for(uint32_t iBallA = 0; iBallA < pool.StateStart.BallCount; ++iBallA) {
+		//for(uint32_t iBallA = 0; iBallA < pool.StateStart.CountBalls; ++iBallA) {
 		//	::gpk::SBodyForces				& forces						= engine.Integrator.Forces		[engine.ManagedEntities.Entities[pool.StateStart.Ball[iBallA].Entity].RigidBody];
 		//	::gpk::SRigidBodyFrame			& bodyAccum						= engine.Integrator.BodyFrames	[engine.ManagedEntities.Entities[pool.StateStart.Ball[iBallA].Entity].RigidBody];
 		//	if(::gpk::SCoord3<float>{forces.Velocity}.Normalize().Dot(::gpk::SCoord3<float>{forces.Rotation.z, 0, -forces.Rotation.x}.Normalize()) < 0) {
@@ -156,8 +156,8 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 			// Separate balls
 			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[entityA.RigidBody].Position;
 			::gpk::SCoord3<float>			& positionB			= engine.Integrator.Centers[entityB.RigidBody].Position;
-			positionA					+= contact.Result.DistanceDirection * ::gpk::max(pool.StateCurrent.BallRadius * 2 - distanceLength, 0.0) * -.51f;
-			positionB					+= contact.Result.DistanceDirection * ::gpk::max(pool.StateCurrent.BallRadius * 2 - distanceLength, 0.0) * .51f;
+			positionA					+= contact.Result.DistanceDirection * ::gpk::max(pool.StateCurrent.Table.BallRadius * 2 - distanceLength, 0.0) * -.51f;
+			positionB					+= contact.Result.DistanceDirection * ::gpk::max(pool.StateCurrent.Table.BallRadius * 2 - distanceLength, 0.0) * .51f;
 
 
 			// Calculate force transfer
@@ -215,16 +215,16 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 		pool.LastFrameContactsBall.append(lastFrameContactsBatchBall);
 
 		const gpk::SCoord2<float>		tableHalfDimensions	= pool.StateCurrent.Table.Dimensions.Slate * .5f;
-		for(uint32_t iBall = 0; iBall < pool.StateCurrent.BallCount; ++iBall) {
-			const float						ballRadius			= pool.StateCurrent.BallRadius;
+		for(uint32_t iBall = 0; iBall < pool.StateCurrent.CountBalls; ++iBall) {
+			const float						ballRadius			= pool.StateCurrent.Table.BallRadius;
 			const gpk::SCoord2<float>		ballLimits			= tableHalfDimensions - ::gpk::SCoord2<float>{ballRadius, ballRadius};
-			const ::gpk::SVirtualEntity		& entityA			= engine.ManagedEntities.Entities[pool.StateCurrent.Ball[iBall].Entity]; 
+			const ::gpk::SVirtualEntity		& entityA			= engine.ManagedEntities.Entities[pool.StateCurrent.BallEntities[iBall]]; 
 			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[entityA.RigidBody].Position;
 			::gpk::SRigidBodyFlags			& flags				= engine.Integrator.BodyFlags[entityA.RigidBody];
 			bool							inPocket			= false;
 			::gpk::SBodyForces				& forces			= engine.Integrator.Forces[entityA.RigidBody];
 			for(uint32_t iPocket = 0; iPocket < 6; ++iPocket) {
-				const ::gpk::SVirtualEntity		& entityPocket		= engine.ManagedEntities.Entities[pool.StateCurrent.Table.Pockets[iPocket].Entity];
+				const ::gpk::SVirtualEntity		& entityPocket		= engine.ManagedEntities.Entities[pool.StateCurrent.Table.EntityPockets[iPocket]];
 				::gpk::SCoord3<float>			pocketPosition		= engine.Scene->ManagedRenderNodes.Transforms[entityPocket.RenderNode].World.GetTranslation();
 				::gpk::SCoord3<float>			positionBall		= positionA;
 				if(positionBall.y < 0) {
@@ -284,20 +284,20 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 			if(false == flags.Falling) 
 				forces.Velocity.y			=  0;
 			else {
-				if(positionA.y < pool.StateCurrent.BallRadius) {
-					positionA.y					= (positionA.y - pool.StateCurrent.BallRadius) * -.95f + pool.StateCurrent.BallRadius;
+				if(positionA.y < pool.StateCurrent.Table.BallRadius) {
+					positionA.y					= (positionA.y - pool.StateCurrent.Table.BallRadius) * -.95f + pool.StateCurrent.Table.BallRadius;
 
 					forces.Velocity.y			*= -1.0f;
 					forces.Velocity.y			*= pool.StateCurrent.Physics.DampingGround;
 					forces.Acceleration.y		= -pool.StateCurrent.Physics.Gravity;
 				}
-				else if(fabs(forces.Velocity.y) > 0.00075 || positionA.y > (pool.StateCurrent.BallRadius + pool.StateCurrent.BallRadius * .125f) || positionA.y < (pool.StateCurrent.BallRadius - pool.StateCurrent.BallRadius * .125f)) {
+				else if(fabs(forces.Velocity.y) > 0.00075 || positionA.y > (pool.StateCurrent.Table.BallRadius + pool.StateCurrent.Table.BallRadius * .125f) || positionA.y < (pool.StateCurrent.Table.BallRadius - pool.StateCurrent.Table.BallRadius * .125f)) {
 					forces.Acceleration.y		= -pool.StateCurrent.Physics.Gravity;
 				}
 				else {
 					forces.Acceleration.y		=  0;
 					forces.Velocity.y			=  0;
-					positionA.y					= pool.StateCurrent.BallRadius;
+					positionA.y					= pool.StateCurrent.Table.BallRadius;
 					flags.Falling				= false;
 				}
 			}
@@ -305,20 +305,20 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 		}
 	}
 
-	const float radius = pool.StateCurrent.BallRadius;
+	const float radius = pool.StateCurrent.Table.BallRadius;
 	const float diameter = radius * 2;
-	for(uint32_t iBall = 0; iBall < pool.StateCurrent.BallCount; ++iBall) {
+	for(uint32_t iBall = 0; iBall < pool.StateCurrent.CountBalls; ++iBall) {
 		::gpk::SLine3<float> & delta = pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1];
 		pool.GetBallPosition(iBall, delta.B);
-		if(engine.IsPhysicsActive(pool.StateCurrent.Ball[iBall].Entity)) {
-			::gpk::SBodyForces				& forces			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StateCurrent.Ball[iBall].Entity].RigidBody];
+		if(engine.IsPhysicsActive(pool.StateCurrent.BallEntities[iBall])) {
+			::gpk::SBodyForces				& forces			= engine.Integrator.Forces[engine.ManagedEntities.Entities[pool.StateCurrent.BallEntities[iBall]].RigidBody];
 
 			::gpk::SCoord3<float>			rotationResult		= (delta.B - delta.A) / diameter * ::gpk::math_2pi;
 			forces.Rotation				+= {rotationResult.z, 0, -rotationResult.x};
 		}
 		if(pool.PositionDeltas[iBall].size() > 10)
 			for(uint32_t iDelta = 0; iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {
-				if(false == engine.IsPhysicsActive(pool.StateCurrent.Ball[iBall].Entity)) {
+				if(false == engine.IsPhysicsActive(pool.StateCurrent.BallEntities[iBall])) {
 					pool.PositionDeltas[iBall].remove_unordered(iDelta--);
 				}
 			}

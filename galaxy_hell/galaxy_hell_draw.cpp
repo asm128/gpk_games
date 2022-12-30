@@ -522,7 +522,7 @@ static	int											drawShip
 	const ::ghg::SShipCore									& shipCore			= solarSystem.ShipState.ShipCores[iShip];
 
 	uint32_t												pixelsDrawn			= 0;
-	const ::gpk::SColorBGRA									playerColor			= ((uint32_t)iShip < solarSystem.PlayState.PlayerCount) ? solarSystem.Pilots[iShip].Color : ::gpk::SColorBGRA(::gpk::RED);
+	const ::gpk::SColorBGRA									playerColor			= ((uint32_t)iShip < solarSystem.PlayState.CountPlayers) ? solarSystem.Pilots[iShip].Color : ::gpk::SColorBGRA(::gpk::RED);
 	const ::gpk::view_array<const uint32_t>					shipParts			= solarSystem.ShipState.ShipParts[iShip];
 	for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
 		const ::ghg::SOrbiter									& shipPart				= solarSystem.ShipState.Orbiters[shipParts[iPart]];
@@ -531,7 +531,7 @@ static	int											drawShip
 		pixelsDrawn += ::ghg::drawOrbiter(solarSystem.ShipState, shipPart, playerColor, (float)solarSystem.DecoState.AnimationTime, matrixVP, targetPixels, depthBuffer, drawCache);
 	}
 
-	if(iShip >= (int32_t)solarSystem.PlayState.PlayerCount || shipCore.Team)
+	if(iShip >= (int32_t)solarSystem.PlayState.CountPlayers || shipCore.Team)
 		return 0;
 
 	const ::ghg::SEntity									& entity			= solarSystem.ShipState.EntitySystem.Entities[shipCore.Entity];

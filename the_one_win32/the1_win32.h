@@ -31,22 +31,27 @@ namespace gpk
 
 
 struct SApplication : DX::IDeviceNotify {
-	::gpk::SFramework							Framework				;
+	::gpk::SFramework						Framework				;
 
-	::gpk::SGUI									GUI						= {};
-	int32_t										IdViewport				= -1;
+	::gpk::SGUI								GUI						= {};
+	int32_t									IdViewport				= -1;
 
-	int32_t										EntityLightDirectional	= -1;
-	int32_t										EntityLightPoint		= -1;
-	int32_t										EntityLightSpot			= -1;
-	int32_t										EntityBox				= -1;
-	int32_t										EntitySphere			= -1;
+	int32_t									EntityLightDirectional	= -1;
+	int32_t									EntityLightPoint		= -1;
+	int32_t									EntityLightSpot			= -1;
+	int32_t									EntityBox				= -1;
+	int32_t									EntitySphere			= -1;
 
-	::the1::STheOne								TheOne					= {};
+	::the1::STheOne							TheOne					= {};
 
 	::gpk::pobj<::DX::D3DDeviceResources>	DeviceResources			;
 	::the1_win32::Sample3DSceneRenderer		D3DScene				;
 	::the1_win32::SampleFpsTextRenderer		D3DText					;
+
+	// We need to render the GUI separately to compose DirectX target from a dynamic texture.
+	::gpk::img<::gpk::SColorBGRA>			GUIRT					;
+	::gpk::pcom<ID3D11ShaderResourceView>	GUISRV					;
+	::gpk::pcom<ID3D11Texture2D>			GUITexture2D			;
 
 	::gpk::apod<uint32_t>					D3DBufferMap			;
 
@@ -54,6 +59,9 @@ struct SApplication : DX::IDeviceNotify {
 	virtual void								OnDeviceLost					() {
 		D3DScene.ReleaseDeviceDependentResources();
 		D3DText.ReleaseDeviceDependentResources();
+
+		GUISRV										= {};
+		GUITexture2D								= {};
 	}
 
 	// Notifies renderers that device resources may now be recreated.
@@ -67,6 +75,9 @@ struct SApplication : DX::IDeviceNotify {
 	}
 
 	::gpk::error_t								CreateDeviceDependentResources	()	{
+		GUIRT.resize(Framework.RootWindow.Size);
+		gpk_necs(::gpk::d3dCreateTextureDynamic					(DeviceResources->GetD3DDevice(), GUITexture2D, GUISRV, GUIRT.View));
+
 		::gpk::SEngine									& engine				= TheOne.MainGame.Game.Engine;
 		gpk_necs(::gpk::d3dCreateBuffersFromEngineMeshes		(DeviceResources->GetD3DDevice(), engine.Scene->Graphics->Meshes, engine.Scene->Graphics->Buffers, D3DScene.IndexBuffer, D3DScene.VertexBuffer));
 		gpk_necs(::gpk::d3dCreateTexturesFromEngineSurfaces		(DeviceResources->GetD3DDevice(), engine.Scene->Graphics->Surfaces, D3DScene.ShaderResourceView));

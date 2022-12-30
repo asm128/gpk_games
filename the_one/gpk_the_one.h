@@ -25,8 +25,8 @@ namespace the1
 	};
 
 	struct SPlayerUI {
-		::gpk::SDialog							DialogPlay					= {};
-		::gpk::SDialog							DialogHome					= {};
+		uint32_t								DialogPlay					= (uint32_t)-1;
+		uint32_t								DialogHome					= (uint32_t)-1;
 		::the1::SPlayerCameras					Cameras						= {};
 		::gpk::SUIInputBox						Name;
 	};
@@ -54,7 +54,6 @@ namespace the1
 
 		::gpk::SCoord3<float>					LightPos					= {3, 2, 0};
 
-		::gpk::SDialog							Dialog						= {};
 		::gpk::astatic<::the1::SPlayerUI
 			, ::the1::MAX_BALLS>				PlayerUI					= {};
 
@@ -94,10 +93,9 @@ namespace the1
 	struct STheOne {
 		::the1::STheOneGame						MainGame					= {};
 		::gpk::astatic<::the1::STheOneGame, 16>	TestGames					= {};
-		::gpk::astatic<::gpk::SDialog
-			, ::the1::APP_STATE_COUNT>			DialogPerState				= {};
-		::gpk::astatic<::the1::TRenderTarget
-			, ::the1::APP_STATE_COUNT>			UIRenderTargets				= {};
+		::gpk::SDialog							DialogForRoot				= {};
+		::gpk::SDialog							DialogForState				= {};
+		::the1::TRenderTarget					UIRenderTarget				= {};
 
 		::gpk::SVirtualKeyboard					VirtualKeyboard				= {};
 

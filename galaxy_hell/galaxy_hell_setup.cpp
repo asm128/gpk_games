@@ -257,12 +257,12 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 		solarSystem.DecoState.Stars.Reset(solarSystem.DrawCache.RenderTargetMetrics);
 		solarSystem.PlayState.TimeStart = solarSystem.PlayState.TimeLast = ::gpk::timeCurrent();
 		memset(solarSystem.ShipState.ShipScores.begin(), 0, solarSystem.ShipState.ShipScores.byte_count());
-		while(solarSystem.Pilots.size() < solarSystem.PlayState.PlayerCount) {
+		while(solarSystem.Pilots.size() < solarSystem.PlayState.CountPlayers) {
 			char text [64] = {};
 			sprintf_s(text, "Player %i", solarSystem.Pilots.size() + 1);
 			solarSystem.Pilots.push_back({::gpk::label(text), PLAYER_COLORS[solarSystem.Pilots.size() % ::gpk::size(PLAYER_COLORS)]});
 		}
-		solarSystem.ShipControllers.resize(solarSystem.PlayState.PlayerCount);
+		solarSystem.ShipControllers.resize(solarSystem.PlayState.CountPlayers);
 	}
 
 #pragma pack(push, 1)
@@ -324,17 +324,17 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 			solarSystem.PlayState.CameraSwitchDelay				= 0;
 			solarSystem.ShipState.Scene.Global.CameraReset();
 
-			for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.PlayerCount; ++iPlayer) {
+			for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.CountPlayers; ++iPlayer) {
 				const int32_t											indexShip						= ::shipCreate(solarSystem.ShipState, 0, 0, iPlayer);
 				::ghg::SShipCore										& playerShip					= solarSystem.ShipState.ShipCores[indexShip];
 				::gpk::SBodyCenter										& shipPivot						= solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[playerShip.Entity].Body];
 				shipPivot.Orientation.MakeFromEulerTaitBryan({0, 0, (float)(-::gpk::math_pi_2)});
 				shipPivot.Position									= {-30};
-				shipPivot.Position.z = float(solarSystem.PlayState.PlayerCount * 30) / 2 - iPlayer * 30;
+				shipPivot.Position.z = float(solarSystem.PlayState.CountPlayers * 30) / 2 - iPlayer * 30;
 			}
 		}
 		// Set up enemy ships
-		while(((int)solarSystem.ShipState.ShipCores.size() - (int)solarSystem.PlayState.PlayerCount - 1) < (int)(solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage)) {	// Create enemy ships depending on stage.
+		while(((int)solarSystem.ShipState.ShipCores.size() - (int)solarSystem.PlayState.CountPlayers - 1) < (int)(solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage)) {	// Create enemy ships depending on stage.
 			int32_t													indexShip						= ::shipCreate(solarSystem.ShipState, 1, -1, solarSystem.PlayState.Stage + solarSystem.ShipState.ShipCores.size());
 			::ghg::SShipCore										& enemyShip						= solarSystem.ShipState.ShipCores[indexShip];
 			::gpk::apod<uint32_t>								& enemyShipOrbiters				= solarSystem.ShipState.ShipParts[indexShip];
@@ -369,7 +369,7 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 
 				}
 				else {
-					if(iShip < 4 || 0 != ((iShip - 1 - solarSystem.PlayState.PlayerCount - solarSystem.PlayState.OffsetStage) % 3) || 0 != iPart) 
+					if(iShip < 4 || 0 != ((iShip - 1 - solarSystem.PlayState.CountPlayers - solarSystem.PlayState.OffsetStage) % 3) || 0 != iPart) 
 						weapon											= 4;
 					else {
 						weapon											= (iShip - 5) / 3;

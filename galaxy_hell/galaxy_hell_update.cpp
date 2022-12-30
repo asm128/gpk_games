@@ -392,7 +392,7 @@ static int											processInput			(::ghg::SGalaxyHell & solarSystem, double se
 
 	constexpr double										speed					= 40;
 	if(solarSystem.ShipState.EntitySystem.Entities.size()) {
-		for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.PlayerCount; ++iPlayer) {
+		for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.CountPlayers; ++iPlayer) {
 			const ::ghg::SShipController							& shipController		= controllers[iPlayer];
 			::gpk::SBodyCenter										& playerBody			= solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCores[iPlayer].Entity].Body];
 			::ghg::SShipCore										& ship					= solarSystem.ShipState.ShipCores[iPlayer];
@@ -425,7 +425,7 @@ static int											processInput			(::ghg::SGalaxyHell & solarSystem, double se
 			playerBody.Orientation.Normalize();
 		}
 	}
-	if(1 == solarSystem.PlayState.PlayerCount && solarSystem.ShipState.ShipCores.size()) {
+	if(1 == solarSystem.PlayState.CountPlayers && solarSystem.ShipState.ShipCores.size()) {
 		::gpk::SCoord3<float>										shipPosition;
 		solarSystem.ShipState.GetShipPosition(0, shipPosition);
 		if(solarSystem.ShipState.Scene.Global.CameraMode == ::ghg::CAMERA_MODE_FOLLOW) {
@@ -451,7 +451,7 @@ static int											processInput			(::ghg::SGalaxyHell & solarSystem, double se
 	if(key_camera_switch && solarSystem.PlayState.CameraSwitchDelay > .2) {
 		solarSystem.PlayState.CameraSwitchDelay							= 0;
 
-		solarSystem.ShipState.Scene.Global.CameraMode = (::ghg::CAMERA_MODE)((solarSystem.ShipState.Scene.Global.CameraMode + 1) % ((solarSystem.PlayState.PlayerCount > 1) ? (::ghg::CAMERA_MODE_PERSPECTIVE + 1) : ::ghg::CAMERA_MODE_COUNT));
+		solarSystem.ShipState.Scene.Global.CameraMode = (::ghg::CAMERA_MODE)((solarSystem.ShipState.Scene.Global.CameraMode + 1) % ((solarSystem.PlayState.CountPlayers > 1) ? (::ghg::CAMERA_MODE_PERSPECTIVE + 1) : ::ghg::CAMERA_MODE_COUNT));
 	}
 
 	if(camera.Position.y > 0.001f)

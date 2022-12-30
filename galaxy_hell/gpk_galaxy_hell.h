@@ -44,7 +44,7 @@ namespace ghg
 		uint64_t												TimeLast				= 0;
 		uint32_t												Seed					= 1;
 		uint32_t												OffsetStage				= 2;
-		uint32_t												PlayerCount				= 1;
+		uint32_t												CountPlayers				= 1;
 		PLAY_TYPE												PlayType				= (PLAY_TYPE)0;
 		PLAY_MODE												PlayMode				= (PLAY_MODE)PLAY_MODE_VR;
 
@@ -98,17 +98,17 @@ namespace ghg
 		}
 
 		::gpk::error_t											PilotsReset				()			{
-			while(Pilots.size() < PlayState.PlayerCount) {
+			while(Pilots.size() < PlayState.CountPlayers) {
 				char														text [64]				= {};
 				sprintf_s(text, "Player %i", Pilots.size() + 1);
 				Pilots.push_back({::gpk::label(text), PLAYER_COLORS[Pilots.size() % ::gpk::size(PLAYER_COLORS)]});
 			}
-			return ShipControllers.resize(PlayState.PlayerCount);
+			return ShipControllers.resize(PlayState.CountPlayers);
 		}
 
 		::gpk::error_t											Save					(::gpk::apod<byte_t> & output)		const	{
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SPlayState>{&PlayState, 1}, output);
-			for(uint32_t iPlayer = 0; iPlayer < PlayState.PlayerCount; ++iPlayer) {
+			for(uint32_t iPlayer = 0; iPlayer < PlayState.CountPlayers; ++iPlayer) {
 				::gpk::viewWrite(Pilots[iPlayer].Name, output);
 				::gpk::viewWrite(::gpk::view_array<const ::gpk::SColorBGRA>{&Pilots[iPlayer].Color, 1}, output);
 			}
@@ -121,7 +121,7 @@ namespace ghg
 			::gpk::mutex_guard											lock(LockUpdate);
 			::gpk::view_array<const ::ghg::SPlayState>					readPlayState			= {};
 			gpk_necs(::gpk::loadPOD(input, PlayState));
-			Pilots.resize(PlayState.PlayerCount);
+			Pilots.resize(PlayState.CountPlayers);
 			for(uint32_t iPlayer = 0; iPlayer < Pilots.size(); ++iPlayer) {
 				gpk_necall(::gpk::loadLabel(input, Pilots[iPlayer].Name), "iPlayer %i", iPlayer);
 				gpk_necall(::gpk::loadPOD(input, Pilots[iPlayer].Color), "iPlayer %i", iPlayer);

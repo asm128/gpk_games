@@ -318,10 +318,10 @@ static	::gpk::error_t			guiHandleLoad				(::ghg::SGalaxyHellApp & app, ::gpk::SG
 			::ghg::solarSystemReset(app.Game);
 			return -1;
 		}
-		::gpk::tunerSetValue(*app.TunerPlayerCount, app.Game.PlayState.PlayerCount);
-		for(uint32_t iPilot = 0; iPilot < app.Game.PlayState.PlayerCount; ++iPilot) {
+		::gpk::tunerSetValue(*app.TunerPlayerCount, app.Game.PlayState.CountPlayers);
+		for(uint32_t iPilot = 0; iPilot < app.Game.PlayState.CountPlayers; ++iPilot) {
 			const ::gpk::vcc namePilot	= app.Game.Pilots[iPilot].Name;
-			for(uint32_t iPlayer = 0; iPlayer < app.Game.PlayState.PlayerCount; ++iPlayer) {
+			for(uint32_t iPlayer = 0; iPlayer < app.Game.PlayState.CountPlayers; ++iPlayer) {
 				if(iPlayer >= app.Players.size())
 					app.AddNewPlayer(namePilot);
 
@@ -331,7 +331,7 @@ static	::gpk::error_t			guiHandleLoad				(::ghg::SGalaxyHellApp & app, ::gpk::SG
 					break;
 				}
 			}
-			for(uint32_t iPlayer = app.Game.PlayState.PlayerCount; iPlayer < app.Players.size(); ++iPlayer) {
+			for(uint32_t iPlayer = app.Game.PlayState.CountPlayers; iPlayer < app.Players.size(); ++iPlayer) {
 				const ::gpk::vcc namePlayer	= app.Players[iPlayer].Name;
 				if(namePilot == namePlayer) {
 					::std::swap(app.Players[iPlayer], app.Players[iPilot]);
@@ -352,8 +352,8 @@ static	::gpk::error_t			guiHandleHome				(::ghg::SGalaxyHellApp & app, ::gpk::SG
 	switch((::ghg::UI_HOME)idControl) {
 	case ::ghg::UI_HOME_Start: 
 		::ghg::solarSystemReset(game);
-		game.PlayState.PlayerCount = (uint32_t)app.TunerPlayerCount->ValueCurrent;
-		for(uint32_t iPlayer = app.Players.size(); iPlayer < app.Game.PlayState.PlayerCount; ++iPlayer) {
+		game.PlayState.CountPlayers = (uint32_t)app.TunerPlayerCount->ValueCurrent;
+		for(uint32_t iPlayer = app.Players.size(); iPlayer < app.Game.PlayState.CountPlayers; ++iPlayer) {
 			char text [64] = {};
 			sprintf_s(text, "Player %i", app.Players.size() + 1);
 			app.AddNewPlayer(text);
@@ -601,12 +601,12 @@ static	::gpk::error_t			guiUpdatePlay				(::ghg::SGalaxyHellApp & app) {
 	drawCache.LightPointsModel.reserve(drawCache.LightPointsWorld.size());
 	drawCache.LightColorsModel.reserve(drawCache.LightColorsWorld.size());
 	if(app.ActiveState == ::ghg::APP_STATE_Play) {
-		for(uint32_t iPlayer = 0; iPlayer < game.PlayState.PlayerCount; ++iPlayer) {
+		for(uint32_t iPlayer = 0; iPlayer < game.PlayState.CountPlayers; ++iPlayer) {
 			::ghg::SUIPlayer					& uiPlayer				= app.UIPlay.PlayerUI[iPlayer];
 			gpk_necall(::uiPlayerUpdatePlay(uiPlayer, iPlayer, app.Game, app.Game.ShipState.ShipScores[iPlayer], app.Game.LockUpdate, drawCache), "iPlayer: %i", iPlayer);
 			uiPlayer.DialogPlay.GUI->Controls.States[0].Hidden = false; 
 		}
-		for(uint32_t iPlayer = app.Game.PlayState.PlayerCount; iPlayer < ghg::MAX_PLAYERS; ++iPlayer) { 
+		for(uint32_t iPlayer = app.Game.PlayState.CountPlayers; iPlayer < ghg::MAX_PLAYERS; ++iPlayer) { 
 			app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI->Controls.States[0].Hidden = true; 
 		}
 	}
