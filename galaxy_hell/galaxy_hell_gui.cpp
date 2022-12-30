@@ -766,7 +766,7 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 
 
 ::gpk::error_t					ghg::gaugeImageUpdate			(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::SColorBGRA> target, ::gpk::SColorFloat colorMin, ::gpk::SColorFloat colorMid, ::gpk::SColorFloat colorMax, ::gpk::SColorBGRA colorEmpty, bool radialColor)  {
-	static ::gpk::SImage<uint32_t>		dummyDepth;
+	static ::gpk::img<uint32_t>		dummyDepth;
 	const ::gpk::SCoord3<float>			center3							= (gauge.Vertices[1] - gauge.Vertices[gauge.Vertices.size() / 2 + 1]) / 2 + gauge.Vertices[gauge.Vertices.size() / 2 + 1];
 	const ::gpk::SCoord2<float>			center2							= {center3.x, center3.y};
 	const double						radiusLarge						= (center3 - gauge.Vertices[1]).Length();

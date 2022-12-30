@@ -33,10 +33,10 @@ namespace gpkg
 
 	// Holds the board state
 	struct SMineHell {
-		::gpk::SImage<::gpkg::SMineHellCell>	Board					;	// Single-block board mode (deprecated)
+		::gpk::img<::gpkg::SMineHellCell>	Board					;	// Single-block board mode (deprecated)
 		::gpkg::SMineHellState					GameState				= {};
 
-		::gpk::aobj<::gpk::pobj<::gpk::SImage<::gpkg::SMineHellCell>>>
+		::gpk::aobj<::gpk::pobj<::gpk::img<::gpkg::SMineHellCell>>>
 												BoardBlocks				;	// New implementation with support for large boards.
 
 		::gpk::error_t							GetCell					(const ::gpk::SCoord2<uint32_t> & cellCoord, ::gpkg::SMineHellCell ** out_cell);					// These functions return the cell
@@ -55,7 +55,7 @@ namespace gpkg
 		::gpk::error_t							Start					(const ::gpk::SCoord2<uint32_t> boardMetrics, const uint32_t mineCount);	// Start a new game with a board of boardMetrics size and mineCount mine count.
 
 		::gpk::error_t							Save					(::gpk::apod<char_t> & bytes);	// Write game state to array
-		::gpk::error_t							Load					(::gpk::view_const_byte		bytes);	// Read game state from view
+		::gpk::error_t							Load					(::gpk::vcb		bytes);	// Read game state from view
 
 
 	};

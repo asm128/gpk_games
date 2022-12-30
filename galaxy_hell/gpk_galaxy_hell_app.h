@@ -88,7 +88,7 @@ namespace ghg
 		::gpk::apod<::gpk::STriangle<int16_t>>			Indices					= {};
 		int16_t												CurrentValue			= 0;
 		int16_t												MaxValue				= 64;
-		::gpk::SImage<::gpk::SColorBGRA>					Image					= {};
+		::gpk::img<::gpk::SColorBGRA>					Image					= {};
 
 		static constexpr const ::gpk::SColorFloat			COLOR_MIN_DEFAULT		= ::gpk::GREEN;
 		static constexpr const ::gpk::SColorFloat			COLOR_MID_DEFAULT		= ::gpk::ORANGE;

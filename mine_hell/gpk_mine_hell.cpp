@@ -143,7 +143,7 @@ static	::gpk::error_t				uncoverCell						(::gpk::view2d<::gpkg::SMineHellCell> 
 		if(cellData->Mine && false == cellData->Flag)
 			cellData->Boom						= true;
 		else if(false == cellData->Flag) {
-			::gpk::SImage<uint8_t>					hints;
+			::gpk::img<uint8_t>					hints;
 			hints.resize(boardMetrics, {});
 			GetHints(hints.View);
 			::gpk::apod<::gpk::SCoord2<uint32_t>>	outOfRangeCells;
@@ -252,7 +252,7 @@ static	::gpk::error_t				uncoverCell						(::gpk::view2d<::gpkg::SMineHellCell> 
 	return 0;
 }
 
-::gpk::error_t						gpkg::SMineHell::Load			(::gpk::view_const_byte	bytes)	{
+::gpk::error_t						gpkg::SMineHell::Load			(::gpk::vcb	bytes)	{
 	if(false == GameState.BlockBased) {
 		GameState.Time						= *(::gpk::SRange<uint64_t>*)&bytes[bytes.size() - sizeof(::gpk::SRange<uint64_t>)];
 		bytes								= {bytes.begin(), bytes.size() - sizeof(::gpk::SRange<uint64_t>)};
@@ -272,7 +272,7 @@ static	::gpk::error_t				uncoverCell						(::gpk::view2d<::gpkg::SMineHellCell> 
 		::gpk::SImageMonochrome<uint64_t>		cellsShows; gpk_necall(cellsShows.resize(Board.metrics())	, "%s", "Out of memory?");
 		const uint32_t							totalMines						= GetMines(cellsMines.View);
 		const uint32_t							totalShows						= GetShows(cellsShows.View);
-		::gpk::SImage<uint8_t>					hints;
+		::gpk::img<uint8_t>					hints;
 		gpk_necall(hints.resize(Board.metrics(), 0), "%s", "");
 		GetHints(hints.View);
 		return ((boardMetrics.x * boardMetrics.y - totalShows) <= totalMines) ? 2 : 0;

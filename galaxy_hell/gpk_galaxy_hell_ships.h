@@ -73,7 +73,7 @@ namespace ghg
 		::ghg::SShipSceneGlobal								Global;
 		//::gpk::SBufferManager								BufferManager					= {};
 		::gpk::aobj<::gpk::SGeometryQuads>				Geometry						= {};
-		::gpk::aobj<::gpk::SImage<::gpk::SColorBGRA>>	Image							= {};
+		::gpk::aobj<::gpk::img<::gpk::SColorBGRA>>	Image							= {};
 		::gpk::apod<::gpk::SMatrix4<float>>			Transforms						= {}; // Ope per entity
 
 		::gpk::error_t										Save(::gpk::apod<byte_t> & output) const { 

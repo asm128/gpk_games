@@ -214,7 +214,7 @@ static int										drawCannonball
 	::gpk::SMatrix4<float>									matrixTransform				= {};
 	matrixTransform.SetIdentity();
 	matrixTransform.SetTranslation(position, false);
-	::gpk::SImage<::gpk::SColorBGRA>						image						= {};
+	::gpk::img<::gpk::SColorBGRA>						image						= {};
 	image.resize({1, 128}, bulletColor);
 	{
 		::gpk::SMatrix4<float>									matrixTransformVP			= matrixTransform * matrixVP;

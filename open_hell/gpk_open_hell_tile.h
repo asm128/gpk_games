@@ -46,12 +46,12 @@ namespace ohg
 
 	struct STileMap {
 		::gpk::SCoord2<uint32_t>		Origin;
-		::gpk::SImage<uint8_t>			Tiles;
+		::gpk::img<uint8_t>			Tiles;
 	};
 
 
 	struct STilePlanet {
-		::gpk::SImage<uint8_t>			Tiles;
+		::gpk::img<uint8_t>			Tiles;
 	};
 } // namespace
 
