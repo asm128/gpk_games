@@ -8,7 +8,7 @@
 
 ::gpk::error_t								the1::poolGameDraw				
 	( ::the1::SPoolGame									& pool
-	, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>	& backBuffer
+	, ::gpk::rt<::gpk::SColorBGRA, uint32_t>	& backBuffer
 	, const ::gpk::SCoord3<float>						& cameraPosition
 	, const ::gpk::SCoord3<float>						& cameraTarget
 	, const ::gpk::SCoord3<float>						& cameraUp

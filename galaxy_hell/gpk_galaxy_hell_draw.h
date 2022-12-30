@@ -8,9 +8,9 @@
 namespace ghg
 {
 
-	typedef ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t>	TRenderTarget;
+	typedef ::gpk::rt<::gpk::SColorBGRA, uint32_t>	TRenderTarget;
 
-	static constexpr ::gpk::SColorBGRA			DEBRIS_COLORS[]			=
+	static constexpr ::gpk::SColorBGRA				DEBRIS_COLORS[]			=
 		{ {0x80, 0xAF, 0xFF, }
 		, {0x40, 0x80, 0xFF, }
 		, {0x20, 0x80, 0xFF, }
@@ -29,7 +29,7 @@ namespace ghg
 		::gpk::apod<::gpk::SColorBGRA>					LightColorsModel		;
 
 		// Gameplay render target. I decided the world will have its own rendertarget to facilitate reuse of the code.
-		::gpk::SCoord2<uint16_t>							RenderTargetMetrics		= {1280, 720};
+		::gpk::SCoord2<uint16_t>						RenderTargetMetrics		= {1280, 720};
 		::gpk::pobj<::ghg::TRenderTarget>				RenderTarget			= {};
 
 		::gpk::error_t										Clear					() {

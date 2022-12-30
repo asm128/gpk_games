@@ -159,7 +159,7 @@ static	::gpk::error_t				updateInput				(::the1::STheOne & app, double secondsEl
 	return 0; 
 }
 
-::gpk::error_t				the1::theOneDraw		(::the1::STheOne & app, ::gpk::SRenderTarget<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds) { 
+::gpk::error_t				the1::theOneDraw		(::the1::STheOne & app, ::gpk::rt<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds) { 
 	const ::the1::SPlayerUI			& playerUI				= app.MainGame.PlayerUI[app.MainGame.CurrentPlayer];
 	const ::the1::SCamera			& cameraSelected		
 		= (playerUI.Cameras.Selected == 0					) ? playerUI.Cameras.Free 
