@@ -86,8 +86,8 @@ namespace ghg
 		::ghg::SShipManager										ShipState				= {};
 		::ghg::SDecoState										DecoState				= {};	
 		::ghg::SPlayState										PlayState				= {};
-		::gpk::array_obj<::ghg::SShipPilot>						Pilots					= {};
-		::gpk::array_pod<::ghg::SShipController>				ShipControllers			= {};
+		::gpk::aobj<::ghg::SShipPilot>						Pilots					= {};
+		::gpk::apod<::ghg::SShipController>				ShipControllers			= {};
 		
 		::ghg::SGalaxyHellDrawCache								DrawCache;
 		::std::mutex											LockUpdate;
@@ -106,7 +106,7 @@ namespace ghg
 			return ShipControllers.resize(PlayState.PlayerCount);
 		}
 
-		::gpk::error_t											Save					(::gpk::array_pod<byte_t> & output)		const	{
+		::gpk::error_t											Save					(::gpk::apod<byte_t> & output)		const	{
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SPlayState>{&PlayState, 1}, output);
 			for(uint32_t iPlayer = 0; iPlayer < PlayState.PlayerCount; ++iPlayer) {
 				::gpk::viewWrite(Pilots[iPlayer].Name, output);
@@ -143,20 +143,20 @@ namespace ghg
 	
 	::gpk::error_t										getLightArraysFromDebris
 		( const ::ghg::SDecoState								& decoState
-		, ::gpk::array_pod<::gpk::SCoord3<float>>				& lightPoints
-		, ::gpk::array_pod<::gpk::SColorBGRA>					& lightColors
+		, ::gpk::apod<::gpk::SCoord3<float>>				& lightPoints
+		, ::gpk::apod<::gpk::SColorBGRA>					& lightColors
 		, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
 		);
 	::gpk::error_t										getLightArraysFromShips
 		( const ::ghg::SShipManager								& shipState
-		, ::gpk::array_pod<::gpk::SCoord3<float>>				& lightPoints
-		, ::gpk::array_pod<::gpk::SColorBGRA>					& lightColors
+		, ::gpk::apod<::gpk::SCoord3<float>>				& lightPoints
+		, ::gpk::apod<::gpk::SColorBGRA>					& lightColors
 		);
 	::gpk::error_t										getLightArrays
 		( const ::ghg::SShipManager								& shipState
 		, const ::ghg::SDecoState								& decoState
-		, ::gpk::array_pod<::gpk::SCoord3<float>>				& lightPoints
-		, ::gpk::array_pod<::gpk::SColorBGRA>					& lightColors
+		, ::gpk::apod<::gpk::SCoord3<float>>				& lightPoints
+		, ::gpk::apod<::gpk::SColorBGRA>					& lightColors
 		, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
 		);
 
@@ -166,8 +166,8 @@ namespace ghg
 		, const ::gpk::SColorFloat							& shipColor	
 		, float												animationTime
 		, const ::gpk::SMatrix4<float>						& matrixVP
-		, ::gpk::view_grid<::gpk::SColorBGRA>				& targetPixels
-		, ::gpk::view_grid<uint32_t>						depthBuffer
+		, ::gpk::view2d<::gpk::SColorBGRA>				& targetPixels
+		, ::gpk::view2d<uint32_t>						depthBuffer
 		, ::ghg::SGalaxyHellDrawCache						& drawCache
 		);
 }

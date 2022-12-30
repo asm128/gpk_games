@@ -19,8 +19,7 @@ static	::gpk::error_t				theOneSetup		(::the1::STheOne & app, const ::gpk::pobj<
 	return 0; 
 }
 
-
-static	::gpk::error_t				updateInput				(::the1::STheOne & app, double secondsElapsed, ::gpk::view_array<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas, ::gpk::view_array<const uint8_t> buttonStates) { 
+static	::gpk::error_t				updateInput				(::the1::STheOne & app, double secondsElapsed, ::gpk::view1d<const uint8_t> keyStates, const ::gpk::SCoord3<int16_t> mouseDeltas, ::gpk::view_const_uint8 buttonStates) { 
 	if(keyStates[VK_ADD]) 
 		app.MainGame.TimeScale					+= (float)secondsElapsed;
 	else if(keyStates[VK_SUBTRACT]) 
@@ -113,7 +112,7 @@ static	::gpk::error_t				updateInput				(::the1::STheOne & app, double secondsEl
 	return 0;
 }
 
-::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents) { 
+::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view1d<::gpk::SSysEvent> & systemEvents) { 
 	switch(app.ActiveState) {
 	case ::the1::APP_STATE_Init		: {
 		::theOneSetup(app, inputState);

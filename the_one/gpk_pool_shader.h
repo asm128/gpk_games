@@ -6,6 +6,7 @@
 namespace the1
 {
 	::gpk::error_t	psTableCloth	(const ::gpk::SEngineSceneConstants & constants, const ::gpk::SPSIn & inPS, ::gpk::SColorBGRA & outputPixel);
+	::gpk::error_t	psTableCushion	(const ::gpk::SEngineSceneConstants & constants, const ::gpk::SPSIn & inPS, ::gpk::SColorBGRA & outputPixel);
 	::gpk::error_t	psPocket		(const ::gpk::SEngineSceneConstants & constants, const ::gpk::SPSIn & inPS, ::gpk::SColorBGRA & outputPixel);
 	::gpk::error_t	psStick			(const ::gpk::SEngineSceneConstants & constants, const ::gpk::SPSIn & inPS, ::gpk::SColorBGRA & outputPixel);
 	::gpk::error_t	psBallCue		(const ::gpk::SEngineSceneConstants & constants, const ::gpk::SPSIn & inPS, ::gpk::SColorBGRA & outputPixel);

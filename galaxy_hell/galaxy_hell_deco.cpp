@@ -3,7 +3,7 @@
 
 static constexpr int		MAX_SLICE_TRIANGLES		= 32;
 
-int							ghg::decoExplosionAdd	(::gpk::array_obj<::ghg::SExplosion> & explosions, int32_t indexMesh, int32_t indexImage, uint32_t triangleCount, const ::gpk::SCoord3<float> &collisionPoint, double debrisSpeed) {
+int							ghg::decoExplosionAdd	(::gpk::aobj<::ghg::SExplosion> & explosions, int32_t indexMesh, int32_t indexImage, uint32_t triangleCount, const ::gpk::SCoord3<float> &collisionPoint, double debrisSpeed) {
 	::ghg::SExplosion				newExplosion			= {};
 	newExplosion.IndexMesh		= indexMesh;
 	newExplosion.IndexImage		= indexImage;

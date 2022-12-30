@@ -50,7 +50,7 @@ static ::gpk::error_t			uiPlayerSetupHome			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 	::gpk::SDialog				& playerDialog		= uiPlayer.DialogHome;
 	gpk_necs(::dialogCreateCommon(playerDialog, input, cursorPos));
 	::gpk::SGUI					& playerGUI			= *playerDialog.GUI;
-	::gpk::pobj<::gpk::array_pod<::gpk::SColorBGRA>>		palette;
+	::gpk::pobj<::gpk::apod<::gpk::SColorBGRA>>		palette;
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
@@ -103,7 +103,7 @@ static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 	::gpk::SDialog						& playerDialog				= uiPlayer.DialogPlay;
 	gpk_necs(::dialogCreateCommon(playerDialog, input, cursorPos));
 	::gpk::SGUI							& playerGUI					= *playerDialog.GUI;
-	::gpk::pobj<::gpk::array_pod<::gpk::SColorBGRA>>		palette;
+	::gpk::pobj<::gpk::apod<::gpk::SColorBGRA>>		palette;
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
@@ -373,7 +373,7 @@ static	::gpk::error_t			guiHandleHome				(::ghg::SGalaxyHellApp & app, ::gpk::SG
 		gerror_if(0 > app.Save(::ghg::SAVE_MODE_USER), "%s", "");
 		break;
 	case ::ghg::UI_HOME_Load: {
-		::gpk::array_obj<::gpk::vcc>	pathFileNames;
+		::gpk::aobj<::gpk::vcc>	pathFileNames;
 		::ghg::listFilesSavegame(app, app.SavegameFolder, pathFileNames);
 		pathFileNames.push_back(::gpk::vcs{"Back"});
 		dialogCreateLoad(app.DialogPerState[::ghg::APP_STATE_Load], pathFileNames, app.DialogPerState[::ghg::APP_STATE_Home].Input, app.DialogPerState[::ghg::APP_STATE_Home].GUI->CursorPos);
@@ -513,8 +513,8 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 			matrixView											*= uiPlayer.ModuleViewports[iOrbiter]->MatrixProjection;
 
 			::ghg::TRenderTarget				& renderTarget		= viewport.RenderTargetOrbiter;
-			::gpk::view_grid<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
-			::gpk::view_grid<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
+			::gpk::view2d<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
+			::gpk::view2d<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
 			//targetPixels.fill(tone);
 			::gpk::mutex_guard										lock					(lockGame);
 			memset(targetPixels.begin(), 0, targetPixels.byte_count());
@@ -531,8 +531,8 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 
 		{ // Update weapon load bar
 			::ghg::TRenderTarget				& renderTarget		= viewport.RenderTargetWeaponLoad;
-			::gpk::view_grid<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
-			::gpk::view_grid<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
+			::gpk::view2d<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
+			::gpk::view2d<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
 			::gpk::mutex_guard					lock				(lockGame);
 			memset(targetPixels.begin(), 0, targetPixels.byte_count());
 			memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
@@ -554,8 +554,8 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 		{ // Update weapon type bar
 			::gpk::mutex_guard					lock				(lockGame);
 			::ghg::TRenderTarget				& renderTarget		= viewport.RenderTargetWeaponType;
-			::gpk::view_grid<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
-			::gpk::view_grid<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
+			::gpk::view2d<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
+			::gpk::view2d<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
 			memset(targetPixels.begin(), 0, targetPixels.byte_count());
 			memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
 			if(ratioOverheat) {
@@ -638,7 +638,7 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 			), "iPlayer: %i", iPlayer
 		);
 
-		::gpk::array_pod<uint32_t>			controlsToProcess			= {};
+		::gpk::apod<uint32_t>			controlsToProcess			= {};
 		::gpk::guiGetProcessableControls(gui, controlsToProcess);
 		if(int32_t result = uiPlayer.InputBox.Update(gui, frameEvents, controlsToProcess)) {
 			if(result == INT_MAX) {
@@ -707,7 +707,7 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 	::gpk::SDialog						& dialog					= app.DialogPerState[appState];
 	dialog.Update();
 	::gpk::SGUI							& gui						= *dialog.GUI;
-	::gpk::array_pod<uint32_t>			controlsToProcess			= {};
+	::gpk::apod<uint32_t>			controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 
 	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
@@ -765,7 +765,7 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 }
 
 
-::gpk::error_t					ghg::gaugeImageUpdate			(::ghg::SUIRadialGauge & gauge, ::gpk::view_grid<::gpk::SColorBGRA> target, ::gpk::SColorFloat colorMin, ::gpk::SColorFloat colorMid, ::gpk::SColorFloat colorMax, ::gpk::SColorBGRA colorEmpty, bool radialColor)  {
+::gpk::error_t					ghg::gaugeImageUpdate			(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::SColorBGRA> target, ::gpk::SColorFloat colorMin, ::gpk::SColorFloat colorMid, ::gpk::SColorFloat colorMax, ::gpk::SColorBGRA colorEmpty, bool radialColor)  {
 	static ::gpk::SImage<uint32_t>		dummyDepth;
 	const ::gpk::SCoord3<float>			center3							= (gauge.Vertices[1] - gauge.Vertices[gauge.Vertices.size() / 2 + 1]) / 2 + gauge.Vertices[gauge.Vertices.size() / 2 + 1];
 	const ::gpk::SCoord2<float>			center2							= {center3.x, center3.y};
@@ -773,8 +773,8 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 	const double						radiusSmall						= (center3 - gauge.Vertices[0]).Length();
 	const double						radiusCenter					= (radiusLarge - radiusSmall) / 2 + radiusSmall;
 	dummyDepth.resize(target.metrics(), 0xFFFFFFFFU);
-	::gpk::array_pod<::gpk::SCoord2<int16_t>>	pixelCoords;
-	::gpk::array_pod<::gpk::STriangle<float>>	triangleWeights;
+	::gpk::apod<::gpk::SCoord2<int16_t>>	pixelCoords;
+	::gpk::apod<::gpk::STriangle<float>>	triangleWeights;
 	for(uint32_t iTriangle = 0, triangleCount = gauge.Indices.size(); iTriangle < triangleCount; ++iTriangle) {
 		const ::gpk::STriangle3<float>		triangleCoords					=
 			{ gauge.Vertices[gauge.Indices[iTriangle].A]

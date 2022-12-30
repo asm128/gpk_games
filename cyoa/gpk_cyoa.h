@@ -13,19 +13,19 @@ namespace gpkg
 	};
 
 	struct SPage {
-		::gpk::array_obj<::std::string>	TextLines;
-		::gpk::array_obj<::gpkg::SJump>	PageJumps;
+		::gpk::aobj<::std::string>	TextLines;
+		::gpk::aobj<::gpkg::SJump>	PageJumps;
 	};
 
 	struct SGame {
-		::gpk::array_obj<::gpkg::SPage>	Pages				= {};
+		::gpk::aobj<::gpkg::SPage>	Pages				= {};
 		uint32_t						CurrentPage			= 0;
 
 		char							StoryFolder[4096]	= "test_story";
 	};
 
 	int								loadPage			(const char* folderName, ::gpkg::SPage & page, uint32_t pageIndex);
-	int								validJump			(const ::gpk::array_obj<::gpkg::SJump> & jumps, uint32_t indexToTest);
+	int								validJump			(const ::gpk::aobj<::gpkg::SJump> & jumps, uint32_t indexToTest);
 } 
 
 #endif

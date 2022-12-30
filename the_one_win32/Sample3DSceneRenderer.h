@@ -7,7 +7,7 @@
 #ifndef SAMPLE3DSCENERENDERER_H_293468238
 #define SAMPLE3DSCENERENDERER_H_293468238
 
-namespace the_one_win32
+namespace the1_win32
 {
 
 	// This sample renderer instantiates a basic rendering pipeline.

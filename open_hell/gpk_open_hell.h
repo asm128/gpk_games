@@ -10,22 +10,22 @@ namespace ohg
 	GDEFINE_ENUM_VALUE(GAME_EVENT, CHUNK_LOAD, 0);
 
 	struct SOpenHellEvent {
-		GAME_EVENT							Event;
-		::gpk::array_pod<uint8_t>			Data;
+		GAME_EVENT						Event;
+		::gpk::apod<uint8_t>			Data;
 	};
 
 	struct SPilot {
-		uint32_t							Color;
-		::gpk::SCoord3<uint32_t>			PlanetChunk;
-		::gpk::SCoord3<uint32_t>			Position;
+		uint32_t						Color;
+		::gpk::SCoord3<uint32_t>		PlanetChunk;
+		::gpk::SCoord3<uint32_t>		Position;
 	};
 
 	struct SOpenHell {
-		::ohg::STileMap						TileMap;
+		::ohg::STileMap					TileMap;
 	
-		::gpk::array_obj<::ohg::SPilot>		Pilots;
+		::gpk::aobj<::ohg::SPilot>	Pilots;
 
-		::gpk::array_pod<SOpenHellEvent>	Events;
+		::gpk::apod<SOpenHellEvent>		Events;
 
 
 	};

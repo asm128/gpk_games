@@ -73,7 +73,7 @@
 		::ghg::solarSystemSetup(app.Game, app.Game.DrawCache.RenderTargetMetrics);
 		::ghg::guiSetup(app, inputState);
 
-		::gpk::array_obj<::gpk::array_pod<char>>					fileNames					= {};
+		::gpk::aobj<::gpk::apod<char>>					fileNames					= {};
 		::gpk::pathList(app.SavegameFolder, fileNames, app.ExtensionSaveAuto);
 		if(fileNames.size()) {
 			if errored(::ghg::solarSystemLoad(app.Game, fileNames[0])) {
@@ -177,7 +177,7 @@
 		if(iShip < app.Game.PlayState.PlayerCount) {
 			for(uint32_t iEvent = 0; iEvent < app.Game.ShipState.ShipOrbiterActionQueue[iShip].size(); ++iEvent)
 				if(app.Game.ShipState.ShipOrbiterActionQueue[iShip][iEvent] == ::ghg::SHIP_ACTION_spawn) {
-					::gpk::array_pod<byte_t>			serialized;
+					::gpk::apod<byte_t>			serialized;
 					app.Save(::ghg::SAVE_MODE_STAGE);
 					app.Game.ShipState.ShipOrbiterActionQueue[iShip][iEvent] = (::ghg::SHIP_ACTION)-1;
 				}
@@ -210,8 +210,8 @@
 
 	target->resize(renderTargetSize.Cast<uint32_t>(), {0, 0, 0, 1}, 0xFFFFFFFFU);
 
-	::gpk::view_grid<::gpk::SColorBGRA>							targetPixels			= target->Color.View;
-	::gpk::view_grid<uint32_t>									depthBuffer				= target->DepthStencil.View;
+	::gpk::view2d<::gpk::SColorBGRA>							targetPixels			= target->Color.View;
+	::gpk::view2d<uint32_t>									depthBuffer				= target->DepthStencil.View;
 	switch(app.ActiveState) {
 	default					: 
 	case APP_STATE_Play		: 
@@ -221,7 +221,7 @@
 		if(!sourceRT)
 			break;
 
-		::gpk::view_grid<::gpk::SColorBGRA>			cameraView			= sourceRT->Color.View;
+		::gpk::view2d<::gpk::SColorBGRA>			cameraView			= sourceRT->Color.View;
 		::gpk::SCoord2<int16_t>						cameraViewMetrics	= cameraView.metrics().Cast<int16_t>();
 		::gpk::grid_copy(targetPixels, cameraView, ::gpk::SCoord2<uint32_t>
 				{ (targetPixels.metrics().x >> 1) - (cameraView.metrics().x >> 1)
@@ -273,17 +273,17 @@
 	return 0;
 }
 
-::gpk::error_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::array_obj<::gpk::vcc> & savegameFilenames) {
-	::gpk::array_obj<::gpk::array_pod<char>>	fileNames;
+::gpk::error_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames) {
+	::gpk::aobj<::gpk::apod<char>>	fileNames;
 	gerror_if(errored(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionSave)), "%s", saveGameFolder.begin());
 
-	::gpk::array_obj<::gpk::vcc>				pathFileNames;
+	::gpk::aobj<::gpk::vcc>				pathFileNames;
 	for(uint32_t iFile = 0; iFile < fileNames.size(); ++iFile)
 		pathFileNames.push_back(fileNames[iFile]);
 
-	::gpk::array_obj<::gpk::vcc>				pathFileNamesSaveAuto;
-	::gpk::array_obj<::gpk::vcc>				pathFileNamesSaveUser;
-	::gpk::array_obj<::gpk::vcc>				pathFileNamesSaveStage;
+	::gpk::aobj<::gpk::vcc>				pathFileNamesSaveAuto;
+	::gpk::aobj<::gpk::vcc>				pathFileNamesSaveUser;
+	::gpk::aobj<::gpk::vcc>				pathFileNamesSaveStage;
 	::gpk::filterPostfix(pathFileNames, app.ExtensionSaveAuto	, pathFileNamesSaveAuto);
 	::gpk::filterPostfix(pathFileNames, app.ExtensionSaveUser	, pathFileNamesSaveUser);
 	::gpk::filterPostfix(pathFileNames, app.ExtensionSaveStage	, pathFileNamesSaveStage);
@@ -294,11 +294,11 @@
 	return 0;
 }
 
-::gpk::error_t					ghg::listFilesProfile		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::array_obj<::gpk::vcc> & savegameFilenames) {
-	::gpk::array_obj<::gpk::array_pod<char>>	fileNames;
+::gpk::error_t					ghg::listFilesProfile		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames) {
+	::gpk::aobj<::gpk::apod<char>>	fileNames;
 	gerror_if(errored(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionProfile)), "%s", saveGameFolder.begin());
 
-	::gpk::array_obj<::gpk::vcc>				pathFileNames;
+	::gpk::aobj<::gpk::vcc>				pathFileNames;
 	for(uint32_t iFile = 0; iFile < fileNames.size(); ++iFile)
 		savegameFilenames.push_back(::gpk::label(::gpk::vcc{fileNames[iFile]}));
 	return 0;

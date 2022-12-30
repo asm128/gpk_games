@@ -7,11 +7,11 @@
 namespace ghg 
 {
 	struct SShots	{
-		::gpk::array_obj<::gpk::array_pod<::gpk::SCoord3<float>>>	DistanceToTargets	= {};
-		::gpk::array_pod<float>										Lifetime			= {};
-		::gpk::array_pod<float>										Brightness			= {};
-		::gpk::array_pod<::gpk::SCoord3<float>>						PositionDraw		= {};
-		::gpk::array_pod<::gpk::SCoord3<float>>						PositionPrev		= {};
+		::gpk::aobj<::gpk::apod<::gpk::SCoord3<float>>>	DistanceToTargets	= {};
+		::gpk::apod<float>										Lifetime			= {};
+		::gpk::apod<float>										Brightness			= {};
+		::gpk::apod<::gpk::SCoord3<float>>						PositionDraw		= {};
+		::gpk::apod<::gpk::SCoord3<float>>						PositionPrev		= {};
 		::gpk::SParticles3											Particles			= {};
 
 		int											Remove				(uint32_t iShot)			{
@@ -57,7 +57,7 @@ namespace ghg
 		}
 
 
-		::gpk::error_t								Save(::gpk::array_pod<byte_t> & output) const { 
+		::gpk::error_t								Save(::gpk::apod<byte_t> & output) const { 
 			gpk_necs(Particles.Save(output));
 			gpk_necs(::gpk::viewWrite(PositionDraw	, output));
 			gpk_necs(::gpk::viewWrite(PositionPrev	, output));

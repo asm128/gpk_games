@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="the_one_win32.h">
+    <ClInclude Include="the1_win32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sample3DSceneRenderer.h">
@@ -47,5 +47,6 @@
     <FxCompile Include="psPocket.hlsl" />
     <FxCompile Include="psSolid.hlsl" />
     <FxCompile Include="psHidden.hlsl" />
+    <FxCompile Include="psTableCushion.hlsl" />
   </ItemGroup>
 </Project>

@@ -24,7 +24,7 @@
 namespace DirectX
 {
     HRESULT LoadWAVAudioInMemory(::gpk::view_array<const uint8_t> wavData, _Outptr_ const WAVEFORMATEX** wfx, ::gpk::view_array<const uint8_t>& audioView) noexcept;
-    HRESULT LoadWAVAudioFromFile(::gpk::view_array<const wchar_t> szFileName, _Inout_ ::gpk::array_pod<uint8_t>& wavData, _Outptr_ const WAVEFORMATEX** wfx, ::gpk::view_array<const uint8_t>& audioView) noexcept;
+    HRESULT LoadWAVAudioFromFile(::gpk::view_array<const wchar_t> szFileName, _Inout_ ::gpk::apod<uint8_t>& wavData, _Outptr_ const WAVEFORMATEX** wfx, ::gpk::view_array<const uint8_t>& audioView) noexcept;
 
     struct WAVData {
         const WAVEFORMATEX      * wfx               = 0;
@@ -36,7 +36,7 @@ namespace DirectX
     };
 
     HRESULT LoadWAVAudioInMemoryEx(::gpk::view_array<const uint8_t> wavData, _Out_ WAVData& result) noexcept;
-    HRESULT LoadWAVAudioFromFileEx(::gpk::view_array<const wchar_t> szFileName, _Inout_ ::gpk::array_pod<uint8_t>& wavData, _Out_ WAVData& result) noexcept;
+    HRESULT LoadWAVAudioFromFileEx(::gpk::view_array<const wchar_t> szFileName, _Inout_ ::gpk::apod<uint8_t>& wavData, _Out_ WAVData& result) noexcept;
 }
 
 #endif // WAVFILEREADER_H_02397492830

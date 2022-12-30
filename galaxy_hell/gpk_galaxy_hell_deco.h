@@ -8,9 +8,9 @@
 namespace ghg 
 {
 	struct SStars	{
-		::gpk::array_pod<::gpk::SCoord2<float>>		Position			= {};
-		::gpk::array_pod<float>						Speed				= {};
-		::gpk::array_pod<float>						Brightness			= {};
+		::gpk::apod<::gpk::SCoord2<float>>		Position			= {};
+		::gpk::apod<float>						Speed				= {};
+		::gpk::apod<float>						Brightness			= {};
 
 
 		int											Reset				(::gpk::SCoord2<uint16_t> targetSize, uint16_t starCount = 128)	{
@@ -49,7 +49,7 @@ namespace ghg
 	};
 
 	struct SDebris	{
-		::gpk::array_pod<float>						Brightness			= {};
+		::gpk::apod<float>						Brightness			= {};
 		::gpk::SParticles3							Particles			= {};
 		
 		int											Remove				(int32_t iParticle)	{
@@ -113,7 +113,7 @@ namespace ghg
 #pragma pack(pop)
 
 	struct SScoreParticles {
-		::gpk::array_pod<::ghg::SScoreParticle>		Scores		= {};
+		::gpk::apod<::ghg::SScoreParticle>		Scores		= {};
 		::gpk::SParticles3							Particles	= {};
 		::gpk::array_static<::ghg::STriColor, 256>	Palette		= {{0xFF00FF00, 0xFFFFEE11, 0xFFFF0000}, };
 
@@ -150,7 +150,7 @@ namespace ghg
 	struct SExplosion {
 		int32_t										IndexMesh;
 		int32_t										IndexImage;
-		::gpk::array_pod<::gpk::SRange<uint16_t>>	Slices;
+		::gpk::apod<::gpk::SRange<uint16_t>>	Slices;
 		::gpk::SParticles3							Particles;
 
 		int											Remove				(uint32_t iSlice)			{
@@ -175,14 +175,14 @@ namespace ghg
 		::ghg::SStars								Stars							= {};
 		::ghg::SDebris								Debris							= {};
 		::ghg::SScoreParticles						ScoreParticles					= {};
-		::gpk::array_obj<::ghg::SExplosion>			Explosions						= {};
+		::gpk::aobj<::ghg::SExplosion>			Explosions						= {};
 
 		double										AnimationTime					= 0;
 
 		::gpk::SRasterFontManager					FontManager						= {};
 	};
 
-	::gpk::error_t								decoExplosionAdd	(::gpk::array_obj<::ghg::SExplosion> & explosions, int32_t indexMesh, int32_t indexImage, uint32_t triangleCount, const ::gpk::SCoord3<float> &collisionPoint, double debrisSpeed);
+	::gpk::error_t								decoExplosionAdd	(::gpk::aobj<::ghg::SExplosion> & explosions, int32_t indexMesh, int32_t indexImage, uint32_t triangleCount, const ::gpk::SCoord3<float> &collisionPoint, double debrisSpeed);
 	::gpk::error_t								decoUpdate			(::ghg::SDecoState & decoState, double secondsLastFrame, double relativeSpeed, const ::gpk::SCoord2<uint16_t> & screenMetrics);
 }
 

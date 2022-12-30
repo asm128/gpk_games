@@ -44,11 +44,11 @@ struct AudioDevice
 	std::wstring description;
 };
 
-HRESULT EnumerateAudio(_In_ IXAudio2* pXaudio2, _Inout_ ::gpk::array_obj<AudioDevice> & list);
+HRESULT EnumerateAudio(_In_ IXAudio2* pXaudio2, _Inout_ ::gpk::aobj<AudioDevice> & list);
 
 struct WAVE_STATE
 {
-	::gpk::pobj<::gpk::array_pod<uint8_t>>	WaveData;
+	::gpk::pobj<::gpk::apod<uint8_t>>	WaveData;
 	IXAudio2SourceVoice							* pSourceVoice			= 0;
 
 	X3DAUDIO_EMITTER							Emitter					= {};
@@ -127,7 +127,7 @@ struct AUDIO_STATE
 	X3DAUDIO_HANDLE						x3DInstance				= {};
 	int									nFrameToApply3DAudio	= 0;
 
-	::gpk::array_pod<uint8_t>			WaveData;
+	::gpk::apod<uint8_t>			WaveData;
 	IXAudio2SourceVoice					* pSourceVoice			= 0;
 
 

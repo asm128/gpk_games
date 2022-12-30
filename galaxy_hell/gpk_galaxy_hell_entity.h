@@ -34,8 +34,8 @@ namespace ghg
 #pragma pack(pop)
 
 	struct SEntitySystem {
-		::gpk::array_pod<::ghg::SEntity>					Entities				= {};
-		::gpk::array_obj<::gpk::array_pod<uint32_t>>		EntityChildren			= {};
+		::gpk::apod<::ghg::SEntity>					Entities				= {};
+		::gpk::aobj<::gpk::apod<uint32_t>>		EntityChildren			= {};
 
 		::gpk::error_t										Create					(const ::ghg::SEntity & newEntity, ::gpk::view_array<const uint32_t> entityChildren) {
 			EntityChildren.push_back(entityChildren);
@@ -59,7 +59,7 @@ namespace ghg
 		//::gpk::error_t										CreateCylinder	(const ::ghg::SEntity & newEntity, uint8_t stacks, uint8_t slices, float radiusYMin, float radiusYMax);
 		//::gpk::error_t										CreateTorus		(const ::ghg::SEntity & newEntity, uint8_t stacks, uint8_t slices, float radiusCircle, float radiusCylinder);
 
-		::gpk::error_t										Save					(::gpk::array_pod<byte_t> & output) const { 
+		::gpk::error_t										Save					(::gpk::apod<byte_t> & output) const { 
 			gpk_necs(::gpk::viewWrite(Entities, output));
 			for(uint32_t iEntity = 0; iEntity < Entities.size(); ++iEntity) 
 				gpk_necall(::gpk::viewWrite(::gpk::view_array<const uint32_t>{EntityChildren[iEntity]}, output), "iEntity: %i", iEntity);

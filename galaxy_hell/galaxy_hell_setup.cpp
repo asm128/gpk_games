@@ -10,10 +10,10 @@
 #include <mmsystem.h>
 
 ::gpk::error_t					ghg::solarSystemSave		(const ::ghg::SGalaxyHell & game, ::gpk::vcc fileName) {
-	::gpk::array_pod<byte_t>			serialized;
+	::gpk::apod<byte_t>			serialized;
 	game.Save(serialized);
 
-	::gpk::array_pod<byte_t>			deflated;
+	::gpk::apod<byte_t>			deflated;
 	::gpk::arrayDeflate(serialized, deflated);
 
 	info_printf("Savegame size in bytes: %u.", serialized.size());
@@ -23,11 +23,11 @@
 }
 
 ::gpk::error_t					ghg::solarSystemLoad		(::ghg::SGalaxyHell & world,::gpk::vcc filename) {
-	::gpk::array_pod<byte_t>			serialized;
+	::gpk::apod<byte_t>			serialized;
 	world.PlayState.TimeLast		= ::gpk::timeCurrent();
 
 	gpk_necall(::gpk::fileToMemory(filename, serialized), "%s", "");
-	::gpk::array_pod<byte_t>			inflated;
+	::gpk::apod<byte_t>			inflated;
 	::gpk::arrayInflate(serialized, inflated);
 
 	info_printf("Savegame file size: %u.", inflated.size());
@@ -99,7 +99,7 @@ static	int											shipCreate			(::ghg::SShipManager & shipState, int32_t team
 		shipState.ShipOrbitersDistanceToTargets.push_back({});
 		shipState.ShipOrbiterActionQueue.push_back({});
 
-		::gpk::array_pod<uint32_t>								& parentEntityChildren	= shipState.EntitySystem.EntityChildren[ship.Entity];
+		::gpk::apod<uint32_t>								& parentEntityChildren	= shipState.EntitySystem.EntityChildren[ship.Entity];
 		parentEntityChildren.push_back(shipPart.Entity);
 	}
 	return indexShip;
@@ -214,7 +214,7 @@ static	int											modelsSetup				(::ghg::SShipScene & scene)			{
 	::gpk::geometryBuildCylinder	(scene.Geometry[::ghg::SHIP_GEOMETRY_CYLINDER		],  1U, 32U, .5, .5, {0, 0}, {1, 1, 1});
 	{
 
-		::gpk::array_pod<::gpk::SColorFloat>	baseColors;
+		::gpk::apod<::gpk::SColorFloat>	baseColors;
 		for(uint32_t i = 0; i < 4096; ++i)
 			baseColors.push_back({(float)::gpk::noiseNormal1D(rand()), (float)::gpk::noiseNormal1D(rand()), (float)::gpk::noiseNormal1D(rand()), 1});
 
@@ -337,7 +337,7 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 		while(((int)solarSystem.ShipState.ShipCores.size() - (int)solarSystem.PlayState.PlayerCount - 1) < (int)(solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage)) {	// Create enemy ships depending on stage.
 			int32_t													indexShip						= ::shipCreate(solarSystem.ShipState, 1, -1, solarSystem.PlayState.Stage + solarSystem.ShipState.ShipCores.size());
 			::ghg::SShipCore										& enemyShip						= solarSystem.ShipState.ShipCores[indexShip];
-			::gpk::array_pod<uint32_t>								& enemyShipOrbiters				= solarSystem.ShipState.ShipParts[indexShip];
+			::gpk::apod<uint32_t>								& enemyShipOrbiters				= solarSystem.ShipState.ShipParts[indexShip];
 			::gpk::SBodyCenter										& shipTransform					= solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[enemyShip.Entity].Body];
 			shipTransform.Orientation.MakeFromEulerTaitBryan({0, 0, (float)(::gpk::math_pi_2)});
 			shipTransform.Position								= {5.0f + 5 * solarSystem.ShipState.ShipCores.size()};
@@ -352,7 +352,7 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 		// set up weapons
 		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
 			::ghg::SShipCore										& ship							= solarSystem.ShipState.ShipCores[iShip];
-			::gpk::array_pod<uint32_t>								& shipParts						= solarSystem.ShipState.ShipParts[iShip];
+			::gpk::apod<uint32_t>								& shipParts						= solarSystem.ShipState.ShipParts[iShip];
 			ship.Health											= 0;
 			ship.Nitro											= (float)(ship.MaxNitro = DEFAULT_NITRO);
 

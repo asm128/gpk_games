@@ -13,7 +13,7 @@ namespace ghg
 	};
 
 	struct SGalaxy {
-		::gpk::array_obj<::ghg::SSolarSystem>	SolarSystems;
+		::gpk::aobj<::ghg::SSolarSystem>	SolarSystems;
 	};
 } // namespace
 

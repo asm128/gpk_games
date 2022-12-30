@@ -62,7 +62,7 @@ static	::gpk::SCoord2<uint32_t>	getLocalCoordFromCoord		(const ::gpk::SCoord2<ui
 ::gpk::error_t						gpkg::SMineHell::GetFlags	(::gpk::view_bit<uint64_t> & out_Cells)	const	{ uint32_t total = 0;	const ::gpk::SCoord2<uint32_t> gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics(); ASSIGN_GRID_BOOL(Flag, total); return total; }
 ::gpk::error_t						gpkg::SMineHell::GetHolds	(::gpk::view_bit<uint64_t> & out_Cells)	const	{ uint32_t total = 0;	const ::gpk::SCoord2<uint32_t> gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics(); ASSIGN_GRID_BOOL(What, total); return total; }
 ::gpk::error_t						gpkg::SMineHell::GetShows	(::gpk::view_bit<uint64_t> & out_Cells)	const	{ uint32_t total = 0;	const ::gpk::SCoord2<uint32_t> gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics(); ASSIGN_GRID_BOOL(Show, total); return total; }
-::gpk::error_t						gpkg::SMineHell::GetHints	(::gpk::view_grid<uint8_t> & out_Cells)	const	{						const ::gpk::SCoord2<uint32_t> gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics();
+::gpk::error_t						gpkg::SMineHell::GetHints	(::gpk::view2d<uint8_t> & out_Cells)	const	{						const ::gpk::SCoord2<uint32_t> gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics();
 	for(int32_t y = 0; y < (int32_t)gridMetrix.y; ++y)
 	for(int32_t x = 0; x < (int32_t)gridMetrix.x; ++x) {
 		const ::gpkg::SMineHellCell				* cellValue					= 0;
@@ -86,15 +86,15 @@ static	::gpk::SCoord2<uint32_t>	getLocalCoordFromCoord		(const ::gpk::SCoord2<ui
 	return 0;
 }
 
-static	::gpk::error_t				uncoverCell						(::gpk::view_grid<::gpkg::SMineHellCell> & board, const ::gpk::view_grid<uint8_t> & hints, const ::gpk::SCoord2<uint32_t> & cellOffset, const ::gpk::SCoord2<uint32_t> & boardSize, const ::gpk::SCoord2<int32_t> localCellCoord, ::gpk::array_pod<::gpk::SCoord2<uint32_t>> & outOfRangeCells);
-static	::gpk::error_t				uncoverCellIfNeeded				(::gpk::view_grid<::gpkg::SMineHellCell> & board, const ::gpk::view_grid<uint8_t> & hints, const ::gpk::SCoord2<uint32_t> & cellOffset, const ::gpk::SCoord2<uint32_t> & boardSize, const ::gpk::SCoord2<int32_t> localCellCoord, ::gpk::array_pod<::gpk::SCoord2<uint32_t>> & outOfRangeCells) {
+static	::gpk::error_t				uncoverCell						(::gpk::view2d<::gpkg::SMineHellCell> & board, const ::gpk::view2d<uint8_t> & hints, const ::gpk::SCoord2<uint32_t> & cellOffset, const ::gpk::SCoord2<uint32_t> & boardSize, const ::gpk::SCoord2<int32_t> localCellCoord, ::gpk::apod<::gpk::SCoord2<uint32_t>> & outOfRangeCells);
+static	::gpk::error_t				uncoverCellIfNeeded				(::gpk::view2d<::gpkg::SMineHellCell> & board, const ::gpk::view2d<uint8_t> & hints, const ::gpk::SCoord2<uint32_t> & cellOffset, const ::gpk::SCoord2<uint32_t> & boardSize, const ::gpk::SCoord2<int32_t> localCellCoord, ::gpk::apod<::gpk::SCoord2<uint32_t>> & outOfRangeCells) {
 	const ::gpkg::SMineHellCell				cellToTest						= board[localCellCoord.y][localCellCoord.x];
 	if(false == cellToTest.Mine && false == cellToTest.Show)
 		::uncoverCell(board, hints, cellOffset, boardSize, localCellCoord, outOfRangeCells);
 	return 0;
 }
 
-static	::gpk::error_t				enqueueCellIfNeeded				(const ::gpk::SCoord2<uint32_t> & cellOffset, const ::gpk::SCoord2<uint32_t> & boardSize, const ::gpk::SCoord2<int32_t> localCellCoord, ::gpk::array_pod<::gpk::SCoord2<uint32_t>> & outOfRangeCells) {
+static	::gpk::error_t				enqueueCellIfNeeded				(const ::gpk::SCoord2<uint32_t> & cellOffset, const ::gpk::SCoord2<uint32_t> & boardSize, const ::gpk::SCoord2<int32_t> localCellCoord, ::gpk::apod<::gpk::SCoord2<uint32_t>> & outOfRangeCells) {
 	const ::gpk::SCoord2<uint32_t>			globalCoordToTest				= cellOffset + localCellCoord.Cast<uint32_t>();
 	if(::gpk::in_range(globalCoordToTest, {{}, boardSize}) && 0 > ::gpk::find(globalCoordToTest, {outOfRangeCells.begin(), outOfRangeCells.size()}))
 		gpk_necall(outOfRangeCells.push_back(globalCoordToTest), "%s", "Out of memory?");
@@ -114,7 +114,7 @@ constexpr ::gpk::array_static<const ::gpk::SCoord2<int32_t>, 8>	SURROUNDING_CELL
 	};
 
 
-static	::gpk::error_t				uncoverCell						(::gpk::view_grid<::gpkg::SMineHellCell> & block, const ::gpk::view_grid<uint8_t> & hints, const ::gpk::SCoord2<uint32_t> & cellOffset, const ::gpk::SCoord2<uint32_t> & boardSize, const ::gpk::SCoord2<int32_t> localCellCoord, ::gpk::array_pod<::gpk::SCoord2<uint32_t>> & outOfRangeCells) {
+static	::gpk::error_t				uncoverCell						(::gpk::view2d<::gpkg::SMineHellCell> & block, const ::gpk::view2d<uint8_t> & hints, const ::gpk::SCoord2<uint32_t> & cellOffset, const ::gpk::SCoord2<uint32_t> & boardSize, const ::gpk::SCoord2<int32_t> localCellCoord, ::gpk::apod<::gpk::SCoord2<uint32_t>> & outOfRangeCells) {
 	::gpkg::SMineHellCell					& currentCell					= block[localCellCoord.y][localCellCoord.x];
 	if(false == currentCell.Mine && false == currentCell.Show) {
 		currentCell.Show					= true;
@@ -146,7 +146,7 @@ static	::gpk::error_t				uncoverCell						(::gpk::view_grid<::gpkg::SMineHellCel
 			::gpk::SImage<uint8_t>					hints;
 			hints.resize(boardMetrics, {});
 			GetHints(hints.View);
-			::gpk::array_pod<::gpk::SCoord2<uint32_t>>	outOfRangeCells;
+			::gpk::apod<::gpk::SCoord2<uint32_t>>	outOfRangeCells;
 			if(false == GameState.BlockBased)
 				gpk_necall(::uncoverCell(Board.View, hints.View, {}, boardMetrics, cellCoord.Cast<int32_t>(), outOfRangeCells), "%s", "Out of memory?");
 			else {
@@ -225,16 +225,16 @@ static	::gpk::error_t				uncoverCell						(::gpk::view_grid<::gpkg::SMineHellCel
 	return 0;
 }
 
-::gpk::error_t						gpkg::SMineHell::Save			(::gpk::array_pod<char_t> & bytes)	{
+::gpk::error_t						gpkg::SMineHell::Save			(::gpk::apod<char_t> & bytes)	{
 	if(false == GameState.BlockBased) {
-		::gpk::array_pod<byte_t>				rleDecoded						= {};
+		::gpk::apod<byte_t>				rleDecoded						= {};
 		gpk_necall(rleDecoded.append((const char*)&Board.metrics(), sizeof(::gpk::SCoord2<uint32_t>)) , "%s", "Out of memory?");
 		gpk_necall(rleDecoded.append((const char*)Board.Texels.begin(), Board.Texels.size()), "%s", "Out of memory?");
 		gpk_necall(::gpk::rleEncode(rleDecoded, bytes), "%s", "Out of memory?");
 		gpk_necall(bytes.append((const char*)&GameState.Time, sizeof(::gpk::SRange<uint64_t>)), "%s", "Out of memory?");
 	}
 	else {
-		::gpk::array_pod<byte_t>				rleDecoded						= {};
+		::gpk::apod<byte_t>				rleDecoded						= {};
 		gpk_necall(rleDecoded.append((const char*)&GameState.BlockSize, sizeof(::gpk::SCoord2<uint32_t>)) , "%s", "Out of memory?");
 		gpk_necall(rleDecoded.append((const char*)&BoardBlocks.size(), sizeof(uint32_t)) , "%s", "Out of memory?");
 		for(uint32_t iBlock = 0; iBlock < BoardBlocks.size(); ++iBlock) {
@@ -256,7 +256,7 @@ static	::gpk::error_t				uncoverCell						(::gpk::view_grid<::gpkg::SMineHellCel
 	if(false == GameState.BlockBased) {
 		GameState.Time						= *(::gpk::SRange<uint64_t>*)&bytes[bytes.size() - sizeof(::gpk::SRange<uint64_t>)];
 		bytes								= {bytes.begin(), bytes.size() - sizeof(::gpk::SRange<uint64_t>)};
-		::gpk::array_pod<byte_t>				gameStateBytes					= {};
+		::gpk::apod<byte_t>				gameStateBytes					= {};
 		gpk_necall(::gpk::arrayInflate(bytes, gameStateBytes), "%s", "Out of memory or corrupt data!");
 		info_printf("Game state loaded. State size: %u. Compressed: %u.", gameStateBytes.size(), bytes.size());
 		ree_if(gameStateBytes.size() < sizeof(::gpk::SCoord2<uint32_t>), "Invalid game state file format: %s.", "Invalid file size");
@@ -280,7 +280,7 @@ static	::gpk::error_t				uncoverCell						(::gpk::view_grid<::gpkg::SMineHellCel
 	else {
 		GameState							= *(::gpkg::SMineHellState*)&bytes[bytes.size() - sizeof(::gpkg::SMineHellState)];
 		bytes								= {bytes.begin(), bytes.size() - sizeof(::gpkg::SMineHellState)};
-		::gpk::array_pod<byte_t>				gameStateBytes					= {};
+		::gpk::apod<byte_t>				gameStateBytes					= {};
 		gpk_necall(::gpk::arrayInflate(bytes, gameStateBytes), "%s", "Out of memory or corrupt data!");
 		info_printf("Game state loaded. State size: %u. Compressed: %u.", gameStateBytes.size(), bytes.size());
 		ree_if(gameStateBytes.size() < sizeof(uint32_t), "Invalid game state file format: %s.", "Invalid file size");

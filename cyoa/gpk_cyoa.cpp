@@ -10,7 +10,7 @@ int						fileSize		(FILE* fp) {
 	return (int)lastPosition;
 }
 
-int						splitLines		(const ::std::string & pageBytes, ::gpk::array_obj<std::string> & pageLines) {
+int						splitLines		(const ::std::string & pageBytes, ::gpk::aobj<std::string> & pageLines) {
 	pageLines.clear();
 	uint32_t				lastOffset		= 0;
 	for(uint32_t iOffset = 0; iOffset < pageBytes.size(); ++iOffset) {
@@ -36,12 +36,12 @@ int32_t					reverse			(_tCell* elements, uint32_t elementCount)	 {
 	return 0;
 }
 
-int						loadLines		(::gpkg::SPage & page, const ::gpk::array_obj<std::string> & pageLines) {
+int						loadLines		(::gpkg::SPage & page, const ::gpk::aobj<std::string> & pageLines) {
 	page.TextLines			= pageLines;
 	page.PageJumps			= {};
 	for(int32_t iLine = (int32_t)page.TextLines.size() - 1; iLine >= 0; --iLine) {
 		std::string					& currentLine		= page.TextLines[iLine];
-		::gpk::view_const_char		trimmed;
+		::gpk::vcc		trimmed;
 		::gpk::trim(trimmed, ::gpk::vcc{currentLine.data(), (uint32_t)currentLine.size()});
 		currentLine = {trimmed.begin(), trimmed.size()};
 		if(currentLine.size() <= 2 && 0 == page.PageJumps.size()) {
@@ -76,13 +76,13 @@ int						gpkg::loadPage		(const char* folderName, gpkg::SPage & page, uint32_t p
 	fread(&pageBytes[0], 1, textSize, fp);
 	fclose(fp);	
 
-	::gpk::array_obj<::std::string> pageLines;
+	::gpk::aobj<::std::string> pageLines;
 	::splitLines(pageBytes, pageLines);
 	::loadLines(page, pageLines);
 	return 0;
 }
 
-int						gpkg::validJump	(const ::gpk::array_obj<gpkg::SJump> & jumps, uint32_t indexToTest) {
+int						gpkg::validJump	(const ::gpk::aobj<gpkg::SJump> & jumps, uint32_t indexToTest) {
 	for(uint32_t iJump = 0; iJump < jumps.size(); ++iJump) {
 		if(jumps[iJump].Jump == indexToTest)
 			return iJump;

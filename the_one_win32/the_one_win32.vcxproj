@@ -173,7 +173,7 @@
     <ClInclude Include="DeviceResources.h" />
     <ClInclude Include="Sample3DSceneRenderer.h" />
     <ClInclude Include="SampleFpsTextRenderer.h" />
-    <ClInclude Include="the_one_win32.h" />
+    <ClInclude Include="the1_win32.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PixelShaderShared.hlsli" />
@@ -223,6 +223,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="psTableCloth.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="psTableCushion.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

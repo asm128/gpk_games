@@ -61,11 +61,17 @@ namespace the1
 		},	
 	};
 
+	struct SPoolTableCushion {
+		uint32_t									Entity							= (uint32_t)-1;
+		float										CushionBase						= 0.030f;	//	
+	};
+
 	struct SPoolTable {
 		uint32_t									Entity							= (uint32_t)-1;
 		SPoolTableDimensions						Dimensions						= COMMON_TABLE_SIZES[0];
 		float										CushionDepth					= .234f;
-		SPoolPocket									Pockets	[6]						= {};
+		SPoolPocket									Pockets		[6]					= {};
+		SPoolTableCushion							Cushions	[6]					= {};
 		float										PocketRadius					= .057f;
 	};
 
@@ -154,9 +160,9 @@ namespace the1
 		::the1::SPoolControllerStick				ControlStick					= {};
 		//::the1::SPoolControllerCamera				ControlCamera					= {};
 
-		::gpk::array_pod<::gpk::SLine3<float>>		PositionDeltas	[MAX_BALLS]		= {};
-		::gpk::array_pod<::the1::SContactBall>		LastFrameContactsBall			= {};
-		::gpk::array_pod<::the1::SContactCushion>	LastFrameContactsCushion		= {};
+		::gpk::apod<::gpk::SLine3<float>>		PositionDeltas	[MAX_BALLS]		= {};
+		::gpk::apod<::the1::SContactBall>		LastFrameContactsBall			= {};
+		::gpk::apod<::the1::SContactCushion>	LastFrameContactsCushion		= {};
 
 		::gpk::SEngine								Engine							= {};
 

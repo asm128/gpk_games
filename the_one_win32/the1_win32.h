@@ -45,10 +45,10 @@ struct SApplication : DX::IDeviceNotify {
 	::the1::STheOne								TheOne					= {};
 
 	::gpk::pobj<::DX::D3DDeviceResources>	DeviceResources			;
-	::the_one_win32::Sample3DSceneRenderer		D3DScene				;
-	::the_one_win32::SampleFpsTextRenderer		D3DText					;
+	::the1_win32::Sample3DSceneRenderer		D3DScene				;
+	::the1_win32::SampleFpsTextRenderer		D3DText					;
 
-	::gpk::array_pod<uint32_t>					D3DBufferMap			;
+	::gpk::apod<uint32_t>					D3DBufferMap			;
 
 	// Notifies renderers that device resources need to be released.
 	virtual void								OnDeviceLost					() {

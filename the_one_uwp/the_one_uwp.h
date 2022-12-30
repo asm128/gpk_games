@@ -74,7 +74,7 @@ namespace the_one_uwp
 
 			// Update scene objects.
 			Timer.Tick([&]() {
-				::gpk::array_obj<::gpk::SSysEvent>				sysEvents;
+				::gpk::aobj<::gpk::SSysEvent>				sysEvents;
 				::gpk::SSysEvent								newEvent;
 
 				Input->KeyboardPrevious						= Input->KeyboardCurrent;

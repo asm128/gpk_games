@@ -477,7 +477,7 @@ HRESULT AUDIO_STATE::CleanupAudio() {
 //--------------------------------------------------------------------------------------
 // Enumerate audio end-points
 //--------------------------------------------------------------------------------------
-HRESULT EnumerateAudio(_In_ IXAudio2* pXaudio2, _Inout_ ::gpk::array_obj<AudioDevice> & list) {
+HRESULT EnumerateAudio(_In_ IXAudio2* pXaudio2, _Inout_ ::gpk::aobj<AudioDevice> & list) {
 #if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
 
     UNREFERENCED_PARAMETER( pXaudio2 );

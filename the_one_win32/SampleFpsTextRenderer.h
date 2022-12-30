@@ -7,7 +7,7 @@
 #ifndef SAMPLEFPSTEXTRENDERER_H_9238679823
 #define SAMPLEFPSTEXTRENDERER_H_9238679823
 
-namespace the_one_win32
+namespace the1_win32
 {
 	// Renders the current FPS value in the bottom right corner of the screen using Direct2D and DirectWrite.
 	struct SampleFpsTextRenderer {

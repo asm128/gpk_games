@@ -34,7 +34,6 @@ static const float4		GPK_LIGHTMAGENTA				= float4(1.0f, 0.25f, 1.0f, 1.0f				);
 static const float4		GPK_LIGHTCYAN					= float4(0.25f, 1.0f, 1.0f, 1.0f				);
 static const float4		GPK_LIGHTORANGE					= float4(1.0f, 0.780f, 0.25f, 1.0f				);
 
-static const float4		PIXEL_BLACK_NUMBER				= float4(0, 0, 0, 1);
 static const float		LIGHT_FACTOR_AMBIENT			= .025f;
 static const float		LIGHT_FACTOR_SPECULAR_POWER		= 30.0f;
 
@@ -57,7 +56,7 @@ float4					lightCalcSpecular				(float4 specularMaterial, float4 specularLight, 
 	const float3				reflected						= reflect(-lightVecW, normalW);
 	const float					reflectedFactor					= max(dot(reflected, pointToEye), 0.0f);
 	if(0 >= reflectedFactor) 
-		return float4(PIXEL_BLACK_NUMBER.rgb, specularMaterial.a);
+		return float4(0, 0, 0, specularMaterial.a);
 	else {
 		const float					factor							= pow(reflectedFactor, specularPower);
 		return specularMaterial * specularLight * factor;

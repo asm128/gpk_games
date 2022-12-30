@@ -400,7 +400,7 @@ namespace
 
 
     //---------------------------------------------------------------------------------
-    HRESULT LoadAudioFromFile(::gpk::view_array<const wchar_t> szFileName, _Inout_ ::gpk::array_pod<uint8_t>& wavData) noexcept {
+    HRESULT LoadAudioFromFile(::gpk::view_array<const wchar_t> szFileName, _Inout_ ::gpk::apod<uint8_t>& wavData) noexcept {
         // open the file
         DWORD bytesRead = 0;
     #if (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
@@ -464,7 +464,7 @@ HRESULT DirectX::LoadWAVAudioInMemory(::gpk::view_array<const uint8_t> wavData, 
 
 
 //-------------------------------------------------------------------------------------
-HRESULT DirectX::LoadWAVAudioFromFile(::gpk::view_array<const wchar_t> szFileName, ::gpk::array_pod<uint8_t>& wavData, const WAVEFORMATEX** wfx, ::gpk::view_array<const uint8_t> & audioBytes) noexcept {
+HRESULT DirectX::LoadWAVAudioFromFile(::gpk::view_array<const wchar_t> szFileName, ::gpk::apod<uint8_t>& wavData, const WAVEFORMATEX** wfx, ::gpk::view_array<const uint8_t> & audioBytes) noexcept {
     DWORD bytesRead = LoadAudioFromFile(szFileName, wavData);
     if (FAILED(bytesRead))
         return bytesRead;
@@ -512,7 +512,7 @@ HRESULT DirectX::LoadWAVAudioInMemoryEx(::gpk::view_array<const uint8_t> wavData
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT DirectX::LoadWAVAudioFromFileEx(::gpk::view_array<const wchar_t> szFileName, ::gpk::array_pod<uint8_t>& wavData, DirectX::WAVData& result) noexcept {
+HRESULT DirectX::LoadWAVAudioFromFileEx(::gpk::view_array<const wchar_t> szFileName, ::gpk::apod<uint8_t>& wavData, DirectX::WAVData& result) noexcept {
     DWORD bytesRead = LoadAudioFromFile(szFileName, wavData);
     if (FAILED(bytesRead))
         return bytesRead;

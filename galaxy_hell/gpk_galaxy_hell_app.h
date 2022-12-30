@@ -84,8 +84,8 @@ namespace ghg
 	GDEFINE_ENUM_TYPE(UI_SCORE, uint8_t);
 
 	struct SUIRadialGauge {
-		::gpk::array_pod<::gpk::SCoord3<float>>				Vertices				= {};
-		::gpk::array_pod<::gpk::STriangle<int16_t>>			Indices					= {};
+		::gpk::apod<::gpk::SCoord3<float>>				Vertices				= {};
+		::gpk::apod<::gpk::STriangle<int16_t>>			Indices					= {};
 		int16_t												CurrentValue			= 0;
 		int16_t												MaxValue				= 64;
 		::gpk::SImage<::gpk::SColorBGRA>					Image					= {};
@@ -100,7 +100,7 @@ namespace ghg
 	};
 
 			::gpk::error_t	gaugeBuildRadial		(::ghg::SUIRadialGauge & gauge, const ::gpk::SCircle<float> & gaugeMetrics, int16_t resolution, int16_t width);
-			::gpk::error_t	gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::view_grid<::gpk::SColorBGRA> target	, ::gpk::SColorFloat colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::SColorFloat colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::SColorFloat colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::SColorBGRA colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false);
+			::gpk::error_t	gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::SColorBGRA> target	, ::gpk::SColorFloat colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::SColorFloat colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::SColorFloat colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::SColorBGRA colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false);
 	inline	::gpk::error_t	gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge												, ::gpk::SColorFloat colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::SColorFloat colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::SColorFloat colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::SColorBGRA colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false) {
 		//gauge.Image.Texels.fill({0, 0, 0, 0});
 		return ::ghg::gaugeImageUpdate(gauge, gauge.Image, colorMin, colorMid, colorMax, colorEmpty, radialColor);
@@ -146,7 +146,7 @@ namespace ghg
 	};
 
 	struct SUIPlay {
-		::gpk::array_obj<::ghg::SUIPlayer>					PlayerUI				= {};
+		::gpk::aobj<::ghg::SUIPlayer>					PlayerUI				= {};
 		::ghg::SGalaxyHellDrawCache							DrawCache				= {};
 
 		::gpk::array_static<char, 128>						TextLevel				= {};
@@ -159,10 +159,10 @@ namespace ghg
 	struct SPlayerShip { 
 		::ghg::SShipCore								Core;
 		::ghg::SShipScore								Score;
-		::gpk::array_pod<uint32_t>						Parts;
-		::gpk::array_pod<uint32_t>						Weapons;
+		::gpk::apod<uint32_t>						Parts;
+		::gpk::apod<uint32_t>						Weapons;
 
-		::gpk::error_t									Save					(::gpk::array_pod<byte_t> & output) const {
+		::gpk::error_t									Save					(::gpk::apod<byte_t> & output) const {
 			gpk_necs(::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipCore >{&Core , 1}, output));
 			gpk_necs(::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipScore>{&Score, 1}, output));
 			gpk_necs(::gpk::viewWrite(Parts		, output));
@@ -203,14 +203,14 @@ namespace ghg
 	struct SPlayer {
 		::gpk::vcc								Name			= {};
 		::ghg::SPlayerState						State			= {};
-		::gpk::array_pod<::ghg::SWeapon>		Weapons			= {};
-		::gpk::array_pod<::ghg::SOrbiter>		Orbiters		= {};
-		::gpk::array_obj<::ghg::SPlayerShip>	Ships			= {};
+		::gpk::apod<::ghg::SWeapon>		Weapons			= {};
+		::gpk::apod<::ghg::SOrbiter>		Orbiters		= {};
+		::gpk::aobj<::ghg::SPlayerShip>	Ships			= {};
 
 		::gpk::error_t							Save(const ::gpk::vcc & filename) const {
-			::gpk::array_pod<byte_t>					serialized;
+			::gpk::apod<byte_t>					serialized;
 			gpk_necs(Save(serialized));
-			::gpk::array_pod<byte_t>					deflated;
+			::gpk::apod<byte_t>					deflated;
 			gpk_necs(::gpk::arrayDeflate(serialized, deflated));
 			info_printf("Player size in bytes: %u.", serialized.size());
 			info_printf("Player file size: %u.", deflated.size());
@@ -219,9 +219,9 @@ namespace ghg
 		}
 
 		::gpk::error_t							Load(const ::gpk::vcc & filename) {
-			::gpk::array_pod<byte_t>					serialized;
+			::gpk::apod<byte_t>					serialized;
 			gpk_necall(::gpk::fileToMemory(filename, serialized), "fileName: %s", ::gpk::toString(filename).begin());
-			::gpk::array_pod<byte_t>					inflated;
+			::gpk::apod<byte_t>					inflated;
 			gpk_necs(::gpk::arrayInflate(serialized, inflated));
 			info_printf("Player file size: %u.", inflated.size());
 			info_printf("Player size in bytes: %u.", serialized.size());
@@ -229,7 +229,7 @@ namespace ghg
 			return Load(input);
 		}
 
-		::gpk::error_t							Save(::gpk::array_pod<byte_t> & output) const {
+		::gpk::error_t							Save(::gpk::apod<byte_t> & output) const {
 			gpk_necs(::gpk::viewWrite(Name		, output));
 			gpk_necs(::gpk::viewWrite(::gpk::view_array<const ::ghg::SPlayerState>{&State, 1}, output));
 			gpk_necs(::gpk::viewWrite(Weapons	, output));
@@ -299,16 +299,16 @@ namespace ghg
 		::ghg::SUIPlay												UIPlay;
 
 		::gpk::SDialog												DialogDesktop				= {};
-		::gpk::array_obj<::ghg::SPlayer>							Players						= {};
+		::gpk::aobj<::ghg::SPlayer>							Players						= {};
 		::gpk::ptr_nco<::gpk::SDialogTuner>							TunerPlayerCount;
 
 		::ghg::SGalaxyHell											Game;
-		::gpk::array_obj<::ghg::SUserCredentials>					UserCredentials				= {};
+		::gpk::aobj<::ghg::SUserCredentials>					UserCredentials				= {};
 
 		::gpk::pobj<::gpk::SDialogViewport>							Inputbox;
-		::gpk::array_pod<char>										InputboxText;
+		::gpk::apod<char>										InputboxText;
 
-		::gpk::array_obj<::gpk::array_pod<char>>					FileNames					= {};
+		::gpk::aobj<::gpk::apod<char>>					FileNames					= {};
 		::gpk::vcs													SavegameFolder				= ".";
 		::gpk::vcs													ExtensionSaveAuto			= ".auto.ghz";
 		::gpk::vcs													ExtensionSaveStage			= ".stage.ghz";
@@ -329,7 +329,7 @@ namespace ghg
 
 		::gpk::error_t												Save						(SAVE_MODE autosaveMode)				{
 			char															fileName[4096]				= {};
-			::gpk::array_pod<char>											b64PlayerName				= {};
+			::gpk::apod<char>											b64PlayerName				= {};
 			for(uint32_t iPlayer = 0; iPlayer < Players.size(); ++iPlayer) {
 				b64PlayerName.clear();
 				const ::ghg::SPlayer											& player					= Players[iPlayer];
@@ -362,7 +362,7 @@ namespace ghg
 	::gpk::error_t												galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents);
 	::gpk::error_t												galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::SCoord2<uint16_t> renderTargetSize);
 
-	::gpk::error_t												listFilesSavegame			(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::array_obj<::gpk::vcc> & savegameFilenames);
-	::gpk::error_t												listFilesProfile			(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::array_obj<::gpk::vcc> & savegameFilenames);
+	::gpk::error_t												listFilesSavegame			(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames);
+	::gpk::error_t												listFilesProfile			(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames);
 
 }

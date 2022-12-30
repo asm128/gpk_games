@@ -17,6 +17,17 @@ static constexpr ::gpk::SColorBGRA				PIXEL_BLACK_NUMBER				= ::gpk::SColorBGRA{
 	return 0; 
 }
 
+::gpk::error_t										the1::psTableCushion
+	( const ::gpk::SEngineSceneConstants					& constants
+	, const ::gpk::SPSIn									& inPS
+	, ::gpk::SColorBGRA										& outputPixel
+	) { 
+	const ::gpk::SCoord3<float>								lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
+	const ::gpk::SColorFloat								diffuse						= ::gpk::lightCalcDiffuse(::gpk::DARKGREEN, inPS.WeightedNormal, lightVecW);
+	outputPixel											= ::gpk::SColorFloat(diffuse).Clamp();
+	return 0; 
+}
+
 ::gpk::error_t										the1::psPocket
 	( const ::gpk::SEngineSceneConstants					& constants
 	, const ::gpk::SPSIn									& inPS

@@ -123,7 +123,7 @@ namespace the_one_uwp
 			::gpk::ptr_com<ID3D11PixelShader>				pixelShader;
 			::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
 
-			::gpk::array_pod<byte_t>						fileVS;
+			::gpk::apod<byte_t>								fileVS;
 			gpk_necs(::gpk::fileToMemory("SampleVertexShader.cso", fileVS));
 			static constexpr D3D11_INPUT_ELEMENT_DESC		vertexDesc []			=
 				{	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 00, D3D11_INPUT_PER_VERTEX_DATA, 0 }
@@ -134,7 +134,7 @@ namespace the_one_uwp
 			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateInputLayout(vertexDesc, ARRAYSIZE(vertexDesc), &fileVS[0], fileVS.size(), &inputLayout)); 
 
 			// After the pixel shader file is loaded, create the shader and constant buffer.
-			::gpk::array_pod<byte_t>						filePS;
+			::gpk::apod<byte_t>								filePS;
 			gpk_necs(::gpk::fileToMemory("SamplePixelShader.cso" , filePS));
 			gpk_hrcall(DeviceResources->GetD3DDevice()->CreatePixelShader(&filePS[0], filePS.size(), nullptr, &pixelShader));
 

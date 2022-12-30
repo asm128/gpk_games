@@ -18,17 +18,17 @@ static	::gpk::error_t					poolGameResetTest2Balls		(::the1::SPoolGame & pool) {
 	//::gpk::SCoord3<float>						velocity					= {0, 0, -1.f - rand() % 30};
 	//velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 20 * ((rand() % 2) ? -1 : 1));
 	//engine.SetVelocity(pool.StartState.Balls[1].Entity, velocity);
-	return 0; 
+	return 0;
 }
 
-static	::gpk::error_t					textureBallNumber			(::gpk::view_grid<::gpk::SColorBGRA> view, uint32_t number, const ::gpk::SRasterFont & font) { 
+static	::gpk::error_t					textureBallNumber			(::gpk::view2d<::gpk::SColorBGRA> view, uint32_t number, const ::gpk::SRasterFont & font) { 
 	char										strNumber[4]				= {};
 	sprintf_s(strNumber, "%i", number);
 	const ::gpk::SRectangle2<int16_t>			targetRect					= 
 		{ {int16_t(view.metrics().x / 2 - (font.CharSize.x * strlen(strNumber)) / 2), int16_t(view.metrics().y / 2 - font.CharSize.y / 2)}
 		, font.CharSize.Cast<int16_t>()
 		};
-	::gpk::array_pod<::gpk::SCoord2<uint16_t>>	coords;
+	::gpk::apod<::gpk::SCoord2<uint16_t>>	coords;
 	::gpk::textLineRaster(view.metrics().Cast<uint16_t>(), font.CharSize, targetRect, font.Texture, strNumber, coords);
 	for(uint32_t iCoord = 0; iCoord < coords.size(); ++iCoord) {
 		const ::gpk::SCoord2<uint16_t>				coord						= coords[iCoord];
@@ -64,7 +64,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		material.Color.Diffuse					= color;
   		material.Color.Ambient					= material.Color.Diffuse * .1f;
 		if(iBall) {
-			::gpk::view_grid<::gpk::SColorBGRA>			view					= {(::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()};
+			::gpk::view2d<::gpk::SColorBGRA>			view					= {(::gpk::SColorBGRA*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()};
 			textureBallNumber(view, iBall, font);
 			//if(0 == iBall)
 			//	textureBallCue(view, ::gpk::RED);
@@ -83,7 +83,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	pool.StateStart.BallOrder[11]			= 8;
 
 	constexpr char								ballsToSet	[12]		= {2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15};
-	::gpk::array_pod<uint32_t>					ballPool				= {};
+	::gpk::apod<uint32_t>					ballPool				= {};
 	for(uint32_t iBall = 0; ballPool.size() < ::gpk::size(ballsToSet); ++iBall) {
 		if(iBall == 8)
 			continue;
@@ -130,9 +130,10 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		pool.PositionDeltas[iBall].clear();
 		engine.SetHidden	(pool.StateStart.Ball[iBall].Entity, true);
 		engine.SetPosition	(pool.StateStart.Ball[iBall].Entity, {});
-		engine.Integrator.BodyFlags		[engine.ManagedEntities.Entities[pool.StateStart.Ball[iBall].Entity].RigidBody].Collides	= false;
-		engine.Integrator.Masses			[engine.ManagedEntities.Entities[pool.StateStart.Ball[iBall].Entity].RigidBody].InverseMass	= 1.0f / (pool.StateStart.Physics.BallWeight / 1000.0f);
-		engine.Integrator.BoundingVolumes	[engine.ManagedEntities.Entities[pool.StateStart.Ball[iBall].Entity].RigidBody].HalfSizes		= {pool.StateStart.BallRadius, pool.StateStart.BallRadius, pool.StateStart.BallRadius};
+		engine.SetMass		(pool.StateStart.Ball[iBall].Entity, pool.StateStart.Physics.BallWeight / 1000.0f);
+
+		engine.Integrator.BodyFlags			[engine.ManagedEntities.Entities[pool.StateStart.Ball[iBall].Entity].RigidBody].Collides	= false;
+		engine.Integrator.BoundingVolumes	[engine.ManagedEntities.Entities[pool.StateStart.Ball[iBall].Entity].RigidBody].HalfSizes	= {pool.StateStart.BallRadius, pool.StateStart.BallRadius, pool.StateStart.BallRadius};
 	}
 
 	engine.SetPosition	(pool.StateStart.Table.Entity, {0, -pool.StateStart.Table.Dimensions.Slate.y * .125f});
@@ -171,13 +172,15 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 	gpk_necs(pool.StateStart.Table.Entity = engine.CreateBox());
 	engine.SetMeshScale(pool.StateStart.Table.Entity, {pool.StateStart.Table.Dimensions.Slate.x, pool.StateStart.Table.Dimensions.Slate.y * .25f, pool.StateStart.Table.Dimensions.Slate.y});
 	engine.SetShader((*engine.ManagedEntities.Children[pool.StateStart.Table.Entity])[0], ::the1::psTableCloth, "psTableCloth");
+	engine.SetColorDiffuse((*engine.ManagedEntities.Children[pool.StateStart.Table.Entity])[0], ::gpk::PURPLE * .5f);
 	for(uint32_t iFace = 1; iFace < 6; ++iFace)
 		engine.SetShader((*engine.ManagedEntities.Children[pool.StateStart.Table.Entity])[iFace], ::gpk::psHidden, "psHidden");
 
 	// pockets
-	uint32_t									iPocketEntity				= engine.CreateCylinder(8, true, 0.5f);
+	uint32_t									iPocketEntity				= engine.CreateCylinder(16, true, 0.5f);
 	gpk_necs(pool.StateStart.Table.Pockets[0].Entity = iPocketEntity);
-	engine.SetMeshScale(pool.StateStart.Table.Pockets[0].Entity, {pool.StateStart.Table.PocketRadius * 2, pool.StateStart.Table.PocketRadius * 2, pool.StateStart.Table.PocketRadius * 2});
+	engine.SetMeshScale(iPocketEntity, {pool.StateStart.Table.PocketRadius * 2, pool.StateStart.Table.PocketRadius * 2, pool.StateStart.Table.PocketRadius * 2});
+	engine.SetColorDiffuse(iPocketEntity, ::gpk::DARKGRAY * .5f);
 	engine.SetShader(iPocketEntity, ::the1::psPocket, "psPocket");
 	for(uint32_t iPocket = 1; iPocket < 6; ++iPocket) {
 		gpk_necs(pool.StateStart.Table.Pockets[iPocket].Entity = engine.Clone(pool.StateStart.Table.Pockets[0].Entity, false, false, false));
@@ -190,6 +193,24 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 		else 
 			engine.SetOrientation(iEntityHole, ::gpk::SQuaternion<float>{}.CreateFromAxisAngle({0, 1, 0}, (::gpk::math_pi - ::gpk::math_pi / 3) + ::gpk::math_pi / 3 * (iPocket % 3)).Normalize());
 	}
+
+	//// tableCushions
+	//uint32_t									iTableCushionEntity				= engine.CreateTableCushion(16, true, 0.5f);
+	//gpk_necs(pool.StateStart.Table.Cushions[0].Entity = iTableCushionEntity);
+	//engine.SetMeshScale(iTableCushionEntity, {pool.StateStart.Table.TableCushionRadius * 2, pool.StateStart.Table.TableCushionRadius * 2, pool.StateStart.Table.TableCushionRadius * 2});
+	//engine.SetColorDiffuse(iTableCushionEntity, ::gpk::DARKGREEN * .5f);
+	//engine.SetShader(iTableCushionEntity, ::the1::psTableCushion, "psTableCushion");
+	//for(uint32_t iTableCushion = 1; iTableCushion < 6; ++iTableCushion) {
+	//	gpk_necs(pool.StateStart.Table.TableCushions[iTableCushion].Entity = engine.Clone(pool.StateStart.Table.TableCushions[0].Entity, false, false, false));
+	//}
+
+	//for(uint32_t iTableCushion = 0; iTableCushion < 6; ++iTableCushion) {
+	//	uint32_t									iEntityHole				= pool.StateStart.Table.TableCushions[iTableCushion].Entity;
+	//	if(iTableCushion < 3)
+	//		engine.SetOrientation(iEntityHole, ::gpk::SQuaternion<float>{}.CreateFromAxisAngle({0, 1, 0}, (::gpk::math_pi / 3) - ::gpk::math_pi / 3 * iTableCushion).Normalize());
+	//	else 
+	//		engine.SetOrientation(iEntityHole, ::gpk::SQuaternion<float>{}.CreateFromAxisAngle({0, 1, 0}, (::gpk::math_pi - ::gpk::math_pi / 3) + ::gpk::math_pi / 3 * (iTableCushion % 3)).Normalize());
+	//}
 
 
 	// sticks
@@ -209,7 +230,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 }
 
 //
-//static	::gpk::error_t					textureBallStripped		(::gpk::view_grid<::gpk::SColorBGRA> view, const ::gpk::SRasterFont & font, ::gpk::SColorBGRA color, uint32_t number) { 
+//static	::gpk::error_t					textureBallStripped		(::gpk::view2d<::gpk::SColorBGRA> view, const ::gpk::SRasterFont & font, ::gpk::SColorBGRA color, uint32_t number) { 
 //	memset(view.begin(), 0xFF, view.byte_count());
 //
 //	::gpk::SCoord2<uint32_t>					viewCenter				= view.metrics() / 2;
@@ -226,7 +247,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 //	return 0; 
 //}
 //
-//static	::gpk::error_t					textureBallSolid		(::gpk::view_grid<::gpk::SColorBGRA> view, const ::gpk::SRasterFont & font, ::gpk::SColorBGRA color, uint32_t number) { 
+//static	::gpk::error_t					textureBallSolid		(::gpk::view2d<::gpk::SColorBGRA> view, const ::gpk::SRasterFont & font, ::gpk::SColorBGRA color, uint32_t number) { 
 //	::gpk::SCoord2<uint32_t>					viewCenter				= view.metrics() / 2;
 //
 //	for(uint32_t y = 0; y < view.metrics().y; ++y)
@@ -241,7 +262,7 @@ static	::gpk::error_t					poolGameResetBall8		(::the1::SPoolGame & pool) {
 //	return 0; 
 //}
 //
-//static	::gpk::error_t					textureBallCue			(::gpk::view_grid<::gpk::SColorBGRA> view, ::gpk::SColorBGRA color) {
+//static	::gpk::error_t					textureBallCue			(::gpk::view2d<::gpk::SColorBGRA> view, ::gpk::SColorBGRA color) {
 //	::gpk::SCoord2<float>						viewCenter				= view.metrics().Cast<float>() / 2;
 //	::gpk::SCoord2<float>						pointCenters[]			= 
 //		{ {0, viewCenter.y}

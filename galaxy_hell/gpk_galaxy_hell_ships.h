@@ -72,11 +72,11 @@ namespace ghg
 	struct SShipScene {
 		::ghg::SShipSceneGlobal								Global;
 		//::gpk::SBufferManager								BufferManager					= {};
-		::gpk::array_obj<::gpk::SGeometryQuads>				Geometry						= {};
-		::gpk::array_obj<::gpk::SImage<::gpk::SColorBGRA>>	Image							= {};
-		::gpk::array_pod<::gpk::SMatrix4<float>>			Transforms						= {}; // Ope per entity
+		::gpk::aobj<::gpk::SGeometryQuads>				Geometry						= {};
+		::gpk::aobj<::gpk::SImage<::gpk::SColorBGRA>>	Image							= {};
+		::gpk::apod<::gpk::SMatrix4<float>>			Transforms						= {}; // Ope per entity
 
-		::gpk::error_t										Save(::gpk::array_pod<byte_t> & output) const { 
+		::gpk::error_t										Save(::gpk::apod<byte_t> & output) const { 
 			gpk_necs(::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipSceneGlobal>{&Global, 1}, output));
 			gpk_necs(::gpk::viewWrite(Transforms, output));
 			info_printf("Saved %s, %i", "Transforms"	, Transforms.size());
@@ -92,10 +92,10 @@ namespace ghg
 
 	int													getLightArrays
 		( const ::gpk::SCoord3<float>							& modelPosition
-		, const ::gpk::array_pod<::gpk::SCoord3<float>>			& lightPointsWorld
-		, const ::gpk::array_pod<::gpk::SColorBGRA>				& lightColorsWorld
-		, ::gpk::array_pod<::gpk::SCoord3<float>>				& lightPointsModel
-		, ::gpk::array_pod<::gpk::SColorBGRA>					& lightColorsModel
+		, const ::gpk::apod<::gpk::SCoord3<float>>			& lightPointsWorld
+		, const ::gpk::apod<::gpk::SColorBGRA>				& lightColorsWorld
+		, ::gpk::apod<::gpk::SCoord3<float>>				& lightPointsModel
+		, ::gpk::apod<::gpk::SColorBGRA>					& lightColorsModel
 		);
 
 	GDEFINE_ENUM_TYPE(SHIP_PART_TYPE, uint8_t);
@@ -169,14 +169,14 @@ namespace ghg
 #pragma pack(pop)
 
 	struct SShipManager {
-		::gpk::array_pod<::ghg::SShipScore			>				ShipScores						= {};
-		::gpk::array_pod<::ghg::SShipCore			>				ShipCores						= {};
-		::gpk::array_obj<::gpk::array_pod<uint32_t>	>				ShipParts						= {};
-		::gpk::array_pod<::ghg::SOrbiter			>				Orbiters						= {};
-		::gpk::array_pod<::ghg::SWeapon				>				Weapons							= {};
-		::gpk::array_obj<::gpk::array_pod<::gpk::SCoord3<float>>>	ShipOrbitersDistanceToTargets	= {};
-		::gpk::array_obj<::ghg::SShots				>				Shots							= {};	// one per weapon
-		::gpk::array_obj<::gpk::array_pod<SHIP_ACTION>>				ShipOrbiterActionQueue			= {};
+		::gpk::apod<::ghg::SShipScore			>				ShipScores						= {};
+		::gpk::apod<::ghg::SShipCore			>				ShipCores						= {};
+		::gpk::aobj<::gpk::apod<uint32_t>	>				ShipParts						= {};
+		::gpk::apod<::ghg::SOrbiter			>				Orbiters						= {};
+		::gpk::apod<::ghg::SWeapon				>				Weapons							= {};
+		::gpk::aobj<::gpk::apod<::gpk::SCoord3<float>>>	ShipOrbitersDistanceToTargets	= {};
+		::gpk::aobj<::ghg::SShots				>				Shots							= {};	// one per weapon
+		::gpk::aobj<::gpk::apod<SHIP_ACTION>>				ShipOrbiterActionQueue			= {};
 		::gpk::SRigidBodyIntegrator									ShipPhysics						= {};
 
 		::ghg::SEntitySystem										EntitySystem;
@@ -234,7 +234,7 @@ namespace ghg
 
 		inline	::gpk::SCoord3<float>&								GetShipPosition			(uint32_t indexShip)		{ return GetShipPosition(ShipCores[indexShip]); }
 
-		::gpk::error_t												Save					(::gpk::array_pod<byte_t> & output) const { 
+		::gpk::error_t												Save					(::gpk::apod<byte_t> & output) const { 
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipScore	>{ShipScores	}, output);
 			::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipCore	>{ShipCores		}, output);
 			uint32_t												totalEntityChildren				= 0;

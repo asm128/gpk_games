@@ -66,7 +66,7 @@ static	::gpk::error_t			guiUpdateHome				(::the1::STheOne & app, const ::gpk::vi
 static	::gpk::error_t			guiHandlePlay				(::the1::STheOne & /*app*/, ::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::the1::STheOneGame & /*game*/) { return 0; }
 static	::gpk::error_t			guiHandleHome				(::the1::STheOne & /*app*/, ::gpk::SGUI & /*gui*/, uint32_t /*idControl*/, ::the1::STheOneGame & /*game*/) { return 0; }
 
-::gpk::error_t					the1::guiUpdate				(::the1::STheOne & app, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents) {
+::gpk::error_t					the1::guiUpdate				(::the1::STheOne & app, ::gpk::view1d<::gpk::SSysEvent> sysEvents) {
 	::the1::APP_STATE					appState					= app.ActiveState; 
 	for(uint32_t iAppState = 0; iAppState < ::the1::APP_STATE_COUNT; ++iAppState) {
 		::gpk::SDialog						& dialog					= app.DialogPerState[iAppState];
@@ -90,7 +90,7 @@ static	::gpk::error_t			guiHandleHome				(::the1::STheOne & /*app*/, ::gpk::SGUI
 	::gpk::SDialog						& dialog					= app.DialogPerState[appState];
 	dialog.Update();
 	::gpk::SGUI							& gui						= *dialog.GUI;
-	::gpk::array_pod<uint32_t>			controlsToProcess			= {};
+	::gpk::apod<uint32_t>			controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 
 	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {

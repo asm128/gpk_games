@@ -55,7 +55,7 @@ static	::gpk::error_t		resolveCollision
 	return 0;
 }
 
-static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, uint32_t iEntityA, const ::gpk::SVirtualEntity & entityA, ::gpk::array_pod<::gpk::SContact> & contactsDetected) {
+static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, uint32_t iEntityA, const ::gpk::SVirtualEntity & entityA, ::gpk::apod<::gpk::SContact> & contactsDetected) {
 	const ::gpk::SCoord3<float>		& radiusA						= engine.Integrator.BoundingVolumes[entityA.RigidBody].HalfSizes;
 	const ::gpk::SCoord3<float>		& positionA						= engine.Integrator.Centers[entityA.RigidBody].Position;
 
@@ -92,7 +92,7 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 	return 0;
 }
 
-::gpk::error_t				gpk::collisionDetect			(const ::gpk::SEngine & engine, ::gpk::array_pod<::gpk::SContact> & contactsDetected) {
+::gpk::error_t				gpk::collisionDetect			(const ::gpk::SEngine & engine, ::gpk::apod<::gpk::SContact> & contactsDetected) {
 	for(uint32_t iEntityA = 0, countEntities = engine.ManagedEntities.Entities.size(); iEntityA < countEntities; ++iEntityA) {
 		const ::gpk::SVirtualEntity		& entityA						= engine.ManagedEntities.Entities[iEntityA];
 		if(entityA.RigidBody >= engine.Integrator.BodyFlags.size())
@@ -119,8 +119,8 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 	double							step							= .005f;
 	pool.LastFrameContactsBall		.clear();
 	pool.LastFrameContactsCushion	.clear();
-	::gpk::array_pod<::the1::SContactBall>	lastFrameContactsBatchBall;
-	::gpk::array_pod<::the1::SContactBall>	lastFrameContactsBatchCushion;
+	::gpk::apod<::the1::SContactBall>	lastFrameContactsBatchBall;
+	::gpk::apod<::the1::SContactBall>	lastFrameContactsBatchCushion;
 
 
 	while(secondsElapsed > 0) { 
