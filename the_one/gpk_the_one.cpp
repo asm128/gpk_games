@@ -64,25 +64,57 @@ static	::gpk::error_t				updateInput				(::the1::STheOne & app, double secondsEl
 
 	app.MainGame.Game.StateCurrent.Player[0].Stick.Angle	+= mouseDeltas.x * (1.0f / (float)::gpk::math_2pi) * .05f;
 
-	if(keyStates[VK_ESCAPE] || buttonStates[1]) 
-		app.MainGame.Game.StateCurrent.Player[0].Stick.Velocity = 0;
-	else {
-		if(keyStates[VK_RETURN] || buttonStates[0]) {
-			if(app.MainGame.Game.StateCurrent.Player[0].Stick.Velocity > 5) 
-				app.MainGame.Game.StateCurrent.Player[0].Stick.Velocity	= 5;
-			else if(app.MainGame.Game.StateCurrent.Player[0].Stick.Velocity < 5) {
-				app.MainGame.Game.StateCurrent.Player[0].Stick.Velocity	+= (float)secondsElapsed * 2.5f;
-				app.MainGame.Game.Engine.SetHidden(app.MainGame.Game.StateCurrent.Player[0].Stick.Entity, false);
+
+	bool					shoot				= false;
+	uint32_t				currentPlayer		= app.MainGame.Game.StateCurrent.PlayerActive;
+	::the1::SPoolStick		& activeStick		= app.MainGame.Game.StateCurrent.Player[currentPlayer].Stick;
+	if(activeStick.ShootState == ::the1::POOL_STICK_CONTROL_STATE_Aiming) {
+		if(keyStates[VK_RETURN] || buttonStates[0])
+			activeStick.ShootState	= ::the1::POOL_STICK_CONTROL_STATE_Charging;
+	}
+	else if(activeStick.ShootState == ::the1::POOL_STICK_CONTROL_STATE_Cancelled) {
+		if(false == (keyStates[VK_RETURN] || buttonStates[0]))
+			activeStick.ShootState	= ::the1::POOL_STICK_CONTROL_STATE_Aiming;
+	}
+	else if(activeStick.ShootState == ::the1::POOL_STICK_CONTROL_STATE_Charging || activeStick.ShootState == ::the1::POOL_STICK_CONTROL_STATE_Discharging) {
+		if(keyStates[VK_ESCAPE] || buttonStates[1]) {
+			activeStick.ShootState		= ::the1::POOL_STICK_CONTROL_STATE_Cancelled;
+			activeStick.Velocity		= 0;
+		}
+		else if(keyStates[VK_RETURN] || buttonStates[0]) {
+			if(activeStick.ShootState == ::the1::POOL_STICK_CONTROL_STATE_Charging) {
+				if(activeStick.Velocity > 5) { // clamp at 5 (should add a variable to the curremt state struct);
+					activeStick.Velocity	= 5;
+					activeStick.ShootState = ::the1::POOL_STICK_CONTROL_STATE_Discharging;
+				}
+				else if(activeStick.Velocity < 5) {
+					activeStick.Velocity	+= (float)secondsElapsed * 2.5f;
+					app.MainGame.Game.Engine.SetHidden(activeStick.Entity, false);
+				}
+			}
+			else if(activeStick.ShootState == ::the1::POOL_STICK_CONTROL_STATE_Discharging) {
+				if(activeStick.Velocity < 0) { // clamp at 5 (should add a variable to the curremt state struct);
+					activeStick.Velocity	= 0.0f;
+					activeStick.ShootState = ::the1::POOL_STICK_CONTROL_STATE_Charging;
+				}
+				else if(activeStick.Velocity > 0) {
+					activeStick.Velocity	-= (float)secondsElapsed * 2.5f;
+					app.MainGame.Game.Engine.SetHidden(activeStick.Entity, false);
+				}
 			}
 		}
-		else if(app.MainGame.Game.StateCurrent.Player[0].Stick.Velocity > 0) {
-			::gpk::SCoord3<float>						velocity				= {app.MainGame.Game.StateCurrent.Player[0].Stick.Velocity, 0, 0}; //{70.0f + (rand() % 90), 0, 0};
-			velocity.RotateY(app.MainGame.Game.StateCurrent.Player[0].Stick.Angle);
-			app.MainGame.Game.Engine.SetVelocity(app.MainGame.Game.StateCurrent.BallEntities[0], velocity);
-			//app.MainGame.Game.Engine.SetRotation(app.MainGame.Game.StateCurrent.Ball[0].Entity, {0, (1.0f + (rand() % 100) * .5f) * -scale, 0});
-			app.MainGame.Game.Engine.SetHidden(app.MainGame.Game.StateCurrent.Player[0].Stick.Entity, true);
-			app.MainGame.Game.StateCurrent.Player[0].Stick.Velocity = 0;
-		}
+		else if(activeStick.Velocity > 0)
+			shoot = true;
+	}
+
+	if(shoot) {
+		app.MainGame.Game.StateCurrent.Active	= true;
+		::gpk::SCoord3<float>						velocity				= {activeStick.Velocity, 0, 0}; //{70.0f + (rand() % 90), 0, 0};
+		velocity.RotateY(activeStick.Angle);
+		app.MainGame.Game.Engine.SetVelocity(app.MainGame.Game.StateCurrent.BallEntities[0], velocity);
+		//app.MainGame.Game.Engine.SetRotation(app.MainGame.Game.StateCurrent.Ball[0].Entity, {0, (1.0f + (rand() % 100) * .5f) * -scale, 0});
+		app.MainGame.Game.Engine.SetHidden(activeStick.Entity, true);
+		activeStick.Velocity = 0;
 	}
 
 	::the1::SCamera					& cameraSelected		
@@ -149,7 +181,7 @@ static	::gpk::error_t				updateInput				(::the1::STheOne & app, double secondsEl
 		}
 		playActive = playActive || activeGame.Engine.IsPhysicsActive(activeGame.StateCurrent.BallEntities[iBall]);
 	}
-	if(false == playActive)
+	if(false == playActive) 
 		app.MainGame.Game.Engine.SetHidden(app.MainGame.Game.StateCurrent.Player[0].Stick.Entity, false);
 
 	app.MainGame.LightPos.RotateY(secondsElapsed);

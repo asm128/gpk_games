@@ -109,20 +109,12 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 	return 0;
 }
 
-::gpk::error_t				the1::poolGameUpdate			(::the1::SPoolGame & pool, double secondsElapsed) {
-	::gpk::SEngine					& engine						= pool.Engine;
-	for(uint32_t iBall = 0; iBall < pool.StateCurrent.CountBalls; ++iBall) {
-		pool.PositionDeltas[iBall].push_back({});
-		pool.GetBallPosition(iBall, pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1].A);
-	}
-
-	double							step							= .005f;
-	pool.LastFrameContactsBall		.clear();
-	pool.LastFrameContactsCushion	.clear();
+static ::gpk::error_t		poolGamePhysicsUpdate			(::the1::SPoolGame & pool, double secondsElapsed) {
 	::gpk::apod<::the1::SContactBall>	lastFrameContactsBatchBall;
 	::gpk::apod<::the1::SContactBall>	lastFrameContactsBatchCushion;
 
-
+	::gpk::SEngine					& engine						= pool.Engine;
+	double							step							= .005f;
 	while(secondsElapsed > 0) { 
 		double							secondsThisStep					= ::gpk::min(step, secondsElapsed);
 		secondsElapsed				-= secondsThisStep;
@@ -138,11 +130,9 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 		//}
 		engine.Update(secondsThisStep);
 
-
-		lastFrameContactsBatchBall		.clear();
+		lastFrameContactsBatchBall.clear();
+		lastFrameContactsBatchCushion.clear();
 		::gpk::collisionDetect(pool.Engine, lastFrameContactsBatchBall);
-
-		lastFrameContactsBatchCushion	.clear();
 
 		for(uint32_t iContact = 0; iContact < lastFrameContactsBatchBall.size(); ++iContact) {
 			::the1::SContactBall			& contact			= lastFrameContactsBatchBall[iContact];
@@ -305,9 +295,34 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 
 		}
 	}
+	return 0;
+}
 
-	const float radius = pool.StateCurrent.Table.BallRadius;
-	const float diameter = radius * 2;
+::gpk::error_t				the1::poolGameUpdate			(::the1::SPoolGame & pool, double secondsElapsed) {
+	for(uint32_t iBall = 0; iBall < pool.StateCurrent.CountBalls; ++iBall) {
+		pool.PositionDeltas[iBall].push_back({});
+		pool.GetBallPosition(iBall, pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1].A);
+	}
+
+	pool.LastFrameContactsBall		.clear();
+	pool.LastFrameContactsCushion	.clear();
+	::gpk::SEngine					& engine						= pool.Engine;
+
+	uint32_t						currentPlayer		= pool.StateCurrent.PlayerActive;
+	::the1::SPoolStick				& activeStick		= pool.StateCurrent.Player[currentPlayer].Stick;
+	::gpk::SCoord3<float>			ballPosition		= {};
+	pool.GetBallPosition(0, ballPosition);
+	engine.SetPosition(activeStick.Entity, ballPosition);
+	engine.SetOrientation(activeStick.Entity, ::gpk::SQuaternion<float>{}.CreateFromAxisAngle({0, 1}, -pool.StateCurrent.Player[currentPlayer].Stick.Angle));
+	if(false == pool.StateCurrent.Active) {
+		engine.Update(secondsElapsed);
+		return 0;
+	}
+
+	::poolGamePhysicsUpdate(pool, secondsElapsed);
+
+	const float						radius							= pool.StateCurrent.Table.BallRadius;
+	const float						diameter						= radius * 2;
 	for(uint32_t iBall = 0; iBall < pool.StateCurrent.CountBalls; ++iBall) {
 		::gpk::SLine3<float> & delta = pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1];
 		pool.GetBallPosition(iBall, delta.B);
@@ -325,9 +340,14 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 			}
 	}
 
-	::gpk::SCoord3<float> ballPosition = {};
-	pool.GetBallPosition(0, ballPosition);
-	engine.SetPosition(pool.StateCurrent.Player[0].Stick.Entity, ballPosition);
-	engine.SetOrientation(pool.StateCurrent.Player[0].Stick.Entity, ::gpk::SQuaternion<float>{}.CreateFromAxisAngle({0, 1}, -pool.StateCurrent.Player[0].Stick.Angle));
+	bool							playActive			= false;
+	for(uint32_t iBall = 0; iBall < pool.StateCurrent.CountBalls; ++iBall) 
+		playActive = playActive || pool.Engine.IsPhysicsActive(pool.StateCurrent.BallEntities[iBall]);
+	if(false == playActive) {
+		pool.Engine.SetHidden(activeStick.Entity, false);
+		pool.StateCurrent.Active	= false;
+	}
+
+
 	return 0;
 }

@@ -64,6 +64,13 @@ namespace the1
 		float										BallWeight						= 165;	// grams
 	};
 
+
+	GDEFINE_ENUM_TYPE(POOL_STICK_CONTROL_STATE, uint8_t);
+	GDEFINE_ENUM_VALUE(POOL_STICK_CONTROL_STATE, Aiming			, 0);
+	GDEFINE_ENUM_VALUE(POOL_STICK_CONTROL_STATE, Charging		, 1);
+	GDEFINE_ENUM_VALUE(POOL_STICK_CONTROL_STATE, Discharging	, 2);
+	GDEFINE_ENUM_VALUE(POOL_STICK_CONTROL_STATE, Done			, 3);
+	GDEFINE_ENUM_VALUE(POOL_STICK_CONTROL_STATE, Cancelled		, 4);
 	struct SPoolStick {
 		uint32_t									Entity							= (uint32_t)-1;
 		float										Radius							= .25f;
@@ -71,6 +78,7 @@ namespace the1
 		::gpk::SCoord2<float>						Tilt							= {};
 		float										Angle							= 0;
 		float										Velocity						= 0;
+		POOL_STICK_CONTROL_STATE					ShootState						= POOL_STICK_CONTROL_STATE_Aiming;
 	};
 
 	struct SPoolPlayer {
@@ -93,10 +101,12 @@ namespace the1
 		uint8_t										CountBalls						= ::the1::MAX_BALLS;
 		uint8_t										CountPlayers					= ::gpk::clamp(uint8_t(::the1::MAX_BALLS - 1), uint8_t(1), ::the1::MAX_BALLS);
 		uint64_t									Seed							= (uint64_t)::gpk::timeCurrentInUs();
+		uint8_t										PlayerActive					= 0;
 		uint8_t										TeamActive						= 0;
 		uint8_t										TeamStripped					= 0;
 		uint64_t									TimeInSeconds					= 0;
 		::the1::SPoolPhysicsState					Physics							= {};
+		bool										Active							= false;
 
 		::the1::SPoolTable							Table							= {};
 
