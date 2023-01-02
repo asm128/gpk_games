@@ -1,4 +1,5 @@
 #include "PixelShaderShared.hlsli"
+#include "ShaderColors.hlsli"
 
 float4 main(PixelShaderInput input) : SV_TARGET {
 	float4												materialcolor				= saturate(GPK_BROWN + (GPK_ORANGE * .5f));

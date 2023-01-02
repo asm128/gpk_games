@@ -103,7 +103,7 @@ namespace the1
 	};
 
 	::gpk::error_t							theOneUpdate		(::the1::STheOne & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view1d<::gpk::SSysEvent> & systemEvents);
-	::gpk::error_t							theOneDraw			(::the1::STheOne & app, ::gpk::rt<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds);
+	::gpk::error_t							theOneDraw			(::the1::STheOne & app, ::gpk::rt<::gpk::SColorBGRA, uint32_t> & backBuffer, double totalSeconds, bool onlyGUI = false);
 
 	::gpk::error_t							guiSetup			(::the1::STheOne & app, const ::gpk::pobj<::gpk::SInput> & input);
 	::gpk::error_t							guiUpdate			(::the1::STheOne & app, ::gpk::view1d<::gpk::SSysEvent> sysEvents);

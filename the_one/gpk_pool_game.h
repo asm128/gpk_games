@@ -16,8 +16,8 @@ namespace the1
 	static constexpr	uint8_t					MAX_BALLS						= 64;
 
 #pragma pack(push, 1)
-	typedef ::gpk::SContactResult	SContactResultBall;
-	typedef ::gpk::SContact			SContactBall;
+	typedef ::gpk::SContactResult				SContactResultBall;
+	typedef ::gpk::SContact						SContactBall;
 
 	struct SContactResultCushion {
 		::gpk::SCoord3<float>						ContactPosition					= {};

@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="the_one_win32.cpp">
+    <ClCompile Include="the1_win32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -36,6 +36,9 @@
   <ItemGroup>
     <None Include="ShaderShared.hlsli" />
     <None Include="PixelShaderShared.hlsli" />
+    <None Include="ShaderShared2D.hlsli" />
+    <None Include="ShaderColors.hlsli" />
+    <None Include="PixelShaderShared2D.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="SampleVertexShader.hlsl" />
@@ -48,5 +51,7 @@
     <FxCompile Include="psSolid.hlsl" />
     <FxCompile Include="psHidden.hlsl" />
     <FxCompile Include="psTableCushion.hlsl" />
+    <FxCompile Include="psGUI.hlsl" />
+    <FxCompile Include="vsGUI.hlsl" />
   </ItemGroup>
 </Project>

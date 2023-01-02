@@ -1,4 +1,5 @@
 ﻿#include "DeviceResources.h"
+#include "gpk_engine_scene.h"
 
 #include "gpk_ptr.h"
 
@@ -15,9 +16,9 @@ namespace the1_win32
 		::gpk::pobj<DX::D3DDeviceResources>		DeviceResources;
 
 		// Direct3D resources for cube geometry
-		::gpk::acom<ID3D11InputLayout	>		InputLayout;
 		::gpk::acom<ID3D11Buffer		>		VertexBuffer;
 		::gpk::acom<ID3D11Buffer		>		IndexBuffer;
+		::gpk::acom<ID3D11InputLayout	>		InputLayout;
 		::gpk::acom<ID3D11VertexShader	>		VertexShader;
 		::gpk::acom<ID3D11PixelShader	>		PixelShader;
 		::gpk::acom<ID3D11Buffer		>		ConstantBuffer;

@@ -1,4 +1,5 @@
 #include "PixelShaderShared.hlsli"
+#include "ShaderColors.hlsli"
 
 float4 main(PixelShaderInput input) : SV_TARGET
 {

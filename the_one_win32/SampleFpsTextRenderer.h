@@ -12,7 +12,7 @@ namespace the1_win32
 	// Renders the current FPS value in the bottom right corner of the screen using Direct2D and DirectWrite.
 	struct SampleFpsTextRenderer {
 		// Cached pointer to device resources.
-		::gpk::pobj<::DX::D3DDeviceResources>		DeviceResources					= {};
+		::gpk::pobj<::DX::D3DDeviceResources>			DeviceResources					= {};
 
 		// Resources related to text rendering.
 		std::wstring									Text							= {};

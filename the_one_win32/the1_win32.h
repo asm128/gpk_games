@@ -49,9 +49,19 @@ struct SApplication : DX::IDeviceNotify {
 	::the1_win32::SampleFpsTextRenderer		D3DText					;
 
 	// We need to render the GUI separately to compose DirectX target from a dynamic texture.
-	::gpk::img<::gpk::SColorBGRA>			GUIRT					;
+	::gpk::rt<::gpk::SColorBGRA, uint32_t>	GUIRT					;
 	::gpk::pcom<ID3D11ShaderResourceView>	GUISRV					;
 	::gpk::pcom<ID3D11Texture2D>			GUITexture2D			;
+	::gpk::pcom<ID3D11Buffer>				GUIVertexBuffer			;
+	::gpk::pcom<ID3D11Buffer>				GUIIndexBuffer			;
+	::gpk::pcom<ID3D11InputLayout	>		GUIInputLayout;
+	::gpk::pcom<ID3D11VertexShader	>		GUIVertexShader;
+	::gpk::pcom<ID3D11PixelShader	>		GUIPixelShader;
+	::gpk::pcom<ID3D11Buffer		>		GUIConstantBuffer;
+	::gpk::pcom<ID3D11SamplerState	>		GUISamplerStates;
+	::gpk::pcom<ID3D11ShaderResourceView>	GUIShaderResourceView;
+	::gpk::pcom<ID3D11Buffer		>		GUIConstantBufferNode, GUIConstantBufferScene;
+
 
 	::gpk::apod<uint32_t>					D3DBufferMap			;
 
@@ -74,14 +84,107 @@ struct SApplication : DX::IDeviceNotify {
 		return 0;
 	}
 
-	::gpk::error_t								CreateDeviceDependentResources	()	{
-		GUIRT.resize(Framework.RootWindow.Size);
-		gpk_necs(::gpk::d3dCreateTextureDynamic					(DeviceResources->GetD3DDevice(), GUITexture2D, GUISRV, GUIRT.View));
+	::gpk::error_t								CreateWindowSizeDependentResources	()	{
+		D3DScene.CreateWindowSizeDependentResources();
+		GUIRT.resize(Framework.RootWindow.Size, {0, 0, 0, 0}, 0xFFFFFFFFU);
+		gpk_necs(::gpk::d3dCreateTextureDynamic(DeviceResources->GetD3DDevice(), GUITexture2D, GUISRV, GUIRT.Color));
+		// 3515504948
+		{
+			// Create a sampler state
+			D3D11_SAMPLER_DESC								samDesc				= {};
+			samDesc.Filter								= D3D11_FILTER_MIN_MAG_MIP_POINT;
+			samDesc.AddressU							= D3D11_TEXTURE_ADDRESS_CLAMP;
+			samDesc.AddressV							= D3D11_TEXTURE_ADDRESS_CLAMP;
+			samDesc.AddressW							= D3D11_TEXTURE_ADDRESS_CLAMP;
+			samDesc.MaxAnisotropy						= 1;
+			samDesc.ComparisonFunc						= D3D11_COMPARISON_ALWAYS;
+			samDesc.MaxLOD								= D3D11_FLOAT32_MAX;
 
-		::gpk::SEngine									& engine				= TheOne.MainGame.Game.Engine;
-		gpk_necs(::gpk::d3dCreateBuffersFromEngineMeshes		(DeviceResources->GetD3DDevice(), engine.Scene->Graphics->Meshes, engine.Scene->Graphics->Buffers, D3DScene.IndexBuffer, D3DScene.VertexBuffer));
-		gpk_necs(::gpk::d3dCreateTexturesFromEngineSurfaces		(DeviceResources->GetD3DDevice(), engine.Scene->Graphics->Surfaces, D3DScene.ShaderResourceView));
-		gpk_necs(::gpk::d3dCreatePixelShadersFromEngineShaders	(DeviceResources->GetD3DDevice(), engine.Scene->Graphics->Shaders, D3DScene.PixelShader));
+			::gpk::pcom<ID3D11SamplerState>					samplerState;
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateSamplerState(&samDesc, &samplerState));
+			GUISamplerStates							= samplerState;
+		}
+
+		{
+#pragma pack(push, 1)
+			struct SPosUV  {
+				::gpk::n3d<float> Position;
+				::gpk::n3d<float> Normal;
+				::gpk::n2d<float> UV;
+			};
+#pragma pack(pop)
+			constexpr SPosUV								vertices[4]					= {{{-1, 1}, {0, 0, 1}, {0, 0}},{{1, 1}, {0, 0, 1}, {1, 0}},{{-1, -1}, {0, 0, 1}, {0, 1}}, {{1, -1}, {0, 0, 1}, {1, 1}}};
+
+			D3D11_SUBRESOURCE_DATA							vertexBufferData			= {vertices};
+			D3D11_BUFFER_DESC								vertexBufferDesc			= {sizeof(SPosUV) * 4};
+			vertexBufferDesc.BindFlags					= D3D11_BIND_VERTEX_BUFFER;
+			::gpk::ptr_com<ID3D11Buffer>					d3dBuffer;
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &d3dBuffer));
+			GUIVertexBuffer								= d3dBuffer;
+		}
+		{
+			constexpr uint16_t								indices[]					= {0, 1, 2, 1, 3, 2};
+			D3D11_SUBRESOURCE_DATA							vertexBufferData			= {indices};
+			D3D11_BUFFER_DESC								vertexBufferDesc			= {sizeof(uint16_t) * 6};
+			vertexBufferDesc.BindFlags					= D3D11_BIND_INDEX_BUFFER;
+			::gpk::ptr_com<ID3D11Buffer>					d3dBuffer;
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &d3dBuffer));
+			GUIIndexBuffer								= d3dBuffer;
+		}
+		return 0;
+	}
+	::gpk::error_t								CreateDeviceDependentResources		()	{
+		::gpk::SEngineGraphics									& engineGraphics				= *TheOne.MainGame.Game.Engine.Scene->Graphics;
+		gpk_necs(::gpk::d3dCreateBuffersFromEngineMeshes		(DeviceResources->GetD3DDevice(), engineGraphics.Meshes, engineGraphics.Buffers, D3DScene.IndexBuffer, D3DScene.VertexBuffer));
+		gpk_necs(::gpk::d3dCreateTexturesFromEngineSurfaces		(DeviceResources->GetD3DDevice(), engineGraphics.Surfaces, D3DScene.ShaderResourceView));
+		gpk_necs(::gpk::d3dCreatePixelShadersFromEngineShaders	(DeviceResources->GetD3DDevice(), engineGraphics.Shaders, D3DScene.PixelShader));
+		{		
+			::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
+			D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(::gpk::SRenderNodeConstants)};
+			constantBufferDesc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
+			GUIConstantBufferNode = constantBuffer;
+		}
+		{
+			::gpk::ptr_com<ID3D11Buffer>					constantBuffer;
+			D3D11_BUFFER_DESC								constantBufferDesc		= {sizeof(::gpk::SEngineSceneConstants)};
+			constantBufferDesc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer));
+			GUIConstantBufferScene = constantBuffer;
+		}
+		{
+			// Load shaders asynchronously.
+			::gpk::pcom<ID3D11InputLayout>					inputLayout	;
+			::gpk::pcom<ID3D11VertexShader>					vertexShader;
+
+			::gpk::vcs										shaderName					= "vsGUI";
+			char											shaderFileName	[1024]		= {};
+			static constexpr D3D11_INPUT_ELEMENT_DESC		vertexDesc []				=
+				{	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 00, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				,	{ "NORMAL"	, 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				,	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				};
+			sprintf_s(shaderFileName, "%s.cso", shaderName.begin());
+			::gpk::apod<byte_t>								fileVS;
+			gpk_necs(::gpk::fileToMemory(::gpk::vcs{shaderFileName}, fileVS));
+			// After the vertex shader file is loaded, create the shader and input layout.
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateVertexShader(&fileVS[0], fileVS.size(), nullptr, &vertexShader));
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreateInputLayout(vertexDesc, ARRAYSIZE(vertexDesc), &fileVS[0], fileVS.size(), &inputLayout)); 
+			GUIInputLayout								= inputLayout;
+			GUIVertexShader								= vertexShader;
+		}
+		{
+			::gpk::vcs										shaderName					= "psGUI";
+			char											shaderFileName	[1024]		= {};
+			::gpk::pcom<ID3D11PixelShader>					pixelShader;
+			sprintf_s(shaderFileName, "%s.cso", shaderName.begin());
+			::gpk::apod<byte_t>								filePS;
+			gpk_necs(::gpk::fileToMemory(::gpk::vcs{shaderFileName}, filePS));
+
+			gpk_hrcall(DeviceResources->GetD3DDevice()->CreatePixelShader(&filePS[0], filePS.size(), nullptr, &pixelShader));
+			GUIPixelShader								= pixelShader;
+		}
+
 		return 0; 
 	}
 
