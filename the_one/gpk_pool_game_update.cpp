@@ -146,18 +146,19 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 
 		for(uint32_t iContact = 0; iContact < lastFrameContactsBatchBall.size(); ++iContact) {
 			::the1::SContactBall			& contact			= lastFrameContactsBatchBall[iContact];
+			::the1::SContactResultBall		& contactResult		= contact.Result;
 			const ::gpk::SVirtualEntity		& entityA			= engine.ManagedEntities.Entities[contact.EntityA]; 
 			const ::gpk::SVirtualEntity		& entityB			= engine.ManagedEntities.Entities[contact.EntityB]; 
 
-			contact.Result.DistanceDirection	= contact.Distance;
+			contactResult.DistanceDirection	= contact.Distance;
 			double							distanceLength		= contact.DistanceLength;
-			contact.Result.DistanceDirection.Normalize();
+			contactResult.DistanceDirection.Normalize();
 
 			// Separate balls
 			::gpk::SCoord3<float>			& positionA			= engine.Integrator.Centers[entityA.RigidBody].Position;
 			::gpk::SCoord3<float>			& positionB			= engine.Integrator.Centers[entityB.RigidBody].Position;
-			positionA					+= contact.Result.DistanceDirection * ::gpk::max(pool.StateCurrent.Table.BallRadius * 2 - distanceLength, 0.0) * -.51f;
-			positionB					+= contact.Result.DistanceDirection * ::gpk::max(pool.StateCurrent.Table.BallRadius * 2 - distanceLength, 0.0) * .51f;
+			positionA					+= contactResult.DistanceDirection * ::gpk::max(pool.StateCurrent.Table.BallRadius * 2 - distanceLength, 0.0) * -.51f;
+			positionB					+= contactResult.DistanceDirection * ::gpk::max(pool.StateCurrent.Table.BallRadius * 2 - distanceLength, 0.0) * .51f;
 
 
 			// Calculate force transfer
@@ -166,33 +167,33 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 			::gpk::SCoord3<float>			& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
 			::gpk::SCoord3<float>			& rotationB			= engine.Integrator.Forces[entityB.RigidBody].Rotation;
 
-			contact.Result.InitialVelocityA	= velocityA;
-			contact.Result.InitialVelocityB	= velocityB;
-			contact.Result.InitialRotationA	= rotationA;
-			contact.Result.InitialRotationB	= rotationB;
+			contactResult.InitialVelocityA	= velocityA;
+			contactResult.InitialVelocityB	= velocityB;
+			contactResult.InitialRotationA	= rotationA;
+			contactResult.InitialRotationB	= rotationB;
 			velocityB					= {};
 			velocityA					= {};
 			rotationB					= {};
 			rotationA					= {};
-			if(contact.Result.InitialVelocityA.LengthSquared() || contact.Result.InitialRotationA.LengthSquared()) {
+			if(contactResult.InitialVelocityA.LengthSquared() || contactResult.InitialRotationA.LengthSquared()) {
 				engine.Integrator.SetActive(entityB.RigidBody, true);
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
-				::resolveCollision(contact.Result.InitialVelocityA.Cast<double>(), contact.Result.InitialRotationA.Cast<double>(), contact.Result.DistanceDirection.Cast<double>(), contact.Result.ForceTransferRatioB, rotationA, rotationB, lvelocityA, lvelocityB);
+				::resolveCollision(contactResult.InitialVelocityA.Cast<double>(), contactResult.InitialRotationA.Cast<double>(), contactResult.DistanceDirection.Cast<double>(), contactResult.ForceTransferRatioB, rotationA, rotationB, lvelocityA, lvelocityB);
 				velocityB					+= lvelocityB;
 				velocityA					+= lvelocityA;
 			}
 
-			if(contact.Result.InitialVelocityB.LengthSquared() || contact.Result.InitialRotationB.LengthSquared()) {
+			if(contactResult.InitialVelocityB.LengthSquared() || contactResult.InitialRotationB.LengthSquared()) {
 				engine.Integrator.SetActive(entityA.RigidBody, true);
 				::gpk::SCoord3<float>			lvelocityB					= {};
 				::gpk::SCoord3<float>			lvelocityA					= {};
-				::resolveCollision(contact.Result.InitialVelocityB.Cast<double>(), contact.Result.InitialRotationB.Cast<double>(), contact.Result.DistanceDirection.Cast<double>() * -1, contact.Result.ForceTransferRatioA, rotationB, rotationA, lvelocityB, lvelocityA);
+				::resolveCollision(contactResult.InitialVelocityB.Cast<double>(), contactResult.InitialRotationB.Cast<double>(), contactResult.DistanceDirection.Cast<double>() * -1, contactResult.ForceTransferRatioA, rotationB, rotationA, lvelocityB, lvelocityA);
 				velocityB					+= lvelocityB;
 				velocityA					+= lvelocityA;
 				{
-					const double					initialSpeedA				= contact.Result.InitialVelocityA.Length();
-					const double					initialSpeedB				= contact.Result.InitialVelocityB.Length();
+					const double					initialSpeedA				= contactResult.InitialVelocityA.Length();
+					const double					initialSpeedB				= contactResult.InitialVelocityB.Length();
 					const double					finalSpeedA					= velocityA.Length();
 					const double					finalSpeedB					= velocityB.Length();
 					const double					totalInitialSpeed			= initialSpeedA + initialSpeedB;
@@ -206,10 +207,10 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 				}
 			}
 
-			contact.Result.FinalVelocityA	= (velocityA *= pool.StateCurrent.Physics.DampingCollision);
-			contact.Result.FinalVelocityB	= (velocityB *= pool.StateCurrent.Physics.DampingCollision);
-			contact.Result.FinalRotationA	= (rotationA *= pool.StateCurrent.Physics.DampingCollision);
-			contact.Result.FinalRotationB	= (rotationB *= pool.StateCurrent.Physics.DampingCollision);
+			contactResult.FinalVelocityA	= (velocityA *= pool.StateCurrent.Physics.DampingCollision);
+			contactResult.FinalVelocityB	= (velocityB *= pool.StateCurrent.Physics.DampingCollision);
+			contactResult.FinalRotationA	= (rotationA *= pool.StateCurrent.Physics.DampingCollision);
+			contactResult.FinalRotationB	= (rotationB *= pool.StateCurrent.Physics.DampingCollision);
 		}
 
 		pool.LastFrameContactsBall.append(lastFrameContactsBatchBall);
@@ -270,7 +271,7 @@ static	::gpk::error_t		collisionDetectSphere			(const ::gpk::SEngine & engine, u
 			}
 			if(outOfBounds.y 
 			 &&  (positionA.x > -(tableHalfDimensions.x - pool.StateCurrent.Table.PocketRadius)
-				&& positionA.x <  (tableHalfDimensions.x - pool.StateCurrent.Table.PocketRadius)
+				&& positionA.x < (tableHalfDimensions.x - pool.StateCurrent.Table.PocketRadius)
 				&& (positionA.x < -pool.StateCurrent.Table.PocketRadius || positionA.x > pool.StateCurrent.Table.PocketRadius)
 			)) {
 				positionA.z					= (positionA.z	< -ballLimits.y) 

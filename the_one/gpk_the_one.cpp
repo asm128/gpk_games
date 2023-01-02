@@ -124,8 +124,7 @@ static	::gpk::error_t				updateInput				(::the1::STheOne & app, double secondsEl
 	//	break;
 	}
 
-	::gpk::guiProcessInput(*app.DialogForState.GUI, *app.DialogForState.Input, systemEvents);
-	::gpk::guiProcessInput(*app.DialogForRoot .GUI, *app.DialogForRoot .Input, systemEvents);
+	::the1::guiUpdate(app, systemEvents);
 
 	::updateInput(app, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.Cast<int16_t>(), inputState->MouseCurrent.ButtonState);
 
@@ -143,8 +142,8 @@ static	::gpk::error_t				updateInput				(::the1::STheOne & app, double secondsEl
 		else {
 			activeGame.GetBallPosition(0, cameraBall.Position);
 			activeGame.GetBallPosition(iBall, cameraBall.Target);
-			::gpk::SCoord3<float>			distance				=  cameraBall.Target - cameraBall.Position;
-			::gpk::SCoord3<float>			direction				=  ::gpk::SCoord3<float>{distance}.Normalize();
+			::gpk::SCoord3<float>			distance				= cameraBall.Target - cameraBall.Position;
+			::gpk::SCoord3<float>			direction				= ::gpk::SCoord3<float>{distance}.Normalize();
 			cameraBall.Position			+= direction * -2.0f;
 			cameraBall.Position.y		= 1.75f * .35f;
 		}
@@ -169,8 +168,8 @@ static	::gpk::error_t				updateInput				(::the1::STheOne & app, double secondsEl
 		::the1::poolGameDraw(app.MainGame.Game, backBuffer, cameraSelected.Position, cameraSelected.Target, {0, 1, 0}, totalSeconds);
 	}
 
-	::gpk::guiDraw(*app.DialogForState.GUI, backBuffer.Color.View);
-	::gpk::guiDraw(*app.DialogForRoot.GUI, backBuffer.Color.View);
+	memset(app.UIRenderTarget.begin(), 0, app.UIRenderTarget.Color.byte_count());
+	::gpk::guiDraw(*app.Dialog.GUI, backBuffer.Color.View);
 	return 0; 
 }
 

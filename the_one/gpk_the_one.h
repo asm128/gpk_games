@@ -93,9 +93,10 @@ namespace the1
 	struct STheOne {
 		::the1::STheOneGame						MainGame					= {};
 		::gpk::astatic<::the1::STheOneGame, 16>	TestGames					= {};
-		::gpk::SDialog							DialogForRoot				= {};
-		::gpk::SDialog							DialogForState				= {};
+		::gpk::SDialog							Dialog						= {};
 		::the1::TRenderTarget					UIRenderTarget				= {};
+		uint32_t								DialogPlay					= (uint32_t)-1;
+		uint32_t								DialogHome					= (uint32_t)-1;
 
 		::gpk::SVirtualKeyboard					VirtualKeyboard				= {};
 

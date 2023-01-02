@@ -35,13 +35,6 @@ struct SApplication : DX::IDeviceNotify {
 
 	::gpk::SGUI								GUI						= {};
 	int32_t									IdViewport				= -1;
-
-	int32_t									EntityLightDirectional	= -1;
-	int32_t									EntityLightPoint		= -1;
-	int32_t									EntityLightSpot			= -1;
-	int32_t									EntityBox				= -1;
-	int32_t									EntitySphere			= -1;
-
 	::the1::STheOne							TheOne					= {};
 
 	::gpk::pobj<::DX::D3DDeviceResources>	DeviceResources			;
@@ -49,7 +42,6 @@ struct SApplication : DX::IDeviceNotify {
 	::the1_win32::SampleFpsTextRenderer		D3DText					;
 
 	// We need to render the GUI separately to compose DirectX target from a dynamic texture.
-	::gpk::rt<::gpk::SColorBGRA, uint32_t>	GUIRT					;
 	::gpk::pcom<ID3D11ShaderResourceView>	GUISRV					;
 	::gpk::pcom<ID3D11Texture2D>			GUITexture2D			;
 	::gpk::pcom<ID3D11Buffer>				GUIVertexBuffer			;
@@ -86,8 +78,8 @@ struct SApplication : DX::IDeviceNotify {
 
 	::gpk::error_t								CreateWindowSizeDependentResources	()	{
 		D3DScene.CreateWindowSizeDependentResources();
-		GUIRT.resize(Framework.RootWindow.Size, {0, 0, 0, 0}, 0xFFFFFFFFU);
-		gpk_necs(::gpk::d3dCreateTextureDynamic(DeviceResources->GetD3DDevice(), GUITexture2D, GUISRV, GUIRT.Color));
+		TheOne.UIRenderTarget.resize(Framework.RootWindow.Size, {0, 0, 0, 0}, 0xFFFFFFFFU);
+		gpk_necs(::gpk::d3dCreateTextureDynamic(DeviceResources->GetD3DDevice(), GUITexture2D, GUISRV, TheOne.UIRenderTarget.Color));
 		// 3515504948
 		{
 			// Create a sampler state
@@ -109,11 +101,10 @@ struct SApplication : DX::IDeviceNotify {
 #pragma pack(push, 1)
 			struct SPosUV  {
 				::gpk::n3d<float> Position;
-				::gpk::n3d<float> Normal;
 				::gpk::n2d<float> UV;
 			};
 #pragma pack(pop)
-			constexpr SPosUV								vertices[4]					= {{{-1, 1}, {0, 0, 1}, {0, 0}},{{1, 1}, {0, 0, 1}, {1, 0}},{{-1, -1}, {0, 0, 1}, {0, 1}}, {{1, -1}, {0, 0, 1}, {1, 1}}};
+			constexpr SPosUV								vertices[4]					= {{{-1, 1}, {0, 0}},{{1, 1}, {1, 0}},{{-1, -1}, {0, 1}}, {{1, -1}, {1, 1}}};
 
 			D3D11_SUBRESOURCE_DATA							vertexBufferData			= {vertices};
 			D3D11_BUFFER_DESC								vertexBufferDesc			= {sizeof(SPosUV) * 4};
@@ -161,10 +152,9 @@ struct SApplication : DX::IDeviceNotify {
 			char											shaderFileName	[1024]		= {};
 			static constexpr D3D11_INPUT_ELEMENT_DESC		vertexDesc []				=
 				{	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 00, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-				,	{ "NORMAL"	, 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-				,	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				,	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 				};
-			sprintf_s(shaderFileName, "%s.cso", shaderName.begin());
+			sprintf_s(shaderFileName, "%s.cso", shaderName.begin()) ;
 			::gpk::apod<byte_t>								fileVS;
 			gpk_necs(::gpk::fileToMemory(::gpk::vcs{shaderFileName}, fileVS));
 			// After the vertex shader file is loaded, create the shader and input layout.
