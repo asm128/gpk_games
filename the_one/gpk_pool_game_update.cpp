@@ -346,6 +346,7 @@ static ::gpk::error_t		poolGamePhysicsUpdate			(::the1::SPoolGame & pool, double
 	if(false == playActive) {
 		pool.Engine.SetHidden(activeStick.Entity, false);
 		pool.StateCurrent.Active	= false;
+		activeStick.ShootState		= ::the1::POOL_STICK_CONTROL_STATE_Aiming;
 	}
 
 

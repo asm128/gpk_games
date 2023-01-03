@@ -72,6 +72,18 @@ namespace the1
 	GDEFINE_ENUM_VALUE(UI_HOME, Settings		, 7);
 	GDEFINE_ENUM_VALUE(UI_HOME, Exit			, 8);
 
+	GDEFINE_ENUM_TYPE (UI_PLAY, uint8_t);
+	GDEFINE_ENUM_VALUE(UI_PLAY, Menu			, 0);
+	GDEFINE_ENUM_VALUE(UI_PLAY, Time			, 1);
+	GDEFINE_ENUM_VALUE(UI_PLAY, Turn			, 2);
+	GDEFINE_ENUM_VALUE(UI_PLAY, Player			, 3);
+	GDEFINE_ENUM_VALUE(UI_PLAY, Strength		, 4);
+	GDEFINE_ENUM_VALUE(UI_PLAY, Level			, 5);
+
+	GDEFINE_ENUM_TYPE (UI_PROFILE, uint8_t);
+	GDEFINE_ENUM_VALUE(UI_PROFILE, Name			, 0);
+	GDEFINE_ENUM_VALUE(UI_PROFILE, Score		, 1);
+
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
 	GDEFINE_ENUM_VALUE(APP_STATE, Init			,  0);
 	GDEFINE_ENUM_VALUE(APP_STATE, Welcome		,  1);
@@ -95,10 +107,8 @@ namespace the1
 		::gpk::astatic<::the1::STheOneGame, 16>	TestGames					= {};
 		::gpk::SDialog							Dialog						= {};
 		::the1::TRenderTarget					UIRenderTarget				= {};
-		uint32_t								DialogPlay					= (uint32_t)-1;
-		uint32_t								DialogHome					= (uint32_t)-1;
-
-		::gpk::SVirtualKeyboard					VirtualKeyboard				= {};
+		::gpk::astatic<uint32_t, ::the1::APP_STATE_COUNT>	
+												DialogPerState				= {};
 
 		APP_STATE								ActiveState					= {};
 	};

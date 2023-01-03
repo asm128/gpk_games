@@ -114,7 +114,8 @@ static	::gpk::error_t				updateInput				(::the1::STheOne & app, double secondsEl
 		app.MainGame.Game.Engine.SetVelocity(app.MainGame.Game.StateCurrent.BallEntities[0], velocity);
 		//app.MainGame.Game.Engine.SetRotation(app.MainGame.Game.StateCurrent.Ball[0].Entity, {0, (1.0f + (rand() % 100) * .5f) * -scale, 0});
 		app.MainGame.Game.Engine.SetHidden(activeStick.Entity, true);
-		activeStick.Velocity = 0;
+		activeStick.Velocity					= 0;
+		activeStick.ShootState					= ::the1::POOL_STICK_CONTROL_STATE_Done;
 	}
 
 	::the1::SCamera					& cameraSelected		
@@ -146,14 +147,12 @@ static	::gpk::error_t				updateInput				(::the1::STheOne & app, double secondsEl
 
 ::gpk::error_t				the1::theOneUpdate		(::the1::STheOne & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view1d<::gpk::SSysEvent> & systemEvents) { 
 	switch(app.ActiveState) {
-	case ::the1::APP_STATE_Init		: {
+	case ::the1::APP_STATE_Quit		: 
+		return 1;
+	case ::the1::APP_STATE_Init		:
 		::theOneSetup(app, inputState);
 		app.ActiveState				= ::the1::APP_STATE_Home;
-	}
 		break;
-	//case ::the1::APP_STATE_Play		: {
-	//	app.ActiveState				= ::the1::APP_STATE_Home;
-	//	break;
 	}
 
 	::the1::guiUpdate(app, systemEvents);

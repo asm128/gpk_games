@@ -87,7 +87,7 @@ namespace the1
 	};
 
 	struct SPoolPhysicsState {
-		float										DampingClothDisplacement		= .7f;
+		float										DampingClothDisplacement		= .6f;
 		float										DampingClothRotation			= .01f;
 		float										DampingCollision				= .975f;
 		float										DampingCushion					= .95f;

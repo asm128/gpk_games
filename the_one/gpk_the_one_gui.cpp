@@ -22,24 +22,56 @@ static	::gpk::error_t			dialogCreateCommon			(::gpk::SDialog & dialog, const ::g
 	return 0;
 }
 
+static	::gpk::error_t			guiContainerSetupDefaults	(::gpk::SGUI & gui, uint32_t iControl, uint32_t iParent) { 
+	gui.Controls.Constraints[iControl].AttachSizeToControl		= {(int32_t)iControl, (int32_t)iControl};
+	gui.Controls.Modes		[iControl].NoBackgroundRect			= true;
+	gui.Controls.Modes		[iControl].Design					= true;
+	::gpk::controlSetParent(gui, iControl, iParent);
+	return 0; 
+}
+
 static	::gpk::error_t			guiSetupWelcome				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.Dialog; (void)dialog; return 0; }
 static	::gpk::error_t			guiSetupHome				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.Dialog; 
 	constexpr int						BUTTON_HEIGHT				= 24;
-	gpk_necs(app.DialogHome = ::gpk::controlCreate(*dialog.GUI));
-	dialog.GUI->Controls.Constraints[app.DialogHome].AttachSizeToControl = {(int32_t)app.DialogHome, (int32_t)app.DialogHome};
-	dialog.GUI->Controls.Modes[app.DialogHome].NoBackgroundRect = true;
-	uint32_t							firstControl				= ::gpk::guiSetupButtonList<::the1::UI_HOME>(*dialog.GUI, app.DialogHome, {160, BUTTON_HEIGHT}, {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::the1::UI_HOME>() / 2)}, ::gpk::ALIGN_CENTER);
-	gpk_necs(firstControl); 
-	for(uint32_t iButton = firstControl; iButton < firstControl + ::gpk::get_value_count<::the1::UI_HOME>(); ++iButton)
-		dialog.GUI->Controls.Controls[iButton].Area.Offset.y += 0;
+	::gpk::SGUI							& gui						= *dialog.GUI;
+	{
+		uint32_t							firstControl				= ::gpk::guiSetupButtonList<::the1::UI_HOME>(gui, app.DialogPerState[::the1::APP_STATE_Home], {160, BUTTON_HEIGHT}, {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::the1::UI_HOME>() / 2)}, ::gpk::ALIGN_CENTER);
+		gpk_necs(firstControl); 
+		for(uint32_t iButton = firstControl; iButton < firstControl + ::gpk::get_value_count<::the1::UI_HOME>(); ++iButton)
+			gui.Controls.Controls[iButton].Area.Offset.y += 0;
 
-	for(uint32_t iButton = firstControl + ::the1::UI_HOME_Start; iButton < firstControl + ::gpk::get_value_count<::the1::UI_HOME>(); ++iButton)
-		dialog.GUI->Controls.Controls[iButton].Area.Offset.y += 36;
-
-	(void)dialog; 
+		for(uint32_t iButton = firstControl + ::the1::UI_HOME_Start; iButton < firstControl + ::gpk::get_value_count<::the1::UI_HOME>(); ++iButton)
+			gui.Controls.Controls[iButton].Area.Offset.y += 36;
+	}
+	for(uint32_t iPlayer = 0; iPlayer < 2; ++iPlayer) {
+		uint32_t							playerRoot					= app.MainGame.PlayerUI[iPlayer].DialogHome = ::gpk::controlCreate(gui);
+		guiContainerSetupDefaults(gui, playerRoot, app.DialogPerState[::the1::APP_STATE_Home]);
+		uint32_t							firstControl				= ::gpk::guiSetupButtonList<::the1::UI_PROFILE>(gui, playerRoot, {160, BUTTON_HEIGHT}, {0, 0}, iPlayer ? ::gpk::ALIGN_TOP_LEFT : ::gpk::ALIGN_TOP_RIGHT);
+		gpk_necs(firstControl);
+		gui.Controls.States[firstControl].Hidden = true;
+		gui.Controls.States[firstControl].Disabled = true;
+		gpk_necs(::gpk::inputBoxCreate(app.MainGame.PlayerUI[iPlayer].Name, gui, firstControl));
+		app.MainGame.PlayerUI[iPlayer].Name.Edit(gui, false);
+	}
 	return 0; 
 }
-static	::gpk::error_t			guiSetupPlay				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.Dialog; (void)dialog; return 0; }
+
+static	::gpk::error_t			guiSetupPlay				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.Dialog; 
+	constexpr int						BUTTON_HEIGHT				= 24;
+	::gpk::SGUI							& gui						= *dialog.GUI;
+	uint32_t							firstControl				= ::gpk::guiSetupButtonList<::the1::UI_PLAY>(gui, app.DialogPerState[::the1::APP_STATE_Play], {160, BUTTON_HEIGHT}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM);
+	gpk_necs(firstControl); 
+	for(uint32_t iPlayer = 0; iPlayer < 2; ++iPlayer) {
+		uint32_t							playerRoot					= app.MainGame.PlayerUI[iPlayer].DialogPlay = ::gpk::controlCreate(gui);
+		guiContainerSetupDefaults(gui, app.MainGame.PlayerUI[iPlayer].DialogPlay, app.DialogPerState[::the1::APP_STATE_Play]);
+		uint32_t							firstControlPlayer			= ::gpk::guiSetupButtonList<::the1::UI_PROFILE>(gui, playerRoot, {160, BUTTON_HEIGHT}, {0, 0}, iPlayer ? ::gpk::ALIGN_TOP_LEFT : ::gpk::ALIGN_TOP_RIGHT);
+		gpk_necs(firstControlPlayer); 
+		gui.Controls.Modes[firstControlPlayer].FrameOut	= true;
+		gui.Controls.States[firstControlPlayer].Disabled	= true;
+	}
+	return 0; 
+}
+
 static	::gpk::error_t			guiSetupShop				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.Dialog; (void)dialog; return 0; }
 static	::gpk::error_t			guiSetupProfile				(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.Dialog; (void)dialog; return 0; }
 static	::gpk::error_t			guiSetupSettings			(::the1::STheOne & app) { ::gpk::SDialog	& dialog = app.Dialog; (void)dialog; return 0; }
@@ -48,7 +80,16 @@ static	::gpk::error_t			guiSetupLoad				(::the1::STheOne & app) { ::gpk::SDialog
 
 ::gpk::error_t					the1::guiSetup				(::the1::STheOne & app, const ::gpk::pobj<::gpk::SInput> & input) {
 	gpk_necs(::dialogCreateCommon(app.Dialog, input, {}));
-
+	::gpk::SGUI							& gui						= *app.Dialog.GUI;
+	for(uint32_t iState = 0; iState < app.DialogPerState.size(); ++iState) {
+		uint32_t							iControl;
+		gpk_necs(iControl = app.DialogPerState[iState] = ::gpk::controlCreate(gui));
+		guiContainerSetupDefaults(gui, iControl, app.Dialog.Root);
+	}
+	for(uint32_t iPlayer = 0; iPlayer < 2; ++iPlayer) {
+		guiContainerSetupDefaults(gui, app.MainGame.PlayerUI[iPlayer].DialogHome = ::gpk::controlCreate(gui), app.DialogPerState[::the1::APP_STATE_Home]);
+		guiContainerSetupDefaults(gui, app.MainGame.PlayerUI[iPlayer].DialogPlay = ::gpk::controlCreate(gui), app.DialogPerState[::the1::APP_STATE_Play]);
+	}
 	gpk_necs(::guiSetupWelcome	(app));
 	gpk_necs(::guiSetupHome		(app));
 	gpk_necs(::guiSetupPlay		(app));
@@ -57,14 +98,11 @@ static	::gpk::error_t			guiSetupLoad				(::the1::STheOne & app) { ::gpk::SDialog
 	gpk_necs(::guiSetupSettings	(app));
 	gpk_necs(::guiSetupAbout	(app));
 	gpk_necs(::guiSetupLoad		(app));
-
-	gpk_necs(::gpk::virtualKeyboardSetup437(*app.Dialog.GUI, app.VirtualKeyboard));
 	return 0;
 }
 
 static	::gpk::error_t			guiUpdatePlay				(::the1::STheOne & app, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents) { (void)app; (void)sysEvents; return 0; }
-static	::gpk::error_t			guiUpdateHome				(::the1::STheOne & app, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents) { 
-	(void)app; (void)sysEvents; 
+static	::gpk::error_t			guiUpdateHome				(::the1::STheOne & app, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents) { (void)app; (void)sysEvents; 
 	return 0; 
 }
 
@@ -74,10 +112,11 @@ static	::gpk::error_t			guiHandleHome				(::the1::STheOne & app, ::gpk::SGUI & g
 	case ::the1::UI_HOME_Start: 
 		::the1::poolGameReset(app.MainGame.Game, ::the1::POOL_GAME_MODE_8Ball);
 	case ::the1::UI_HOME_Continue: 
+		gui.Controls.States[app.DialogPerState[app.ActiveState]].Hidden = true;
 		app.ActiveState = ::the1::APP_STATE_Play;
-		gui.Controls.States[app.DialogHome].Hidden = true;
-		::gpk::guiUpdateMetrics(gui, gui.LastSize, true);
-		//memset(app.UIRenderTarget.Color.begin(), 0, app.UIRenderTarget.Color.byte_count());
+		break;
+	case ::the1::UI_HOME_Exit: 
+		app.ActiveState					= ::the1::APP_STATE_Quit;
 		break;
 	}
 	return 0; 
@@ -95,8 +134,12 @@ static	::gpk::error_t			guiHandleHome				(::the1::STheOne & app, ::gpk::SGUI & g
 	::gpk::SDialog						& dialog					= app.Dialog;
 	dialog.Update();
 	::gpk::SGUI							& gui						= *dialog.GUI;
+
 	::gpk::apod<uint32_t>				controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
+	for(uint32_t iPlayer = 0; iPlayer < 2; ++iPlayer) {
+		app.MainGame.PlayerUI[iPlayer].Name.Update(gui, sysEvents, controlsToProcess);
+	}
 
 	::the1::STheOneGame					& game						= app.MainGame;
 	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
@@ -105,13 +148,14 @@ static	::gpk::error_t			guiHandleHome				(::the1::STheOne & app, ::gpk::SGUI & g
 		bool								handled				= false;
 		if(controlState.Execute) {
 			info_printf("Executed %u.", idControl);
+			idControl						= idControl - (gui.Controls.Children[app.DialogPerState[app.ActiveState]][0]);
 			switch(appState) {
 			//case ::the1::APP_STATE_Load		: appState = (::the1::APP_STATE)::guiHandleLoad		(app, gui, idControl, game);			handled = true; break;
 			//case ::the1::APP_STATE_Welcome	: appState = (::the1::APP_STATE)::guiHandleWelcome	(app, gui, idControl, game);			handled = true; break;
-			case ::the1::APP_STATE_Home		: appState = (::the1::APP_STATE)::guiHandleHome		(app, gui, idControl - (app.DialogHome + 1), game);			handled = true; break;
+			case ::the1::APP_STATE_Home		: appState = (::the1::APP_STATE)::guiHandleHome		(app, gui, idControl, game);			handled = true; break;
 			//case ::the1::APP_STATE_Profile	: appState = (::the1::APP_STATE)::guiHandleUser		(gui, idControl, game);				handled = true; break;
 			//case ::the1::APP_STATE_Shop		: appState = (::the1::APP_STATE)::guiHandleShop		(gui, idControl, game);				handled = true; break;
-			case ::the1::APP_STATE_Play		: appState = (::the1::APP_STATE)::guiHandlePlay		(app, gui, idControl - (app.DialogPlay + 1), game);			handled = true; break;
+			case ::the1::APP_STATE_Play		: appState = (::the1::APP_STATE)::guiHandlePlay		(app, gui, idControl, game);			handled = true; break;
 			//case ::the1::APP_STATE_Settings	: appState = (::the1::APP_STATE)::guiHandleSetup	(gui, idControl, game);				handled = true; break;
 			//case ::the1::APP_STATE_About	: appState = (::the1::APP_STATE)::guiHandleAbout	(gui, idControl, game);				handled = true; break;
 			}

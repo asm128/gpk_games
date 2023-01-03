@@ -71,7 +71,8 @@ static				::gpk::error_t					updateSizeDependentResources				(::SApplication& ap
 	::gpk::SWindow											& mainWindow								= app.Framework.RootWindow;
 	{
 		::gpk::STimer										timer;
-		::the1::theOneUpdate(app.TheOne, frameInfo.Seconds.LastFrame, framework.Input, framework.RootWindow.EventQueue);
+		if(::the1::theOneUpdate(app.TheOne, frameInfo.Seconds.LastFrame, framework.Input, framework.RootWindow.EventQueue))
+			return 1;
 
 		timer.Frame();
 		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
@@ -93,11 +94,6 @@ static				::gpk::error_t					updateSizeDependentResources				(::SApplication& ap
 	if(mainWindow.Resized) {
 		ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
 	}
-	else 
-		for(uint32_t iEvent = 0; iEvent < mainWindow.EventQueue.size(); ++iEvent) {
-			if(mainWindow.EventQueue[iEvent].Type == ::gpk::SYSEVENT_WINDOW_RESIZE)
-				ree_if(errored(::updateSizeDependentResources(app)), "Cannot update offscreen and this could cause an invalid memory access later on.");
-		}
 
 	//-----------------------------
 	::gpk::STimer											& timer										= app.Framework.Timer;
