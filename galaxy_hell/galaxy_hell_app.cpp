@@ -13,10 +13,10 @@
 		switch(eventToProcess.Type) {
 		case gpk::SYSEVENT_WINDOW_RESIZE: {
 			::gpk::SCoord2<uint16_t>			newMetrics						= *(const ::gpk::SCoord2<uint16_t>*)eventToProcess.Data.begin();
-			::gpk::guiUpdateMetrics(*app.DialogDesktop.GUI, newMetrics.Cast<uint32_t>(), true);
+			::gpk::guiUpdateMetrics(*app.DialogDesktop.GUI, newMetrics, true);
 			for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) {
-				if(app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI) ::gpk::guiUpdateMetrics(*app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI, newMetrics.Cast<uint32_t>(), true);
-				if(app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI) ::gpk::guiUpdateMetrics(*app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI, newMetrics.Cast<uint32_t>(), true);
+				if(app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI) ::gpk::guiUpdateMetrics(*app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI, newMetrics, true);
+				if(app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI) ::gpk::guiUpdateMetrics(*app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI, newMetrics, true);
 			}
 
 			app.RenderTargetPool.resize(16);
