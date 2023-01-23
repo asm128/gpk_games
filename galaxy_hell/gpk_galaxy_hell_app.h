@@ -163,8 +163,8 @@ namespace ghg
 		::gpk::apod<uint32_t>					Weapons;
 
 		::gpk::error_t							Save			(::gpk::apod<byte_t> & output) const {
-			gpk_necs(::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipCore >{&Core , 1}, output));
-			gpk_necs(::gpk::viewWrite(::gpk::view_array<const ::ghg::SShipScore>{&Score, 1}, output));
+			gpk_necs(::gpk::savePOD(output, Core ));
+			gpk_necs(::gpk::savePOD(output, Score));
 			gpk_necs(::gpk::viewWrite(Parts		, output));
 			gpk_necs(::gpk::viewWrite(Weapons	, output));
 			return 0;
@@ -231,7 +231,7 @@ namespace ghg
 
 		::gpk::error_t							Save			(::gpk::apod<byte_t> & output) const {
 			gpk_necs(::gpk::viewWrite(Name		, output));
-			gpk_necs(::gpk::viewWrite(::gpk::view_array<const ::ghg::SPlayerState>{&State, 1}, output));
+			gpk_necs(::gpk::savePOD(output, State));
 			gpk_necs(::gpk::viewWrite(Weapons	, output));
 			gpk_necs(::gpk::viewWrite(Orbiters	, output));
 			gpk_necs(output.append(::gpk::vcc{(const byte_t*)&Ships.size(), 4}));

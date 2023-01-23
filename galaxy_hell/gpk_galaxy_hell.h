@@ -86,8 +86,8 @@ namespace ghg
 		::ghg::SShipManager										ShipState				= {};
 		::ghg::SDecoState										DecoState				= {};	
 		::ghg::SPlayState										PlayState				= {};
-		::gpk::aobj<::ghg::SShipPilot>						Pilots					= {};
-		::gpk::apod<::ghg::SShipController>				ShipControllers			= {};
+		::gpk::aobj<::ghg::SShipPilot>							Pilots					= {};
+		::gpk::apod<::ghg::SShipController>						ShipControllers			= {};
 		
 		::ghg::SGalaxyHellDrawCache								DrawCache;
 		::std::mutex											LockUpdate;
@@ -107,10 +107,10 @@ namespace ghg
 		}
 
 		::gpk::error_t											Save					(::gpk::apod<byte_t> & output)		const	{
-			::gpk::viewWrite(::gpk::view_array<const ::ghg::SPlayState>{&PlayState, 1}, output);
+			gpk_necs(::gpk::savePOD(output, PlayState));
 			for(uint32_t iPlayer = 0; iPlayer < PlayState.CountPlayers; ++iPlayer) {
 				::gpk::viewWrite(Pilots[iPlayer].Name, output);
-				::gpk::viewWrite(::gpk::view_array<const ::gpk::SColorBGRA>{&Pilots[iPlayer].Color, 1}, output);
+				::gpk::savePOD(output, Pilots[iPlayer].Color);
 			}
 
 			::gpk::viewWrite(ShipControllers, output);
@@ -166,8 +166,8 @@ namespace ghg
 		, const ::gpk::SColorFloat							& shipColor	
 		, float												animationTime
 		, const ::gpk::SMatrix4<float>						& matrixVP
-		, ::gpk::view2d<::gpk::SColorBGRA>				& targetPixels
-		, ::gpk::view2d<uint32_t>						depthBuffer
+		, ::gpk::view2d<::gpk::SColorBGRA>					& targetPixels
+		, ::gpk::view2d<uint32_t>							depthBuffer
 		, ::ghg::SGalaxyHellDrawCache						& drawCache
 		);
 }

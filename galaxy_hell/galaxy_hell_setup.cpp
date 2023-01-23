@@ -10,11 +10,11 @@
 #include <mmsystem.h>
 
 ::gpk::error_t					ghg::solarSystemSave		(const ::ghg::SGalaxyHell & game, ::gpk::vcc fileName) {
-	::gpk::apod<byte_t>			serialized;
-	game.Save(serialized);
+	::gpk::apod<byte_t>					serialized;
+	gpk_necs(game.Save(serialized));
 
-	::gpk::apod<byte_t>			deflated;
-	::gpk::arrayDeflate(serialized, deflated);
+	::gpk::apod<byte_t>					deflated;
+	gpk_necs(::gpk::arrayDeflate(serialized, deflated));
 
 	info_printf("Savegame size in bytes: %u.", serialized.size());
 	info_printf("Savegame file size: %u.", deflated.size());
@@ -23,19 +23,19 @@
 }
 
 ::gpk::error_t					ghg::solarSystemLoad		(::ghg::SGalaxyHell & world,::gpk::vcc filename) {
-	::gpk::apod<byte_t>			serialized;
+	::gpk::apod<byte_t>					serialized;
 	world.PlayState.TimeLast		= ::gpk::timeCurrent();
 
 	gpk_necall(::gpk::fileToMemory(filename, serialized), "%s", "");
-	::gpk::apod<byte_t>			inflated;
-	::gpk::arrayInflate(serialized, inflated);
+	::gpk::apod<byte_t>					inflated;
+	gpk_necs(::gpk::arrayInflate(serialized, inflated));
 
 	info_printf("Savegame file size: %u.", inflated.size());
 	info_printf("Savegame size in bytes: %u.", serialized.size());
 
 	::gpk::view_array<const byte_t>		viewSerialized				= {(const byte_t*)inflated.begin(), inflated.size()};
 	if errored(world.Load(viewSerialized)) {
-		::ghg::solarSystemReset(world);
+		gpk_necs(::ghg::solarSystemReset(world));
 		return -1;
 	}
 	world.PlayState.Paused			= true;
