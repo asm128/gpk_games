@@ -122,8 +122,7 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Flare		, 7);
 
 	GDEFINE_ENUM_TYPE(WEAPON_EFFECT, uint8_t);
-	GDEFINE_ENUM_VALUE(WEAPON_LOAD, Pierce		, 0);
-
+	GDEFINE_ENUM_VALUE(WEAPON_EFFECT, Pierce		, 0);
 
 	// One per value combination
 	struct SWeaponLoad {

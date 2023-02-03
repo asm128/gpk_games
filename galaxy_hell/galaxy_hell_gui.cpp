@@ -210,7 +210,7 @@ static	::gpk::error_t			guiSetupHome				(::ghg::SGalaxyHellApp & app, ::gpk::SDi
 	gpk_necs(::gpk::tunerCreate(dialog, app.TunerPlayerCount));
 	app.TunerPlayerCount->ValueLimits.Min			= 1;
 	app.TunerPlayerCount->ValueLimits.Max			= ::ghg::MAX_PLAYERS;
-	app.TunerPlayerCount->FuncValueFormat			= [](::gpk::vcc & string, int64_t value) { 
+	app.TunerPlayerCount->FuncValueFormat			= [](::gpk::vcc & string, int64_t value, const ::gpk::SMinMax<int64_t> & /*limits*/) { 
 		string = (value == 1) ? ::gpk::vcs("%lli Player") : ::gpk::vcs("%lli Players"); 
 		return 0; 
 	};
