@@ -210,11 +210,11 @@ static	::gpk::error_t			guiSetupHome				(::ghg::SGalaxyHellApp & app, ::gpk::SDi
 	gpk_necs(::gpk::tunerCreate(dialog, app.TunerPlayerCount));
 	app.TunerPlayerCount->ValueLimits.Min			= 1;
 	app.TunerPlayerCount->ValueLimits.Max			= ::ghg::MAX_PLAYERS;
-	app.TunerPlayerCount->FuncValueFormat			= [](::gpk::vcc & string, int64_t value, const ::gpk::SMinMax<int64_t> & /*limits*/) { 
+	app.TunerPlayerCount->FuncValueFormat			= [](::gpk::vcc & string, uint8_t value, const ::gpk::SMinMax<uint8_t> & /*limits*/) { 
 		string = (value == 1) ? ::gpk::vcs("%lli Player") : ::gpk::vcs("%lli Players"); 
 		return 0; 
 	};
-	::gpk::tunerSetValue(*app.TunerPlayerCount, 1);
+	app.TunerPlayerCount->SetValue(1);
 	//tuner->IdGUIControl
 	::gpk::SControl						& control					= dialog.GUI->Controls.Controls[app.TunerPlayerCount->IdGUIControl];
 	control.Area.Size.x				= 160;
@@ -318,7 +318,7 @@ static	::gpk::error_t			guiHandleLoad				(::ghg::SGalaxyHellApp & app, ::gpk::SG
 			::ghg::solarSystemReset(app.Game);
 			return -1;
 		}
-		::gpk::tunerSetValue(*app.TunerPlayerCount, app.Game.PlayState.CountPlayers);
+		app.TunerPlayerCount->SetValue(app.Game.PlayState.CountPlayers);
 		for(uint32_t iPilot = 0; iPilot < app.Game.PlayState.CountPlayers; ++iPilot) {
 			const ::gpk::vcc namePilot	= app.Game.Pilots[iPilot].Name;
 			for(uint32_t iPlayer = 0; iPlayer < app.Game.PlayState.CountPlayers; ++iPlayer) {

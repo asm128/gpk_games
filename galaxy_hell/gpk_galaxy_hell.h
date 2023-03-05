@@ -43,8 +43,8 @@ namespace ghg
 		uint64_t												TimeStart				= 0;
 		uint64_t												TimeLast				= 0;
 		uint32_t												Seed					= 1;
-		uint32_t												OffsetStage				= 2;
-		uint32_t												CountPlayers				= 1;
+		uint16_t												OffsetStage				= 2;
+		uint8_t													CountPlayers			= 1;
 		PLAY_TYPE												PlayType				= (PLAY_TYPE)0;
 		PLAY_MODE												PlayMode				= (PLAY_MODE)PLAY_MODE_VR;
 

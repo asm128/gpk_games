@@ -25,7 +25,7 @@ struct SApplication {
  
 	//::gpk::SUDPClient		Client;
 
-							SApplication		(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
+							SApplication		(::gpk::SRuntimeValues & runtimeValues)	: Framework(runtimeValues)		{}
 };
 
 #endif // CED_DEMO_08_H_298837492837

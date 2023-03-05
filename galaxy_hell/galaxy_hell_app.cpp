@@ -93,7 +93,7 @@
 			}
 
 		}
-		::gpk::tunerSetValue(*app.TunerPlayerCount, app.Game.PlayState.CountPlayers);
+		app.TunerPlayerCount->SetValue((uint8_t)app.Game.PlayState.CountPlayers);
 		for(uint32_t iPilot = 0; iPilot < app.Game.PlayState.CountPlayers; ++iPilot) {
 			const ::gpk::vcc namePilot	= app.Game.Pilots[iPilot].Name;
 			for(uint32_t iPlayer = 0; iPlayer < app.Game.PlayState.CountPlayers; ++iPlayer) {

@@ -300,7 +300,7 @@ namespace ghg
 
 		::gpk::SDialog											DialogDesktop				= {};
 		::gpk::aobj<::ghg::SPlayer>								Players						= {};
-		::gpk::pnco<::gpk::SDialogTuner>						TunerPlayerCount;
+		::gpk::pnco<::gpk::SDialogTuner<uint8_t>>				TunerPlayerCount;
 
 		::ghg::SGalaxyHell										Game;
 		::gpk::aobj<::ghg::SUserCredentials>					UserCredentials				= {};
