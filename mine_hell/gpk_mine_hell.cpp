@@ -225,54 +225,55 @@ static	::gpk::error_t				uncoverCell						(::gpk::view2d<::gpkg::SMineHellCell> 
 	return 0;
 }
 
-::gpk::error_t						gpkg::SMineHell::Save			(::gpk::apod<char_t> & bytes)	{
+::gpk::error_t						gpkg::SMineHell::Save			(::gpk::au8 & bytes)	{
 	if(false == GameState.BlockBased) {
-		::gpk::apod<byte_t>				rleDecoded						= {};
-		gpk_necall(rleDecoded.append((const char*)&Board.metrics(), sizeof(::gpk::SCoord2<uint32_t>)) , "%s", "Out of memory?");
-		gpk_necall(rleDecoded.append((const char*)Board.Texels.begin(), Board.Texels.size()), "%s", "Out of memory?");
+		::gpk::au8								rleDecoded						= {};
+		gpk_necall(rleDecoded.append((const uint8_t*)&Board.metrics(), sizeof(::gpk::SCoord2<uint32_t>)) , "%s", "Out of memory?");
+		gpk_necall(rleDecoded.append((const uint8_t*)Board.Texels.begin(), Board.Texels.size()), "%s", "Out of memory?");
 		gpk_necall(::gpk::rleEncode(rleDecoded, bytes), "%s", "Out of memory?");
-		gpk_necall(bytes.append((const char*)&GameState.Time, sizeof(::gpk::SRange<uint64_t>)), "%s", "Out of memory?");
+		gpk_necall(bytes.append((const uint8_t*)&GameState.Time, sizeof(::gpk::SRange<uint64_t>)), "%s", "Out of memory?");
 	}
 	else {
-		::gpk::apod<byte_t>				rleDecoded						= {};
-		gpk_necall(rleDecoded.append((const char*)&GameState.BlockSize, sizeof(::gpk::SCoord2<uint32_t>)) , "%s", "Out of memory?");
-		gpk_necall(rleDecoded.append((const char*)&BoardBlocks.size(), sizeof(uint32_t)) , "%s", "Out of memory?");
+		::gpk::au8								rleDecoded						= {};
+		gpk_necall(rleDecoded.append((const uint8_t*)&GameState.BlockSize, sizeof(::gpk::SCoord2<uint32_t>)) , "%s", "Out of memory?");
+		gpk_necall(rleDecoded.append((const uint8_t*)&BoardBlocks.size(), sizeof(uint32_t)) , "%s", "Out of memory?");
 		for(uint32_t iBlock = 0; iBlock < BoardBlocks.size(); ++iBlock) {
 			if(nullptr == BoardBlocks[iBlock].get_ref())
 				gpk_necall(rleDecoded.push_back(0), "%s", "Out of memory?");
 			else {
 				gpk_necall(rleDecoded.push_back(1), "%s", "Out of memory?");
-				gpk_necall(rleDecoded.append((const char*)BoardBlocks[iBlock]->Texels.begin(), BoardBlocks[iBlock]->Texels.size()), "%s", "Out of memory?");
+				gpk_necall(rleDecoded.append((const uint8_t*)BoardBlocks[iBlock]->Texels.begin(), BoardBlocks[iBlock]->Texels.size()), "%s", "Out of memory?");
 			}
 		}
 		gpk_necall(::gpk::arrayDeflate(rleDecoded, bytes), "%s", "Out of memory?");
 		info_printf("Game state saved. State size: %u. Deflated: %u.", rleDecoded.size(), bytes.size());
-		gpk_necall(bytes.append((const char*)&GameState, sizeof(::gpkg::SMineHellState)), "%s", "Out of memory?");
+		gpk_necall(bytes.append((const uint8_t*)&GameState, sizeof(::gpkg::SMineHellState)), "%s", "Out of memory?");
 	}
 	return 0;
 }
 
-::gpk::error_t						gpkg::SMineHell::Load			(::gpk::vcb	bytes)	{
+::gpk::error_t						gpkg::SMineHell::Load			(::gpk::vcu8 bytes)	{
 	if(false == GameState.BlockBased) {
 		GameState.Time						= *(::gpk::SRange<uint64_t>*)&bytes[bytes.size() - sizeof(::gpk::SRange<uint64_t>)];
 		bytes								= {bytes.begin(), bytes.size() - sizeof(::gpk::SRange<uint64_t>)};
-		::gpk::apod<byte_t>				gameStateBytes					= {};
+		::gpk::au8								gameStateBytes					= {};
 		gpk_necall(::gpk::arrayInflate(bytes, gameStateBytes), "%s", "Out of memory or corrupt data!");
 		info_printf("Game state loaded. State size: %u. Compressed: %u.", gameStateBytes.size(), bytes.size());
-		ree_if(gameStateBytes.size() < sizeof(::gpk::SCoord2<uint32_t>), "Invalid game state file format: %s.", "Invalid file size");
-		const ::gpk::SCoord2<uint32_t>			boardMetrics					= *(::gpk::SCoord2<uint32_t>*)gameStateBytes.begin();
+		ree_if(gameStateBytes.size() < sizeof(::gpk::n2<uint32_t>), "Invalid game state file format: %s.", "Invalid file size");
+		const ::gpk::n2<uint32_t>				boardMetrics					= *(::gpk::n2<uint32_t>*)gameStateBytes.begin();
 		gpk_necall(Board.resize(boardMetrics, {}), "Out of memory? Board size: {%u, %u}", boardMetrics.x, boardMetrics.y);
-		memcpy(Board.View.begin(), &gameStateBytes[sizeof(::gpk::SCoord2<uint32_t>)], Board.View.size());
+		memcpy(Board.View.begin(), &gameStateBytes[sizeof(::gpk::n2<uint32_t>)], Board.View.size());
 		// --- The game is already loaded. Now, we need to get a significant return value from the data we just loaded.
 		for(uint32_t y = 0; y < Board.metrics().y; ++y)
 		for(uint32_t x = 0; x < Board.metrics().x; ++x)
 			if(Board.View[y][x].Boom)
 				return 1;
+
 		::gpk::SImageMonochrome<uint64_t>		cellsMines; gpk_necall(cellsMines.resize(Board.metrics())	, "%s", "Out of memory?");
 		::gpk::SImageMonochrome<uint64_t>		cellsShows; gpk_necall(cellsShows.resize(Board.metrics())	, "%s", "Out of memory?");
 		const uint32_t							totalMines						= GetMines(cellsMines.View);
 		const uint32_t							totalShows						= GetShows(cellsShows.View);
-		::gpk::img<uint8_t>					hints;
+		::gpk::imgu8							hints;
 		gpk_necall(hints.resize(Board.metrics(), 0), "%s", "");
 		GetHints(hints.View);
 		return ((boardMetrics.x * boardMetrics.y - totalShows) <= totalMines) ? 2 : 0;
@@ -280,13 +281,13 @@ static	::gpk::error_t				uncoverCell						(::gpk::view2d<::gpkg::SMineHellCell> 
 	else {
 		GameState							= *(::gpkg::SMineHellState*)&bytes[bytes.size() - sizeof(::gpkg::SMineHellState)];
 		bytes								= {bytes.begin(), bytes.size() - sizeof(::gpkg::SMineHellState)};
-		::gpk::apod<byte_t>				gameStateBytes					= {};
+		::gpk::au8								gameStateBytes					= {};
 		gpk_necall(::gpk::arrayInflate(bytes, gameStateBytes), "%s", "Out of memory or corrupt data!");
 		info_printf("Game state loaded. State size: %u. Compressed: %u.", gameStateBytes.size(), bytes.size());
 		ree_if(gameStateBytes.size() < sizeof(uint32_t), "Invalid game state file format: %s.", "Invalid file size");
 		uint32_t								iByteOffset						= 0;
-		GameState.BlockSize					= *(const ::gpk::SCoord2<uint32_t>*)&gameStateBytes[iByteOffset];
-		iByteOffset							+= sizeof(::gpk::SCoord2<uint32_t>);
+		GameState.BlockSize					= *(const ::gpk::n2<uint32_t>*)&gameStateBytes[iByteOffset];
+		iByteOffset							+= sizeof(::gpk::n2<uint32_t>);
 		const uint32_t							blockCount						= *(const uint32_t*)&gameStateBytes[iByteOffset];
 		iByteOffset							+= sizeof(uint32_t);
 		gpk_necall(BoardBlocks.resize(blockCount), "%s", "Corrupt file?");
@@ -300,8 +301,10 @@ static	::gpk::error_t				uncoverCell						(::gpk::view2d<::gpkg::SMineHellCell> 
 		}
 		if(GameState.Blast)
 			return 1;
+
 		if(GameState.Time.Count)
 			return 2;
+
 		return 0;
 	}
 }

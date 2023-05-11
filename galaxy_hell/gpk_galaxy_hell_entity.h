@@ -59,14 +59,14 @@ namespace ghg
 		//::gpk::error_t										CreateCylinder	(const ::ghg::SEntity & newEntity, uint8_t stacks, uint8_t slices, float radiusYMin, float radiusYMax);
 		//::gpk::error_t										CreateTorus		(const ::ghg::SEntity & newEntity, uint8_t stacks, uint8_t slices, float radiusCircle, float radiusCylinder);
 
-		::gpk::error_t										Save					(::gpk::apod<byte_t> & output) const { 
-			gpk_necs(::gpk::viewWrite(Entities, output));
+		::gpk::error_t										Save					(::gpk::au8 & output) const { 
+			gpk_necs(::gpk::viewSave(output, Entities));
 			for(uint32_t iEntity = 0; iEntity < Entities.size(); ++iEntity) 
-				gpk_necall(::gpk::viewWrite(::gpk::view_array<const uint32_t>{EntityChildren[iEntity]}, output), "iEntity: %i", iEntity);
+				gpk_necall(::gpk::viewSave(output, ::gpk::vcu32{EntityChildren[iEntity]}), "iEntity: %i", iEntity);
 			info_printf("Saved %s, %i", "Entities"					, EntityChildren.size());
 			return 0; 
 		}
-		::gpk::error_t										Load					(::gpk::view_array<const byte_t> & input) { 
+		::gpk::error_t										Load					(::gpk::vcu8 & input) { 
 			gpk_necs(::gpk::loadView(input, Entities));
 			gpk_necall(EntityChildren.resize(Entities.size()), "size: %i", Entities.size());
 			for(uint32_t iEntity = 0; iEntity < Entities.size(); ++iEntity)

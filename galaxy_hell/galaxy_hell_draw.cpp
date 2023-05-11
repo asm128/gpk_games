@@ -215,7 +215,7 @@ static int										drawCannonball
 	matrixTransform.SetIdentity();
 	matrixTransform.SetTranslation(position, false);
 	::gpk::img<::gpk::SColorBGRA>						image						= {};
-	image.resize(1, 1286, bulletColor);
+	image.resize(::gpk::n2u32{1, 1286}, bulletColor);
 	{
 		::gpk::SMatrix4<float>									matrixTransformVP			= matrixTransform * matrixVP;
 		::ghg::getLightArrays(matrixTransform.GetTranslation(), drawCache.LightPointsWorld, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightColorsModel);

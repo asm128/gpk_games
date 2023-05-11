@@ -32,9 +32,9 @@ namespace ghg
 			return Particles.Create(position, direction, speed);
 		}
 
-		int											SpawnForcedDirected	(double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime)	{
-			static constexpr const double					randUnit			= ::gpk::math_2pi / RAND_MAX;
-			::gpk::SCoord3<float>							finalDirection		= {0, 1, 0};
+		int											SpawnForcedDirected	(double stabilityFactor, const ::gpk::n3f & position, const ::gpk::n3f & direction, float speedDebris, float brightness, float lifetime)	{
+			stacxpr	const double					randUnit			= ::gpk::math_2pi / RAND_MAX;
+			::gpk::n3f										finalDirection		= {0, 1, 0};
 			finalDirection.RotateX(rand() * randUnit);
 			finalDirection.RotateY(rand() * randUnit);
 			finalDirection.Normalize();
@@ -42,9 +42,9 @@ namespace ghg
 		}
 
 		int											Update				(float secondsLastFrame)	{
-			static constexpr	const uint32_t				maxRange			= 200;
-			static constexpr	const uint32_t				maxRangeSquared		= maxRange * maxRange;
-			memcpy(PositionPrev.begin(), Particles.Position.begin(), Particles.Position.size() * sizeof(::gpk::SCoord3<float>));
+			stacxpr	const uint32_t				maxRange			= 200;
+			stacxpr	const uint32_t				maxRangeSquared		= maxRange * maxRange;
+			memcpy(PositionPrev.begin(), Particles.Position.begin(), Particles.Position.size() * sizeof(::gpk::n3f));
 			Particles.IntegrateSpeed(secondsLastFrame);
 			for(uint32_t iShot = 0; iShot < Particles.Position.size(); ++iShot) {
 				Lifetime[iShot] -= secondsLastFrame;
@@ -57,18 +57,18 @@ namespace ghg
 		}
 
 
-		::gpk::error_t								Save(::gpk::apod<byte_t> & output) const { 
+		::gpk::error_t								Save				(::gpk::au8 & output) const { 
 			gpk_necs(Particles.Save(output));
-			gpk_necs(::gpk::viewWrite(PositionDraw	, output));
-			gpk_necs(::gpk::viewWrite(PositionPrev	, output));
-			gpk_necs(::gpk::viewWrite(Brightness	, output));
-			gpk_necs(::gpk::viewWrite(Lifetime		, output));
+			gpk_necs(::gpk::viewSave(output, PositionDraw	));
+			gpk_necs(::gpk::viewSave(output, PositionPrev	));
+			gpk_necs(::gpk::viewSave(output, Brightness		));
+			gpk_necs(::gpk::viewSave(output, Lifetime		));
 			for(uint32_t iParticle = 0; iParticle < Particles.Position.size(); ++iParticle) {
-				gpk_necs(::gpk::viewWrite(DistanceToTargets[iParticle], output));
+				gpk_necs(::gpk::viewSave(output, DistanceToTargets[iParticle]));
 			}
 			return 0; 
 		}
-		::gpk::error_t								Load				(::gpk::view_array<const byte_t> & input) { 
+		::gpk::error_t								Load				(::gpk::vcu8 & input) { 
 			gpk_necs(Particles.Load(input));
 			gpk_necs(::gpk::loadView(input, PositionPrev	));
 			gpk_necs(::gpk::loadView(input, PositionDraw	));

@@ -159,18 +159,18 @@ namespace ghg
 	struct SPlayerShip { 
 		::ghg::SShipCore						Core;
 		::ghg::SShipScore						Score;
-		::gpk::apod<uint32_t>					Parts;
-		::gpk::apod<uint32_t>					Weapons;
+		::gpk::au32								Parts;
+		::gpk::au32								Weapons;
 
-		::gpk::error_t							Save			(::gpk::apod<byte_t> & output) const {
-			gpk_necs(::gpk::savePOD(output, Core ));
-			gpk_necs(::gpk::savePOD(output, Score));
-			gpk_necs(::gpk::viewWrite(Parts		, output));
-			gpk_necs(::gpk::viewWrite(Weapons	, output));
+		::gpk::error_t							Save			(::gpk::au8 & output) const {
+			gpk_necs(::gpk::savePOD (output, Core	));
+			gpk_necs(::gpk::savePOD (output, Score	));
+			gpk_necs(::gpk::viewSave(output, Parts	));
+			gpk_necs(::gpk::viewSave(output, Weapons));
 			return 0;
 		}
 
-		::gpk::error_t							Load			(::gpk::vcc & input) {
+		::gpk::error_t							Load			(::gpk::vcu8 & input) {
 			gpk_necs(::gpk::loadPOD	(input, Core	));
 			gpk_necs(::gpk::loadPOD	(input, Score	));
 			gpk_necs(::gpk::loadView(input, Parts	));
@@ -208,9 +208,9 @@ namespace ghg
 		::gpk::aobj<::ghg::SPlayerShip>			Ships			= {};
 
 		::gpk::error_t							Save			(const ::gpk::vcc & filename) const {
-			::gpk::apod<byte_t>							serialized;
+			::gpk::au8									serialized;
 			gpk_necs(Save(serialized));
-			::gpk::apod<byte_t>							deflated;
+			::gpk::au8									deflated;
 			gpk_necs(::gpk::arrayDeflate(serialized, deflated));
 			info_printf("Player size in bytes: %u.", serialized.size());
 			info_printf("Player file size: %u.", deflated.size());
@@ -219,29 +219,29 @@ namespace ghg
 		}
 
 		::gpk::error_t							Load			(const ::gpk::vcc & filename) {
-			::gpk::apod<byte_t>							serialized;
+			::gpk::au8									serialized;
 			gpk_necall(::gpk::fileToMemory(filename, serialized), "fileName: %s", ::gpk::toString(filename).begin());
-			::gpk::apod<byte_t>							inflated;
+			::gpk::au8									inflated;
 			gpk_necs(::gpk::arrayInflate(serialized, inflated));
 			info_printf("Player file size: %u.", inflated.size());
 			info_printf("Player size in bytes: %u.", serialized.size());
-			::gpk::vcc									input		= inflated;
+			::gpk::vcu8									input		= inflated;
 			return Load(input);
 		}
 
-		::gpk::error_t							Save			(::gpk::apod<byte_t> & output) const {
-			gpk_necs(::gpk::viewWrite(Name		, output));
+		::gpk::error_t							Save			(::gpk::au8 & output) const {
+			gpk_necs(::gpk::viewSave(output, Name));
 			gpk_necs(::gpk::savePOD(output, State));
-			gpk_necs(::gpk::viewWrite(Weapons	, output));
-			gpk_necs(::gpk::viewWrite(Orbiters	, output));
-			gpk_necs(output.append(::gpk::vcc{(const byte_t*)&Ships.size(), 4}));
+			gpk_necs(::gpk::viewSave(output, Weapons));
+			gpk_necs(::gpk::viewSave(output, Orbiters));
+			gpk_necs(output.append(::gpk::vcu8{(const uint8_t*)&Ships.size(), 4}));
 			for(uint32_t iShip = 0; iShip < Ships.size(); ++iShip) {
 				gpk_necall(Ships[iShip].Save(output), "iShip: %u", iShip);
 			}
 			return 0;
 		}
 
-		::gpk::error_t							Load			(::gpk::vcc & input) {
+		::gpk::error_t							Load			(::gpk::vcu8 & input) {
 			gpk_necs(::gpk::loadLabel	(input, Name	));
 			gpk_necs(::gpk::loadPOD		(input, State	));
 			gpk_necs(::gpk::loadView	(input, Weapons	));
@@ -329,7 +329,7 @@ namespace ghg
 
 		::gpk::error_t											Save						(SAVE_MODE autosaveMode)				{
 			char														fileName[4096]				= {};
-			::gpk::apod<char>											b64PlayerName				= {};
+			::gpk::au8													b64PlayerName				= {};
 			for(uint32_t iPlayer = 0; iPlayer < Players.size(); ++iPlayer) {
 				b64PlayerName.clear();
 				const ::ghg::SPlayer										& player					= Players[iPlayer];
@@ -357,10 +357,10 @@ namespace ghg
 	};
 
 	::gpk::error_t											guiSetup					(::ghg::SGalaxyHellApp & gameui, const ::gpk::pobj<::gpk::SInput> & inputState);
-	::gpk::error_t											guiUpdate					(::ghg::SGalaxyHellApp & gameui, const ::gpk::view_array<::gpk::SSysEvent> & sysEvents);
+	::gpk::error_t											guiUpdate					(::ghg::SGalaxyHellApp & gameui, const ::gpk::view<::gpk::SSysEvent> & sysEvents);
 	
 	::gpk::error_t											galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents);
-	::gpk::error_t											galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::SCoord2<uint16_t> renderTargetSize);
+	::gpk::error_t											galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::n2<uint16_t> renderTargetSize);
 
 	::gpk::error_t											listFilesSavegame			(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames);
 	::gpk::error_t											listFilesProfile			(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames);

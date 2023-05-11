@@ -106,18 +106,18 @@ namespace ghg
 			return ShipControllers.resize(PlayState.CountPlayers);
 		}
 
-		::gpk::error_t											Save					(::gpk::apod<byte_t> & output)		const	{
+		::gpk::error_t											Save					(::gpk::au8 & output)		const	{
 			gpk_necs(::gpk::savePOD(output, PlayState));
 			for(uint32_t iPlayer = 0; iPlayer < PlayState.CountPlayers; ++iPlayer) {
-				::gpk::viewWrite(Pilots[iPlayer].Name, output);
+				::gpk::viewSave(output, Pilots[iPlayer].Name);
 				::gpk::savePOD(output, Pilots[iPlayer].Color);
 			}
 
-			::gpk::viewWrite(ShipControllers, output);
+			::gpk::viewSave(output, ShipControllers);
 			ShipState.Save(output);
 			return 0;
 		}
-		::gpk::error_t											Load					(::gpk::view_array<const byte_t> & input) {
+		::gpk::error_t											Load					(::gpk::vcu8 & input) {
 			::gpk::mutex_guard											lock(LockUpdate);
 			::gpk::view_array<const ::ghg::SPlayState>					readPlayState			= {};
 			gpk_necs(::gpk::loadPOD(input, PlayState));

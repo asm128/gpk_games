@@ -36,7 +36,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Galaxy Hell v0.4");
 
 ::gpk::error_t							cleanup							(::SApplication & app)						{ 
 	::gpk::SFramework							& framework						= app.Framework;
-	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.Input, framework.RootWindow.EventQueue);
+	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, framework.RootWindow.EventQueue);
 	app.AudioState.CleanupAudio(); 
 
 
@@ -138,7 +138,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 
 	mainWindow.Size							= {1280, 720};
 
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, framework.Input)), "Failed to create main window. %s.", "why?!");
+	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
 
 	srand((uint32_t)time(0));
 
@@ -201,7 +201,7 @@ int										update				(SApplication & app, bool exitSignal)	{
 		}
 	}
 
-	if(1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.Input, framework.RootWindow.EventQueue))
+	if(1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, framework.RootWindow.EventQueue))
 		return ::gpk::APPLICATION_STATE_EXIT;
 
 	{

@@ -174,7 +174,7 @@ static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 		playerGUI.Controls.Modes	[viewport.Viewport + 2].NoBackgroundRect		= true;
 
 		::gpk::SMatrix4<float>						& matrixProjection				= viewport.MatrixProjection;
-		matrixProjection.FieldOfView(::gpk::math_pi * .25, MODULE_CAMERA_SIZE.x / (double)MODULE_CAMERA_SIZE.y, 0.01, 500);
+		matrixProjection.FieldOfView(::gpk::math_pi * .25, MODULE_CAMERA_SIZE.x / (double)MODULE_CAMERA_SIZE.y, 0.01, 500.0);
 		::gpk::SMatrix4<float>						matrixViewport					= {};
 		matrixViewport.ViewportLH(MODULE_CAMERA_SIZE.Cast<uint16_t>());
 		matrixProjection						*= matrixViewport;

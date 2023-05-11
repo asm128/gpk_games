@@ -76,14 +76,14 @@ namespace ghg
 		::gpk::aobj<::gpk::img<::gpk::bgra>>				Image							= {};
 		::gpk::apod<::gpk::SMatrix4<float>>					Transforms						= {}; // Ope per entity
 
-		::gpk::error_t										Save							(::gpk::apod<byte_t> & output) const { 
+		::gpk::error_t										Save							(::gpk::au8 & output) const { 
 			gpk_necs(::gpk::savePOD		(output, Global));
-			gpk_necs(::gpk::viewWrite	(Transforms, output));
+			gpk_necs(::gpk::viewSave	(output, Transforms));
 			info_printf("Saved %s, %i", "Transforms"	, Transforms.size());
 			return 0; 
 		}
 
-		::gpk::error_t										Load							(::gpk::view_array<const byte_t> & input) { 
+		::gpk::error_t										Load							(::gpk::vcu8 & input) { 
 			gpk_necs(::gpk::loadPOD	(input, Global		));
 			gpk_necs(::gpk::loadView(input, Transforms	));
 			return 0; 
@@ -232,27 +232,27 @@ namespace ghg
 
 		inline	::gpk::n3<float>&							GetShipPosition					(uint32_t indexShip)		{ return GetShipPosition(ShipCores[indexShip]); }
 
-		::gpk::error_t										Save							(::gpk::apod<byte_t> & output) const { 
-			gpk_necs(::gpk::viewWrite(ShipScores	, output));
-			gpk_necs(::gpk::viewWrite(ShipCores		, output));
+		::gpk::error_t										Save							(::gpk::au8 & output) const { 
+			gpk_necs(::gpk::viewSave(output, ShipScores	));
+			gpk_necs(::gpk::viewSave(output, ShipCores	));
 			uint32_t												totalEntityChildren				= 0;
 			for(uint32_t iShipCore = 0; iShipCore < ShipCores.size(); ++iShipCore) {
 				::gpk::view<const uint32_t>		v	{ShipParts[iShipCore]};
-				::gpk::viewWrite(v, output);
+				::gpk::viewSave(output, v);
 				totalEntityChildren += v.size();
 			}
 
 			info_printf("Saved %s, %i", "ShipScores	", ShipScores	.size());
 			info_printf("Saved %s, %i", "ShipCores	", ShipCores	.size());
 	
-			gpk_necs(::gpk::viewWrite(Orbiters, output));
+			gpk_necs(::gpk::viewSave(output, Orbiters));
 			info_printf("Saved %s, %i", "Orbiters", Orbiters.size());
 			for(uint32_t iShipOrbiter = 0; iShipOrbiter < Orbiters.size(); ++iShipOrbiter) {
-				gpk_necs(::gpk::viewWrite(ShipOrbitersDistanceToTargets	[iShipOrbiter], output));
-				gpk_necs(::gpk::viewWrite(ShipOrbiterActionQueue		[iShipOrbiter], output));
+				gpk_necs(::gpk::viewSave(output, ShipOrbitersDistanceToTargets	[iShipOrbiter]));
+				gpk_necs(::gpk::viewSave(output, ShipOrbiterActionQueue			[iShipOrbiter]));
 			}
 
-			::gpk::viewWrite(Weapons, output);
+			::gpk::viewSave(output, Weapons);
 			info_printf("Saved %s, %i", "Weapons", Weapons.size());
 			for(uint32_t iWeapon = 0; iWeapon < Weapons.size(); ++iWeapon) 
 				gpk_necs(Shots[iWeapon].Save(output));
@@ -262,7 +262,7 @@ namespace ghg
 			gpk_necs(Scene			.Save(output));
 			return 0; 
 		}
-		::gpk::error_t										Load							(::gpk::view_array<const byte_t> & input) { 
+		::gpk::error_t										Load							(::gpk::vcu8 & input) { 
 			gpk_necs(::gpk::loadView(input, ShipScores	));
 			gpk_necs(::gpk::loadView(input, ShipCores	));
 			gpk_necs(ShipParts.resize(ShipCores.size()));
