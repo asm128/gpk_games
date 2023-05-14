@@ -58,11 +58,12 @@ namespace ghg
 		//::gpk::error_t										CreateSphere	(const ::ghg::SEntity & newEntity, uint8_t stacks, uint8_t slices);
 		//::gpk::error_t										CreateCylinder	(const ::ghg::SEntity & newEntity, uint8_t stacks, uint8_t slices, float radiusYMin, float radiusYMax);
 		//::gpk::error_t										CreateTorus		(const ::ghg::SEntity & newEntity, uint8_t stacks, uint8_t slices, float radiusCircle, float radiusCylinder);
+		// 11 6688 8367
 
 		::gpk::error_t										Save					(::gpk::au8 & output) const { 
-			gpk_necs(::gpk::viewSave(output, Entities));
+			gpk_necs(::gpk::saveView(output, Entities));
 			for(uint32_t iEntity = 0; iEntity < Entities.size(); ++iEntity) 
-				gpk_necall(::gpk::viewSave(output, ::gpk::vcu32{EntityChildren[iEntity]}), "iEntity: %i", iEntity);
+				gpk_necall(::gpk::saveView(output, ::gpk::vcu32{EntityChildren[iEntity]}), "iEntity: %i", iEntity);
 			info_printf("Saved %s, %i", "Entities"					, EntityChildren.size());
 			return 0; 
 		}

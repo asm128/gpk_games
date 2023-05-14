@@ -59,12 +59,12 @@ namespace ghg
 
 		::gpk::error_t								Save				(::gpk::au8 & output) const { 
 			gpk_necs(Particles.Save(output));
-			gpk_necs(::gpk::viewSave(output, PositionDraw	));
-			gpk_necs(::gpk::viewSave(output, PositionPrev	));
-			gpk_necs(::gpk::viewSave(output, Brightness		));
-			gpk_necs(::gpk::viewSave(output, Lifetime		));
+			gpk_necs(::gpk::saveView(output, PositionDraw	));
+			gpk_necs(::gpk::saveView(output, PositionPrev	));
+			gpk_necs(::gpk::saveView(output, Brightness		));
+			gpk_necs(::gpk::saveView(output, Lifetime		));
 			for(uint32_t iParticle = 0; iParticle < Particles.Position.size(); ++iParticle) {
-				gpk_necs(::gpk::viewSave(output, DistanceToTargets[iParticle]));
+				gpk_necs(::gpk::saveView(output, DistanceToTargets[iParticle]));
 			}
 			return 0; 
 		}

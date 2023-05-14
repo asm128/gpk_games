@@ -109,11 +109,11 @@ namespace ghg
 		::gpk::error_t											Save					(::gpk::au8 & output)		const	{
 			gpk_necs(::gpk::savePOD(output, PlayState));
 			for(uint32_t iPlayer = 0; iPlayer < PlayState.CountPlayers; ++iPlayer) {
-				::gpk::viewSave(output, Pilots[iPlayer].Name);
+				::gpk::saveView(output, Pilots[iPlayer].Name);
 				::gpk::savePOD(output, Pilots[iPlayer].Color);
 			}
 
-			::gpk::viewSave(output, ShipControllers);
+			::gpk::saveView(output, ShipControllers);
 			ShipState.Save(output);
 			return 0;
 		}

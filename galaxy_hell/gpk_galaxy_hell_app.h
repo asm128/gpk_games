@@ -165,8 +165,8 @@ namespace ghg
 		::gpk::error_t							Save			(::gpk::au8 & output) const {
 			gpk_necs(::gpk::savePOD (output, Core	));
 			gpk_necs(::gpk::savePOD (output, Score	));
-			gpk_necs(::gpk::viewSave(output, Parts	));
-			gpk_necs(::gpk::viewSave(output, Weapons));
+			gpk_necs(::gpk::saveView(output, Parts	));
+			gpk_necs(::gpk::saveView(output, Weapons));
 			return 0;
 		}
 
@@ -230,10 +230,10 @@ namespace ghg
 		}
 
 		::gpk::error_t							Save			(::gpk::au8 & output) const {
-			gpk_necs(::gpk::viewSave(output, Name));
+			gpk_necs(::gpk::saveView(output, Name));
 			gpk_necs(::gpk::savePOD(output, State));
-			gpk_necs(::gpk::viewSave(output, Weapons));
-			gpk_necs(::gpk::viewSave(output, Orbiters));
+			gpk_necs(::gpk::saveView(output, Weapons));
+			gpk_necs(::gpk::saveView(output, Orbiters));
 			gpk_necs(output.append(::gpk::vcu8{(const uint8_t*)&Ships.size(), 4}));
 			for(uint32_t iShip = 0; iShip < Ships.size(); ++iShip) {
 				gpk_necall(Ships[iShip].Save(output), "iShip: %u", iShip);

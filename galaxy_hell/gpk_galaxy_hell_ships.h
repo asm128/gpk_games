@@ -78,7 +78,7 @@ namespace ghg
 
 		::gpk::error_t										Save							(::gpk::au8 & output) const { 
 			gpk_necs(::gpk::savePOD		(output, Global));
-			gpk_necs(::gpk::viewSave	(output, Transforms));
+			gpk_necs(::gpk::saveView	(output, Transforms));
 			info_printf("Saved %s, %i", "Transforms"	, Transforms.size());
 			return 0; 
 		}
@@ -233,26 +233,26 @@ namespace ghg
 		inline	::gpk::n3<float>&							GetShipPosition					(uint32_t indexShip)		{ return GetShipPosition(ShipCores[indexShip]); }
 
 		::gpk::error_t										Save							(::gpk::au8 & output) const { 
-			gpk_necs(::gpk::viewSave(output, ShipScores	));
-			gpk_necs(::gpk::viewSave(output, ShipCores	));
+			gpk_necs(::gpk::saveView(output, ShipScores	));
+			gpk_necs(::gpk::saveView(output, ShipCores	));
 			uint32_t												totalEntityChildren				= 0;
 			for(uint32_t iShipCore = 0; iShipCore < ShipCores.size(); ++iShipCore) {
 				::gpk::view<const uint32_t>		v	{ShipParts[iShipCore]};
-				::gpk::viewSave(output, v);
+				::gpk::saveView(output, v);
 				totalEntityChildren += v.size();
 			}
 
 			info_printf("Saved %s, %i", "ShipScores	", ShipScores	.size());
 			info_printf("Saved %s, %i", "ShipCores	", ShipCores	.size());
 	
-			gpk_necs(::gpk::viewSave(output, Orbiters));
+			gpk_necs(::gpk::saveView(output, Orbiters));
 			info_printf("Saved %s, %i", "Orbiters", Orbiters.size());
 			for(uint32_t iShipOrbiter = 0; iShipOrbiter < Orbiters.size(); ++iShipOrbiter) {
-				gpk_necs(::gpk::viewSave(output, ShipOrbitersDistanceToTargets	[iShipOrbiter]));
-				gpk_necs(::gpk::viewSave(output, ShipOrbiterActionQueue			[iShipOrbiter]));
+				gpk_necs(::gpk::saveView(output, ShipOrbitersDistanceToTargets	[iShipOrbiter]));
+				gpk_necs(::gpk::saveView(output, ShipOrbiterActionQueue			[iShipOrbiter]));
 			}
 
-			::gpk::viewSave(output, Weapons);
+			::gpk::saveView(output, Weapons);
 			info_printf("Saved %s, %i", "Weapons", Weapons.size());
 			for(uint32_t iWeapon = 0; iWeapon < Weapons.size(); ++iWeapon) 
 				gpk_necs(Shots[iWeapon].Save(output));

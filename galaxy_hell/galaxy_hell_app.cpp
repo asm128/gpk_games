@@ -177,7 +177,6 @@
 		if(iShip < app.Game.PlayState.CountPlayers) {
 			for(uint32_t iEvent = 0; iEvent < app.Game.ShipState.ShipOrbiterActionQueue[iShip].size(); ++iEvent)
 				if(app.Game.ShipState.ShipOrbiterActionQueue[iShip][iEvent] == ::ghg::SHIP_ACTION_spawn) {
-					::gpk::apod<byte_t>			serialized;
 					app.Save(::ghg::SAVE_MODE_STAGE);
 					app.Game.ShipState.ShipOrbiterActionQueue[iShip][iEvent] = (::ghg::SHIP_ACTION)-1;
 				}
