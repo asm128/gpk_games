@@ -7,11 +7,11 @@
 namespace ghg 
 {
 	struct SShots	{
-		::gpk::aobj<::gpk::apod<::gpk::SCoord3<float>>>	DistanceToTargets	= {};
+		::gpk::aobj<::gpk::apod<::gpk::n3<float>>>	DistanceToTargets	= {};
 		::gpk::apod<float>										Lifetime			= {};
 		::gpk::apod<float>										Brightness			= {};
-		::gpk::apod<::gpk::SCoord3<float>>						PositionDraw		= {};
-		::gpk::apod<::gpk::SCoord3<float>>						PositionPrev		= {};
+		::gpk::apod<::gpk::n3<float>>						PositionDraw		= {};
+		::gpk::apod<::gpk::n3<float>>						PositionPrev		= {};
 		::gpk::SParticles3											Particles			= {};
 
 		int											Remove				(uint32_t iShot)			{
@@ -23,7 +23,7 @@ namespace ghg
 			return PositionDraw	.remove_unordered(iShot);
 		}
 
-		int											SpawnForced			(const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness, float lifetime)	{
+		int											SpawnForced			(const ::gpk::n3<float> & position, const ::gpk::n3<float> & direction, float speed, float brightness, float lifetime)	{
 			PositionDraw.push_back(position);
 			PositionPrev.push_back(position);
 			Brightness	.push_back(brightness);
@@ -172,7 +172,7 @@ namespace ghg
 		bool										CoolingDown			;//= false;
 		float										Overheat			;//= 0;
 
-		int											Create				(::ghg::SShots & shots, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speed, float brightness, float lifetime)	{
+		int											Create				(::ghg::SShots & shots, const ::gpk::n3<float> & position, const ::gpk::n3<float> & direction, float speed, float brightness, float lifetime)	{
 			if(Delay < MaxDelay)
 				return 0;
 
@@ -181,7 +181,7 @@ namespace ghg
 			return shots.SpawnForced(position, direction, speed, brightness, lifetime);
 		}
 
-		int											SpawnDirected		(::ghg::SShots & shots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime)	{
+		int											SpawnDirected		(::ghg::SShots & shots, double stabilityFactor, const ::gpk::n3<float> & position, const ::gpk::n3<float> & direction, float speedDebris, float brightness, float lifetime)	{
 			if(Delay < MaxDelay)
 				return 0;
 
@@ -190,7 +190,7 @@ namespace ghg
 			return shots.SpawnForcedDirected(Stability * stabilityFactor, position, direction, speedDebris, brightness, lifetime);
 		}
 
-		int											SpawnDirected		(::ghg::SShots & shots, uint32_t countShots, double stabilityFactor, const ::gpk::SCoord3<float> & position, const ::gpk::SCoord3<float> & direction, float speedDebris, float brightness, float lifetime)	{
+		int											SpawnDirected		(::ghg::SShots & shots, uint32_t countShots, double stabilityFactor, const ::gpk::n3<float> & position, const ::gpk::n3<float> & direction, float speedDebris, float brightness, float lifetime)	{
 			if(Delay < MaxDelay || 0 == countShots)
 				return 0;
 

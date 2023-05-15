@@ -5,9 +5,9 @@
 
 static constexpr	::gpk::GUI_COLOR_MODE		GHG_MENU_COLOR_MODE		= ::gpk::GUI_COLOR_MODE_3D;
 static constexpr	bool						BACKGROUND_3D_ONLY		= true;
-static constexpr	::gpk::SCoord2<uint16_t>	MODULE_CAMERA_SIZE		= {48, 48};
-static constexpr	::gpk::SCoord2<uint16_t>	MODULE_VIEWPORT_SIZE	= {128, 64};
-static constexpr	::gpk::SCoord2<uint16_t>	WEAPON_BAR_SIZE			= {96, 16};
+static constexpr	::gpk::n2<uint16_t>	MODULE_CAMERA_SIZE		= {48, 48};
+static constexpr	::gpk::n2<uint16_t>	MODULE_VIEWPORT_SIZE	= {128, 64};
+static constexpr	::gpk::n2<uint16_t>	WEAPON_BAR_SIZE			= {96, 16};
 
 static	::gpk::error_t			guiSetupCommon				(::gpk::SGUI & gui) {
 	gui.ColorModeDefault			= ::gpk::GUI_COLOR_MODE_3D;
@@ -19,7 +19,7 @@ static	::gpk::error_t			guiSetupCommon				(::gpk::SGUI & gui) {
 	return 0;
 }
 
-static	::gpk::error_t			dialogCreateCommon			(::gpk::SDialog & dialogLoad, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::SCoord2<float> & cursorPos) { 
+static	::gpk::error_t			dialogCreateCommon			(::gpk::SDialog & dialogLoad, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2<float> & cursorPos) { 
 	dialogLoad						= {};
 	dialogLoad.Input				= inputState;
 	dialogLoad.GUI->CursorPos		= cursorPos;
@@ -30,9 +30,9 @@ static	::gpk::error_t			dialogCreateCommon			(::gpk::SDialog & dialogLoad, const
 }
 
 // -------------------------------- Set up player GUI for home screen
-static ::gpk::error_t			uiPlayerSetupHome			(::ghg::SUIPlayer & uiPlayer, ::gpk::pobj<::gpk::SInput> input, ::gpk::SCoord2<float> cursorPos, uint32_t iPlayer, const ::gpk::vcc playerName) {
+static ::gpk::error_t			uiPlayerSetupHome			(::ghg::SUIPlayer & uiPlayer, ::gpk::pobj<::gpk::SInput> input, ::gpk::n2<float> cursorPos, uint32_t iPlayer, const ::gpk::vcc playerName) {
 	::gpk::ALIGN						playerAlign		;
-	::gpk::SCoord2<int16_t>				playerPosition	;
+	::gpk::n2<int16_t>				playerPosition	;
 	switch(iPlayer) {
 	default:
 	case 0: playerAlign = ::gpk::ALIGN_BOTTOM_LEFT;		break;
@@ -50,7 +50,7 @@ static ::gpk::error_t			uiPlayerSetupHome			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 	::gpk::SDialog				& playerDialog		= uiPlayer.DialogHome;
 	gpk_necs(::dialogCreateCommon(playerDialog, input, cursorPos));
 	::gpk::SGUI					& playerGUI			= *playerDialog.GUI;
-	::gpk::pobj<::gpk::apod<::gpk::SColorBGRA>>		palette;
+	::gpk::pobj<::gpk::apod<::gpk::bgra>>		palette;
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
@@ -83,8 +83,8 @@ static ::gpk::error_t			uiPlayerSetupHome			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 }
 
 // -------------------------------- Set up player GUI for in-stage display
-static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk::pobj<::gpk::SInput> input, ::gpk::SCoord2<float> cursorPos, uint32_t iPlayer, const ::gpk::vcc pilotName, uint32_t nShipParts) {
-	::gpk::SCoord2<int16_t>				playerPosition;
+static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk::pobj<::gpk::SInput> input, ::gpk::n2<float> cursorPos, uint32_t iPlayer, const ::gpk::vcc pilotName, uint32_t nShipParts) {
+	::gpk::n2<int16_t>				playerPosition;
 	::gpk::ALIGN						playerAlign		;
 	switch(iPlayer) {
 	default:
@@ -103,7 +103,7 @@ static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 	::gpk::SDialog						& playerDialog				= uiPlayer.DialogPlay;
 	gpk_necs(::dialogCreateCommon(playerDialog, input, cursorPos));
 	::gpk::SGUI							& playerGUI					= *playerDialog.GUI;
-	::gpk::pobj<::gpk::apod<::gpk::SColorBGRA>>		palette;
+	::gpk::pobj<::gpk::apod<::gpk::bgra>>		palette;
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
@@ -247,7 +247,7 @@ static	::gpk::error_t			guiSetupShop				(::gpk::SDialog & dialog) {
 
 static	::gpk::error_t			guiSetupWelcome				(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { 
 	::gpk::SGUI							& gui						= *dialog.GUI;
-	gpk_necall(::gpk::guiSetupButtonList<::ghg::UI_WELCOME>(gui, dialog.Root, ::gpk::SCoord2<uint16_t>{128, 32}, ::gpk::SCoord2<int16_t>{0, 64}, ::gpk::ALIGN_CENTER), "%s", "");
+	gpk_necall(::gpk::guiSetupButtonList<::ghg::UI_WELCOME>(gui, dialog.Root, ::gpk::n2<uint16_t>{128, 32}, ::gpk::n2<int16_t>{0, 64}, ::gpk::ALIGN_CENTER), "%s", "");
 	::gpk::viewportCreate(dialog, app.Inputbox);
 	::gpk::pobj<::gpk::SDialogViewport>	viewport				= app.Inputbox;
 	gui.Controls.Controls	[viewport->IdGUIControl	].Align			= ::gpk::ALIGN_CENTER;
@@ -343,7 +343,7 @@ static	::gpk::error_t			guiHandleLoad				(::ghg::SGalaxyHellApp & app, ::gpk::SG
 	return ::ghg::APP_STATE_Home; 
 }
 
-static	::gpk::error_t			dialogCreateLoad			(::gpk::SDialog & dialogLoad, ::gpk::view_array<::gpk::vcc> pathFileNames, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::SCoord2<float> & cursorPos) { 
+static	::gpk::error_t			dialogCreateLoad			(::gpk::SDialog & dialogLoad, ::gpk::view_array<::gpk::vcc> pathFileNames, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2<float> & cursorPos) { 
 	::dialogCreateCommon(dialogLoad, inputState, cursorPos);
 	return ::gpk::guiSetupButtonList(*dialogLoad.GUI, pathFileNames, dialogLoad.Root, 256, (int16_t)(-20 * pathFileNames.size() / 2), ::gpk::ALIGN_CENTER, ::gpk::ALIGN_LEFT);
 }
@@ -446,7 +446,7 @@ template<size_t _nStorageSize>
 	return 0;
 }
 
-static	::gpk::error_t			uiPlayerUpdateHome			(::ghg::SUIPlayer & uiPlayer, uint16_t iPlayer, const ::gpk::vcc playerName, const ::gpk::SColorBGRA & shipColor, const ::ghg::SShipScore & shipScore) { 
+static	::gpk::error_t			uiPlayerUpdateHome			(::ghg::SUIPlayer & uiPlayer, uint16_t iPlayer, const ::gpk::vcc playerName, const ::gpk::bgra & shipColor, const ::ghg::SShipScore & shipScore) { 
 	sprintf_s(uiPlayer.TextScore.Storage, "%c %llu  %c %llu  %c %llu", 4, shipScore.Score, 1, (uint64_t)shipScore.KilledShips, 2, (uint64_t)shipScore.KilledOrbiters);
 	::gpk::SDialog						& playerDialog				= uiPlayer.DialogHome;
 	::gpk::SGUI							& playerGUI					= *playerDialog.GUI;
@@ -456,7 +456,7 @@ static	::gpk::error_t			uiPlayerUpdateHome			(::ghg::SUIPlayer & uiPlayer, uint1
 		::gpk::SControl						& control					= playerGUI.Controls.Controls[playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name];
 		control.ColorTheme				= int16_t(3 + iPlayer);
 		const ::gpk::SControlTheme											& theme													= (*playerGUI.Colors->ControlThemes)[(0 == control.ColorTheme) ? playerGUI.ThemeDefault : control.ColorTheme - 1];
-		const ::gpk::array_static<uint32_t, ::gpk::GUI_CONTROL_COLOR_COUNT>	& colorCombo											= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
+		const ::gpk::astaticu32<::gpk::GUI_CONTROL_COLOR_COUNT>	& colorCombo											= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
 		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_COLOR_TEXT_FACE		]] = shipColor;
 		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_COLOR_BACKGROUND	]] = shipColor;
 		playerGUI.Controls.Controls[uiPlayer.InputBox.IdText].ColorTheme = control.ColorTheme;
@@ -479,7 +479,7 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 		::gpk::SControl						& control					= playerGUI.Controls.Controls[1 + ::ghg::UI_PILOT_Name];
 		control.ColorTheme				= int16_t(3 + iPlayer);
 		const ::gpk::SControlTheme											& theme													= (*playerGUI.Colors->ControlThemes)[(0 == control.ColorTheme) ? playerGUI.ThemeDefault : control.ColorTheme - 1];
-		const ::gpk::array_static<uint32_t, ::gpk::GUI_CONTROL_COLOR_COUNT>	& colorCombo											= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
+		const ::gpk::astaticu32<::gpk::GUI_CONTROL_COLOR_COUNT>	& colorCombo											= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
 		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_COLOR_TEXT_FACE		]] = shipColor;
 		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_COLOR_BACKGROUND	]] = shipColor;
 	}
@@ -513,7 +513,7 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 			matrixView											*= uiPlayer.ModuleViewports[iOrbiter]->MatrixProjection;
 
 			::ghg::TRenderTarget				& renderTarget		= viewport.RenderTargetOrbiter;
-			::gpk::view2d<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
+			::gpk::view2d<::gpk::bgra>	targetPixels		= renderTarget.Color		; 
 			::gpk::view2d<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
 			//targetPixels.fill(tone);
 			::gpk::mutex_guard										lock					(lockGame);
@@ -531,7 +531,7 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 
 		{ // Update weapon load bar
 			::ghg::TRenderTarget				& renderTarget		= viewport.RenderTargetWeaponLoad;
-			::gpk::view2d<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
+			::gpk::view2d<::gpk::bgra>	targetPixels		= renderTarget.Color		; 
 			::gpk::view2d<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
 			::gpk::mutex_guard					lock				(lockGame);
 			memset(targetPixels.begin(), 0, targetPixels.byte_count());
@@ -543,8 +543,8 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 					::gpk::drawLine(targetPixels.metrics().Cast<uint16_t>(), ::gpk::SLine2<int16_t>{{0, (int16_t)iLine}, {int16_t((targetPixels.metrics().x - 1) * ratioDelay), (int16_t)iLine}}, drawCache.PixelCoords);
 				
 				for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) {
-					const ::gpk::SCoord2<int16_t>		& pixelCoord = drawCache.PixelCoords[iPixel];
-					const ::gpk::SCoord2<float>			floatCoord						= pixelCoord.Cast<float>();
+					const ::gpk::n2<int16_t>		& pixelCoord = drawCache.PixelCoords[iPixel];
+					const ::gpk::n2<float>			floatCoord						= pixelCoord.Cast<float>();
 					const double						distanceFromCenter				= fabs((floatCoord.y / (targetPixels.metrics().y)) - .5) * 2.0;
 					::gpk::setPixel(targetPixels, pixelCoord, ::gpk::interpolate_linear(colorDelay, ::gpk::GRAY * .25, distanceFromCenter));
 				}
@@ -554,7 +554,7 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 		{ // Update weapon type bar
 			::gpk::mutex_guard					lock				(lockGame);
 			::ghg::TRenderTarget				& renderTarget		= viewport.RenderTargetWeaponType;
-			::gpk::view2d<::gpk::SColorBGRA>	targetPixels		= renderTarget.Color		; 
+			::gpk::view2d<::gpk::bgra>	targetPixels		= renderTarget.Color		; 
 			::gpk::view2d<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
 			memset(targetPixels.begin(), 0, targetPixels.byte_count());
 			memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
@@ -564,8 +564,8 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 					::gpk::drawLine(targetPixels.metrics().Cast<uint16_t>(), ::gpk::SLine2<int16_t>{{0, (int16_t)iLine}, {int16_t((targetPixels.metrics().x - 1) * ratioOverheat), (int16_t)iLine}}, drawCache.PixelCoords);
 				
 				for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) {
-					const ::gpk::SCoord2<int16_t>		& pixelCoord = drawCache.PixelCoords[iPixel];
-					const ::gpk::SCoord2<float>			floatCoord						= pixelCoord.Cast<float>();
+					const ::gpk::n2<int16_t>		& pixelCoord = drawCache.PixelCoords[iPixel];
+					const ::gpk::n2<float>			floatCoord						= pixelCoord.Cast<float>();
 					const double						distanceFromCenter				= fabs((floatCoord.y / (targetPixels.metrics().y)) - .5) * 2.0;
 					::gpk::setPixel(targetPixels, drawCache.PixelCoords[iPixel], ::gpk::interpolate_linear(colorCooldown, ::gpk::GRAY * .25, distanceFromCenter));
 				}
@@ -707,7 +707,7 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 	::gpk::SDialog						& dialog					= app.DialogPerState[appState];
 	dialog.Update();
 	::gpk::SGUI							& gui						= *dialog.GUI;
-	::gpk::apod<uint32_t>			controlsToProcess			= {};
+	::gpk::au32							controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 
 	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
@@ -741,12 +741,12 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 	const double						outerRadius						= finalRadius;			//::gpk::interpolate_linear(gaugeMetrics.Radius, gaugeMetrics.Radius * .5, ::gpk::clamp(abs(sinCos.Cos), 0.0, 1.0)); //
 	const double						innerRadius						= outerRadius - width;	//::gpk::interpolate_linear(gaugeMetrics.Radius, gaugeMetrics.Radius * .5, ::gpk::clamp(abs(sinCos.Cos), 0.0, 1.0)); //
 	for(int16_t iStep = 0, stepCount = resolution; iStep < stepCount; ++iStep) {
-		::gpk::SPairSinCos					sinCos							= {sin(iStep * stepUnit), -cos(iStep * stepUnit)};
-		const ::gpk::SCoord3<double>		relativePosSmall				=
+		::gpk::SSinCos						sinCos							= {sin(iStep * stepUnit), -cos(iStep * stepUnit)};
+		const ::gpk::n3<double>				relativePosSmall				=
 			{ sinCos.Sin * innerRadius
 			, sinCos.Cos * innerRadius
 			};
-		const ::gpk::SCoord3<double>		relativePos						=
+		const ::gpk::n3<double>				relativePos						=
 			{ sinCos.Sin * outerRadius
 	  		, sinCos.Cos * outerRadius
 			};
@@ -765,16 +765,16 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 }
 
 
-::gpk::error_t					ghg::gaugeImageUpdate			(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::SColorBGRA> target, ::gpk::SColorFloat colorMin, ::gpk::SColorFloat colorMid, ::gpk::SColorFloat colorMax, ::gpk::SColorBGRA colorEmpty, bool radialColor)  {
-	static ::gpk::img<uint32_t>		dummyDepth;
-	const ::gpk::SCoord3<float>			center3							= (gauge.Vertices[1] - gauge.Vertices[gauge.Vertices.size() / 2 + 1]) / 2 + gauge.Vertices[gauge.Vertices.size() / 2 + 1];
-	const ::gpk::SCoord2<float>			center2							= {center3.x, center3.y};
+::gpk::error_t					ghg::gaugeImageUpdate			(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::bgra> target, ::gpk::SColorFloat colorMin, ::gpk::SColorFloat colorMid, ::gpk::SColorFloat colorMax, ::gpk::bgra colorEmpty, bool radialColor)  {
+	static ::gpk::imgu32				dummyDepth;
+	const ::gpk::n3<float>				center3							= (gauge.Vertices[1] - gauge.Vertices[gauge.Vertices.size() / 2 + 1]) / 2 + gauge.Vertices[gauge.Vertices.size() / 2 + 1];
+	const ::gpk::n2<float>				center2							= {center3.x, center3.y};
 	const double						radiusLarge						= (center3 - gauge.Vertices[1]).Length();
 	const double						radiusSmall						= (center3 - gauge.Vertices[0]).Length();
 	const double						radiusCenter					= (radiusLarge - radiusSmall) / 2 + radiusSmall;
 	dummyDepth.resize(target.metrics(), 0xFFFFFFFFU);
-	::gpk::apod<::gpk::SCoord2<int16_t>>	pixelCoords;
-	::gpk::apod<::gpk::STriangle<float>>	triangleWeights;
+	::gpk::apod<::gpk::n2i16>				pixelCoords;
+	::gpk::apod<::gpk::tri<float>>			triangleWeights;
 	for(uint32_t iTriangle = 0, triangleCount = gauge.Indices.size(); iTriangle < triangleCount; ++iTriangle) {
 		const ::gpk::STriangle3<float>		triangleCoords					=
 			{ gauge.Vertices[gauge.Indices[iTriangle].A]
@@ -793,17 +793,17 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 		pixelCoords.clear();
 		::gpk::drawTriangle(target.metrics(), triangleCoords, pixelCoords, triangleWeights, dummyDepth);
 		for(uint32_t iPixelCoords = 0; iPixelCoords < pixelCoords.size(); ++iPixelCoords) {
-			const ::gpk::SCoord2<int16_t>		pixelCoord						= pixelCoords[iPixelCoords];
+			const ::gpk::n2<int16_t>			pixelCoord						= pixelCoords[iPixelCoords];
 //#define GAUGE_NO_SHADING
 #ifndef GAUGE_NO_SHADING
-			const ::gpk::SCoord2<float>			floatCoord						= pixelCoord.Cast<float>();
+			const ::gpk::n2<float>				floatCoord						= pixelCoord.Cast<float>();
 			const double						distanceFromCenter				= (floatCoord - center2).Length();
 			const double						distanceFromRadiusCenter		= fabs(distanceFromCenter - radiusCenter) / ((radiusLarge - radiusSmall) / 2);
 			finalColor.a					= (float)(1.f - distanceFromRadiusCenter);
 #else
 			(void)radiusCenter;
 #endif		
-			::gpk::SColorBGRA					& targetPixel					= target[pixelCoord.y][pixelCoord.x];
+			::gpk::bgra							& targetPixel					= target[pixelCoord.y][pixelCoord.x];
 			finalColor.Clamp();
 			targetPixel						= ::gpk::interpolate_linear(::gpk::SColorFloat{targetPixel}, finalColor, finalColor.a);
 			targetPixel.a					= uint8_t(finalColor.a * 255);

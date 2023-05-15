@@ -12,7 +12,7 @@
 		const ::gpk::SSysEvent				& eventToProcess				= systemEvents[iEvent];
 		switch(eventToProcess.Type) {
 		case gpk::SYSEVENT_WINDOW_RESIZE: {
-			::gpk::SCoord2<uint16_t>			newMetrics						= *(const ::gpk::SCoord2<uint16_t>*)eventToProcess.Data.begin();
+			::gpk::n2<uint16_t>			newMetrics						= *(const ::gpk::n2<uint16_t>*)eventToProcess.Data.begin();
 			::gpk::guiUpdateMetrics(*app.DialogDesktop.GUI, newMetrics, true);
 			for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) {
 				if(app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI) ::gpk::guiUpdateMetrics(*app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI, newMetrics, true);
@@ -187,7 +187,7 @@
 	return 0;
 }
 
-::gpk::error_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::SCoord2<uint16_t> renderTargetSize) {
+::gpk::error_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::n2<uint16_t> renderTargetSize) {
 	if(app.ActiveState < 2)
 		return 0;
 
@@ -221,19 +221,19 @@
 			break;
 
 		::gpk::view2d<::gpk::SColorBGRA>			cameraView			= sourceRT->Color.View;
-		::gpk::SCoord2<int16_t>						cameraViewMetrics	= cameraView.metrics().Cast<int16_t>();
-		::gpk::grid_copy(targetPixels, cameraView, ::gpk::SCoord2<uint32_t>
+		::gpk::n2<int16_t>						cameraViewMetrics	= cameraView.metrics().Cast<int16_t>();
+		::gpk::grid_copy(targetPixels, cameraView, ::gpk::n2<uint32_t>
 				{ (targetPixels.metrics().x >> 1) - (cameraView.metrics().x >> 1)
 				, (targetPixels.metrics().y >> 1) - (cameraView.metrics().y >> 1)
 				}
 			);
 
-		const ::gpk::SCoord2<int16_t>		targetCenter		= targetPixels.metrics().Cast<int16_t>() / 2;
-		const ::gpk::SCoord2<int16_t>		cameraCenter		= cameraView.metrics().Cast<int16_t>() / 2;
-		::gpk::SCoord2<int16_t>				cornerTopLeft		= targetCenter + ::gpk::SCoord2<int16_t>{int16_t(-cameraCenter.x), int16_t(-cameraCenter.y)};
-		::gpk::SCoord2<int16_t>				cornerTopRight		= targetCenter + ::gpk::SCoord2<int16_t>{int16_t( cameraCenter.x), int16_t(-cameraCenter.y)};
-		::gpk::SCoord2<int16_t>				cornerBottomLeft	= targetCenter + ::gpk::SCoord2<int16_t>{int16_t(-cameraCenter.x), int16_t( cameraCenter.y)};
-		::gpk::SCoord2<int16_t>				cornerBottomRight	= targetCenter + ::gpk::SCoord2<int16_t>{int16_t( cameraCenter.x), int16_t( cameraCenter.y)};
+		const ::gpk::n2<int16_t>		targetCenter		= targetPixels.metrics().Cast<int16_t>() / 2;
+		const ::gpk::n2<int16_t>		cameraCenter		= cameraView.metrics().Cast<int16_t>() / 2;
+		::gpk::n2<int16_t>				cornerTopLeft		= targetCenter + ::gpk::n2<int16_t>{int16_t(-cameraCenter.x), int16_t(-cameraCenter.y)};
+		::gpk::n2<int16_t>				cornerTopRight		= targetCenter + ::gpk::n2<int16_t>{int16_t( cameraCenter.x), int16_t(-cameraCenter.y)};
+		::gpk::n2<int16_t>				cornerBottomLeft	= targetCenter + ::gpk::n2<int16_t>{int16_t(-cameraCenter.x), int16_t( cameraCenter.y)};
+		::gpk::n2<int16_t>				cornerBottomRight	= targetCenter + ::gpk::n2<int16_t>{int16_t( cameraCenter.x), int16_t( cameraCenter.y)};
 
 		cornerTopLeft		.InPlaceClamp({}, {(int16_t)(targetPixels.metrics().x - 1), (int16_t)(targetPixels.metrics().y - 1)});
 		cornerTopRight		.InPlaceClamp({}, {(int16_t)(targetPixels.metrics().x - 1), (int16_t)(targetPixels.metrics().y - 1)});

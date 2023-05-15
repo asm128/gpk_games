@@ -3,7 +3,7 @@
 
 static constexpr int		MAX_SLICE_TRIANGLES		= 32;
 
-int							ghg::decoExplosionAdd	(::gpk::aobj<::ghg::SExplosion> & explosions, int32_t indexMesh, int32_t indexImage, uint32_t triangleCount, const ::gpk::SCoord3<float> &collisionPoint, double debrisSpeed) {
+int							ghg::decoExplosionAdd	(::gpk::aobj<::ghg::SExplosion> & explosions, int32_t indexMesh, int32_t indexImage, uint32_t triangleCount, const ::gpk::n3<float> &collisionPoint, double debrisSpeed) {
 	::ghg::SExplosion				newExplosion			= {};
 	newExplosion.IndexMesh		= indexMesh;
 	newExplosion.IndexImage		= indexImage;
@@ -12,7 +12,7 @@ int							ghg::decoExplosionAdd	(::gpk::aobj<::ghg::SExplosion> & explosions, in
 		newExplosion.Slices.push_back({(uint16_t)iTriangle, (uint16_t)sliceTriangleCount});
 		iTriangle					+= sliceTriangleCount;
 
-		::gpk::SCoord3<float>			direction				= {0, 1, 0};
+		::gpk::n3<float>			direction				= {0, 1, 0};
 		direction.RotateX(rand() * (::gpk::math_2pi / RAND_MAX));
 		direction.RotateY(rand() * (::gpk::math_2pi / RAND_MAX));
 		direction.RotateZ(rand() * (::gpk::math_2pi / RAND_MAX));
@@ -29,7 +29,7 @@ int							ghg::decoExplosionAdd	(::gpk::aobj<::ghg::SExplosion> & explosions, in
 	return explosions.push_back(newExplosion);
 }
 
-::gpk::error_t				ghg::decoUpdate			(::ghg::SDecoState & decoState, double secondsLastFrame, double relativeSpeed, const ::gpk::SCoord2<uint16_t> & screenMetrics)		{
+::gpk::error_t				ghg::decoUpdate			(::ghg::SDecoState & decoState, double secondsLastFrame, double relativeSpeed, const ::gpk::n2<uint16_t> & screenMetrics)		{
 	// Update background stars
 	decoState.Stars			.Update(screenMetrics, (float)secondsLastFrame);
 	decoState.ScoreParticles.Update((float)secondsLastFrame);

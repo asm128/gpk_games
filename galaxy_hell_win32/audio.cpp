@@ -361,12 +361,12 @@ HRESULT AUDIO_STATE::UpdateAudio( double fElapsedTime ) {
 		if( vListenerPos.x != listener.Position.x
 			|| vListenerPos.z != listener.Position.z )
 		{
-			::gpk::SCoord3<float> vDelta = vListenerPos - ::gpk::SCoord3<float>{listener.Position.x, listener.Position.y, listener.Position.z};
+			::gpk::n3<float> vDelta = vListenerPos - ::gpk::n3<float>{listener.Position.x, listener.Position.y, listener.Position.z};
 
 			fListenerAngle = float( atan2( vDelta.x, vDelta.z ) );
 
 			vDelta.y = 0.0f;
-			::gpk::SCoord3<float> delta = { vDelta.x,vDelta.y,vDelta.z};
+			::gpk::n3<float> delta = { vDelta.x,vDelta.y,vDelta.z};
 			delta.Normalize();
 
 			listener.OrientFront.x = delta.x;
@@ -386,11 +386,11 @@ HRESULT AUDIO_STATE::UpdateAudio( double fElapsedTime ) {
 
 		if( fElapsedTime > 0 )
 		{
-			::gpk::SCoord3<float> lVelocity = ( vListenerPos - ::gpk::SCoord3<float>{listener.Position.x, listener.Position.y, listener.Position.z} ) / fElapsedTime;
+			::gpk::n3<float> lVelocity = ( vListenerPos - ::gpk::n3<float>{listener.Position.x, listener.Position.y, listener.Position.z} ) / fElapsedTime;
 			listener.Position = {vListenerPos.x, vListenerPos.y, vListenerPos.z};
 			listener.Velocity = {lVelocity.x, lVelocity.y, lVelocity.z};
 
-			::gpk::SCoord3<float> eVelocity = ( vEmitterPos - ::gpk::SCoord3<float>{emitter.Position.x, emitter.Position.y, emitter.Position.z} ) / fElapsedTime;
+			::gpk::n3<float> eVelocity = ( vEmitterPos - ::gpk::n3<float>{emitter.Position.x, emitter.Position.y, emitter.Position.z} ) / fElapsedTime;
 			emitter.Position = {vEmitterPos.x, vEmitterPos.y, vEmitterPos.z};
 			emitter.Velocity = {eVelocity.x, eVelocity.y, eVelocity.z};
 		}

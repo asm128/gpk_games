@@ -53,7 +53,7 @@ struct WAVE_STATE
 
 	X3DAUDIO_EMITTER							Emitter					= {};
 	X3DAUDIO_CONE								EmitterCone				= {};
-	::gpk::SCoord3<float>						EmitterPos				= {};
+	::gpk::n3<float>						EmitterPos				= {};
 	float										EmitterAzimuths			[INPUTCHANNELS]                     = {};
 	float										MatrixCoefficients		[INPUTCHANNELS * OUTPUTCHANNELS]    = {};
 
@@ -139,8 +139,8 @@ struct AUDIO_STATE
 	X3DAUDIO_EMITTER					emitter					= {};
 	X3DAUDIO_CONE						emitterCone				= {};
 
-	::gpk::SCoord3<float>				vListenerPos			= {};
-	::gpk::SCoord3<float>				vEmitterPos				= {};
+	::gpk::n3<float>				vListenerPos			= {};
+	::gpk::n3<float>				vEmitterPos				= {};
 	float								fListenerAngle			= (float)(::gpk::math_pi_2 * .5);
 	bool								fUseListenerCone		= true;
 	bool								fUseInnerRadius			= true;

@@ -22,7 +22,7 @@ namespace ghg
 
 #pragma pack(push, 1)
 	struct SShipSceneGlobal	{
-		::gpk::SCoord3	<float>										LightVector						= {0, -12, 0};
+		::gpk::n3	<float>										LightVector						= {0, -12, 0};
 		::gpk::SMatrix4	<float>										MatrixProjection				= {};
 		CAMERA_MODE													CameraMode						= CAMERA_MODE_PERSPECTIVE;
 		::gpk::astatic<::gpk::SCamera, ::ghg::CAMERA_MODE_COUNT>	Camera							= {};
@@ -222,7 +222,7 @@ namespace ghg
 
 		::gpk::n3<float>&									GetShipPosition					(const SShipCore & ship)	{ return ShipPhysics.Centers[EntitySystem.Entities[ship.Entity].Body].Position; }
 
-		::gpk::error_t										GetShipPosition					(uint32_t iShip, ::gpk::SCoord3<float> & output) const {
+		::gpk::error_t										GetShipPosition					(uint32_t iShip, ::gpk::n3<float> & output) const {
 			output = ShipPhysics.Centers[EntitySystem.Entities[ShipCores[iShip].Entity].Body].Position;
 			return 0;
 		}

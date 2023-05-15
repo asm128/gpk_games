@@ -285,7 +285,7 @@ static	int											updateShipOrbiter				(::ghg::SGalaxyHell & solarSystem, int
 					::gpk::n3<float>									front						= {0, 1, 0};
 					//const ::gpk::SMatrix4<float>							& shipMatrix				= solarSystem.Scene.Transforms[solarSystem.Entities[solarSystem.Entities[shipPart.Entity].Parent].Transform];
 					targetPosition										= inverseTransform.Transform(targetPosition);
-					::gpk::SQuaternion<float>								q;
+					::gpk::quat<float>								q;
 					q.LookAt(shipModuleTransform.Position, targetPosition, up, front);
 					shipModuleTransform.Orientation						= q;
 				}

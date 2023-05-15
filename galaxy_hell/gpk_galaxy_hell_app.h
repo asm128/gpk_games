@@ -84,7 +84,7 @@ namespace ghg
 	GDEFINE_ENUM_TYPE(UI_SCORE, uint8_t);
 
 	struct SUIRadialGauge {
-		::gpk::apod<::gpk::SCoord3<float>>				Vertices				= {};
+		::gpk::apod<::gpk::n3<float>>				Vertices				= {};
 		::gpk::apod<::gpk::STriangle<int16_t>>			Indices					= {};
 		int16_t											CurrentValue			= 0;
 		int16_t											MaxValue				= 64;

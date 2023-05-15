@@ -7,8 +7,8 @@
 namespace ghg
 {
 	struct SSolarSystem {
-		::gpk::SCoord3<int64_t>					Sector;
-		::gpk::SCoord3<int64_t>					Position;
+		::gpk::n3<int64_t>					Sector;
+		::gpk::n3<int64_t>					Position;
 		::gpk::vcc								Name;
 	};
 

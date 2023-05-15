@@ -72,8 +72,8 @@ namespace ghg
 		uint8_t					Left				: 1;
 		uint8_t					Right				: 1;
 		uint8_t					Turbo				: 1;
-		::gpk::SCoord3<int16_t>	PointerDeltas		= {};
-		::gpk::SCoord3<int16_t>	PointerPosition		= {};
+		::gpk::n3<int16_t>	PointerDeltas		= {};
+		::gpk::n3<int16_t>	PointerPosition		= {};
 	};
 #pragma pack(pop)
 
@@ -134,7 +134,7 @@ namespace ghg
 	};
 
 	::gpk::error_t										stageSetup						(::ghg::SGalaxyHell & solarSystem);
-	::gpk::error_t										solarSystemSetup				(::ghg::SGalaxyHell & solarSystem, const ::gpk::SCoord2<uint16_t> & windowSize);
+	::gpk::error_t										solarSystemSetup				(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2<uint16_t> & windowSize);
 	::gpk::error_t										solarSystemReset				(::ghg::SGalaxyHell & solarSystem); 
 	::gpk::error_t										solarSystemDraw					(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
 	::gpk::error_t										solarSystemUpdate				(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, const ::gpk::view_array<::gpk::SSysEvent> & frameEvents);
@@ -143,19 +143,19 @@ namespace ghg
 	
 	::gpk::error_t										getLightArraysFromDebris
 		( const ::ghg::SDecoState								& decoState
-		, ::gpk::apod<::gpk::SCoord3<float>>				& lightPoints
+		, ::gpk::apod<::gpk::n3<float>>				& lightPoints
 		, ::gpk::apod<::gpk::SColorBGRA>					& lightColors
 		, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
 		);
 	::gpk::error_t										getLightArraysFromShips
 		( const ::ghg::SShipManager								& shipState
-		, ::gpk::apod<::gpk::SCoord3<float>>				& lightPoints
+		, ::gpk::apod<::gpk::n3<float>>				& lightPoints
 		, ::gpk::apod<::gpk::SColorBGRA>					& lightColors
 		);
 	::gpk::error_t										getLightArrays
 		( const ::ghg::SShipManager								& shipState
 		, const ::ghg::SDecoState								& decoState
-		, ::gpk::apod<::gpk::SCoord3<float>>				& lightPoints
+		, ::gpk::apod<::gpk::n3<float>>				& lightPoints
 		, ::gpk::apod<::gpk::SColorBGRA>					& lightColors
 		, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
 		);

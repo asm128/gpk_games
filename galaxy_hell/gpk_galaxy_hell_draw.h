@@ -19,17 +19,17 @@ namespace ghg
 
 	struct SGalaxyHellDrawCache {
 		// Used when rastering triangles
-		::gpk::apod<::gpk::SCoord2<int16_t>>			PixelCoords				;
+		::gpk::apod<::gpk::n2<int16_t>>			PixelCoords				;
 		::gpk::apod<::gpk::STriangle<float>>			PixelVertexWeights		;
 		
 		// Used for pixel shading
-		::gpk::apod<::gpk::SCoord3<float>>				LightPointsWorld		;
+		::gpk::apod<::gpk::n3<float>>				LightPointsWorld		;
 		::gpk::apod<::gpk::SColorBGRA>					LightColorsWorld		;
-		::gpk::apod<::gpk::SCoord3<float>>				LightPointsModel		;
+		::gpk::apod<::gpk::n3<float>>				LightPointsModel		;
 		::gpk::apod<::gpk::SColorBGRA>					LightColorsModel		;
 
 		// Gameplay render target. I decided the world will have its own rendertarget to facilitate reuse of the code.
-		::gpk::SCoord2<uint16_t>						RenderTargetMetrics		= {1280, 720};
+		::gpk::n2<uint16_t>						RenderTargetMetrics		= {1280, 720};
 		::gpk::pobj<::ghg::TRenderTarget>				RenderTarget			= {};
 
 		::gpk::error_t										Clear					() {
