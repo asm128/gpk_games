@@ -491,7 +491,7 @@ int												ghg::drawOrbiter
 		::gpk::SMatrix4<float>									matrixTransformVP			= matrixTransform * matrixVP;
 		::ghg::getLightArrays(matrixTransform.GetTranslation(), drawCache.LightPointsWorld, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightColorsModel);
 		const ::gpk::SGeometryQuads								& mesh						= shipState.Scene.Geometry[entityChild.Geometry];
-		const ::gpk::view2d<const ::gpk::SColorBGRA>			image						= shipState.Scene.Image	[entityChild.Image].View;
+		const ::gpk::view2d<const ::gpk::bgra>					image						= shipState.Scene.Image	[entityChild.Image].View;
 		for(uint32_t iTriangle = 0; iTriangle < mesh.Triangles.size(); ++iTriangle) {
 			::gpk::clear(drawCache.PixelCoords, drawCache.PixelVertexWeights);
 			pixelsDrawn += ::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformVP, shipState.Scene.Global.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer
@@ -620,7 +620,7 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 	memset(targetPixels.begin(), 0, targetPixels.byte_count());
 	memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
 	{
-		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		::std::lock_guard							lockUpdate					(mutexUpdate);
 		::drawStars(solarSystem.DecoState.Stars, targetPixels);
 	}
 
@@ -631,13 +631,13 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 	drawCache.LightPointsWorld.clear();
 	drawCache.LightColorsWorld.clear();
 	{
-		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		::std::lock_guard							lockUpdate					(mutexUpdate);
 		::ghg::getLightArrays(solarSystem.ShipState, solarSystem.DecoState, drawCache.LightPointsWorld, drawCache.LightColorsWorld, ::ghg::DEBRIS_COLORS);
 	}
 	drawCache.LightPointsModel.reserve(drawCache.LightPointsWorld.size());
 	drawCache.LightColorsModel.reserve(drawCache.LightColorsWorld.size());
 	{
-		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		::std::lock_guard							lockUpdate					(mutexUpdate);
 		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
 			const ::ghg::SShipCore									& ship						= solarSystem.ShipState.ShipCores[iShip];
 			if(ship.Health <= 0 && ship.Team)
@@ -648,7 +648,7 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 	}
 
 	{
-		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		::std::lock_guard							lockUpdate					(mutexUpdate);
 		for(uint32_t iExplosion = 0; iExplosion < solarSystem.DecoState.Explosions.size(); ++iExplosion) {
 			const ::ghg::SExplosion									& explosion					= solarSystem.DecoState.Explosions[iExplosion];
 			if(0 == explosion.Slices.size())
@@ -665,7 +665,7 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 	};
 #pragma pack(pop)
 	{
-		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		::std::lock_guard							lockUpdate					(mutexUpdate);
 		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
 			const ::ghg::SShipCore									& shipCore			= solarSystem.ShipState.ShipCores[iShip];
 			const ::gpk::apod<uint32_t>						& shipParts			= solarSystem.ShipState.ShipParts[iShip];
@@ -678,11 +678,11 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 		}
 	}
 	{
-		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		::std::lock_guard							lockUpdate					(mutexUpdate);
 		::drawDebris(targetPixels, solarSystem.DecoState.Debris, matrixView, depthBuffer, ::ghg::DEBRIS_COLORS);
 	}
 	{
-		::std::lock_guard<::std::mutex>							lockUpdate					(mutexUpdate);
+		::std::lock_guard							lockUpdate					(mutexUpdate);
 		::drawScoreParticles(targetPixels, solarSystem.DecoState.ScoreParticles, matrixView, depthBuffer, *solarSystem.DecoState.FontManager.Fonts[8]);
 	}
 	return 0;

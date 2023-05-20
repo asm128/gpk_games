@@ -205,13 +205,13 @@ int										update				(SApplication & app, bool exitSignal)	{
 		return ::gpk::APPLICATION_STATE_EXIT;
 
 	{
-		::std::lock_guard<::std::mutex>			lockRTQueue	(app.GalaxyHellApp.RenderTargetLockQueue);
+		::std::lock_guard			lockRTQueue	(app.GalaxyHellApp.RenderTargetLockQueue);
 		if(app.GalaxyHellApp.RenderTargetQueue.size()) {
-			::std::lock_guard<::std::mutex>			lockRTPool	(app.GalaxyHellApp.RenderTargetLockPool);
+			::std::lock_guard			lockRTPool	(app.GalaxyHellApp.RenderTargetLockPool);
 
 			app.GalaxyHellApp.RenderTargetPool.push_back(app.Framework.RootWindow.BackBuffer);
 			app.Framework.RootWindow.BackBuffer	= app.GalaxyHellApp.RenderTargetQueue[app.GalaxyHellApp.RenderTargetQueue.size() - 1];
-			app.GalaxyHellApp.RenderTargetQueue.pop_back(0);
+			app.GalaxyHellApp.RenderTargetQueue.pop_back();
 			for(uint32_t iRT = 0; iRT < app.GalaxyHellApp.RenderTargetQueue.size(); ++iRT) {
 				app.GalaxyHellApp.RenderTargetPool.push_back(app.GalaxyHellApp.RenderTargetQueue[iRT]);
 			}

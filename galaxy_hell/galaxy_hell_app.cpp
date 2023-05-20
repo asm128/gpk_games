@@ -193,14 +193,14 @@
 
 	::gpk::pobj<::ghg::TRenderTarget>		target	= {};
 	{
-		::gpk::mutex_guard			rtLock(app.RenderTargetLockPool);
+		::std::lock_guard			rtLock(app.RenderTargetLockPool);
 		if(app.RenderTargetPool.size()) {
 			target					= app.RenderTargetPool[0];
 			app.RenderTargetPool.remove_unordered(0);
 		}
 	}
 	if(!target) {
-		::gpk::mutex_guard			rtLock(app.RenderTargetLockQueue);
+		::std::lock_guard			rtLock(app.RenderTargetLockQueue);
 		if(app.RenderTargetQueue.size() > 1) {
 			target					= app.RenderTargetQueue[0];
 			app.RenderTargetQueue.remove_unordered(0);
@@ -250,15 +250,15 @@
 	}
 
 	{
-		::std::lock_guard<::std::mutex>							lockUpdate			(app.Game.LockUpdate);
+		::std::lock_guard							lockUpdate			(app.Game.LockUpdate);
 		::gpk::guiDraw(*app.DialogPerState[app.ActiveState].GUI, targetPixels);
 	}
 	if(app.ActiveState != ::ghg::APP_STATE_Play) {
-		::std::lock_guard<::std::mutex>							lockUpdate			(app.Game.LockUpdate);
+		::std::lock_guard							lockUpdate			(app.Game.LockUpdate);
 		::gpk::guiDraw(*app.DialogDesktop.GUI, targetPixels);
 	}
 	for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) {
-		::std::lock_guard<::std::mutex>							lockUpdate			(app.Game.LockUpdate);
+		::std::lock_guard							lockUpdate			(app.Game.LockUpdate);
 		::gpk::guiDraw((app.ActiveState == ::ghg::APP_STATE_Play)
 			? *app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI
 			: *app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI
@@ -266,7 +266,7 @@
 		);
 	}
 	{
-		::gpk::mutex_guard			rtLock(app.RenderTargetLockQueue);
+		::std::lock_guard			rtLock(app.RenderTargetLockQueue);
 		app.RenderTargetQueue.push_back(target);
 	}
 	return 0;

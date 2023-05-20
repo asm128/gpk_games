@@ -516,7 +516,7 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 			::gpk::view2d<::gpk::bgra>	targetPixels		= renderTarget.Color		; 
 			::gpk::view2d<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
 			//targetPixels.fill(tone);
-			::gpk::mutex_guard										lock					(lockGame);
+			::std::lock_guard										lock					(lockGame);
 			memset(targetPixels.begin(), 0, targetPixels.byte_count());
 			memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
 
@@ -533,7 +533,7 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 			::ghg::TRenderTarget				& renderTarget		= viewport.RenderTargetWeaponLoad;
 			::gpk::view2d<::gpk::bgra>	targetPixels		= renderTarget.Color		; 
 			::gpk::view2d<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
-			::gpk::mutex_guard					lock				(lockGame);
+			::std::lock_guard					lock				(lockGame);
 			memset(targetPixels.begin(), 0, targetPixels.byte_count());
 			memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
 
@@ -552,7 +552,7 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 		}
 
 		{ // Update weapon type bar
-			::gpk::mutex_guard					lock				(lockGame);
+			::std::lock_guard					lock				(lockGame);
 			::ghg::TRenderTarget				& renderTarget		= viewport.RenderTargetWeaponType;
 			::gpk::view2d<::gpk::bgra>	targetPixels		= renderTarget.Color		; 
 			::gpk::view2d<uint32_t>			depthBuffer			= renderTarget.DepthStencil	;
@@ -621,7 +621,7 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 		gui.Controls.States[dialog.Root].Hidden = false; 
 
 		if(app.Players.size() <= iPlayer) {
-			::gpk::mutex_guard					lock						(app.Game.LockUpdate);
+			::std::lock_guard					lock						(app.Game.LockUpdate);
 			char text [64] = {};
 			sprintf_s(text, "Player %i", app.Players.size() + 1);
 			app.AddNewPlayer(text);

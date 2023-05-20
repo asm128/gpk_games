@@ -45,7 +45,7 @@ int						loadLines		(::gpkg::SPage & page, const ::gpk::aobj<std::string> & page
 		::gpk::trim(trimmed, ::gpk::vcc{currentLine.data(), (uint32_t)currentLine.size()});
 		currentLine = {trimmed.begin(), trimmed.size()};
 		if(currentLine.size() <= 2 && 0 == page.PageJumps.size()) {
-			page.TextLines.pop_back(0);
+			page.TextLines.pop_back();
 			continue;
 		}
 
@@ -54,7 +54,7 @@ int						loadLines		(::gpkg::SPage & page, const ::gpk::aobj<std::string> & page
 			break;
 		}
 		page.PageJumps.push_back({currentLine, jumpIndex});
-		page.TextLines.pop_back(0);
+		page.TextLines.pop_back();
 	}
 
 

@@ -118,7 +118,7 @@ namespace ghg
 			return 0;
 		}
 		::gpk::error_t											Load					(::gpk::vcu8 & input) {
-			::gpk::mutex_guard											lock(LockUpdate);
+			::std::lock_guard											lock(LockUpdate);
 			::gpk::view_array<const ::ghg::SPlayState>					readPlayState			= {};
 			gpk_necs(::gpk::loadPOD(input, PlayState));
 			Pilots.resize(PlayState.CountPlayers);

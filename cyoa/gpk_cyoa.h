@@ -1,4 +1,4 @@
-#include "gpk_array.h"
+#include "gpk_array_obj.h"
 
 #include <string>
 

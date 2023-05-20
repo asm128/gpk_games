@@ -99,7 +99,7 @@ static	int											shipCreate			(::ghg::SShipManager & shipState, int32_t team
 		shipState.ShipOrbitersDistanceToTargets.push_back({});
 		shipState.ShipOrbiterActionQueue.push_back({});
 
-		::gpk::apod<uint32_t>								& parentEntityChildren	= shipState.EntitySystem.EntityChildren[ship.Entity];
+		::gpk::au32								& parentEntityChildren	= shipState.EntitySystem.EntityChildren[ship.Entity];
 		parentEntityChildren.push_back(shipPart.Entity);
 	}
 	return indexShip;
@@ -237,23 +237,23 @@ static	int											modelsSetup				(::ghg::SShipScene & scene)			{
 }
 
 int													ghg::solarSystemReset					(::ghg::SGalaxyHell & solarSystem)	{	// Set up enemy ships
-	::gpk::mutex_guard										lock(solarSystem.LockUpdate);
+	::std::lock_guard										lock(solarSystem.LockUpdate);
 	solarSystem.ShipControllers.clear();
 	solarSystem.ShipState.Clear();
-	solarSystem.DecoState = {};
-	solarSystem.PlayState								= {};
+	solarSystem.DecoState	= {};
+	solarSystem.PlayState	= {};
 	::gpk::rasterFontDefaults(solarSystem.DecoState.FontManager);
 	solarSystem.PilotsReset();
 	return 0;
 }
 
 int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Set up enemy ships
-	static constexpr	const uint32_t						partHealth								= 100;
+	stacxpr	const uint32_t						partHealth								= 100;
 
 	solarSystem.PlayState.TimeStage						= 0;
 	solarSystem.PlayState.TimeRealStage					= 0;
 	if(0 == solarSystem.PlayState.Stage) {
-		::gpk::mutex_guard										lock(solarSystem.LockUpdate);
+		::std::lock_guard										lock(solarSystem.LockUpdate);
 		solarSystem.DecoState.Stars.Reset(solarSystem.DrawCache.RenderTargetMetrics);
 		solarSystem.PlayState.TimeStart = solarSystem.PlayState.TimeLast = ::gpk::timeCurrent();
 		memset(solarSystem.ShipState.ShipScores.begin(), 0, solarSystem.ShipState.ShipScores.byte_count());
@@ -286,7 +286,7 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 
 	::gpk::SJSONFile										stageFile								= {};
 	char													stageFileName			[256]			= "./%s.json";
-	static constexpr const SShipOrbiterSetup				weaponDefinitions		[]				=
+	stacxpr const SShipOrbiterSetup				weaponDefinitions		[]				=
 		{ {::ghg::SHIP_PART_TYPE_Gun			, 128, ::ghg::WEAPON_TYPE_Gun		, .08, 0.975, ::ghg::WEAPON_LOAD_Bullet		,  256,    20, 1,   0,0.00,  1.5, ::ghg::WEAPON_DAMAGE_Pierce	}
 		, {::ghg::SHIP_PART_TYPE_Shotgun		, 128, ::ghg::WEAPON_TYPE_Shotgun	, .16, 0.925, ::ghg::WEAPON_LOAD_Bullet		,  160,    10, 6,   0,0.00,  1.5, ::ghg::WEAPON_DAMAGE_Impact	}
 		, {::ghg::SHIP_PART_TYPE_Wafer			, 128, ::ghg::WEAPON_TYPE_Gun		, .24, 0.99, ::ghg::WEAPON_LOAD_Ray			,  480,    30, 1,   1,0.50,  1, ::ghg::WEAPON_DAMAGE_Pierce	| ::ghg::WEAPON_DAMAGE_Burn	}
@@ -304,11 +304,11 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 
 	sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage);
 	if(0 <= ::gpk::fileToMemory(stageFileName, stageFile.Bytes) && stageFile.Bytes.size()) {
-		::gpk::mutex_guard										lock	(solarSystem.LockUpdate);
+		::std::lock_guard										lock	(solarSystem.LockUpdate);
 		gpk_necall(-1 == ::gpk::jsonParse(stageFile.Reader, stageFile.Bytes), "%s", stageFileName);
 	} 
 	else {
-		::gpk::mutex_guard										lock	(solarSystem.LockUpdate);
+		::std::lock_guard										lock	(solarSystem.LockUpdate);
 		// Set up player ships
 		if(solarSystem.PlayState.Stage == 0) {
 			solarSystem.PlayState.TimeWorld		= 0;
@@ -337,7 +337,7 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 		while(((int)solarSystem.ShipState.ShipCores.size() - (int)solarSystem.PlayState.CountPlayers - 1) < (int)(solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage)) {	// Create enemy ships depending on stage.
 			int32_t													indexShip						= ::shipCreate(solarSystem.ShipState, 1, -1, solarSystem.PlayState.Stage + solarSystem.ShipState.ShipCores.size());
 			::ghg::SShipCore										& enemyShip						= solarSystem.ShipState.ShipCores[indexShip];
-			::gpk::apod<uint32_t>								& enemyShipOrbiters				= solarSystem.ShipState.ShipParts[indexShip];
+			::gpk::au32								& enemyShipOrbiters				= solarSystem.ShipState.ShipParts[indexShip];
 			::gpk::SBodyCenter										& shipTransform					= solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[enemyShip.Entity].Body];
 			shipTransform.Orientation.MakeFromEulerTaitBryan({0, 0, (float)(::gpk::math_pi_2)});
 			shipTransform.Position								= {5.0f + 5 * solarSystem.ShipState.ShipCores.size()};
@@ -352,7 +352,7 @@ int													ghg::stageSetup							(::ghg::SGalaxyHell & solarSystem)	{	// Se
 		// set up weapons
 		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
 			::ghg::SShipCore										& ship							= solarSystem.ShipState.ShipCores[iShip];
-			::gpk::apod<uint32_t>								& shipParts						= solarSystem.ShipState.ShipParts[iShip];
+			::gpk::au32								& shipParts						= solarSystem.ShipState.ShipParts[iShip];
 			ship.Health											= 0;
 			ship.Nitro											= (float)(ship.MaxNitro = DEFAULT_NITRO);
 
