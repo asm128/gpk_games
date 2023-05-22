@@ -126,6 +126,7 @@ namespace ghg
 				gpk_necall(::gpk::loadLabel(input, Pilots[iPlayer].Name), "iPlayer %i", iPlayer);
 				gpk_necall(::gpk::loadPOD(input, Pilots[iPlayer].Color), "iPlayer %i", iPlayer);
 			}
+			ShipControllers.clear();
 			gpk_necs(::gpk::loadView(input, ShipControllers));
 			gpk_necs(ShipState.Load(input));
 			return 0;

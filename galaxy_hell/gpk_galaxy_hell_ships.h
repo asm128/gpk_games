@@ -252,7 +252,7 @@ namespace ghg
 				gpk_necs(::gpk::saveView(output, ShipOrbiterActionQueue			[iShipOrbiter]));
 			}
 
-			::gpk::saveView(output, Weapons);
+			gpk_necs(::gpk::saveView(output, Weapons));
 			info_printf("Saved %s, %i", "Weapons", Weapons.size());
 			for(uint32_t iWeapon = 0; iWeapon < Weapons.size(); ++iWeapon) 
 				gpk_necs(Shots[iWeapon].Save(output));
@@ -263,12 +263,15 @@ namespace ghg
 			return 0; 
 		}
 		::gpk::error_t										Load							(::gpk::vcu8 & input) { 
+			ShipScores	.clear();
+			ShipCores	.clear();
 			gpk_necs(::gpk::loadView(input, ShipScores	));
 			gpk_necs(::gpk::loadView(input, ShipCores	));
 			gpk_necs(ShipParts.resize(ShipCores.size()));
-			for(uint32_t iWeapon = 0; iWeapon < ShipParts.size(); ++iWeapon) 
-				gpk_necall(::gpk::loadView(input, ShipParts[iWeapon]), "iWeapon: %i", iWeapon);
+			for(uint32_t iPart = 0; iPart < ShipParts.size(); ++iPart) 
+				gpk_necall(::gpk::loadView(input, ShipParts[iPart]), "iWeapon: %i", iPart);
 
+			Orbiters.clear();
 			gpk_necs(::gpk::loadView(input, Orbiters));
 			gpk_necs(ShipOrbitersDistanceToTargets	.resize(Orbiters.size()));
 			gpk_necs(ShipOrbiterActionQueue			.resize(Orbiters.size()));
@@ -277,10 +280,11 @@ namespace ghg
 				gpk_necall(::gpk::loadView(input, ShipOrbiterActionQueue		[iShipOrbiter]), "iShipOrbiter: %i", iShipOrbiter);
 			}
 
+			Weapons.clear();
 			gpk_necs(::gpk::loadView(input, Weapons));
-			Shots.clear();
+			Shots.resize(Weapons.size());
 			for(uint32_t iWeapon = 0; iWeapon < Weapons.size(); ++iWeapon)
-				gpk_necs(Shots[Shots.push_back({})].Load(input));
+				gpk_necs(Shots[iWeapon].Load(input));
 
 			gpk_necs(ShipPhysics	.Load(input));
 			gpk_necs(EntitySystem	.Load(input));
