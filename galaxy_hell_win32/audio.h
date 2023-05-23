@@ -2,23 +2,22 @@
 #include "XAudio2Versions.h"
 #include "WAVFileReader.h"
 
-#include "gpk_array.h"
-#include "gpk_coord.h"
+#include "gpk_n3.h"
 #include "gpk_ptr.h"
 #include "gpk_complus.h"
 
 #include <wrl/client.h>
 
 #ifndef USING_XAUDIO2_7_DIRECTX
-#pragma comment(lib,"runtimeobject.lib")
-#include <Windows.Devices.Enumeration.h>
-#include <wrl.h>
-#include <ppltasks.h>
+#	pragma comment(lib,"runtimeobject.lib")
+#	include <Windows.Devices.Enumeration.h>
+#	include <wrl.h>
+#	include <ppltasks.h>
 #endif
 
 #ifdef USING_XAUDIO2_REDIST
-#include <mmdeviceapi.h>
-#include <Functiondiscoverykeys_devpkey.h>
+#	include <mmdeviceapi.h>
+#	include <Functiondiscoverykeys_devpkey.h>
 #endif
 
 #ifndef AUDIO_H_29834928374
