@@ -4,7 +4,7 @@
 #include "gpk_storage.h"
 #include "gpk_deflate.h"
 
-::gpk::error_t					ghg::galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents) {
+::gpk::error_t					ghg::galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view<::gpk::SSysEvent> & systemEvents) {
 	if(app.ActiveState == ::ghg::APP_STATE_Quit)
 		return 1;
 
@@ -128,7 +128,7 @@
 
 	const bool inGame = app.ActiveState == ::ghg::APP_STATE_Play;
 
-	::gpk::view_array<::ghg::SShipController>		controllerPlayer	= app.Game.ShipControllers;
+	::gpk::view<::ghg::SShipController>		controllerPlayer	= app.Game.ShipControllers;
 
 
 	const ::gpk::SInput								& input				= *app.DialogDesktop.Input;
@@ -221,29 +221,29 @@
 			break;
 
 		::gpk::view2d<::gpk::bgra>			cameraView			= sourceRT->Color.View;
-		::gpk::n2<int16_t>						cameraViewMetrics	= cameraView.metrics().Cast<int16_t>();
+		::gpk::n2i16						cameraViewMetrics	= cameraView.metrics().Cast<int16_t>();
 		::gpk::grid_copy(targetPixels, cameraView, ::gpk::n2<uint32_t>
 				{ (targetPixels.metrics().x >> 1) - (cameraView.metrics().x >> 1)
 				, (targetPixels.metrics().y >> 1) - (cameraView.metrics().y >> 1)
 				}
 			);
 
-		const ::gpk::n2<int16_t>		targetCenter		= targetPixels.metrics().Cast<int16_t>() / 2;
-		const ::gpk::n2<int16_t>		cameraCenter		= cameraView.metrics().Cast<int16_t>() / 2;
-		::gpk::n2<int16_t>				cornerTopLeft		= targetCenter + ::gpk::n2<int16_t>{int16_t(-cameraCenter.x), int16_t(-cameraCenter.y)};
-		::gpk::n2<int16_t>				cornerTopRight		= targetCenter + ::gpk::n2<int16_t>{int16_t( cameraCenter.x), int16_t(-cameraCenter.y)};
-		::gpk::n2<int16_t>				cornerBottomLeft	= targetCenter + ::gpk::n2<int16_t>{int16_t(-cameraCenter.x), int16_t( cameraCenter.y)};
-		::gpk::n2<int16_t>				cornerBottomRight	= targetCenter + ::gpk::n2<int16_t>{int16_t( cameraCenter.x), int16_t( cameraCenter.y)};
+		const ::gpk::n2i16		targetCenter		= targetPixels.metrics().Cast<int16_t>() / 2;
+		const ::gpk::n2i16		cameraCenter		= cameraView.metrics().Cast<int16_t>() / 2;
+		::gpk::n2i16				cornerTopLeft		= targetCenter + ::gpk::n2i16{int16_t(-cameraCenter.x), int16_t(-cameraCenter.y)};
+		::gpk::n2i16				cornerTopRight		= targetCenter + ::gpk::n2i16{int16_t( cameraCenter.x), int16_t(-cameraCenter.y)};
+		::gpk::n2i16				cornerBottomLeft	= targetCenter + ::gpk::n2i16{int16_t(-cameraCenter.x), int16_t( cameraCenter.y)};
+		::gpk::n2i16				cornerBottomRight	= targetCenter + ::gpk::n2i16{int16_t( cameraCenter.x), int16_t( cameraCenter.y)};
 
 		cornerTopLeft		.InPlaceClamp({}, {(int16_t)(targetPixels.metrics().x - 1), (int16_t)(targetPixels.metrics().y - 1)});
 		cornerTopRight		.InPlaceClamp({}, {(int16_t)(targetPixels.metrics().x - 1), (int16_t)(targetPixels.metrics().y - 1)});
 		cornerBottomLeft	.InPlaceClamp({}, {(int16_t)(targetPixels.metrics().x - 1), (int16_t)(targetPixels.metrics().y - 1)});
 		cornerBottomRight	.InPlaceClamp({}, {(int16_t)(targetPixels.metrics().x - 1), (int16_t)(targetPixels.metrics().y - 1)});
 
-		::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{cornerTopLeft		, cornerTopRight	}, ::gpk::DARKGRAY);
-		::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{cornerTopLeft		, cornerBottomLeft	}, ::gpk::DARKGRAY);
-		::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{cornerTopRight		, cornerBottomRight	}, ::gpk::GRAY * 1.1);
-		::gpk::drawLine(targetPixels, ::gpk::SLine2<int16_t>{cornerBottomLeft	, cornerBottomRight	}, ::gpk::GRAY * 1.1);
+		::gpk::drawLine(targetPixels, ::gpk::line2i16{cornerTopLeft		, cornerTopRight	}, ::gpk::DARKGRAY);
+		::gpk::drawLine(targetPixels, ::gpk::line2i16{cornerTopLeft		, cornerBottomLeft	}, ::gpk::DARKGRAY);
+		::gpk::drawLine(targetPixels, ::gpk::line2i16{cornerTopRight	, cornerBottomRight	}, ::gpk::GRAY * 1.1);
+		::gpk::drawLine(targetPixels, ::gpk::line2i16{cornerBottomLeft	, cornerBottomRight	}, ::gpk::GRAY * 1.1);
 
 		//::ghg::overlayDraw(app.Overlay, app.World.DrawCache, app.World.PlayState.TimeWorld, depthBuffer, targetPixels);
 		break;

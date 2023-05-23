@@ -323,9 +323,9 @@ static	int											drawShots			(::gpk::view2d<::gpk::bgra> targetPixels
 		pixelCoordsCache.clear();
 		const ::gpk::n3<float>							& starPosPrev			= shots.PositionDraw[iShot];
 		const ::gpk::n3<float>							& starPos				= shots.Particles.Position[iShot];
-		//::gpk::SLine3<float>								raySegment				= {starPosPrev, starPos};
+		//::gpk::line3<float>								raySegment				= {starPosPrev, starPos};
 
-		::gpk::SLine3<float>								raySegment				= {starPos, starPosPrev}; //raySegmentWorld;
+		::gpk::line3<float>								raySegment				= {starPos, starPosPrev}; //raySegmentWorld;
 		raySegment.A									= matrixVPV.Transform(raySegment.A);
 		raySegment.B									= matrixVPV.Transform(raySegment.B);
 		if(raySegment.A.z < 0 || raySegment.A.z > 1) continue;

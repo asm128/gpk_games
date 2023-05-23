@@ -2,6 +2,8 @@
 
 #include "gpk_collision.h"
 
+#include "gpk_line3.h"
+
 #include <Windows.h>
 #include <mmsystem.h>
 #include <gpk_noise.h>
@@ -21,7 +23,7 @@ static	int											collisionDetect		(::ghg::SShots & shots, const ::gpk::n3<fl
 	bool													detected			= false;
 	collisionPoints.clear();
 	for(uint32_t iShot = 0; iShot < shots.Particles.Position.size(); ++iShot) {
-		const ::gpk::SLine3<float>								shotSegment			= {shots.PositionPrev[iShot], shots.Particles.Position[iShot]};
+		const ::gpk::line3<float>								shotSegment			= {shots.PositionPrev[iShot], shots.Particles.Position[iShot]};
 		float													t					= 0;
 		::gpk::n3<float>									collisionPoint		= {};
 		if( ::gpk::intersectRaySphere(shotSegment.A, (shotSegment.B - shotSegment.A).Normalize(), {1.2, modelPosition}, t, collisionPoint)
