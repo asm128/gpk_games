@@ -209,7 +209,7 @@
 
 	target->resize(renderTargetSize.Cast<uint32_t>(), {0, 0, 0, 1}, 0xFFFFFFFFU);
 
-	::gpk::view2d<::gpk::SColorBGRA>							targetPixels			= target->Color.View;
+	::gpk::view2d<::gpk::bgra>							targetPixels			= target->Color.View;
 	::gpk::view2d<uint32_t>									depthBuffer				= target->DepthStencil.View;
 	switch(app.ActiveState) {
 	default					: 
@@ -220,7 +220,7 @@
 		if(!sourceRT)
 			break;
 
-		::gpk::view2d<::gpk::SColorBGRA>			cameraView			= sourceRT->Color.View;
+		::gpk::view2d<::gpk::bgra>			cameraView			= sourceRT->Color.View;
 		::gpk::n2<int16_t>						cameraViewMetrics	= cameraView.metrics().Cast<int16_t>();
 		::gpk::grid_copy(targetPixels, cameraView, ::gpk::n2<uint32_t>
 				{ (targetPixels.metrics().x >> 1) - (cameraView.metrics().x >> 1)

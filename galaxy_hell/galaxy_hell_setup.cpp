@@ -220,7 +220,7 @@ static	int											modelsSetup				(::ghg::SShipScene & scene)			{
 
 		scene.Image.resize(256);
 		for(uint32_t iImage = 0; iImage < scene.Image.size(); ++iImage) {
-			::gpk::img<::gpk::SColorBGRA>						& image							= scene.Image[iImage];
+			::gpk::img<::gpk::bgra>						& image							= scene.Image[iImage];
 			if(image.Texels.size())
 				continue;
 			image.resize(::gpk::n2u32{32, 5});

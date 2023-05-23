@@ -8,7 +8,7 @@
 namespace ghg
 {
 
-	typedef ::gpk::rt<::gpk::SColorBGRA, uint32_t>	TRenderTarget;
+	typedef ::gpk::rt<::gpk::bgra, uint32_t>	TRenderTarget;
 
 	static constexpr ::gpk::SColorBGRA				DEBRIS_COLORS[]			=
 		{ {0x80, 0xAF, 0xFF, }
@@ -20,13 +20,13 @@ namespace ghg
 	struct SGalaxyHellDrawCache {
 		// Used when rastering triangles
 		::gpk::apod<::gpk::n2<int16_t>>			PixelCoords				;
-		::gpk::apod<::gpk::STriangle<float>>			PixelVertexWeights		;
+		::gpk::apod<::gpk::tri<float>>			PixelVertexWeights		;
 		
 		// Used for pixel shading
 		::gpk::apod<::gpk::n3<float>>				LightPointsWorld		;
-		::gpk::apod<::gpk::SColorBGRA>					LightColorsWorld		;
+		::gpk::apod<::gpk::bgra>					LightColorsWorld		;
 		::gpk::apod<::gpk::n3<float>>				LightPointsModel		;
-		::gpk::apod<::gpk::SColorBGRA>					LightColorsModel		;
+		::gpk::apod<::gpk::bgra>					LightColorsModel		;
 
 		// Gameplay render target. I decided the world will have its own rendertarget to facilitate reuse of the code.
 		::gpk::n2<uint16_t>						RenderTargetMetrics		= {1280, 720};

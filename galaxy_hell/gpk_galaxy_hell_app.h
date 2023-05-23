@@ -85,10 +85,10 @@ namespace ghg
 
 	struct SUIRadialGauge {
 		::gpk::apod<::gpk::n3<float>>				Vertices				= {};
-		::gpk::apod<::gpk::STriangle<int16_t>>			Indices					= {};
+		::gpk::apod<::gpk::tri<int16_t>>			Indices					= {};
 		int16_t											CurrentValue			= 0;
 		int16_t											MaxValue				= 64;
-		::gpk::img<::gpk::SColorBGRA>					Image					= {};
+		::gpk::img<::gpk::bgra>					Image					= {};
 
 		static constexpr const ::gpk::SColorFloat		COLOR_MIN_DEFAULT		= ::gpk::GREEN;
 		static constexpr const ::gpk::SColorFloat		COLOR_MID_DEFAULT		= ::gpk::ORANGE;
@@ -100,7 +100,7 @@ namespace ghg
 	};
 
 			::gpk::error_t			gaugeBuildRadial		(::ghg::SUIRadialGauge & gauge, const ::gpk::SCircle<float> & gaugeMetrics, int16_t resolution, int16_t width);
-			::gpk::error_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::SColorBGRA> target	, ::gpk::SColorFloat colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::SColorFloat colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::SColorFloat colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::SColorBGRA colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false);
+			::gpk::error_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::bgra> target	, ::gpk::SColorFloat colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::SColorFloat colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::SColorFloat colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::SColorBGRA colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false);
 	inline	::gpk::error_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::SColorFloat colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::SColorFloat colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::SColorFloat colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::SColorBGRA colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false) {
 		//gauge.Image.Texels.fill({0, 0, 0, 0});
 		return ::ghg::gaugeImageUpdate(gauge, gauge.Image, colorMin, colorMid, colorMax, colorEmpty, radialColor);

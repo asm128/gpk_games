@@ -312,7 +312,7 @@ static	::gpk::error_t			guiSetupSettings			(::gpk::SDialog & dialog) {
 static	::gpk::error_t			guiHandleLoad				(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & gui, uint32_t idControl, ::ghg::SGalaxyHell & /*game*/) { 
 	if(idControl < (gui.Controls.Text.size() - 2)) {
 		try {
-			gerror_if(0 > ::ghg::solarSystemLoad(app.Game, gui.Controls.Text[idControl + 1].Text), "%s", gui.Controls.Text[idControl + 1].Text.begin());
+			gerror_if(0 > ::ghg::solarSystemLoad(app.Game, gui.Controls.Text[idControl + 1].Text), "Failed to load file: '%s'", gui.Controls.Text[idControl + 1].Text.begin());
 		}
 		catch (const char * ) {
 			::ghg::solarSystemReset(app.Game);
@@ -776,7 +776,7 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 	::gpk::apod<::gpk::n2i16>				pixelCoords;
 	::gpk::apod<::gpk::tri<float>>			triangleWeights;
 	for(uint32_t iTriangle = 0, triangleCount = gauge.Indices.size(); iTriangle < triangleCount; ++iTriangle) {
-		const ::gpk::STriangle3<float>		triangleCoords					=
+		const ::gpk::tri3<float>		triangleCoords					=
 			{ gauge.Vertices[gauge.Indices[iTriangle].A]
 			, gauge.Vertices[gauge.Indices[iTriangle].B]
 			, gauge.Vertices[gauge.Indices[iTriangle].C]

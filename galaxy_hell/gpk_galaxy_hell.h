@@ -145,19 +145,19 @@ namespace ghg
 	::gpk::error_t										getLightArraysFromDebris
 		( const ::ghg::SDecoState								& decoState
 		, ::gpk::apod<::gpk::n3<float>>				& lightPoints
-		, ::gpk::apod<::gpk::SColorBGRA>					& lightColors
+		, ::gpk::apod<::gpk::bgra>					& lightColors
 		, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
 		);
 	::gpk::error_t										getLightArraysFromShips
 		( const ::ghg::SShipManager								& shipState
 		, ::gpk::apod<::gpk::n3<float>>				& lightPoints
-		, ::gpk::apod<::gpk::SColorBGRA>					& lightColors
+		, ::gpk::apod<::gpk::bgra>					& lightColors
 		);
 	::gpk::error_t										getLightArrays
 		( const ::ghg::SShipManager								& shipState
 		, const ::ghg::SDecoState								& decoState
 		, ::gpk::apod<::gpk::n3<float>>				& lightPoints
-		, ::gpk::apod<::gpk::SColorBGRA>					& lightColors
+		, ::gpk::apod<::gpk::bgra>					& lightColors
 		, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
 		);
 
@@ -167,7 +167,7 @@ namespace ghg
 		, const ::gpk::SColorFloat							& shipColor	
 		, float												animationTime
 		, const ::gpk::SMatrix4<float>						& matrixVP
-		, ::gpk::view2d<::gpk::SColorBGRA>					& targetPixels
+		, ::gpk::view2d<::gpk::bgra>					& targetPixels
 		, ::gpk::view2d<uint32_t>							depthBuffer
 		, ::ghg::SGalaxyHellDrawCache						& drawCache
 		);
