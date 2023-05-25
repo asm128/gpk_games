@@ -18,13 +18,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "The One");
 // --- Cleanup application resources.
 ::gpk::error_t						cleanup								(::SApplication& app)											{
 	::gpk::SFramework						& framework							= app.Framework;
-	::d1::theOneUpdate(app.TheOne, 0, framework.RootWindow.Input, framework.RootWindow.EventQueue);
+	::d1::d1Update(app.TheOne, 0, framework.RootWindow.Input, framework.RootWindow.EventQueue);
 #if !defined(DISABLE_D3D11)
 	app.D3DApp.Shutdown();
 #endif
 
 	::gpk::mainWindowDestroy(app.Framework.RootWindow);
-	::d1::theOneUpdate(app.TheOne, 0, framework.RootWindow.Input, framework.RootWindow.EventQueue);
+	::d1::d1Update(app.TheOne, 0, framework.RootWindow.Input, framework.RootWindow.EventQueue);
 	return 0;
 }
 
@@ -67,7 +67,7 @@ static	::gpk::error_t				processSystemEvent					(::SApplication & app, const ::g
 	static const ::gpk::FSysEvent			funcEvent							= [&app](const ::gpk::SSysEvent & sysEvent) { return ::processSystemEvent(app, sysEvent); };
 	gpk_necs(mainWindow.EventQueue.for_each(funcEvent));
 
-	if(::d1::APP_STATE_Quit == ::d1::theOneUpdate(app.TheOne, 0, mainWindow.Input, mainWindow.EventQueue))
+	if(::d1::APP_STATE_Quit == ::d1::d1Update(app.TheOne, 0, mainWindow.Input, mainWindow.EventQueue))
 		return 1;
 
 	return 0;
@@ -87,7 +87,7 @@ static	::gpk::error_t				processSystemEvent					(::SApplication & app, const ::g
 	::gpk::SFrameInfo						& frameInfo							= framework.FrameInfo;
 	{
 		::gpk::STimer							timer;
-		if(::d1::APP_STATE_Quit == ::d1::theOneUpdate(app.TheOne, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue))
+		if(::d1::APP_STATE_Quit == ::d1::d1Update(app.TheOne, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue))
 			return 1;
 
 		timer.Frame();
@@ -130,7 +130,7 @@ static	::gpk::error_t				processSystemEvent					(::SApplication & app, const ::g
 	::gpk::SFramework						& framework							= app.Framework;
 	::gpk::pobj<::gpk::SWindow::TOffscreen>	backBuffer							= framework.RootWindow.BackBuffer;
 	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), 0xFF000030, (uint32_t)-1);
-	gpk_necs(::d1::theOneDraw(app.TheOne.AppUI, app.TheOne.MainGame, *backBuffer, framework.FrameInfo.Seconds.Total));
+	gpk_necs(::d1::d1Draw(app.TheOne.AppUI, app.TheOne.MainGame, *backBuffer, framework.FrameInfo.Seconds.Total));
 	memcpy(framework.RootWindow.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 #endif
 

@@ -1,7 +1,7 @@
 #include "gpk_d1.h"
 #include "gpk_pool_game_update.h"
 
-static	::gpk::error_t		theOneSetup				(::d1::SD1UI & appUI, ::d1::SD1Game & game, const ::gpk::pobj<::gpk::SInput> & inputState) { 
+static	::gpk::error_t		d1Setup				(::d1::SD1UI & appUI, ::d1::SD1Game & game, const ::gpk::pobj<::gpk::SInput> & inputState) { 
 	gpk_necs(::d1::poolGameSetup(game.Pool));
 	gpk_necs(::d1::guiSetup(appUI, game, inputState));
 
@@ -361,7 +361,7 @@ static	::gpk::error_t		handleFOUL				(::d1::SD1 & /*app*/, const ::gpk::SEventVi
 }
 
 
-::gpk::error_t				d1::theOneUpdate		(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view<::gpk::SSysEvent> & systemEvents) { 
+::gpk::error_t				d1::d1Update		(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view<::gpk::SSysEvent> & systemEvents) { 
 	app.MainGame.FrameInfo.Frame(uint64_t(secondsElapsed * 1000000));
 
 	const ::gpk::FSysEventConst		funcEvent				= [&app](const ::gpk::SSysEvent & sysEvent) { 
@@ -374,7 +374,7 @@ static	::gpk::error_t		handleFOUL				(::d1::SD1 & /*app*/, const ::gpk::SEventVi
 	case ::d1::APP_STATE_Quit		: return 1;
 	case ::d1::APP_STATE_Welcome	: app.StateSwitch(::d1::APP_STATE_Home); break;	// APP_STATE_Welcome comes right after APP_STATE_Init.
 	case ::d1::APP_STATE_Init		: {
-		gpk_necs(::theOneSetup(app.AppUI, app.MainGame, inputState));
+		gpk_necs(::d1Setup(app.AppUI, app.MainGame, inputState));
 
 		::gpk::aobj<::gpk::apod<char>>	fileNames				= {};
 		::gpk::pathList(app.FileStrings.SavegameFolder, fileNames, app.FileStrings.ExtensionSaveAuto);
@@ -423,7 +423,7 @@ static	::gpk::error_t		handleFOUL				(::d1::SD1 & /*app*/, const ::gpk::SEventVi
 	return app.StateSwitch(newState); 
 }
 
-::gpk::error_t				d1::theOneDraw		(::d1::SD1UI & appUI, ::d1::SD1Game & clientGame, ::gpk::rt<::gpk::bgra, uint32_t> & backBuffer, double totalSeconds, bool onlyGUI) { 
+::gpk::error_t				d1::d1Draw		(::d1::SD1UI & appUI, ::d1::SD1Game & clientGame, ::gpk::rt<::gpk::bgra, uint32_t> & backBuffer, double totalSeconds, bool onlyGUI) { 
 	if(false == onlyGUI) {
 		const ::d1::SCamera				& cameraSelected	= clientGame.CameraSelected();
 		gpk_necs(::d1::poolGameDraw(clientGame.Pool, backBuffer, cameraSelected.Position, cameraSelected.Target, {0, 1, 0}, totalSeconds));
