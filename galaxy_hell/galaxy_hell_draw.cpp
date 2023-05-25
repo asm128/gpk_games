@@ -131,7 +131,7 @@ int													drawScoreParticles
 		char													textToShow[64]		= {};
 		sprintf_s(textToShow, "%i", particle.Score);
 		const ::gpk::vcs										finalText			= textToShow;
-		::gpk::SRectangle2<int16_t>								rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
+		::gpk::rect2<int16_t>								rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
 		rectText.Offset = (pixelCoord - ::gpk::n2<int32_t>{(rectText.Size.x >> 1), (rectText.Size.y >> 1)}).Cast<int16_t>();
 
 		gpk_necs(::gpk::textLineRaster(targetPixels.metrics().Cast<uint16_t>(), font.CharSize, rectText, font.Texture, finalText, dstCoords));
@@ -543,7 +543,7 @@ static	int											drawShip
 	const ::gpk::n2<int32_t>							pixelCoord			= {(int32_t)starPos.x, (int32_t)starPos.y};
 
 	const ::gpk::vcs										finalText			= solarSystem.Pilots[iShip].Name;
-	::gpk::SRectangle2<int16_t>								rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
+	::gpk::rect2<int16_t>								rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
 	rectText.Offset = (pixelCoord - ::gpk::n2<int32_t>{(rectText.Size.x >> 1), (rectText.Size.y >> 1)}).Cast<int16_t>();
 
 	::gpk::apod<::gpk::n2<uint16_t>>				dstCoords;

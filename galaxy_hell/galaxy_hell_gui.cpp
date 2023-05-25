@@ -84,7 +84,7 @@ static ::gpk::error_t			uiPlayerSetupHome			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 
 // -------------------------------- Set up player GUI for in-stage display
 static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk::pobj<::gpk::SInput> input, ::gpk::n2<float> cursorPos, uint32_t iPlayer, const ::gpk::vcc pilotName, uint32_t nShipParts) {
-	::gpk::n2<int16_t>				playerPosition;
+	::gpk::n2<int16_t>					playerPosition;
 	::gpk::ALIGN						playerAlign		;
 	switch(iPlayer) {
 	default:
@@ -109,13 +109,13 @@ static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
 	::gpk::guiSetupButtonList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, {240, 40}, playerPosition, playerAlign, ::gpk::ALIGN_CENTER);
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Name; iButton < iStop; ++iButton) {
-		playerGUI.Controls.Controls		[iOffset + iButton].Margin		= {}; 
-		//playerGUI.Controls.Controls		[iOffset + iButton].Border			= {};
-		playerGUI.Controls.Modes		[iOffset + iButton].NoBackgroundRect		= true;
+		playerGUI.Controls.Controls	[iOffset + iButton].Margin		= {}; 
+		//playerGUI.Controls.Controls	[iOffset + iButton].Border			= {};
+		playerGUI.Controls.Modes	[iOffset + iButton].NoBackgroundRect		= true;
 	}
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Score; iButton < iStop; ++iButton) {
-		playerGUI.Controls.Controls		[iOffset + iButton].Area.Offset.y		-= int16_t(16 * iButton);
-		playerGUI.Controls.Controls		[iOffset + iButton].Area.Size.y			= 24; 
+		playerGUI.Controls.Controls	[iOffset + iButton].Area.Offset.y		-= int16_t(16 * iButton);
+		playerGUI.Controls.Controls	[iOffset + iButton].Area.Size.y			= 24; 
 	}
 
 	gpk_necs(::gpk::controlFontSet(playerGUI, playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name, 10));
@@ -233,23 +233,23 @@ static	::gpk::error_t			guiSetupProfile				(::gpk::SDialog & dialog) { return ::
 static	::gpk::error_t			guiSetupShop				(::gpk::SDialog & dialog) { 
 	::gpk::SGUI							& gui						= *dialog.GUI;
 	gpk_necall(::gpk::guiSetupButtonList<::ghg::UI_SHOP>(gui, dialog.Root, 60, 0, ::gpk::ALIGN_BOTTOM_RIGHT), "%s", "");
-	::gpk::pobj<::gpk::SDialogViewport>	viewport									= {};
-	//int32_t									idViewport					=
-	::gpk::viewportCreate(dialog, viewport);
+
+	::gpk::pobj<::gpk::SDialogViewport>	viewport					= {};
+	gpk_necs(::gpk::viewportCreate(dialog, viewport));
 	//viewport->Settings.DisplacementLockX	= false;;
 	//viewport->Settings.DisplacementLockY	= false;;
-	gui.Controls.Controls	[viewport->IdGUIControl	].Align					= ::gpk::ALIGN_CENTER;
-	gui.Controls.Controls	[viewport->IdGUIControl	].Area.Offset			= {};
-	gui.Controls.Controls	[viewport->IdGUIControl	].Area.Size				= {640, 480};
-	gui.Controls.States		[viewport->IdClient		].ImageInvertY			= true;
+	gui.Controls.Controls	[viewport->IdGUIControl	].Align			= ::gpk::ALIGN_CENTER;
+	gui.Controls.Controls	[viewport->IdGUIControl	].Area.Offset	= {};
+	gui.Controls.Controls	[viewport->IdGUIControl	].Area.Size		= {640, 480};
+	gui.Controls.States		[viewport->IdClient		].ImageInvertY	= true;
 	return 0;
 }
 
 static	::gpk::error_t			guiSetupWelcome				(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { 
 	::gpk::SGUI							& gui						= *dialog.GUI;
-	gpk_necall(::gpk::guiSetupButtonList<::ghg::UI_WELCOME>(gui, dialog.Root, ::gpk::n2<uint16_t>{128, 32}, ::gpk::n2<int16_t>{0, 64}, ::gpk::ALIGN_CENTER), "%s", "");
+	gpk_necs(::gpk::guiSetupButtonList<::ghg::UI_WELCOME>(gui, dialog.Root, ::gpk::n2<uint16_t>{128, 32}, ::gpk::n2<int16_t>{0, 64}, ::gpk::ALIGN_CENTER));
 	::gpk::viewportCreate(dialog, app.Inputbox);
-	::gpk::pobj<::gpk::SDialogViewport>	viewport				= app.Inputbox;
+	::gpk::pobj<::gpk::SDialogViewport>	viewport					= app.Inputbox;
 	gui.Controls.Controls	[viewport->IdGUIControl	].Align			= ::gpk::ALIGN_CENTER;
 	gui.Controls.Controls	[viewport->IdGUIControl	].Area.Offset	= {};
 	gui.Controls.Controls	[viewport->IdClient		].Area.Size		= {256, 20};

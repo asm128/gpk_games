@@ -201,7 +201,7 @@ namespace
 						break;
 
 					case WAVE_FORMAT_EXTENSIBLE:
-						retval_gerror_if(E_FAIL, ((fmtChunk->size < sizeof(WAVEFORMATEXTENSIBLE)) || (wfx->cbSize < (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)))), "%s", "")
+						retval_gerror_if(E_FAIL, ((fmtChunk->size < sizeof(WAVEFORMATEXTENSIBLE)) || (wfx->cbSize < (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)))), "%s", "");
 						else {
 							static const GUID s_wfexBase = { 0x00000000, 0x0000, 0x0010, { 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71 } };
 
@@ -237,11 +237,11 @@ namespace
 
 		// Locate 'data'
 		ptr = reinterpret_cast<const uint8_t*>(riffHeader) + sizeof(RIFFChunkHeader);
-		retval_gerror_if(HRESULT_FROM_WIN32(ERROR_HANDLE_EOF), ((ptr + sizeof(RIFFChunk)) > wavEnd), "%s", "")
+		retval_gerror_if(HRESULT_FROM_WIN32(ERROR_HANDLE_EOF), ((ptr + sizeof(RIFFChunk)) > wavEnd), "%s", "");
 		auto dataChunk = FindChunk({ptr, riffChunk->size}, FOURCC_DATA_TAG);
-		retval_gerror_if(HRESULT_FROM_WIN32(ERROR_INVALID_DATA), (!dataChunk || !dataChunk->size), "%s", "")
+		retval_gerror_if(HRESULT_FROM_WIN32(ERROR_INVALID_DATA), (!dataChunk || !dataChunk->size), "%s", "");
 		ptr = reinterpret_cast<const uint8_t*>(dataChunk) + sizeof(RIFFChunk);
-		retval_gerror_if(HRESULT_FROM_WIN32(ERROR_HANDLE_EOF), (ptr + dataChunk->size > wavEnd), "%s", "")
+		retval_gerror_if(HRESULT_FROM_WIN32(ERROR_HANDLE_EOF), (ptr + dataChunk->size > wavEnd), "%s", "");
 		*pwfx = reinterpret_cast<const WAVEFORMATEX*>(wf);
 		data = {ptr, dataChunk->size};
 		return S_OK;

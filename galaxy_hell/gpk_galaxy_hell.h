@@ -16,11 +16,11 @@
 
 namespace ghg
 {
-	static constexpr uint16_t								MAX_PLAYERS			= 4;
-	static constexpr uint32_t								MAX_ORBITER_COUNT	= 6;
+	stacxpr uint16_t	MAX_PLAYERS				= 4;
+	stacxpr uint32_t	MAX_ORBITER_COUNT		= 6;
 
 #pragma pack(push, 1)
-	static constexpr ::gpk::SColorBGRA						PLAYER_COLORS[]		= 
+	stacxpr ::gpk::astatic<::gpk::bgra, 16>	PLAYER_COLORS	= 
 		{ 0xFF00FF00U	// GREEN
 		, ::gpk::PURPLE
 		, 0xFF0000FFU	// BLUE
@@ -40,59 +40,59 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(PLAY_MODE, VR			, 1);
 
 	struct SPlayState {
-		uint64_t												TimeStart				= 0;
-		uint64_t												TimeLast				= 0;
-		uint32_t												Seed					= 1;
-		uint16_t												OffsetStage				= 2;
-		uint8_t													CountPlayers			= 1;
-		PLAY_TYPE												PlayType				= (PLAY_TYPE)0;
-		PLAY_MODE												PlayMode				= (PLAY_MODE)PLAY_MODE_VR;
+		uint64_t			TimeStart				= 0;
+		uint64_t			TimeLast				= 0;
+		uint32_t			Seed					= 1;
+		uint16_t			OffsetStage				= 2;
+		uint8_t				CountPlayers			= 1;
+		PLAY_TYPE			PlayType				= (PLAY_TYPE)0;
+		PLAY_MODE			PlayMode				= (PLAY_MODE)PLAY_MODE_VR;
 
-		uint32_t												Stage					= 0;
-		double													TimeStage				= 0;
-		double													TimeWorld				= 0;
-		double													TimeRealStage			= 0;
-		double													TimeReal				= 0;
-		bool													Paused					= false;
+		uint32_t			Stage					= 0;
+		double				TimeStage				= 0;
+		double				TimeWorld				= 0;
+		double				TimeRealStage			= 0;
+		double				TimeReal				= 0;
+		bool				Paused					= false;
 
-		double													CameraSwitchDelay		= 0;
+		double				CameraSwitchDelay		= 0;
 
-		double													RelativeSpeedTarget		= 20;
-		double													RelativeSpeedCurrent	= -50;
-		int														AccelerationControl		= 0;
+		double				RelativeSpeedTarget		= 20;
+		double				RelativeSpeedCurrent	= -50;
+		int					AccelerationControl		= 0;
 
-		double													TimeScale				= 1.0f;
-		bool													Slowing					= true;
+		double				TimeScale				= 1.0f;
+		bool				Slowing					= true;
 
 	};
 	 
 	struct SShipController {
-		uint8_t					Forward				: 1;
-		uint8_t					Back				: 1;
-		uint8_t					Left				: 1;
-		uint8_t					Right				: 1;
-		uint8_t					Turbo				: 1;
+		uint8_t				Forward				: 1;
+		uint8_t				Back				: 1;
+		uint8_t				Left				: 1;
+		uint8_t				Right				: 1;
+		uint8_t				Turbo				: 1;
 		::gpk::n3<int16_t>	PointerDeltas		= {};
 		::gpk::n3<int16_t>	PointerPosition		= {};
 	};
 #pragma pack(pop)
 
 	struct SShipPilot {
-		::gpk::vcc												Name					= "Evil Dead";
-		::gpk::SColorBGRA										Color					= ::gpk::MAGENTA;
+		::gpk::vcc							Name					= "Evil Dead";
+		::gpk::SColorBGRA					Color					= ::gpk::MAGENTA;
 	};
 
 	struct SGalaxyHell {
-		::ghg::SShipManager										ShipState				= {};
-		::ghg::SDecoState										DecoState				= {};	
-		::ghg::SPlayState										PlayState				= {};
-		::gpk::aobj<::ghg::SShipPilot>							Pilots					= {};
-		::gpk::apod<::ghg::SShipController>						ShipControllers			= {};
+		::ghg::SShipManager					ShipState				= {};
+		::ghg::SDecoState					DecoState				= {};	
+		::ghg::SPlayState					PlayState				= {};
+		::gpk::aobj<::ghg::SShipPilot>		Pilots					= {};
+		::gpk::apod<::ghg::SShipController>	ShipControllers			= {};
 		
-		::ghg::SGalaxyHellDrawCache								DrawCache;
-		::std::mutex											LockUpdate;
+		::ghg::SGalaxyHellDrawCache			DrawCache;
+		::std::mutex						LockUpdate;
 
-		::gpk::error_t											PilotCreate				(const ::ghg::SShipPilot & shipPilot)			{
+		::gpk::error_t						PilotCreate				(const ::ghg::SShipPilot & shipPilot)			{
 			Pilots.push_back(shipPilot);
 			return ShipControllers.push_back({});
 		}
