@@ -18,13 +18,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "The One");
 // --- Cleanup application resources.
 ::gpk::error_t						cleanup								(::SApplication& app)											{
 	::gpk::SFramework						& framework							= app.Framework;
-	::d1::d1Update(app.TheOne, 0, framework.RootWindow.Input, framework.RootWindow.EventQueue);
+	::d1::d1Update(app.D1, 0, framework.RootWindow.Input, framework.RootWindow.EventQueue);
 #if !defined(DISABLE_D3D11)
 	app.D3DApp.Shutdown();
 #endif
 
 	::gpk::mainWindowDestroy(app.Framework.RootWindow);
-	::d1::d1Update(app.TheOne, 0, framework.RootWindow.Input, framework.RootWindow.EventQueue);
+	::d1::d1Update(app.D1, 0, framework.RootWindow.Input, framework.RootWindow.EventQueue);
 	return 0;
 }
 
@@ -46,7 +46,7 @@ static	::gpk::error_t				processSystemEvent					(::SApplication & app, const ::g
 	default								: break;
 	case ::gpk::SYSEVENT_WINDOW_CREATE	: 
 #if !defined(DISABLE_D3D11)
-		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.TheOne.MainGame.Pool.Engine.Scene->Graphics));
+		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.D1.MainGame.Pool.Engine.Scene->Graphics));
 #endif
 	case ::gpk::SYSEVENT_WINDOW_RESIZE	: 
 		gpk_necs(::updateSizeDependentResources(app));
@@ -67,7 +67,7 @@ static	::gpk::error_t				processSystemEvent					(::SApplication & app, const ::g
 	static const ::gpk::FSysEvent			funcEvent							= [&app](const ::gpk::SSysEvent & sysEvent) { return ::processSystemEvent(app, sysEvent); };
 	gpk_necs(mainWindow.EventQueue.for_each(funcEvent));
 
-	if(::d1::APP_STATE_Quit == ::d1::d1Update(app.TheOne, 0, mainWindow.Input, mainWindow.EventQueue))
+	if(::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue))
 		return 1;
 
 	return 0;
@@ -87,7 +87,7 @@ static	::gpk::error_t				processSystemEvent					(::SApplication & app, const ::g
 	::gpk::SFrameInfo						& frameInfo							= framework.FrameInfo;
 	{
 		::gpk::STimer							timer;
-		if(::d1::APP_STATE_Quit == ::d1::d1Update(app.TheOne, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue))
+		if(::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue))
 			return 1;
 
 		timer.Frame();
@@ -95,9 +95,9 @@ static	::gpk::error_t				processSystemEvent					(::SApplication & app, const ::g
 	}
 
 #if !defined(DISABLE_D3D11)
-	if(app.TheOne.ActiveState != ::d1::APP_STATE_Init && app.D3DApp.Scene.IndexBuffer.size() < app.TheOne.MainGame.Pool.Engine.Scene->Graphics->Meshes.size()) {
-		//gpk_necs(app.D3DApp.CreateDeviceDependentEngineResources(app.D3DApp.DeviceResources->GetD3DDevice(), *app.TheOne.MainGame.Pool.Engine.Scene->Graphics));
-		gpk_necs(app.D3DApp.CreateDeviceResources(*app.TheOne.MainGame.Pool.Engine.Scene->Graphics));
+	if(app.D1.ActiveState != ::d1::APP_STATE_Init && app.D3DApp.Scene.IndexBuffer.size() < app.D1.MainGame.Pool.Engine.Scene->Graphics->Meshes.size()) {
+		//gpk_necs(app.D3DApp.CreateDeviceDependentEngineResources(app.D3DApp.DeviceResources->GetD3DDevice(), *app.D1.MainGame.Pool.Engine.Scene->Graphics));
+		gpk_necs(app.D3DApp.CreateDeviceResources(*app.D1.MainGame.Pool.Engine.Scene->Graphics));
 	}
 	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (uint32_t)frameInfo.FramesPerSecond);
 #endif
@@ -118,19 +118,19 @@ static	::gpk::error_t				processSystemEvent					(::SApplication & app, const ::g
 #if !defined(DISABLE_D3D11) 
 	memset(app.D3DApp.GUIStuff.RenderTarget.begin(), 0, app.D3DApp.GUIStuff.RenderTarget.byte_count());
 	
-	gpk_necs(::gpk::guiDraw(*app.TheOne.AppUI.Dialog.GUI, app.D3DApp.GUIStuff.RenderTarget));
+	gpk_necs(::gpk::guiDraw(*app.D1.AppUI.Dialog.GUI, app.D3DApp.GUIStuff.RenderTarget));
 
-	const ::d1::SCamera						& cameraSelected	= app.TheOne.MainGame.CameraSelected();
-	const ::gpk::SEngineScene				& engineScene		= *app.TheOne.MainGame.Pool.Engine.Scene;
-	const ::gpk::rgbaf						clearColor			= app.TheOne.AppUI.ClearColor;
-	const ::gpk::n3f						& lightPos			= app.TheOne.MainGame.LightPos;
+	const ::d1::SCamera						& cameraSelected	= app.D1.MainGame.CameraSelected();
+	const ::gpk::SEngineScene				& engineScene		= *app.D1.MainGame.Pool.Engine.Scene;
+	const ::gpk::rgbaf						clearColor			= app.D1.AppUI.ClearColor;
+	const ::gpk::n3f						& lightPos			= app.D1.MainGame.LightPos;
 
 	gpk_necs(::d1_win32::d3dAppDraw(app.D3DApp, engineScene, clearColor, lightPos, cameraSelected.Position, cameraSelected.Target));
 #else 
 	::gpk::SFramework						& framework							= app.Framework;
 	::gpk::pobj<::gpk::SWindow::TOffscreen>	backBuffer							= framework.RootWindow.BackBuffer;
 	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), 0xFF000030, (uint32_t)-1);
-	gpk_necs(::d1::d1Draw(app.TheOne.AppUI, app.TheOne.MainGame, *backBuffer, framework.FrameInfo.Seconds.Total));
+	gpk_necs(::d1::d1Draw(app.D1.AppUI, app.D1.MainGame, *backBuffer, framework.FrameInfo.Seconds.Total));
 	memcpy(framework.RootWindow.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 #endif
 

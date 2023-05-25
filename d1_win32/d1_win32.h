@@ -16,7 +16,7 @@
 
 struct SApplication {
 	::gpk::SFramework			Framework		;
-	::d1::SD1				TheOne			= {};
+	::d1::SD1				D1			= {};
 #ifndef DISABLE_D3D11
 	::d1_win32::SD3DApplication	D3DApp			;
 #endif
@@ -25,7 +25,7 @@ struct SApplication {
 #endif
 								SApplication	(::gpk::SRuntimeValues & runtimeValues)	noexcept
 		: Framework(runtimeValues) { 
-		TheOne.MainGame.Pool.Engine.Scene->Graphics.create(); 
+		D1.MainGame.Pool.Engine.Scene->Graphics.create(); 
 	}
 };
 
