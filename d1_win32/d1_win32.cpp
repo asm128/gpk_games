@@ -13,7 +13,7 @@
 
 #include <DirectXColors.h>
 
-GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "The One");
+GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "D1");
 
 // --- Cleanup application resources.
 ::gpk::error_t						cleanup								(::SApplication& app)											{

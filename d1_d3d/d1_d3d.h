@@ -7,8 +7,8 @@
 #include "gpk_image.h"
 #include "gpk_storage.h"
 
-#ifndef THE_ONE_D3D_H_28903749823
-#define THE_ONE_D3D_H_28903749823
+#ifndef D1_D3D_H_28903749823
+#define D1_D3D_H_28903749823
 
 namespace d1_win32
 {

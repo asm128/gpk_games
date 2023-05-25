@@ -7,8 +7,8 @@
 #include "gpk_storage.h"
 
 
-#ifndef GPK_THE_ONE_H_098273498237423
-#define GPK_THE_ONE_H_098273498237423
+#ifndef GPK_D1_H_098273498237423
+#define GPK_D1_H_098273498237423
 
 namespace d1 
 {
@@ -220,30 +220,29 @@ namespace d1
 		::gpk::pnco<::gpk::SDialogTuner<uint8_t>>	TunerTableSize;
 
 
-		::d1::SD1Logo					Logo;
+		::d1::SD1Logo						Logo;
 		float								ClearColor	[4]				= {.25f, .125f, .35f, 1.0f};
 
 	};
 
 	struct SD1FileStrings {
-		::gpk::vcs							SavegameFolder				= ".";
-		::gpk::vcs							ExtensionSaveAuto			= ".auto.d1z";
-		::gpk::vcs							ExtensionSaveStage			= ".stage.d1z";
-		::gpk::vcs							ExtensionSaveQuick			= ".quick.d1z";
-		::gpk::vcs							ExtensionSaveUser			= ".user.d1z";
-		::gpk::vcs							ExtensionSave				= ".d1z";
-		::gpk::vcs							ExtensionImages				= ".png";
-
-		::gpk::vcs							ExtensionProfile			= ".d1p";
-		::gpk::vcs							ExtensionCredentials		= ".d1c";
+		::gpk::vcc							SavegameFolder				= {1, "."};
+		::gpk::vcc							ExtensionImages				= {4, ".png"};
+		::gpk::vcc							ExtensionProfile			= {4, ".d1p"};
+		::gpk::vcc							ExtensionCredentials		= {4, ".d1c"};
+		::gpk::vcc							ExtensionSave				= {4, ".d1z"};
+		::gpk::vcc							ExtensionSaveUser			= {9, ".user.d1z"};
+		::gpk::vcc							ExtensionSaveAuto			= {9, ".auto.d1z"};
+		::gpk::vcc							ExtensionSaveStage			= {10, ".stage.d1z"};
+		::gpk::vcc							ExtensionSaveQuick			= {10, ".quick.d1z"};
 	};
 	
 	struct SD1 {
-		::d1::SD1Game					MainGame					= {};
-		::d1::SD1UI						AppUI						= {};
+		::d1::SD1Game						MainGame					= {};
+		::d1::SD1UI							AppUI						= {};
 		::d1::APP_STATE						ActiveState					= {};
 
-		::d1::SD1FileStrings			FileStrings					= {};
+		::d1::SD1FileStrings				FileStrings					= {};
 
 		::gpk::error_t						StateSwitch					(::d1::APP_STATE newState)			{
 			if(newState != ActiveState) {
@@ -281,7 +280,7 @@ namespace d1
 			::gpk::au8								serialized;
 			gpk_necs(MainGame.Save(serialized));
 			for(uint32_t iPlayer = 0; iPlayer < MainGame.Players.size(); ++iPlayer) {
-				const ::d1::SD1Player				& player					= MainGame.Players[iPlayer];
+				const ::d1::SD1Player					& player					= MainGame.Players[iPlayer];
 				gpk_necall(player.Save(serialized), "iPlayer: %i", iPlayer);
 			}
 
