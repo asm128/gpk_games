@@ -6,7 +6,7 @@
 #ifndef GPK_POOL_GAME_EVENT_H_098273498237423
 #define GPK_POOL_GAME_EVENT_H_098273498237423
 
-namespace d1
+namespace d1p
 {
 #pragma pack(push, 1)
 	GDEFINE_ENUM_TYPE(BALL_EVENT, uint8_t);
@@ -56,7 +56,7 @@ namespace d1
 	struct SArgsStickForce	{ float Value = 0; ::gpk::AXIS Direction = ::gpk::AXIS_ORIGIN; }; // I put the members in this order because of floating point variable alignment
 
 	GDEFINE_ENUM_TYPE(MATCH_CONTROL, uint8_t);
-	GDEFINE_ENUM_VALUE(MATCH_CONTROL, Start, 0); // SEvent::Data contains a ::d1::SPoolMatchState structure containing the start state of the match.
+	GDEFINE_ENUM_VALUE(MATCH_CONTROL, Start, 0); // SEvent::Data contains a ::d1p::SMatchState structure containing the start state of the match.
 	typedef	::gpk::SEvent<MATCH_CONTROL>	SEventMatchControl;
 
 	// 20. LOSS OF GAME.
@@ -138,8 +138,8 @@ namespace d1
 #pragma pack(pop)
 
 	template<typename _tChildEvent>
-	stainli	::gpk::error_t		extractAndHandle		(const ::gpk::SEvent<::d1::POOL_EVENT> & parentEvent, const ::std::function<::gpk::error_t (const ::gpk::SEventView<_tChildEvent> &)> & funcHandleChild) {
-		return ::gpk::extractAndHandle<::d1::POOL_EVENT, _tChildEvent>(parentEvent, funcHandleChild);
+	stainli	::gpk::error_t		extractAndHandle		(const ::gpk::SEvent<::d1p::POOL_EVENT> & parentEvent, const ::std::function<::gpk::error_t (const ::gpk::SEventView<_tChildEvent> &)> & funcHandleChild) {
+		return ::gpk::extractAndHandle<::d1p::POOL_EVENT, _tChildEvent>(parentEvent, funcHandleChild);
 	}
 
 } // namespace

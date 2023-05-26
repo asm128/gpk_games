@@ -1,26 +1,26 @@
 #include "gpk_pool_game_update.h"
 
-::gpk::error_t		d1::SPoolGame::AdvanceTurn	(::gpk::apobj<::d1::SEventPool> & outputEvents) { 
-	::d1::SPoolTurnState	& turnState					= MatchState.TurnState;
-	if(turnState.End)
+::gpk::error_t		d1p::SPoolGame::AdvanceTurn	(::gpk::apobj<::d1p::SEventPool> & outputEvents) { 
+	::d1p::SMatchFlags		& matchFlags				= MatchState.Flags;
+	if(matchFlags.GameOver)
 		return 0;
 
 	if(ActiveTurn().Continues) 
 		ActiveTurn().Continues	= false;
 	else {
+		++matchFlags.TeamActive;
 		++Teams[ActiveTeam()].CurrentPlayer;
-		++turnState.TeamActive;
 		Teams[ActiveTeam()].CurrentPlayer %= Teams[ActiveTeam()].PlayerCount;
 		gpk_necs(Engine.SetHidden(ActiveStickEntity(), false));
 	}
-	::d1::SPoolTurnInfo							newTurn						= {{(uint64_t)::gpk::timeCurrentInMs()}, 0, ActivePlayer(), ActiveTeam()};
+	::d1p::STurnInfo							newTurn						= {{(uint64_t)::gpk::timeCurrentInMs()}, 0, ActivePlayer(), ActiveTeam()};
 	gpk_necs(TurnHistory.push_back(newTurn));
-	return ::gpk::eventEnqueueChild(outputEvents, ::d1::POOL_EVENT_MATCH_EVENT, ::d1::MATCH_EVENT_TurnStart, newTurn);	// Report turn start for player
+	return ::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_TurnStart, newTurn);	// Report turn start for player
 }
 
-::gpk::error_t		d1::SPoolGame::Save						(::gpk::au8 & bytes)	const	{
+::gpk::error_t		d1p::SPoolGame::Save						(::gpk::au8 & bytes)	const	{
 	gpk_necs(::gpk::savePOD (bytes, MatchState		));
-	gpk_necs(::gpk::saveView(bytes, ::gpk::view<const ::d1::SPoolTeam	>{Teams		}));
+	gpk_necs(::gpk::saveView(bytes, ::gpk::view<const ::d1p::SPoolTeam	>{Teams		}));
 	gpk_necs(::gpk::saveView(bytes, ::gpk::view<const ::gpk::bgra		>{BallColors}));
 	gpk_necs(::gpk::savePOD (bytes, Entities		));
 	gpk_necs(::gpk::saveView(bytes, TurnHistory		));
@@ -29,7 +29,7 @@
 	return 0;
 }
 
-::gpk::error_t		d1::SPoolGame::Load						(::gpk::vcu8 & bytes)			{
+::gpk::error_t		d1p::SPoolGame::Load						(::gpk::vcu8 & bytes)			{
 	gpk_necs(::gpk::loadPOD (bytes, MatchState		));
 	gpk_necs(::gpk::loadView(bytes, Teams			));
 	gpk_necs(::gpk::loadView(bytes, BallColors		));
@@ -41,25 +41,25 @@
 }
 
 
-::gpk::error_t		d1::poolGameUpdate		(::d1::SPoolGame & pool, ::gpk::view<const ::d1::SEventPlayer> inputEvents, ::gpk::apobj<::d1::SEventPool> & outputEvents, double secondsElapsed) {
+::gpk::error_t		d1p::poolGameUpdate		(::d1p::SPoolGame & pool, ::gpk::view<const ::d1p::SEventPlayer> inputEvents, ::gpk::apobj<::d1p::SEventPool> & outputEvents, double secondsElapsed) {
 	pool.LastFrameContactsBall		.clear();
 	pool.LastFrameContactsCushion	.clear();
 
 	const uint32_t			eventOffset				= outputEvents.size();
 
 	::gpk::SEngine			& engine				= pool.Engine;
-	if(false == pool.MatchState.TurnState.Active) { // Always set the stick origin to the position of the cue ball
+	if(false == pool.MatchState.Flags.PhysicsActive) { // Always set the stick origin to the position of the cue ball
 		::gpk::n3f				ballPosition			= {};
 		pool.GetBallPosition(0, ballPosition);
 		engine.SetPosition(pool.ActiveStickEntity(), ballPosition);
-		gpk_necs(::d1::processInputEvents(pool, inputEvents, outputEvents));
+		gpk_necs(::d1p::processInputEvents(pool, inputEvents, outputEvents));
 		gpk_necs(engine.Update(secondsElapsed));
 	}
 	else {
 		for(uint8_t iBall = 0; iBall < pool.MatchState.CountBalls; ++iBall)
 			pool.GetBallPosition(iBall, pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].push_back({})].A);
 
-		gpk_necs(::d1::poolGamePhysicsUpdate(pool, outputEvents, secondsElapsed));
+		gpk_necs(::d1p::poolGamePhysicsUpdate(pool, outputEvents, secondsElapsed));
 
 		const float				radius					= pool.MatchState.Table.BallRadius;
 		const float				diameter				= radius * 2;
@@ -80,12 +80,35 @@
 		}
 	}
 
-	gpk_necs(::d1::evaluateTurnProgress(pool, outputEvents, eventOffset));
+	gpk_necs(::d1p::evaluateTurnProgress(pool, outputEvents, eventOffset));
 
 	return 0;
 }
 
-::gpk::error_t	d1::debugPrintMatchState	(const ::d1::SPoolMatchState & matchState) { 
+
+::gpk::error_t	debugPrintMatchFlags	(const ::d1p::SMatchFlags & matchFlags) { 
+	info_printf("Match flags:"
+		"\nTeamActive    : %i"
+		"\nTeamStripped  : %i"
+		"\nStrippedChosen: %i"
+		"\nPhysicsActive : %i"
+		"\nGameOver      : %i"
+		"\nNotInHand     : %i"
+		"\nInHandAnywhere: %i"
+		"\nUnusedBit     : %i"
+		, (int)matchFlags.TeamActive			
+		, (int)matchFlags.TeamStripped		
+		, (int)matchFlags.StrippedChosen		
+		, (int)matchFlags.PhysicsActive		
+		, (int)matchFlags.GameOver			
+		, (int)matchFlags.NotInHand			
+		, (int)matchFlags.InHandAnywhere		
+		, (int)matchFlags.UnusedBit				
+		);
+	return 0;
+}
+
+::gpk::error_t	d1p::debugPrintMatchState	(const ::d1p::SMatchState & matchState) { 
 	info_printf("Match state:"
 		"\nSeed         : %llu"
 		"\nTimeStart    : %llu"
@@ -98,32 +121,11 @@
 		, ::gpk::get_value_namep(matchState.Mode)
 		, matchState.CountBalls
 		);
+	::debugPrintMatchFlags(matchState.Flags);
 	return 0;
 }
 
-::gpk::error_t	d1::debugPrintTurnState		(const ::d1::SPoolTurnState & turnState) { 
-	info_printf("Turn state:"
-		"\nActive        : %i"
-		"\nTeamActive    : %i"
-		"\nTeamStripped  : %i"
-		"\nStrippedChosen: %i"
-		"\nPaused        : %i"
-		"\nEnd           : %i"
-		"\nNotInHand     : %i"
-		"\nInHandAnywhere: %i"
-		, (int)turnState.Active
-		, (int)turnState.TeamActive
-		, (int)turnState.TeamStripped
-		, (int)turnState.StrippedChosen
-		, (int)turnState.Paused
-		, (int)turnState.End
-		, (int)turnState.NotInHand
-		, (int)turnState.InHandAnywhere
-		);
-	return 0;
-}
-
-::gpk::error_t	d1::debugPrintStickControl	(const ::d1::SStickControl & stickControl) { 
+::gpk::error_t	d1p::debugPrintStickControl	(const ::d1p::SStickControl & stickControl) { 
 	info_printf("Stick control:"
 		"\nShift     : {%f, %f}"
 		"\nAngle     : %f"
@@ -137,7 +139,7 @@
 	return 0;
 }
 
-::gpk::error_t	d1::debugPrintTurnInfo		(const ::d1::SPoolTurnInfo & turnInfo) { 
+::gpk::error_t	d1p::debugPrintTurnInfo		(const ::d1p::STurnInfo & turnInfo) { 
 	info_printf("Turn info:"
 		"\nTimeStart   : %lli"
 		"\nTimeShoot   : %lli"
@@ -148,7 +150,7 @@
 		"\nContinues   : %i" 
 		"\nReverse     : %i" 
 		"\nFoul        : %i"
-		"\nOrientation : " QUAT_F32
+		//"\nOrientation : " QUAT_F32
 		, turnInfo.Time.Start
 		, turnInfo.Time.Shoot
 		, turnInfo.Time.Ended
@@ -158,8 +160,8 @@
 		, (int)turnInfo.Continues
 		, (int)turnInfo.Reverse
 		, (int)turnInfo.Foul
-		, gpk_xyzw(turnInfo.Orientation)
+		//, gpk_xyzw(turnInfo.Orientation)
 		);
-	::d1::debugPrintStickControl(turnInfo.StickControl);
+	::d1p::debugPrintStickControl(turnInfo.StickControl);
 	return 0;
 }

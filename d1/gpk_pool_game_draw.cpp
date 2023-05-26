@@ -5,8 +5,8 @@
 
 ::gpk::error_t								transformFragments				()	{ return 0; }
 
-::gpk::error_t								d1::poolGameDraw				
-	( ::d1::SPoolGame							& pool
+::gpk::error_t								d1p::poolGameDraw				
+	( ::d1p::SPoolGame							& pool
 	, ::gpk::rt<::gpk::bgra, uint32_t>			& backBuffer
 	, const ::gpk::n3f							& cameraPosition
 	, const ::gpk::n3f							& cameraTarget

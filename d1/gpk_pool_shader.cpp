@@ -6,7 +6,7 @@ stacxpr	float						LIGHT_FACTOR_AMBIENT			= .025f;
 stacxpr	float						LIGHT_FACTOR_SPECULAR_POWER		= 30.0f;
 stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 
-::gpk::error_t							d1::psTableCloth
+::gpk::error_t							d1p::psTableCloth
 	( const ::gpk::SEngineSceneConstants	& constants
 	, const ::gpk::SPSIn					& inPS
 	, ::gpk::bgra							& outputPixel
@@ -17,7 +17,7 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	return 0; 
 }
 
-::gpk::error_t							d1::psTableCushion
+::gpk::error_t							d1p::psTableCushion
 	( const ::gpk::SEngineSceneConstants	& constants
 	, const ::gpk::SPSIn					& inPS
 	, ::gpk::bgra							& outputPixel
@@ -28,7 +28,7 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	return 0; 
 }
 
-::gpk::error_t							d1::psPocket
+::gpk::error_t							d1p::psPocket
 	( const ::gpk::SEngineSceneConstants	& constants
 	, const ::gpk::SPSIn					& inPS
 	, ::gpk::bgra							& outputPixel
@@ -39,7 +39,7 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	return 0; 
 }
 
-::gpk::error_t							d1::psStick
+::gpk::error_t							d1p::psStick
 	( const ::gpk::SEngineSceneConstants	& constants
 	, const ::gpk::SPSIn					& inPS
 	, ::gpk::bgra							& outputPixel
@@ -54,7 +54,7 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 }
 
 
-::gpk::error_t							d1::psBallCue				
+::gpk::error_t							d1p::psBallCue				
 	( const ::gpk::SEngineSceneConstants	& constants
 	, const ::gpk::SPSIn					& inPS
 	, ::gpk::bgra							& outputPixel
@@ -81,7 +81,7 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	return 0; 
 }
 
-::gpk::error_t							d1::psBallSolid				
+::gpk::error_t							d1p::psBallSolid				
 	( const ::gpk::SEngineSceneConstants	& constants
 	, const ::gpk::SPSIn					& inPS
 	, ::gpk::bgra							& outputPixel
@@ -135,7 +135,7 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	return 0; 
 }
 
-::gpk::error_t							d1::psBallStripped			
+::gpk::error_t							d1p::psBallStripped			
 	( const ::gpk::SEngineSceneConstants	& constants
 	, const ::gpk::SPSIn					& inPS
 	, ::gpk::bgra							& outputPixel

@@ -54,7 +54,7 @@ static	::gpk::error_t		resolveCollision
 }
 
 // this shoulnd't exist really but it will be here until we handle ball collisions properly
-static	::gpk::error_t		handleBallContact	(::d1::SPoolGame & pool, const ::gpk::SContact & contact, ::gpk::SContactResult & contactResult) {
+static	::gpk::error_t		handleBallContact	(::d1p::SPoolGame & pool, const ::gpk::SContact & contact, ::gpk::SContactResult & contactResult) {
 	::gpk::SEngine					& engine			= pool.Engine;
 	const ::gpk::SVirtualEntity		& entityA			= engine.Entities[contact.EntityA]; 
 	const ::gpk::SVirtualEntity		& entityB			= engine.Entities[contact.EntityB]; 
@@ -115,21 +115,21 @@ static	::gpk::error_t		handleBallContact	(::d1::SPoolGame & pool, const ::gpk::S
 		//	}
 		//}
 	}
-	contactResult.FinalVelocityA	= (velocityA *= pool.MatchState.Physics.Damping.Collision);
-	contactResult.FinalVelocityB	= (velocityB *= pool.MatchState.Physics.Damping.Collision);
-	contactResult.FinalRotationA	= (rotationA *= pool.MatchState.Physics.Damping.Collision);
-	contactResult.FinalRotationB	= (rotationB *= pool.MatchState.Physics.Damping.Collision);
+	contactResult.FinalVelocityA	= (velocityA *= (pool.MatchState.Physics.Damping.Collision * (1.0f / 255.0f)));
+	contactResult.FinalVelocityB	= (velocityB *= (pool.MatchState.Physics.Damping.Collision * (1.0f / 255.0f)));
+	contactResult.FinalRotationA	= (rotationA *= (pool.MatchState.Physics.Damping.Collision * (1.0f / 255.0f)));
+	contactResult.FinalRotationB	= (rotationB *= (pool.MatchState.Physics.Damping.Collision * (1.0f / 255.0f)));
 
 	return 0;
 }
 
 static	::gpk::error_t		handlePockets	
-	( ::d1::SPoolGame					& pool
+	( ::d1p::SPoolGame					& pool
 	, uint8_t							iBall
 	, ::gpk::SBodyFlags					& flags	
 	, ::gpk::SBodyForces				& forces
 	, const ::gpk::n3f					& positionA
-	, ::gpk::apobj<::d1::SEventPool>	& outputEvents
+	, ::gpk::apobj<::d1p::SEventPool>	& outputEvents
 	//, double					secondsElapsed
 	) {
 	uint8_t							inPocket				= 0;
@@ -156,8 +156,8 @@ static	::gpk::error_t		handlePockets
 			forces.Velocity.z			= 0;
 			flags.Falling				= true;
 
-			const ::d1::SArgsBall			eventData			= {pool.MatchState.TotalSeconds, uint16_t(pool.TurnHistory.size() - 1), {iBall, iPocket}};
-			gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1::POOL_EVENT_BALL_EVENT, ::d1::BALL_EVENT_Pocketed, eventData));
+			const ::d1p::SArgsBall			eventData			= {pool.MatchState.TotalSeconds, uint16_t(pool.TurnHistory.size() - 1), {iBall, iPocket}};
+			gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_BALL_EVENT, ::d1p::BALL_EVENT_Pocketed, eventData));
 			gpk_necs(engine.SetCollides(pool.Entities.Balls[eventData.Event.Pocketed.Ball], false));
 			pool.MatchState.SetPocketed(eventData.Event.Pocketed.Ball);
 			break;
@@ -165,7 +165,7 @@ static	::gpk::error_t		handlePockets
 
 		float							w						= (float)(distanceFromPocket.Length() - ballRadius) / (pocketRadius - ballRadius);
 		inPocket					= 1 + iPocket;
-		forces.Acceleration.y		= -pool.MatchState.Physics.Gravity * ::gpk::max(0.0f, (1.0f - w));
+		forces.Acceleration.y		= -(pool.MatchState.Physics.Gravity * .001f) * ::gpk::max(0.0f, (1.0f - w));
 		flags.Falling				= true;
 		break;
 	}
@@ -173,7 +173,7 @@ static	::gpk::error_t		handlePockets
 }
 
 // this shoulnd't exist really but it will be here until we handle cushion collisions properly
-static	::gpk::error_t		handleBoundaries				(::d1::SPoolGame & pool, float ballRadius, ::gpk::n3f & positionA, ::gpk::SBodyForces & forcesA, const ::d1::STableMetrics & tableDimensions, const gpk::n2f & tableHalfDimensions) {
+static	::gpk::error_t		handleBoundaries				(::d1p::SPoolGame & pool, float ballRadius, ::gpk::n3f & positionA, ::gpk::SBodyForces & forcesA, const ::d1p::STableMetrics & tableDimensions, const gpk::n2f & tableHalfDimensions) {
 	const gpk::n2f					ballLimits						= tableHalfDimensions - ::gpk::n2f{ballRadius, ballRadius};
 	::gpk::n2<bool>					outOfBounds						= 
 		{ (positionA.x < -ballLimits.x) || (positionA.x > ballLimits.x)
@@ -188,7 +188,7 @@ static	::gpk::error_t		handleBoundaries				(::d1::SPoolGame & pool, float ballRa
 			:   ballLimits.x  - (positionA.x - ballLimits.x)
 			;
 		forcesA.Velocity.x			*= -1;
-		forcesA.Velocity			*= pool.MatchState.Physics.Damping.Cushion;
+		forcesA.Velocity			*= pool.MatchState.Physics.Damping.Cushion * (1.0f / 255.0f);
 		forcesA.Rotation.z			*= -1;
 	}
 	if(outOfBounds.y 
@@ -201,22 +201,22 @@ static	::gpk::error_t		handleBoundaries				(::d1::SPoolGame & pool, float ballRa
 			:   ballLimits.y  - (positionA.z - ballLimits.y)
 			;
 		forcesA.Velocity.z			*= -1;
-		forcesA.Velocity			*= pool.MatchState.Physics.Damping.Cushion;
+		forcesA.Velocity			*= pool.MatchState.Physics.Damping.Cushion * (1.0f / 255.0f);
 		forcesA.Rotation.x			*= -1;
 	}
 	return 0;
 }
 
-static	::gpk::error_t		handleFalling					(::d1::SPoolGame & pool, uint32_t iRigidBody, ::gpk::n3f & positionA, ::gpk::SBodyFlags & flagsA, ::gpk::SBodyForces & forcesA, ::gpk::SBodyMass & massA) {
+static	::gpk::error_t		handleFalling					(::d1p::SPoolGame & pool, uint32_t iRigidBody, ::gpk::n3f & positionA, ::gpk::SBodyFlags & flagsA, ::gpk::SBodyForces & forcesA, ::gpk::SBodyMass & massA) {
 	if(positionA.y < pool.MatchState.Table.BallRadius) { // if the ball is falling through the top of the table we make it bounce up
 		positionA.y						= (positionA.y - pool.MatchState.Table.BallRadius) * -.95f + pool.MatchState.Table.BallRadius;
 
 		forcesA.Velocity.y				*= -1.0f;
-		forcesA.Velocity.y				*= pool.MatchState.Physics.Damping.Ground;
-		pool.Engine.Integrator.Frames[iRigidBody].AccumulatedForce.y	= -float(pool.MatchState.Physics.Gravity * massA.GetMass());
+		forcesA.Velocity.y				*= pool.MatchState.Physics.Damping.Ground * (1.0f / 255.0f);
+		pool.Engine.Integrator.Frames[iRigidBody].AccumulatedForce.y	= -float(pool.MatchState.Physics.Gravity * .001f * massA.GetMass());
 	}
 	else if(fabs(forcesA.Velocity.y) > 0.0000075 || positionA.y > pool.MatchState.Table.BallRadius) { // if the ball is falling, we continue falling
-		pool.Engine.Integrator.Frames[iRigidBody].AccumulatedForce.y	= -float(pool.MatchState.Physics.Gravity * massA.GetMass());
+		pool.Engine.Integrator.Frames[iRigidBody].AccumulatedForce.y	= -float(pool.MatchState.Physics.Gravity * .001f * massA.GetMass());
 	} 
 	else { // else, no velocity, so we disable falling
 		forcesA.Acceleration.y			=  0;
@@ -227,7 +227,7 @@ static	::gpk::error_t		handleFalling					(::d1::SPoolGame & pool, uint32_t iRigi
 	return 0;
 }
 
-static	::gpk::error_t	handlePocketsAndBoundaries		(::d1::SPoolGame & pool, uint8_t iBall, const ::d1::STableMetrics & tableDimensions, const gpk::n2f & tableHalfDimensions, ::gpk::apobj<::d1::SEventPool> & outputEvents) {
+static	::gpk::error_t	handlePocketsAndBoundaries		(::d1p::SPoolGame & pool, uint8_t iBall, const ::d1p::STableMetrics & tableDimensions, const gpk::n2f & tableHalfDimensions, ::gpk::apobj<::d1p::SEventPool> & outputEvents) {
 	::gpk::SEngine				& engine						= pool.Engine;
 	const float					ballRadius						= pool.MatchState.Table.BallRadius;
 	const ::gpk::SVirtualEntity	& entityA						= engine.Entities[pool.Entities.Balls[iBall]]; 
@@ -248,14 +248,14 @@ static	::gpk::error_t	handlePocketsAndBoundaries		(::d1::SPoolGame & pool, uint8
 	return 0;
 }
 
-::gpk::error_t			d1::poolGamePhysicsUpdate		(::d1::SPoolGame & pool, ::gpk::apobj<::d1::SEventPool> & outputEvents, double secondsElapsed) {
+::gpk::error_t			d1p::poolGamePhysicsUpdate		(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents, double secondsElapsed) {
 	::gpk::apod<::gpk::SContact>	lastFrameContactsBatchBall;
 	::gpk::apod<::gpk::SContact>	lastFrameContactsBatchCushion;
 	
 	::gpk::SEngine					& engine					= pool.Engine;
 	double							step						= .001f;
 
-	const ::d1::STableMetrics		& tableDimensions			= pool.MatchState.Table.Dimensions;
+	const ::d1p::STableMetrics		& tableDimensions			= pool.MatchState.Table.Dimensions;
 	const gpk::n2f					tableHalfDimensions			= tableDimensions.Slate * .5f;
 	while(secondsElapsed > 0) { 
 		double							secondsThisStep				= ::gpk::min(step, secondsElapsed);
@@ -276,12 +276,12 @@ static	::gpk::error_t	handlePocketsAndBoundaries		(::d1::SPoolGame & pool, uint8
 			//	continue;
 			gpk_necs(::handleBallContact(pool, ballContact, ballContact.Result));
 			if(ballContact.Result.ForceTransferRatioB > 0 || ballContact.Result.ForceTransferRatioA > 0) {
-				const ::d1::SArgsBall				eventContact					= 
+				const ::d1p::SArgsBall				eventContact					= 
 					{ pool.MatchState.TotalSeconds
 					, uint16_t(pool.TurnHistory.size() - 1)
 					, {iBallA, iBallB}
 					};
-				gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1::POOL_EVENT_BALL_EVENT, ::d1::BALL_EVENT_ContactBall, eventContact));
+				gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_BALL_EVENT, ::d1p::BALL_EVENT_ContactBall, eventContact));
 			}
 
 		}

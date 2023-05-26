@@ -14,13 +14,13 @@ namespace d1
 {
 #pragma pack(push, 1)
 	struct SD1Logo {
-		::gpk::n3f							T[8]						= {};
-		::gpk::n3f							H[12]						= {{-1, 0}, {-2, 0}, {-2, 8}, {-1, 9}, };
-		::gpk::n3f							E[12]						= {};
+		::gpk::n3f							A[8]						= {};
+		::gpk::n3f							B[12]						= {{-1, 0}, {-2, 0}, {-2, 8}, {-1, 9}, };
+		::gpk::n3f							C[12]						= {};
 
-		::gpk::n3f							o[8]						= {};
-		::gpk::n3f							n[10]						= {};
-		::gpk::n3f							e[12]						= {};
+		::gpk::n3f							D[8]						= {};
+		::gpk::n3f							E[10]						= {};
+		::gpk::n3f							F[12]						= {};
 	};
 #pragma pack(pop)
 
@@ -32,15 +32,13 @@ namespace d1
 		uint8_t								BallLockAtTarget			= (uint8_t)-1;
 	};
 
-	typedef ::gpk::array_static<::d1::SCamera, ::d1::MAX_BALLS> TCameraStaticArray;
+	typedef ::gpk::array_static<::d1::SCamera, ::d1p::MAX_BALLS> TCameraStaticArray;
 	struct SPlayerCameras {
 		::d1::SCamera						Free						= {{-1, 1.75, -2}, {0,}};
 		::d1::TCameraStaticArray			Balls						= {{{-1, 1.75, -2}, {}}};
 		::d1::TCameraStaticArray			Pockets						= {{{-1, 1.75, -2}, {}}};
 		::d1::SCamera						Stick						= {{-1, 1.75, -2}, {}};
-		uint32_t							Selected					= ::d1::MAX_BALLS + 1;
-
-
+		uint32_t							Selected					= ::d1p::MAX_BALLS + 1;
 	};
 
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
@@ -111,8 +109,8 @@ namespace d1
 	struct SEventCameraInstance	{ gpk::DIRECTION Direction; };
 
 	// This structure extends the game setup to include enumerations used by the UI but which are irrelevant to the game mechanics.
-	struct SD1StartState : public SPoolMatchState {
-		TABLE_SIZE							StandardTableSize	= TABLE_SIZE_8_00_FOOT;
+	struct SD1StartState : public ::d1p::SMatchState {
+		::d1p::TABLE_SIZE					StandardTableSize	= ::d1p::TABLE_SIZE_8_00_FOOT;
 		uint8_t								CountPlayers		= 0;
 	};
 #pragma pack(pop)
@@ -124,15 +122,15 @@ namespace d1
 	GDEFINE_ENUM_VALUE(D1_ASSET_MODE, File		, 1);
 
 	struct SD1Game {
-		::d1::SPoolGame						Pool				= {};
-		::d1::SD1StartState				StartState			= {};
+		::d1p::SPoolGame					Pool				= {};
+		::d1::SD1StartState					StartState			= {};
 		::gpk::SFrameInfo					FrameInfo			= {};
 		float								TimeScale			= 1;
 		::gpk::apod<::gpk::SContact>		ContactsToDraw		= {};
-		::gpk::aobj<::d1::SEventPlayer>		QueueStick			= {};
+		::gpk::aobj<::d1p::SEventPlayer>	QueueStick			= {};
 		::gpk::aobj<::d1::CAMERA_INPUT>		QueueCamera			= {};
 		::gpk::astatic<::d1::SD1Player
-			, ::d1::MAX_PLAYERS>			Players				= {};
+			, ::d1p::MAX_PLAYERS>			Players				= {};
 		::gpk::n3f							LightPos			= {5, 2, 0};
 
 
@@ -156,14 +154,14 @@ namespace d1
 		::d1::SCamera&						CameraSelected		()			{ 
 			::d1::SPlayerCameras					& playerCameras		= ActiveCameras();
 			return	(playerCameras.Selected == 0			) ? playerCameras.Free 
-				:	(playerCameras.Selected > d1::MAX_BALLS	) ? playerCameras.Stick
+				:	(playerCameras.Selected > d1p::MAX_BALLS) ? playerCameras.Stick
 				:	playerCameras.Balls[playerCameras.Selected - 1] 
 				;
 		}
 		const ::d1::SCamera&				CameraSelected		()	const	{ 
 			const ::d1::SPlayerCameras				& playerCameras		= ActiveCameras();
 			return	(playerCameras.Selected == 0			) ? playerCameras.Free 
-				:	(playerCameras.Selected > d1::MAX_BALLS	) ? playerCameras.Stick
+				:	(playerCameras.Selected > d1p::MAX_BALLS) ? playerCameras.Stick
 				:	playerCameras.Balls[playerCameras.Selected - 1] 
 				;
 		}
@@ -212,7 +210,7 @@ namespace d1
 		::gpk::astaticu32<::d1::APP_STATE_COUNT>	
 											DialogPerState				= {};
 		::gpk::astatic<::d1::SPlayerUI
-			, ::d1::MAX_PLAYERS>			PlayerUI					= {};
+			, ::d1p::MAX_PLAYERS>			PlayerUI					= {};
 		::gpk::SUIInputBox					NameEditBox;
 
 		::gpk::pnco<::gpk::SDialogTuner<uint8_t>>	TunerTeamCount;
@@ -271,7 +269,7 @@ namespace d1
 			char									fileName[4096]				= {};
 			sprintf_s(fileName, "%s/%llu.%llu%s", FileStrings.SavegameFolder.begin(), timeStart, timeCurrent, extension.begin());
 
-			if(false == MainGame.Pool.MatchState.TurnState.End) // Save only if a player is alive
+			if(false == MainGame.Pool.MatchState.Flags.GameOver) // Save only if a player is alive
 				return Save(fileName);
 			return 0;
 		}
@@ -305,18 +303,18 @@ namespace d1
 
 			::gpk::vcu8								viewSerialized				= inflated;
 			if errored(MainGame.Load(viewSerialized)) {
-				es_if(errored(::d1::poolGameReset(MainGame.Pool, MainGame.StartState)));
+				es_if(errored(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
 				return -1;
 			}
 			for(uint32_t iPlayer = 0; iPlayer < MainGame.Players.size(); ++iPlayer) {
 				::d1::SD1Player						& player					= MainGame.Players[iPlayer];
 				if errored(player.Load(viewSerialized)) {
 					error_printf("Failed to load player %i.", iPlayer);
-					es_if(errored(::d1::poolGameReset(MainGame.Pool, MainGame.StartState)));
+					es_if(errored(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
 					return -1;
 				}
 			}
-			gpk_necs(::gpk::sliderSetValue(*AppUI.ForceSlider, int64_t(AppUI.ForceSlider->ValueLimits.Max - MainGame.Pool.ActiveStick().Velocity * (AppUI.ForceSlider->ValueLimits.Max / ::d1::MAX_SHOOT_VELOCITY))));
+			gpk_necs(::gpk::sliderSetValue(*AppUI.ForceSlider, int64_t(AppUI.ForceSlider->ValueLimits.Max - MainGame.Pool.ActiveStick().Velocity * (AppUI.ForceSlider->ValueLimits.Max / ::d1p::MAX_SHOOT_VELOCITY))));
 			AppUI.TunerPlayerCount->SetValue(MainGame.StartState.CountPlayers);
 			AppUI.TunerTableSize->SetValue(MainGame.StartState.StandardTableSize);
 			return 0;

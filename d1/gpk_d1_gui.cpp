@@ -51,7 +51,7 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	gpk_necs(::gpk::inputBoxCreate(appUI.NameEditBox, gui, firstControlHome));
 	gpk_necs(appUI.NameEditBox.Edit(gui, false));
 
-	for(uint32_t iPlayer = 0; iPlayer < ::d1::MAX_PLAYERS; ++iPlayer) {
+	for(uint32_t iPlayer = 0; iPlayer < ::d1p::MAX_PLAYERS; ++iPlayer) {
 		uint32_t					playerRoot					= appUI.PlayerUI[iPlayer].DialogPerState[::d1::APP_STATE_Home];
 		gui.Controls.Controls[playerRoot].Align			= (iPlayer % 2) ? ::gpk::ALIGN_LEFT : ::gpk::ALIGN_RIGHT;
 		//gui.Controls.Controls[playerRoot].Area.Offset.x = (iPlayer / 2) ? 0 : 256;
@@ -65,7 +65,7 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 		gpk_necs(::gpk::tunerCreate(dialog, appUI.TunerPlayerCount));
 		gpk_necs(::gpk::controlSetParent(gui, appUI.TunerPlayerCount->IdGUIControl, appUI.DialogPerState[::d1::APP_STATE_Home]));
 		appUI.TunerPlayerCount->ValueLimits.Min	= 2;
-		appUI.TunerPlayerCount->ValueLimits.Max	= ::d1::MAX_PLAYERS;
+		appUI.TunerPlayerCount->ValueLimits.Max	= ::d1p::MAX_PLAYERS;
 		appUI.TunerPlayerCount->FuncValueFormat	= [&appGame](::gpk::vcc & string, uint8_t value, const ::gpk::SMinMax<uint8_t> & /*limits*/) mutable { 
 			string					= (value == 1) ? ::gpk::vcs("%lli Player") : ::gpk::vcs("%lli Players"); 
 			appGame.StartState.CountPlayers	= (uint8_t)value;
@@ -83,9 +83,9 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 		gpk_necs(::gpk::tunerCreate(dialog, appUI.TunerTableSize));
 		gpk_necs(::gpk::controlSetParent(gui, appUI.TunerTableSize->IdGUIControl, appUI.DialogPerState[::d1::APP_STATE_Home]));
 		appUI.TunerTableSize->ValueLimits.Min	= 0;
-		appUI.TunerTableSize->ValueLimits.Max	= uint8_t(::gpk::get_value_count<::d1::TABLE_SIZE>() - 1);
+		appUI.TunerTableSize->ValueLimits.Max	= uint8_t(::gpk::get_value_count<::d1p::TABLE_SIZE>() - 1);
 		appUI.TunerTableSize->FuncValueFormat	= [&appGame, &appUI](::gpk::vcc & string, uint8_t value, const ::gpk::SMinMax<uint8_t> &)			mutable { 
-			appGame.StartState.StandardTableSize	= (::d1::TABLE_SIZE)value;
+			appGame.StartState.StandardTableSize	= (::d1p::TABLE_SIZE)value;
 			string					= ::gpk::get_value_descv(appGame.StartState.StandardTableSize); 
 			return 0; 
 		};
@@ -94,7 +94,7 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 			return 0; 
 		};
 
-		appUI.TunerTableSize->SetValue(::d1::TABLE_SIZE_8_00_FOOT);
+		appUI.TunerTableSize->SetValue(::d1p::TABLE_SIZE_8_00_FOOT);
 
 		::gpk::SControl				& control					= dialog.GUI->Controls.Controls[appUI.TunerTableSize->IdGUIControl];
 		control.Area.Size.x		= BUTTON_WIDTH_LARGE;
@@ -158,16 +158,16 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 
 	static char					velocityString[32]			= {};
 	appUI.ForceSlider->FuncValueFormat	= [&appGame](::gpk::vcc & string, int64_t value, const ::gpk::SMinMax<int64_t> & limits) mutable { 
-		const float					newVelocity					= ::d1::MAX_SHOOT_VELOCITY / limits.Max * (limits.Max - value);
+		const float					newVelocity					= ::d1p::MAX_SHOOT_VELOCITY / limits.Max * (limits.Max - value);
 		const float					currentVelocity				= appGame.Pool.ActiveStick().Velocity;
 		if(newVelocity != currentVelocity) { // only generate the event if the value actually changed. this is because this may be called randomly to ensure the right value is in sync with the server.
-			const ::d1::SArgsStickForce	eventData					= {newVelocity, ::gpk::AXIS_ORIGIN};
-			appGame.QueueStick.push_back({::d1::PLAYER_INPUT_Force, ::gpk::vcu8{(const uint8_t*)&eventData, sizeof(eventData)}});
+			const ::d1p::SArgsStickForce	eventData					= {newVelocity, ::gpk::AXIS_ORIGIN};
+			appGame.QueueStick.push_back({::d1p::PLAYER_INPUT_Force, ::gpk::vcu8{(const uint8_t*)&eventData, sizeof(eventData)}});
 		}
 		string					= ::gpk::vcc{(uint32_t)sprintf_s(velocityString, "%.02f m/s", newVelocity), velocityString}; 
 		return 0; 
 	};
-	gpk_necs(::gpk::sliderSetValue(*appUI.ForceSlider, int64_t(appUI.ForceSlider->ValueLimits.Max - appGame.Pool.ActiveStick().Velocity * (appUI.ForceSlider->ValueLimits.Max / ::d1::MAX_SHOOT_VELOCITY))));
+	gpk_necs(::gpk::sliderSetValue(*appUI.ForceSlider, int64_t(appUI.ForceSlider->ValueLimits.Max - appGame.Pool.ActiveStick().Velocity * (appUI.ForceSlider->ValueLimits.Max / ::d1p::MAX_SHOOT_VELOCITY))));
 
 	gui.Controls.Controls[firstControl + ::d1::UI_PLAY_Shoot].Align			= ::gpk::ALIGN_CENTER_RIGHT;
 	gui.Controls.Controls[firstControl + ::d1::UI_PLAY_Shoot].Area.Offset.x	= offsetX;
@@ -206,7 +206,7 @@ static	::gpk::error_t	guiHandlePlay				(::d1::SD1 & app, ::gpk::SGUI & gui, uint
 		appState				= (::d1::APP_STATE)app.StateSwitch(::d1::APP_STATE_Home);
 		break;
 	case ::d1::UI_PLAY_Shoot:
-		app.MainGame.QueueStick.push_back({::d1::PLAYER_INPUT_Shoot});
+		app.MainGame.QueueStick.push_back({::d1p::PLAYER_INPUT_Shoot});
 		break;
 	}
 	return appState; 
@@ -219,8 +219,8 @@ static	::gpk::error_t	guiHandleHome				(::d1::SD1 & app, ::gpk::SGUI & gui, uint
 	switch((::d1::UI_HOME)idControl) {
 	case ::d1::UI_HOME_Start: 
 		if(app.AppUI.TunerTableSize->ValueCurrent)
-			app.MainGame.StartState.Table.Dimensions = ::d1::TABLE_SIZES[app.AppUI.TunerTableSize->ValueCurrent - app.AppUI.TunerTableSize->ValueLimits.Min - 1];
-		gpk_necs(::d1::poolGameReset(app.MainGame.Pool, app.MainGame.StartState));
+			app.MainGame.StartState.Table.Dimensions = ::d1p::TABLE_SIZES[app.AppUI.TunerTableSize->ValueCurrent - app.AppUI.TunerTableSize->ValueLimits.Min - 1];
+		gpk_necs(::d1p::poolGameReset(app.MainGame.Pool, app.MainGame.StartState));
 	case ::d1::UI_HOME_Continue: 
 		appState				= ::d1::APP_STATE_Play;
 		break;
