@@ -1,5 +1,6 @@
 #include "gpk_d1.h"
 #include "gpk_pool_game_update.h"
+#include "gpk_path.h"
 
 static	::gpk::error_t		d1Setup				(::d1::SD1UI & appUI, ::d1::SD1Game & game, const ::gpk::pobj<::gpk::SInput> & inputState) { 
 	gpk_necs(::d1p::poolGameSetup(game.Pool));

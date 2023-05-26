@@ -1,7 +1,7 @@
 #define GPK_INFO_PRINTF_ENABLED
 
 #include "gpk_galaxy_hell.h"
-#include "gpk_storage.h"
+#include "gpk_file.h"
 #include "gpk_json.h"
 #include "gpk_noise.h"
 #include "gpk_deflate.h"

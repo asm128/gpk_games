@@ -426,14 +426,14 @@ HRESULT WaveBankReader::WaveBankReaderImpl::Open(const wchar_t* szFileName) noex
 	if (!result || (bytes != sizeof(m_header))) 
 		return HRESULT_FROM_WIN32(GetLastError());
 
-	rvs_if(E_FAIL, m_header.dwSignature != HEADER::SIGNATURE && m_header.dwSignature != HEADER::BE_SIGNATURE);
+	rves_if(E_FAIL, m_header.dwSignature != HEADER::SIGNATURE && m_header.dwSignature != HEADER::BE_SIGNATURE);
 
 	const bool be = (m_header.dwSignature == HEADER::BE_SIGNATURE);
 	if (be) {
 		return E_FAIL;
 	}
 
-	rvs_if(E_FAIL, m_header.dwHeaderVersion != HEADER::VERSION);
+	rves_if(E_FAIL, m_header.dwHeaderVersion != HEADER::VERSION);
 
 	// Load bank data
 	memset(&request, 0, sizeof(request));
@@ -474,18 +474,15 @@ HRESULT WaveBankReader::WaveBankReaderImpl::Open(const wchar_t* szFileName) noex
 		return E_FAIL;
 
 	if (m_data.dwFlags & BANKDATA::FLAGS_COMPACT) {
-		rvs_if(E_FAIL, m_data.dwEntryMetaDataElementSize != sizeof(ENTRYCOMPACT));
-		rvs_if(E_FAIL, m_header.Segments[HEADER::SEGIDX_ENTRYWAVEDATA].dwLength > (MAX_COMPACT_DATA_SEGMENT_SIZE * m_data.dwAlignment)); // Data segment is too large to be valid compact wavebank
+		rves_if(E_FAIL, m_data.dwEntryMetaDataElementSize != sizeof(ENTRYCOMPACT));
+		rves_if(E_FAIL, m_header.Segments[HEADER::SEGIDX_ENTRYWAVEDATA].dwLength > (MAX_COMPACT_DATA_SEGMENT_SIZE * m_data.dwAlignment)); // Data segment is too large to be valid compact wavebank
 	}
 	else {
-		rvs_if(E_FAIL, m_data.dwEntryMetaDataElementSize != sizeof(ENTRY));
+		rves_if(E_FAIL, m_data.dwEntryMetaDataElementSize != sizeof(ENTRY));
 	}
 
 	const DWORD metadataBytes = m_header.Segments[HEADER::SEGIDX_ENTRYMETADATA].dwLength;
-	if (metadataBytes != (m_data.dwEntryCount * m_data.dwEntryMetaDataElementSize))
-	{
-		return E_FAIL;
-	}
+	rves_if(E_FAIL, metadataBytes != (m_data.dwEntryCount * m_data.dwEntryMetaDataElementSize));
 
 	// Load names
 	const DWORD namesBytes = m_header.Segments[HEADER::SEGIDX_ENTRYNAMES].dwLength;

@@ -2,7 +2,7 @@
 #include "gpk_dialog_controls.h"
 #include "gpk_gui_control.h"
 #include "gpk_deflate.h"
-#include "gpk_storage.h"
+#include "gpk_file.h"
 #include "gpk_circle.h"
 
 namespace ghg

@@ -201,7 +201,7 @@ namespace
 						break;
 
 					case WAVE_FORMAT_EXTENSIBLE:
-						retval_gerror_if(E_FAIL, ((fmtChunk->size < sizeof(WAVEFORMATEXTENSIBLE)) || (wfx->cbSize < (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)))), "%s", "");
+						retval_gerror_if(E_FAIL, ((fmtChunk->size < sizeof(WAVEFORMATEXTENSIBLE)) || (wfx->cbSize < (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)))), "%s", "")
 						else {
 							static const GUID s_wfexBase = { 0x00000000, 0x0000, 0x0010, { 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71 } };
 

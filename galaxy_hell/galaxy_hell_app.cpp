@@ -1,8 +1,9 @@
 #include "gpk_galaxy_hell_app.h"
 #include "gpk_grid_copy.h"
 #include "gpk_raster_lh.h"
-#include "gpk_storage.h"
+#include "gpk_file.h"
 #include "gpk_deflate.h"
+#include "gpk_path.h"
 
 ::gpk::error_t					ghg::galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view<::gpk::SSysEvent> & systemEvents) {
 	if(app.ActiveState == ::ghg::APP_STATE_Quit)

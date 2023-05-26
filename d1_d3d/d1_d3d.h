@@ -5,7 +5,7 @@
 #include "gpk_engine_d3d.h"
 
 #include "gpk_image.h"
-#include "gpk_storage.h"
+#include "gpk_file.h"
 
 #ifndef D1_D3D_H_28903749823
 #define D1_D3D_H_28903749823

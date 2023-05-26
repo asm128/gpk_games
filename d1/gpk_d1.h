@@ -4,7 +4,7 @@
 #include "gpk_gui_control.h"
 #include "gpk_dialog_controls.h"
 #include "gpk_deflate.h"
-#include "gpk_storage.h"
+#include "gpk_file.h"
 
 
 #ifndef GPK_D1_H_098273498237423

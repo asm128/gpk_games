@@ -1,7 +1,7 @@
 ﻿#include "DeviceResources.h"
 #include "gpk_engine_scene.h"
 
-#include "gpk_storage.h"
+#include "gpk_file.h"
 
 #ifndef SAMPLE3DSCENERENDERER_H_293468238
 #define SAMPLE3DSCENERENDERER_H_293468238

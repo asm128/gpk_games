@@ -142,26 +142,26 @@ namespace
 	//---------------------------------------------------------------------------------
 	HRESULT WaveFindFormatAndData(::gpk::vcu8 wavData, _Outptr_ const WAVEFORMATEX* * pwfx, ::gpk::vcu8 & data, _Out_ bool & dpds, _Out_ bool & seek) noexcept {
 		dpds = seek = false;
-		rvs_if(E_FAIL, wavData.size() < (sizeof(RIFFChunk) * 2 + sizeof(uint32_t) + sizeof(WAVEFORMAT)));
+		rves_if(E_FAIL, wavData.size() < (sizeof(RIFFChunk) * 2 + sizeof(uint32_t) + sizeof(WAVEFORMAT)));
 
 		const uint8_t* wavEnd = wavData.begin() + wavData.size();
 
 		// Locate RIFF 'WAVE'
 		auto riffChunk = FindChunk(wavData, FOURCC_RIFF_TAG);
-		rvs_if(E_FAIL, (!riffChunk || riffChunk->Size < 4));
+		rves_if(E_FAIL, (!riffChunk || riffChunk->Size < 4));
 
 		auto riffHeader = reinterpret_cast<const RIFFChunkHeader*>(riffChunk);
-		rvs_if(E_FAIL, (riffHeader->Riff != FOURCC_WAVE_FILE_TAG && riffHeader->Riff != FOURCC_XWMA_FILE_TAG));
+		rves_if(E_FAIL, (riffHeader->Riff != FOURCC_WAVE_FILE_TAG && riffHeader->Riff != FOURCC_XWMA_FILE_TAG));
 
 		// Locate 'fmt '
 		auto ptr = reinterpret_cast<const uint8_t*>(riffHeader) + sizeof(RIFFChunkHeader);
-		rvs_if(HRESULT_FROM_WIN32(ERROR_HANDLE_EOF), ((ptr + sizeof(RIFFChunk)) > wavEnd));
+		rves_if(HRESULT_FROM_WIN32(ERROR_HANDLE_EOF), ((ptr + sizeof(RIFFChunk)) > wavEnd));
 
 		auto fmtChunk = FindChunk({ptr, riffHeader->Size}, FOURCC_FORMAT_TAG);
-		rvs_if(E_FAIL, (!fmtChunk || fmtChunk->Size < sizeof(PCMWAVEFORMAT)));
+		rves_if(E_FAIL, (!fmtChunk || fmtChunk->Size < sizeof(PCMWAVEFORMAT)));
 
 		ptr = reinterpret_cast<const uint8_t*>(fmtChunk) + sizeof(RIFFChunk);
-		rvs_if(HRESULT_FROM_WIN32(ERROR_HANDLE_EOF), (ptr + fmtChunk->Size > wavEnd));
+		rves_if(HRESULT_FROM_WIN32(ERROR_HANDLE_EOF), (ptr + fmtChunk->Size > wavEnd));
 
 		auto wf = reinterpret_cast<const WAVEFORMAT*>(ptr);
 
@@ -191,22 +191,22 @@ namespace
 						break;
 
 					case  0x166 /*WAVE_FORMAT_XMA2*/: // XMA2 is supported by Xbox One
-						rvs_if(E_FAIL, ((fmtChunk->Size < 52 /*sizeof(XMA2WAVEFORMATEX)*/) || (wfx->cbSize < 34 /*( sizeof(XMA2WAVEFORMATEX) - sizeof(WAVEFORMATEX) )*/)));
+						rves_if(E_FAIL, ((fmtChunk->Size < 52 /*sizeof(XMA2WAVEFORMATEX)*/) || (wfx->cbSize < 34 /*( sizeof(XMA2WAVEFORMATEX) - sizeof(WAVEFORMATEX) )*/)));
 						seek = true;
 						break;
 
 					case WAVE_FORMAT_ADPCM:
-						rvs_if(E_FAIL, ((fmtChunk->Size < (sizeof(WAVEFORMATEX) + 32)) || (wfx->cbSize < 32 /*MSADPCM_FORMAT_EXTRA_BYTES*/)));
+						rves_if(E_FAIL, ((fmtChunk->Size < (sizeof(WAVEFORMATEX) + 32)) || (wfx->cbSize < 32 /*MSADPCM_FORMAT_EXTRA_BYTES*/)));
 						break;
 
 					case WAVE_FORMAT_EXTENSIBLE:
-						rvs_if(E_FAIL, ((fmtChunk->Size < sizeof(WAVEFORMATEXTENSIBLE)) || (wfx->cbSize < (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)))));
+						rves_if(E_FAIL, ((fmtChunk->Size < sizeof(WAVEFORMATEXTENSIBLE)) || (wfx->cbSize < (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)))))
 						else {
 							static const GUID s_wfexBase = { 0x00000000, 0x0000, 0x0010, { 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71 } };
 
 							auto wfex = reinterpret_cast<const WAVEFORMATEXTENSIBLE*>(ptr);
 
-							rvs_if(HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED), (memcmp(reinterpret_cast<const BYTE*>(&wfex->SubFormat) + sizeof(DWORD),
+							rves_if(HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED), (memcmp(reinterpret_cast<const BYTE*>(&wfex->SubFormat) + sizeof(DWORD),
 								reinterpret_cast<const BYTE*>(&s_wfexBase) + sizeof(DWORD), sizeof(GUID) - sizeof(DWORD)) != 0));
 
 							switch (wfex->SubFormat.Data1) {
@@ -236,11 +236,11 @@ namespace
 
 		// Locate 'data'
 		ptr = reinterpret_cast<const uint8_t*>(riffHeader) + sizeof(RIFFChunkHeader);
-		rvs_if(HRESULT_FROM_WIN32(ERROR_HANDLE_EOF), ((ptr + sizeof(RIFFChunk)) > wavEnd));
+		rves_if(HRESULT_FROM_WIN32(ERROR_HANDLE_EOF), ((ptr + sizeof(RIFFChunk)) > wavEnd));
 		auto dataChunk = FindChunk({ptr, riffChunk->Size}, FOURCC_DATA_TAG);
-		rvs_if(HRESULT_FROM_WIN32(ERROR_INVALID_DATA), (!dataChunk || !dataChunk->Size));
+		rves_if(HRESULT_FROM_WIN32(ERROR_INVALID_DATA), (!dataChunk || !dataChunk->Size));
 		ptr = reinterpret_cast<const uint8_t*>(dataChunk) + sizeof(RIFFChunk);
-		rvs_if(HRESULT_FROM_WIN32(ERROR_HANDLE_EOF), (ptr + dataChunk->Size > wavEnd));
+		rves_if(HRESULT_FROM_WIN32(ERROR_HANDLE_EOF), (ptr + dataChunk->Size > wavEnd));
 		*pwfx = reinterpret_cast<const WAVEFORMATEX*>(wf);
 		data = {ptr, dataChunk->Size};
 		return S_OK;
@@ -326,7 +326,7 @@ namespace
 
 	//---------------------------------------------------------------------------------
 	HRESULT WaveFindTable(::gpk::vcu8 wavData, _In_ uint32_t tag, _Outptr_result_maybenull_ const uint32_t* * pData, _Out_ uint32_t * dataCount) noexcept {
-		rvs_if(E_FAIL, wavData.size() < (sizeof(RIFFChunk) + sizeof(uint32_t)));
+		rves_if(E_FAIL, wavData.size() < (sizeof(RIFFChunk) + sizeof(uint32_t)));
 
 		*pData				= nullptr;
 		*dataCount			= 0;
