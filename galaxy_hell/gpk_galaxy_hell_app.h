@@ -91,18 +91,18 @@ namespace ghg
 		int16_t											MaxValue				= 64;
 		::gpk::img<::gpk::bgra>					Image					= {};
 
-		static constexpr const ::gpk::SColorFloat		COLOR_MIN_DEFAULT		= ::gpk::GREEN;
-		static constexpr const ::gpk::SColorFloat		COLOR_MID_DEFAULT		= ::gpk::ORANGE;
-		static constexpr const ::gpk::SColorFloat		COLOR_MAX_DEFAULT		= ::gpk::RED;
-		static constexpr const ::gpk::SColorFloat		COLOR_BKG_DEFAULT		= ::gpk::BROWN * .5 + ::gpk::DARKBLUE * .5;
+		static constexpr const ::gpk::rgbaf		COLOR_MIN_DEFAULT		= ::gpk::GREEN;
+		static constexpr const ::gpk::rgbaf		COLOR_MID_DEFAULT		= ::gpk::ORANGE;
+		static constexpr const ::gpk::rgbaf		COLOR_MAX_DEFAULT		= ::gpk::RED;
+		static constexpr const ::gpk::rgbaf		COLOR_BKG_DEFAULT		= ::gpk::BROWN * .5 + ::gpk::DARKBLUE * .5;
 		
 		inline	int16_t									SetValue				(float weight)							noexcept	{ return CurrentValue = int16_t(weight * MaxValue); }
 				int16_t									SetValue				(float currentValue, uint32_t maxValue)	noexcept	{ return SetValue(currentValue / maxValue); }
 	};
 
 			::gpk::error_t			gaugeBuildRadial		(::ghg::SUIRadialGauge & gauge, const ::gpk::SCircle<float> & gaugeMetrics, int16_t resolution, int16_t width);
-			::gpk::error_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::bgra> target	, ::gpk::SColorFloat colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::SColorFloat colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::SColorFloat colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::SColorBGRA colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false);
-	inline	::gpk::error_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::SColorFloat colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::SColorFloat colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::SColorFloat colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::SColorBGRA colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false) {
+			::gpk::error_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::bgra> target	, ::gpk::rgbaf colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::rgbaf colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::rgbaf colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::bgra colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false);
+	inline	::gpk::error_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::rgbaf colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::rgbaf colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::rgbaf colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::bgra colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false) {
 		//gauge.Image.Texels.fill({0, 0, 0, 0});
 		return ::ghg::gaugeImageUpdate(gauge, gauge.Image, colorMin, colorMid, colorMax, colorEmpty, radialColor);
 	}
@@ -113,7 +113,7 @@ namespace ghg
 		SUIRadialGauge									GaugeLife		;
 		SUIRadialGauge									GaugeCooldown	;
 		SUIRadialGauge									GaugeDelay		;
-		::gpk::SMatrix4	<float>							MatrixProjection;
+		::gpk::m4	<float>							MatrixProjection;
 		::ghg::TRenderTarget							RenderTargetOrbiter	;
 		::ghg::TRenderTarget							RenderTargetWeaponLoad	;
 		::ghg::TRenderTarget							RenderTargetWeaponType	;
@@ -195,7 +195,7 @@ namespace ghg
 
 	struct SPlayerState {
 		PLAYER_TYPE								Type;
-		::gpk::SColorBGRA						Color;
+		::gpk::bgra						Color;
 		int32_t									ShipSelected;
 		::ghg::SPlayerScore						Score;
 	};

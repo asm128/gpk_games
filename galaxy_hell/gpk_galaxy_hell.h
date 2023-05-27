@@ -79,7 +79,7 @@ namespace ghg
 
 	struct SShipPilot {
 		::gpk::vcc							Name					= "Evil Dead";
-		::gpk::SColorBGRA					Color					= ::gpk::MAGENTA;
+		::gpk::bgra					Color					= ::gpk::MAGENTA;
 	};
 
 	struct SGalaxyHell {
@@ -146,7 +146,7 @@ namespace ghg
 		( const ::ghg::SDecoState								& decoState
 		, ::gpk::apod<::gpk::n3<float>>				& lightPoints
 		, ::gpk::apod<::gpk::bgra>					& lightColors
-		, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
+		, const ::gpk::view_array<const ::gpk::bgra>		& debrisColors
 		);
 	::gpk::error_t										getLightArraysFromShips
 		( const ::ghg::SShipManager								& shipState
@@ -158,15 +158,15 @@ namespace ghg
 		, const ::ghg::SDecoState								& decoState
 		, ::gpk::apod<::gpk::n3<float>>				& lightPoints
 		, ::gpk::apod<::gpk::bgra>					& lightColors
-		, const ::gpk::view_array<const ::gpk::SColorBGRA>		& debrisColors
+		, const ::gpk::view_array<const ::gpk::bgra>		& debrisColors
 		);
 
 	::gpk::error_t										drawOrbiter
 		( const ::ghg::SShipManager							& shipState
 		, const ::ghg::SOrbiter								& shipPart
-		, const ::gpk::SColorFloat							& shipColor	
+		, const ::gpk::rgbaf							& shipColor	
 		, float												animationTime
-		, const ::gpk::SMatrix4<float>						& matrixVP
+		, const ::gpk::m4<float>						& matrixVP
 		, ::gpk::view2d<::gpk::bgra>					& targetPixels
 		, ::gpk::view2d<uint32_t>							depthBuffer
 		, ::ghg::SGalaxyHellDrawCache						& drawCache

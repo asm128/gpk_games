@@ -15,7 +15,7 @@
 	game.Save(serialized);
 
 	::gpk::au8							deflated;
-	::gpk::arrayDeflate(serialized, deflated);
+	gpk_necs(::gpk::arrayDeflate(serialized, deflated));
 
 	info_printf("Savegame size in bytes: %u.", serialized.size());
 	info_printf("Savegame file size: %u.", deflated.size());
@@ -27,7 +27,7 @@
 	::gpk::au8							serialized;
 	gpk_necs(::gpk::fileToMemory(filename, serialized));
 	::gpk::au8							inflated;
-	::gpk::arrayInflate(serialized, inflated);
+	gpk_necs(::gpk::arrayInflate(serialized, inflated));
 
 	info_printf("Savegame file size: %u.", inflated.size());
 	info_printf("Savegame size in bytes: %u.", serialized.size());
@@ -100,7 +100,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		::gpk::SSkin								& skin					= *engine.Scene->Graphics->Skins[renderNode.Skin];
 		::gpk::SSurface								& surface				= *engine.Scene->Graphics->Surfaces[skin.Textures[0]];
 		::gpk::SRenderMaterial						& material				= skin.Material;
-		::gpk::SColorFloat							color					= pool.BallColors[iBall];
+		::gpk::rgbaf								color					= pool.BallColors[iBall];
 		material.Color.Specular					= ::gpk::WHITE;
 		material.Color.Diffuse					= color;
   		material.Color.Ambient					= material.Color.Diffuse * .1f;
@@ -423,7 +423,7 @@ static	::gpk::error_t	geometryBuildTableCushion			(::gpk::SGeometryIndexedTriang
 	::geometryBuildTableCushion(geometry);
 
 	int32_t									iEntity								= this->Entities.Create();
-	Entities.Names[iEntity]		= ::gpk::vcs{"TableCushion"};
+	Entities.Names[iEntity]				= ::gpk::vcs{"TableCushion"};
 	::gpk::SVirtualEntity					& entity							= Entities[iEntity];
 	entity.RenderNode					= Scene->RenderNodes.Create();;
 	Integrator.BoundingVolumes[entity.RigidBody = this->Integrator.Create()].HalfSizes = {0.5f, 0.5f, 0.5f};

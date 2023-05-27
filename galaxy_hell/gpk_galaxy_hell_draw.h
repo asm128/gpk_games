@@ -10,7 +10,7 @@ namespace ghg
 
 	typedef ::gpk::rt<::gpk::bgra, uint32_t>	TRenderTarget;
 
-	static constexpr ::gpk::SColorBGRA				DEBRIS_COLORS[]			=
+	static constexpr ::gpk::bgra				DEBRIS_COLORS[]			=
 		{ {0x80, 0xAF, 0xFF, }
 		, {0x40, 0x80, 0xFF, }
 		, {0x20, 0x80, 0xFF, }

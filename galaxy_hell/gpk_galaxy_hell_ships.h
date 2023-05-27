@@ -23,7 +23,7 @@ namespace ghg
 #pragma pack(push, 1)
 	struct SShipSceneGlobal	{
 		::gpk::n3	<float>										LightVector						= {0, -12, 0};
-		::gpk::SMatrix4	<float>										MatrixProjection				= {};
+		::gpk::m4	<float>										MatrixProjection				= {};
 		CAMERA_MODE													CameraMode						= CAMERA_MODE_PERSPECTIVE;
 		::gpk::astatic<::gpk::SCamera, ::ghg::CAMERA_MODE_COUNT>	Camera							= {};
 
@@ -74,7 +74,7 @@ namespace ghg
 		//::gpk::SBufferManager								BufferManager					= {};
 		::gpk::aobj<::gpk::SGeometryQuads>					Geometry						= {};
 		::gpk::aobj<::gpk::img<::gpk::bgra>>				Image							= {};
-		::gpk::apod<::gpk::SMatrix4<float>>					Transforms						= {}; // Ope per entity
+		::gpk::apod<::gpk::m4<float>>					Transforms						= {}; // Ope per entity
 
 		::gpk::error_t										Save							(::gpk::au8 & output) const { 
 			gpk_necs(::gpk::savePOD		(output, Global));

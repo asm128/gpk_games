@@ -214,7 +214,7 @@ static	int											modelsSetup				(::ghg::SShipScene & scene)			{
 	::gpk::geometryBuildCylinder	(scene.Geometry[::ghg::SHIP_GEOMETRY_CYLINDER		],  1U, 32U, .5, .5, {0, 0}, {1, 1, 1});
 	{
 
-		::gpk::apod<::gpk::SColorFloat>	baseColors;
+		::gpk::apod<::gpk::rgbaf>	baseColors;
 		for(uint32_t i = 0; i < 4096; ++i)
 			baseColors.push_back({(float)::gpk::noiseNormal1D(rand()), (float)::gpk::noiseNormal1D(rand()), (float)::gpk::noiseNormal1D(rand()), 1});
 
@@ -226,7 +226,7 @@ static	int											modelsSetup				(::ghg::SShipScene & scene)			{
 			image.resize(::gpk::n2u32{32, 5});
 			for(uint32_t y = 0; y < image.metrics().y; ++y) {// Generate noise color for planet texture
 				bool													xAffect						= (y % 2);
-				::gpk::SColorFloat										lineColor					= baseColors[(iImage + (rand() % 4)) % (baseColors.size() - 4)];
+				::gpk::rgbaf										lineColor					= baseColors[(iImage + (rand() % 4)) % (baseColors.size() - 4)];
 				for(uint32_t x = 0; x < image.metrics().x; ++x) {
 					image.Texels[y * image.metrics().x + x]				= (lineColor * (xAffect ? ::gpk::max(.25, ::gpk::sin(x * (1.0 / image.metrics().x * ::gpk::math_pi))) : 1)).Clamp();
 				}
@@ -431,9 +431,9 @@ int										ghg::solarSystemSetup			(::ghg::SGalaxyHell & solarSystem, const ::
 
 	gpk_necs(::ghg::stageSetup(solarSystem));
 
-	::gpk::SMatrix4<float>						& matrixProjection				= solarSystem.ShipState.Scene.Global.MatrixProjection;
+	::gpk::m4<float>						& matrixProjection				= solarSystem.ShipState.Scene.Global.MatrixProjection;
 	matrixProjection.FieldOfView(::gpk::math_pi * .25, windowSize.x / (double)windowSize.y, 0.01, 500.0);
-	::gpk::SMatrix4<float>						matrixViewport					= {};
+	::gpk::m4<float>						matrixViewport					= {};
 	matrixViewport.ViewportLH(windowSize.Cast<uint16_t>());
 	matrixProjection						*= matrixViewport;
 	return 0;

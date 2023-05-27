@@ -173,9 +173,9 @@ static ::gpk::error_t			uiPlayerSetupPlay			(::ghg::SUIPlayer & uiPlayer, ::gpk:
 		playerGUI.Controls.Modes	[viewport.Viewport + 1].NoBackgroundRect		= 
 		playerGUI.Controls.Modes	[viewport.Viewport + 2].NoBackgroundRect		= true;
 
-		::gpk::SMatrix4<float>						& matrixProjection				= viewport.MatrixProjection;
+		::gpk::m4<float>						& matrixProjection				= viewport.MatrixProjection;
 		matrixProjection.FieldOfView(::gpk::math_pi * .25, MODULE_CAMERA_SIZE.x / (double)MODULE_CAMERA_SIZE.y, 0.01, 500.0);
-		::gpk::SMatrix4<float>						matrixViewport					= {};
+		::gpk::m4<float>						matrixViewport					= {};
 		matrixViewport.ViewportLH(MODULE_CAMERA_SIZE.Cast<uint16_t>());
 		matrixProjection						*= matrixViewport;
 
@@ -472,7 +472,7 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 
 	sprintf_s(uiPlayer.TextScore.Storage, "%c %llu  %c %llu  %c %llu", 4, shipScore.Score, 1, (uint64_t)shipScore.KilledShips, 2, (uint64_t)shipScore.KilledOrbiters);
 	const ::ghg::SShipCore				& shipCore					= game.ShipState.ShipCores[iPlayer];
-	const ::gpk::SColorFloat			shipColor					= (shipCore.Team ? ::gpk::RED : ::gpk::SColorFloat(game.Pilots[iPlayer].Color));
+	const ::gpk::rgbaf			shipColor					= (shipCore.Team ? ::gpk::RED : ::gpk::rgbaf(game.Pilots[iPlayer].Color));
 	gpk_necs(::gpk::controlTextSet(playerGUI, 1 + ::ghg::UI_PILOT_Name	, game.Pilots[iPlayer].Name));
 	gpk_necs(::gpk::controlTextSet(playerGUI, 1 + ::ghg::UI_PILOT_Score, uiPlayer.TextScore.Storage));
 	{
@@ -496,14 +496,14 @@ static	::gpk::error_t			uiPlayerUpdatePlay			(::ghg::SUIPlayer & uiPlayer, uint3
 		const float							ratioOverheat		= (orbiter.Health > 0) ? ::gpk::clamp(weapon.Overheat	/ float(weapon.Cooldown), 0.0f, 1.0f) : 0;
 		const float							ratioDelay			= (orbiter.Health > 0) ? ::gpk::clamp(weapon.Delay		/ float(weapon.MaxDelay), 0.0f, 1.0f) : 0;
 
-		const ::gpk::SColorFloat			colorLife			= ::gpk::interpolate_linear(::gpk::RED, ::gpk::GREEN, healthRatio);
-		const ::gpk::SColorFloat			colorDelay			= ::gpk::interpolate_linear(::gpk::GRAY * .5, ::gpk::YELLOW, ratioDelay);;
-		const ::gpk::SColorFloat			colorCooldown		= ::gpk::interpolate_linear(::gpk::LIGHTBLUE * ::gpk::CYAN, ::gpk::ORANGE * .5 + ::gpk::RED * .5, ratioOverheat);
+		const ::gpk::rgbaf			colorLife			= ::gpk::interpolate_linear(::gpk::RED, ::gpk::GREEN, healthRatio);
+		const ::gpk::rgbaf			colorDelay			= ::gpk::interpolate_linear(::gpk::GRAY * .5, ::gpk::YELLOW, ratioDelay);;
+		const ::gpk::rgbaf			colorCooldown		= ::gpk::interpolate_linear(::gpk::LIGHTBLUE * ::gpk::CYAN, ::gpk::ORANGE * .5 + ::gpk::RED * .5, ratioOverheat);
 
 		viewport.GaugeLife.SetValue(healthRatio	);
 
 		{ // Update ship part render and health bar
-			::gpk::SMatrix4<float>									matrixView				= {};
+			::gpk::m4<float>									matrixView				= {};
 			::gpk::SCamera											& camera				= viewport.Camera;
 			camera.Target										= game.ShipState.Scene.Transforms[game.ShipState.EntitySystem.Entities[orbiter.Entity + 1].Transform].GetTranslation();
 			camera.Position										= camera.Target;
@@ -627,7 +627,7 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 			app.AddNewPlayer(text);
 		}
 
-		::gpk::SColorFloat					shipColor					= ::ghg::PLAYER_COLORS[iPlayer];
+		::gpk::rgbaf					shipColor					= ::ghg::PLAYER_COLORS[iPlayer];
 		if((iPlayer < app.Game.ShipState.ShipCores.size())) {
 			const ::ghg::SShipCore				& shipCore					=  app.Game.ShipState.ShipCores[iPlayer];
 			shipColor						= (shipCore.Team ? ::ghg::PLAYER_COLORS[iPlayer] : app.Game.Pilots[iPlayer].Color);
@@ -765,7 +765,7 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 }
 
 
-::gpk::error_t					ghg::gaugeImageUpdate			(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::bgra> target, ::gpk::SColorFloat colorMin, ::gpk::SColorFloat colorMid, ::gpk::SColorFloat colorMax, ::gpk::bgra colorEmpty, bool radialColor)  {
+::gpk::error_t					ghg::gaugeImageUpdate			(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::bgra> target, ::gpk::rgbaf colorMin, ::gpk::rgbaf colorMid, ::gpk::rgbaf colorMax, ::gpk::bgra colorEmpty, bool radialColor)  {
 	static ::gpk::imgu32				dummyDepth;
 	const ::gpk::n3<float>				center3							= (gauge.Vertices[1] - gauge.Vertices[gauge.Vertices.size() / 2 + 1]) / 2 + gauge.Vertices[gauge.Vertices.size() / 2 + 1];
 	const ::gpk::n2<float>				center2							= {center3.x, center3.y};
@@ -782,10 +782,10 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 			, gauge.Vertices[gauge.Indices[iTriangle].C]
 			};
 		const double						colorFactor						= radialColor ? ::gpk::min(1.0, iTriangle / (double)triangleCount) : gauge.CurrentValue / (float)gauge.MaxValue;
-		::gpk::SColorFloat					finalColor;
+		::gpk::rgbaf					finalColor;
 		const bool							isEmptyGauge					= ((iTriangle + 2) >> 1) >= (uint32_t)gauge.CurrentValue * 2;
 		finalColor						= isEmptyGauge
-			? ::gpk::SColorFloat(colorEmpty)
+			? ::gpk::rgbaf(colorEmpty)
 			: (colorFactor < .5)
 				? ::gpk::interpolate_linear(colorMin, colorMid, (::gpk::min(1.0, iTriangle * 2.25 / (double)triangleCount)))
 				: ::gpk::interpolate_linear(colorMid, colorMax, (colorFactor - .5) * 2)
@@ -805,7 +805,7 @@ static ::gpk::error_t			guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vi
 #endif		
 			::gpk::bgra							& targetPixel					= target[pixelCoord.y][pixelCoord.x];
 			finalColor.Clamp();
-			targetPixel						= ::gpk::interpolate_linear(::gpk::SColorFloat{targetPixel}, finalColor, finalColor.a);
+			targetPixel						= ::gpk::interpolate_linear(::gpk::rgbaf{targetPixel}, finalColor, finalColor.a);
 			targetPixel.a					= uint8_t(finalColor.a * 255);
 		}
 	}

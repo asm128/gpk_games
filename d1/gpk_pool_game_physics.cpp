@@ -173,7 +173,7 @@ static	::gpk::error_t		handlePockets
 }
 
 // this shoulnd't exist really but it will be here until we handle cushion collisions properly
-static	::gpk::error_t		handleBoundaries				(::d1p::SPoolGame & pool, float ballRadius, ::gpk::n3f & positionA, ::gpk::SBodyForces & forcesA, const ::d1p::STableMetrics & tableDimensions, const gpk::n2f & tableHalfDimensions) {
+static	::gpk::error_t		handleBoundaries				(::d1p::SPoolGame & pool, float ballRadius, ::gpk::n3f & positionA, ::gpk::SBodyForces & forcesA, const ::d1p::SPoolTable & tableDimensions, const gpk::n2f & tableHalfDimensions) {
 	const gpk::n2f					ballLimits						= tableHalfDimensions - ::gpk::n2f{ballRadius, ballRadius};
 	::gpk::n2<bool>					outOfBounds						= 
 		{ (positionA.x < -ballLimits.x) || (positionA.x > ballLimits.x)
@@ -227,7 +227,7 @@ static	::gpk::error_t		handleFalling					(::d1p::SPoolGame & pool, uint32_t iRig
 	return 0;
 }
 
-static	::gpk::error_t	handlePocketsAndBoundaries		(::d1p::SPoolGame & pool, uint8_t iBall, const ::d1p::STableMetrics & tableDimensions, const gpk::n2f & tableHalfDimensions, ::gpk::apobj<::d1p::SEventPool> & outputEvents) {
+static	::gpk::error_t	handlePocketsAndBoundaries		(::d1p::SPoolGame & pool, uint8_t iBall, const ::d1p::SPoolTable & tableDimensions, const gpk::n2f & tableHalfDimensions, ::gpk::apobj<::d1p::SEventPool> & outputEvents) {
 	::gpk::SEngine				& engine						= pool.Engine;
 	const float					ballRadius						= pool.MatchState.Table.BallRadius;
 	const ::gpk::SVirtualEntity	& entityA						= engine.Entities[pool.Entities.Balls[iBall]]; 
@@ -255,7 +255,7 @@ static	::gpk::error_t	handlePocketsAndBoundaries		(::d1p::SPoolGame & pool, uint
 	::gpk::SEngine					& engine					= pool.Engine;
 	double							step						= .001f;
 
-	const ::d1p::STableMetrics		& tableDimensions			= pool.MatchState.Table.Dimensions;
+	const ::d1p::SPoolTable			& tableDimensions			= pool.MatchState.Table.Dimensions;
 	const gpk::n2f					tableHalfDimensions			= tableDimensions.Slate * .5f;
 	while(secondsElapsed > 0) { 
 		double							secondsThisStep				= ::gpk::min(step, secondsElapsed);

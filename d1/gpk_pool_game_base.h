@@ -1,3 +1,5 @@
+#define GPK_STDOUT_LOG_ENABLED
+
 #include "gpk_color.h"
 #include "gpk_array_static.h"
 #include "gpk_noise.h"
@@ -27,7 +29,7 @@ namespace d1p
 		uint8_t				UnusedBit			: 1;
 	};
 
-	struct STableMetrics {
+	struct SPoolTable {
 		::gpk::n2f			Slate				= {  9 * ::d1p::SCALE_FOOT_TO_METER, 4.5f * ::d1p::SCALE_FOOT_TO_METER};
 		::gpk::n2f			PlayingSurface		= {100 * ::d1p::SCALE_INCH_TO_METER,   50 * ::d1p::SCALE_INCH_TO_METER};
 		::gpk::n2f			Cushion				= {100 * ::d1p::SCALE_INCH_TO_METER,   50 * ::d1p::SCALE_INCH_TO_METER};
@@ -40,7 +42,7 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(CUSHION_PROFILE, K55, 1);
 	GDEFINE_ENUM_VALUE(CUSHION_PROFILE, U23, 2);
 	GDEFINE_ENUM_VALUE(CUSHION_PROFILE, Century, 3);
-	stacxpr	::gpk::n2f			CUSHION_SIZES[]		=
+	stacxpr	::gpk::n2f	CUSHION_SIZES[]		=
 		{ {(1 + 1.0f / 8) * ::d1p::SCALE_INCH_TO_METER, (1 + 3.0f / 16.f) * ::d1p::SCALE_INCH_TO_METER}
 		, {(1 + 1.0f / 4) * ::d1p::SCALE_INCH_TO_METER, (1 + 5.0f / 16.f) * ::d1p::SCALE_INCH_TO_METER}
 		, {(0 + 1.0f / 1) * ::d1p::SCALE_INCH_TO_METER, (1 + 1.0f / 8.0f) * ::d1p::SCALE_INCH_TO_METER}
@@ -55,7 +57,7 @@ namespace d1p
 	GDEFINE_ENUM_VALUED(TABLE_SIZE, 9_00_FOOT	, 4, "9-Foot");
 	GDEFINE_ENUM_VALUED(TABLE_SIZE, 9_50_FOOT	, 5, "9.5 Foot");
 	GDEFINE_ENUM_VALUED(TABLE_SIZE, 10_0_FOOT	, 6, "10-Foot");
-	stacxpr	::d1p::STableMetrics	TABLE_SIZES	[]		=
+	stacxpr	SPoolTable	TABLE_SIZES	[]		=
 	{	{ {::d1p::SCALE_FOOT_TO_METER * 7.0f, ::d1p::SCALE_FOOT_TO_METER * 3.5f}		// 7-foot
 		, {::d1p::SCALE_INCH_TO_METER * 78.f, ::d1p::SCALE_INCH_TO_METER * 39.f}
 		, ::d1p::CUSHION_SIZES[0]
@@ -82,8 +84,8 @@ namespace d1p
 		},
 	};
 
-	struct SPoolTable {
-		STableMetrics		Dimensions			= TABLE_SIZES[1];
+	struct SPoolBoard {
+		SPoolTable			Dimensions			= TABLE_SIZES[1];
 		float				BallRadius			= .05715f * .5f;	// meters
 		uint16_t			BallWeight			= 165;	// grams
 	};
@@ -138,7 +140,7 @@ namespace d1p
 		uint64_t			Seed				= (uint64_t)::gpk::timeCurrentInUs();
 		uint64_t			TimeStart			= {};
 		double				TotalSeconds		= 0;
-		::d1p::SPoolTable	Table				= {};
+		::d1p::SPoolBoard	Table				= {};
 		::d1p::SPoolPhysics	Physics				= {};
 		uint32_t			Pocketed			= 0;
 
@@ -163,7 +165,7 @@ namespace d1p
 		}
 	};
 
-	cnstxpr	uint32_t		MATCH_STATE_SIZE	= sizeof(SMatchState);
+	cnstxpr	uint32_t	MATCH_STATE_SIZE	= sizeof(SMatchState);
 
 #pragma pack(pop)
 
