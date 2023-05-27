@@ -19,7 +19,7 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(BALL_EVENT, FirstContact		, 6);
 
 	typedef ::gpk::SEvent<BALL_EVENT>		SEventBall;
-	
+
 	struct SArgsBall {
 		struct SContactBall		{ uint8_t BallA = 0; uint8_t BallB		= 0; };
 		struct SContactPocket	{ uint8_t Ball  = 0; uint8_t Pocket		= 0; };
@@ -31,7 +31,6 @@ namespace d1p
 
 		double			Seconds				= 0;
 		uint16_t		Turn				;
-		//uint16_t		Type				;	// cast to BALL_EVENT
 		union UEvent {
 			SContactBall	ContactBall		;
 			SContactPocket	ContactPocket	;
@@ -68,11 +67,12 @@ namespace d1p
 	// e. Pockets the 8-ball when it is not the legal object ball.
 	// Note: All infractions must be called before another shot is taken, or else it will be deemed that no infraction occurred. 
 	GDEFINE_ENUM_TYPE(LOST, uint8_t);
-	GDEFINE_ENUM_VALUE(LOST, Eight_ball_foul				, 0);	// a. Fouls when pocketing the 8-ball (exception: see 8-Ball Pocketed On The Break).
-	GDEFINE_ENUM_VALUE(LOST, Eight_ball_not_on_last_stroke	, 1);	// b. Pockets the 8-ball on the same stroke as the last of his group of balls.
-	GDEFINE_ENUM_VALUE(LOST, Eight_ball_off_the_table		, 2);	// c. Jumps the 8-ball off the table at any time.
-	GDEFINE_ENUM_VALUE(LOST, Eight_ball_wrong_pocket		, 3);	// d. Pockets the 8-ball in a pocket other than the one designated.
-	GDEFINE_ENUM_VALUE(LOST, Eight_ball_pocketed			, 4);	// e. Pockets the 8-ball when it is not the legal object ball.
+	GDEFINE_ENUM_VALUE(LOST, None							, 0);	// a. Fouls when pocketing the 8-ball (exception: see 8-Ball Pocketed On The Break).
+	GDEFINE_ENUM_VALUE(LOST, Eight_ball_foul				, 1);	// a. Fouls when pocketing the 8-ball (exception: see 8-Ball Pocketed On The Break).
+	GDEFINE_ENUM_VALUE(LOST, Eight_ball_not_on_last_stroke	, 2);	// b. Pockets the 8-ball on the same stroke as the last of his group of balls.
+	GDEFINE_ENUM_VALUE(LOST, Eight_ball_off_the_table		, 3);	// c. Jumps the 8-ball off the table at any time.
+	GDEFINE_ENUM_VALUE(LOST, Eight_ball_wrong_pocket		, 4);	// d. Pockets the 8-ball in a pocket other than the one designated.
+	GDEFINE_ENUM_VALUE(LOST, Eight_ball_pocketed			, 5);	// e. Pockets the 8-ball when it is not the legal object ball.
 
 	GDEFINE_ENUM_TYPE(MATCH_EVENT, uint8_t);
 	GDEFINE_ENUM_VALUE(MATCH_EVENT, TurnEnd			, 0); // Arg is the player number
@@ -85,8 +85,9 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(MATCH_EVENT, StrippedAssigned, 7);
 	typedef	::gpk::SEvent<MATCH_EVENT>		SEventMatchEvent;
 
-	struct SArgsMatchEventLost {
-		LOST			Reason			= LOST_Eight_ball_foul;
+	struct SArgsMatchEvent {
+		SArgsBall		ArgsBall;
+		LOST			Reason	;
 	};
 
 	// Unsportsmanlike conduct is any intentional behavior that brings disrepute to the sport or which disrupts or changes the game to the extent that it cannot be played fairly. It includes
@@ -119,14 +120,6 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(FOUL, Unsportsmanlike_conduct				, 17);	// The normal penalty for unsportsmanlike conduct is the same as for a serious foul, but the referee may impose a penalty depending on his judgment of the conduct. Among other penalties possible are a warning; a standard-foul penalty, which will count as part of a three-foul sequence if applicable; a serious-foul penalty; loss of a rack, set or match; ejection from the competition possibly with forfeiture of all prizes, trophies and standings points.
 	GDEFINE_ENUM_VALUE(FOUL, Eight_ball_scratch						, 18);	// The normal penalty for unsportsmanlike conduct is the same as for a serious foul, but the referee may impose a penalty depending on his judgment of the conduct. Among other penalties possible are a warning; a standard-foul penalty, which will count as part of a three-foul sequence if applicable; a serious-foul penalty; loss of a rack, set or match; ejection from the competition possibly with forfeiture of all prizes, trophies and standings points.
 	typedef	::gpk::SEvent<FOUL>				SEventFoul;
-
-	struct SArgsFoul {
-		double			Seconds			= 0;
-		uint16_t		BallA			= 0; 
-		uint16_t		BallB			= 0;
-		uint16_t		Pocket			= 0;
-		uint16_t		Cushion			= 0;
-	};
 
 	GDEFINE_ENUM_TYPE (POOL_EVENT, uint8_t);
 	GDEFINE_ENUM_VALUE(POOL_EVENT, PLAYER_INPUT	, 0);	// SEvent<>::Data contains a serialized SEvent<PLAYER_INPUT>   structure that requires to be loaded with SEvent<PLAYER_INPUT>  ::Load().

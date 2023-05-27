@@ -174,14 +174,23 @@ static	::gpk::error_t		handlePockets
 
 // this shoulnd't exist really but it will be here until we handle cushion collisions properly
 static	::gpk::error_t		handleBoundaries				(::d1p::SPoolGame & pool, float ballRadius, ::gpk::n3f & positionA, ::gpk::SBodyForces & forcesA, const ::d1p::SPoolTable & tableDimensions, const gpk::n2f & tableHalfDimensions) {
-	const gpk::n2f					ballLimits						= tableHalfDimensions - ::gpk::n2f{ballRadius, ballRadius};
+	::gpk::n2f						ballLimits						= tableHalfDimensions - ::gpk::n2f{ballRadius, ballRadius};
+	::gpk::n3f						pocketPosition					= {};
+	double							pocketRadius					= tableDimensions.PocketRadius;
+	double							pocketRadiusSquared				= pocketRadius * pocketRadius;
+	for(uint8_t iPocket = 0; iPocket < ::d1p::MAX_POCKETS; ++iPocket) {
+		pool.GetPocketPosition(iPocket, pocketPosition);
+		if((positionA - pocketPosition).LengthSquared() < pocketRadiusSquared + ballRadius * ballRadius)
+			ballLimits	+= ::gpk::n2f{(float)pocketRadius, (float)pocketRadius};
+	}
+
 	::gpk::n2<bool>					outOfBounds						= 
 		{ (positionA.x < -ballLimits.x) || (positionA.x > ballLimits.x)
 		, (positionA.z < -ballLimits.y) || (positionA.z > ballLimits.y)
 		};
 	if(outOfBounds.x 
-		&& (positionA.z > -(tableHalfDimensions.y - tableDimensions.PocketRadius))
-		&& (positionA.z <  (tableHalfDimensions.y - tableDimensions.PocketRadius))
+	//	&& (positionA.z > -(tableHalfDimensions.y - tableDimensions.PocketRadius))
+	//	&& (positionA.z <  (tableHalfDimensions.y - tableDimensions.PocketRadius))
 	) {
 		positionA.x					= (positionA.x < -ballLimits.x) 
 			? (-ballLimits.x) - (positionA.x + ballLimits.x)
@@ -192,10 +201,11 @@ static	::gpk::error_t		handleBoundaries				(::d1p::SPoolGame & pool, float ballR
 		forcesA.Rotation.z			*= -1;
 	}
 	if(outOfBounds.y 
-		&& (positionA.x > -(tableHalfDimensions.x - tableDimensions.PocketRadius)
-		&& (positionA.x <  (tableHalfDimensions.x - tableDimensions.PocketRadius))
-		&& (positionA.x <  -tableDimensions.PocketRadius || positionA.x > tableDimensions.PocketRadius)
-	)) {
+	//	&& (	positionA.x > -(tableHalfDimensions.x - tableDimensions.PocketRadius)
+	//		&& (positionA.x <  (tableHalfDimensions.x - tableDimensions.PocketRadius))
+	//		&& (positionA.x <  -tableDimensions.PocketRadius || positionA.x > tableDimensions.PocketRadius)
+	//	)
+	) {
 		positionA.z					= (positionA.z	< -ballLimits.y) 
 			? (-ballLimits.y) - (positionA.z + ballLimits.y)
 			:   ballLimits.y  - (positionA.z - ballLimits.y)

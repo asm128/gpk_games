@@ -16,7 +16,7 @@ namespace d1p
 		::gpk::n2f				Shift				= {};
 		float					Angle				= 0;
 		float					Pitch				= 0;
-		float					Velocity			= 8;
+		float					Velocity			= 2;
 	};
 
 	struct SPoolStick {
@@ -95,25 +95,29 @@ namespace d1p
 
 		::gpk::error_t						AdvanceTurn					(::gpk::apobj<::d1p::SEventPool> & outputEvents);
 
+		uint8_t								ActivePlayer				()	const	{ 
+			const ::d1p::SPoolTeam					& team						= Teams[ActiveTeam()]; 
+			return team.Players[team.CurrentPlayer]; 
+		}
+		inline	::d1p::SStickControl&		ActiveStick					()			{ return Players[ActivePlayer()].StickControl; }
+		inline	const ::d1p::SStickControl&	ActiveStick					()	const	{ return Players[ActivePlayer()].StickControl; }
 		inline	::d1p::STurnInfo&			ActiveTurn					()			{ return TurnHistory[TurnHistory.size() - 1]; }
-		inline	::d1p::SStickControl&		ActiveStick					()			{ ::d1p::SPoolTeam		& team = Teams[ActiveTeam()]; return Players[team.Players[team.CurrentPlayer]].StickControl; }
 		inline	const ::d1p::STurnInfo&		ActiveTurn					()	const	{ return TurnHistory[TurnHistory.size() - 1]; }
-		inline	const ::d1p::SStickControl&	ActiveStick					()	const	{ const ::d1p::SPoolTeam	& team = Teams[ActiveTeam()]; return Players[team.Players[team.CurrentPlayer]].StickControl; }
 		inlcxpr	bool						FirstTurn					()	const	{ return TurnHistory.size() == 1; }
 		inlcxpr	uint8_t						ActiveTeam					()	const	{ return MatchState.Flags.TeamActive; }
-		inline	uint8_t						ActivePlayer				()	const	{ const ::d1p::SPoolTeam	& team = Teams[ActiveTeam()]; return team.Players[team.CurrentPlayer]; }
-		inline	uint16_t					ActiveStickEntity			()	const	{ return Entities.Sticks[ActiveTeam()]; }
-		inline	uint8_t						EntityToPocket				(uint16_t iEntity)								const	{ return (uint8_t)::gpk::find(iEntity, ::gpk::vcu16{Entities.Pockets}); }
-		inline	uint8_t						EntityToBall				(uint16_t iEntity)								const	{ return (uint8_t)::gpk::find(iEntity, ::gpk::vcu16{Entities.Balls  }); }
-		inline	::gpk::error_t				BallToEntity				(uint8_t iBall)									const	{ return Entities.Balls[iBall]; }
-		inline	::gpk::error_t				BallToRenderNode			(uint8_t iBall)									const	{ return Engine.Entities[Entities.Balls[iBall]].RenderNode; }
-		inline	::gpk::error_t				BallToBody					(uint8_t iBall)									const	{ return Engine.Entities[Entities.Balls[iBall]].RigidBody; }
-		inline	::gpk::error_t				GetPocketPosition			(uint8_t iPocket, ::gpk::n3f & out_position)	const	{ return Engine.GetPosition(Entities.Pockets[iPocket], out_position); }
-		inline	::gpk::error_t				GetBallPosition				(uint8_t iBall  , ::gpk::n3f & out_position)	const	{ return Engine.GetPosition(Entities.Balls  [iBall  ], out_position); }
-		inline	::gpk::error_t				GetStickOrientation			(::gpk::quatf32 & out_orientation)				const	{ return Engine.GetOrientation(Entities.Sticks[ActiveTeam()], out_orientation); }
-		inline	::gpk::error_t				SetStickVelocity			(float velocity)										{ return ::gpk::error_t((ActiveStick().Velocity = ::gpk::clamp(velocity, 0.0f, ::d1p::MAX_SHOOT_VELOCITY)) * 1000); }
-		inline	::gpk::error_t				AddStickVelocity			(float velocity)										{ 
-			::d1p::SStickControl						& activeStick				= ActiveStick(); 
+		inline	uint16_t					ActiveStickEntity			()	const	{ return Entities.Sticks[ActivePlayer()]; }
+		inline	uint8_t						EntityToPocket				(uint16_t iEntity)									const	{ return (uint8_t)::gpk::find(iEntity, ::gpk::vcu16{Entities.Pockets}); }
+		inline	uint8_t						EntityToBall				(uint16_t iEntity)									const	{ return (uint8_t)::gpk::find(iEntity, ::gpk::vcu16{Entities.Balls  }); }
+		inline	::gpk::error_t				BallToEntity				(uint8_t iBall)										const	{ return Entities.Balls[iBall]; }
+		inline	::gpk::error_t				BallToRenderNode			(uint8_t iBall)										const	{ return Engine.Entities[Entities.Balls[iBall]].RenderNode; }
+		inline	::gpk::error_t				BallToBody					(uint8_t iBall)										const	{ return Engine.Entities[Entities.Balls[iBall]].RigidBody; }
+		inline	::gpk::error_t				GetPocketPosition			(uint8_t iPocket, ::gpk::n3f & out_position)		const	{ return Engine.GetPosition(Entities.Pockets[iPocket], out_position); }
+		inline	::gpk::error_t				GetBallPosition				(uint8_t iBall  , ::gpk::n3f & out_position)		const	{ return Engine.GetPosition(Entities.Balls  [iBall  ], out_position); }
+		inline	::gpk::error_t				GetStickOrientation			(uint8_t iStick , ::gpk::quatf32 & out_orientation)	const	{ return Engine.GetOrientation(Entities.Sticks[iStick], out_orientation); }
+		inline	::gpk::error_t				GetStickOrientation			(::gpk::quatf32 & out_orientation)					const	{ return Engine.GetOrientation(Entities.Sticks[ActivePlayer()], out_orientation); }
+		inline	::gpk::error_t				SetStickVelocity			(float velocity)											{ return ::gpk::error_t((ActiveStick().Velocity = ::gpk::clamp(velocity, 0.0f, ::d1p::MAX_SHOOT_VELOCITY)) * 1000); }
+		inline	::gpk::error_t				AddStickVelocity			(float velocity)											{ 
+			::d1p::SStickControl					& activeStick				= ActiveStick(); 
 			return ::gpk::error_t((activeStick.Velocity = ::gpk::clamp(activeStick.Velocity + velocity, 0.0f, ::d1p::MAX_SHOOT_VELOCITY)) * 1000);
 		}
 	};

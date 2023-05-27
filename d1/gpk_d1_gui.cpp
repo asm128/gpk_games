@@ -3,7 +3,7 @@
 stacxpr	bool					BACKGROUND_3D_ONLY			= true;
 stacxpr	::gpk::n2u16			SHOOT_SLIDER_SIZE			= {24, 320};
 stacxpr	::gpk::n2u16			MODULE_VIEWPORT_SIZE		= {128, 64};
-stacxpr	::gpk::n2u16			WEAPON_BAR_SIZE				= {96, 16};
+stacxpr	::gpk::n2u16			WEAPON_BAR_SIZE				= {184, 24};
 
 static	::gpk::error_t	guiSetupCommon				(::gpk::SGUI & gui, const ::gpk::n2<float> & cursorPos) {
 	gui.ThemeDefault		= ::gpk::ASCII_COLOR_DARKRED * 16 + 10;
@@ -37,7 +37,7 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	cnstxpr uint16_t			BUTTON_WIDTH_SMALL			= 160;
 	cnstxpr uint16_t			BUTTON_WIDTH_LARGE			= 184;
 	::gpk::SGUI					& gui						= *dialog.GUI;
-	uint32_t					firstControlHome			= ::gpk::guiSetupButtonList<::d1::UI_HOME>(gui, appUI.DialogPerState[::d1::APP_STATE_Home], {BUTTON_WIDTH_SMALL, BUTTON_HEIGHT}, {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::d1::UI_HOME>() / 2)}, ::gpk::ALIGN_CENTER);
+	uint32_t					firstControlHome			= appUI.FirstControl[::d1::APP_STATE_Home] = ::gpk::guiSetupButtonList<::d1::UI_HOME>(gui, appUI.DialogPerState[::d1::APP_STATE_Home], {BUTTON_WIDTH_SMALL, BUTTON_HEIGHT}, {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::d1::UI_HOME>() / 2)}, ::gpk::ALIGN_CENTER);
 	gpk_necs(firstControlHome); 
 	for(uint32_t iButton = firstControlHome; iButton < firstControlHome + ::gpk::get_value_count<::d1::UI_HOME>(); ++iButton) {
 		gui.Controls.Controls[iButton].Area.Offset.y	+= 0;
@@ -50,35 +50,6 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 
 	gpk_necs(::gpk::inputBoxCreate(appUI.NameEditBox, gui, firstControlHome));
 	gpk_necs(appUI.NameEditBox.Edit(gui, false));
-
-	for(uint32_t iPlayer = 0; iPlayer < ::d1p::MAX_PLAYERS; ++iPlayer) {
-		uint32_t					playerRoot					= appUI.PlayerUI[iPlayer].DialogPerState[::d1::APP_STATE_Home];
-		gui.Controls.Controls[playerRoot].Align			= (iPlayer % 2) ? ::gpk::ALIGN_LEFT : ::gpk::ALIGN_RIGHT;
-		//gui.Controls.Controls[playerRoot].Area.Offset.x = (iPlayer / 2) ? 0 : 256;
-
-		uint32_t					firstControl				= ::gpk::guiSetupButtonList<::d1::UI_PROFILE>(gui, playerRoot, {BUTTON_WIDTH_LARGE, BUTTON_HEIGHT}, {0, 0}, (iPlayer % 2) ? ::gpk::ALIGN_TOP_RIGHT : ::gpk::ALIGN_TOP_LEFT);
-		gpk_necs(firstControl);
-		//gui.Controls.States[firstControl].Hidden		= true;
-		//gui.Controls.States[firstControl].Disabled	= true;
-	}
-	{
-		gpk_necs(::gpk::tunerCreate(dialog, appUI.TunerPlayerCount));
-		gpk_necs(::gpk::controlSetParent(gui, appUI.TunerPlayerCount->IdGUIControl, appUI.DialogPerState[::d1::APP_STATE_Home]));
-		appUI.TunerPlayerCount->ValueLimits.Min	= 2;
-		appUI.TunerPlayerCount->ValueLimits.Max	= ::d1p::MAX_PLAYERS;
-		appUI.TunerPlayerCount->FuncValueFormat	= [&appGame](::gpk::vcc & string, uint8_t value, const ::gpk::SMinMax<uint8_t> & /*limits*/) mutable { 
-			string					= (value == 1) ? ::gpk::vcs("%lli Player") : ::gpk::vcs("%lli Players"); 
-			appGame.StartState.CountPlayers	= (uint8_t)value;
-			return 0; 
-		};
-		appUI.TunerPlayerCount->SetValue(appGame.StartState.CountPlayers);
-
-		::gpk::SControl				& control					= dialog.GUI->Controls.Controls[appUI.TunerPlayerCount->IdGUIControl];
-		control.Area.Size.x		= BUTTON_WIDTH_LARGE;
-		control.Area.Size.y		= 24;
-		control.Area.Offset.y	= int16_t(dialog.GUI->Controls.Controls[firstControlHome + ::d1::UI_HOME_Start].Area.Offset.y - (dialog.GUI->Controls.Controls[firstControlHome + ::d1::UI_HOME_Start].Area.Size.y >> 1) - (control.Area.Size.y >> 1) - control.Area.Size.y * 1);
-		control.Align			= ::gpk::ALIGN_CENTER;
-	}
 	{
 		gpk_necs(::gpk::tunerCreate(dialog, appUI.TunerTableSize));
 		gpk_necs(::gpk::controlSetParent(gui, appUI.TunerTableSize->IdGUIControl, appUI.DialogPerState[::d1::APP_STATE_Home]));
@@ -102,6 +73,16 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 		control.Area.Offset.y	= int16_t(dialog.GUI->Controls.Controls[firstControlHome + ::d1::UI_HOME_Start].Area.Offset.y - (dialog.GUI->Controls.Controls[firstControlHome + ::d1::UI_HOME_Start].Area.Size.y >> 1) - (control.Area.Size.y >> 1));
 		control.Align			= ::gpk::ALIGN_CENTER;
 	}
+
+	for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam) {
+		uint32_t					playerRoot					= appUI.TeamUI[iTeam].DialogPerState[::d1::APP_STATE_Home];
+		gui.Controls.Controls[playerRoot].Align			= iTeam ? ::gpk::ALIGN_LEFT : ::gpk::ALIGN_RIGHT;
+
+		uint32_t					firstControl				= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Home] = ::gpk::guiSetupButtonList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_RIGHT : ::gpk::ALIGN_TOP_LEFT);
+		gpk_necs(firstControl);
+		//gui.Controls.States[firstControl].Hidden		= true;
+		//gui.Controls.States[firstControl].Disabled	= true;
+	}
 	return 0; 
 }
 
@@ -109,14 +90,14 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	cnstxpr int					BUTTON_HEIGHT				= 24;
 	::gpk::SGUI					& gui						= *dialog.GUI;
 	const uint32_t				iDialog						= appUI.DialogPerState[::d1::APP_STATE_Play];
-	uint32_t					firstControl				= ::gpk::guiSetupButtonList<::d1::UI_PLAY>(gui, iDialog, {160, BUTTON_HEIGHT}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM);
+	uint32_t					firstControl				=  appUI.FirstControl[d1::APP_STATE_Play] = ::gpk::guiSetupButtonList<::d1::UI_PLAY>(gui, iDialog, {160, BUTTON_HEIGHT}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM);
 	gpk_necs(firstControl); 
-	for(uint32_t iPlayer = 0; iPlayer < appUI.PlayerUI.size(); ++iPlayer) {
-		uint32_t					playerRoot					= appUI.PlayerUI[iPlayer].DialogPerState[d1::APP_STATE_Play];
-		uint32_t					firstControlPlayer			= ::gpk::guiSetupButtonList<::d1::UI_PROFILE>(gui, playerRoot, {160, BUTTON_HEIGHT}, {0, 0}, iPlayer ? ::gpk::ALIGN_TOP_LEFT : ::gpk::ALIGN_TOP_RIGHT);
-		gpk_necs(firstControlPlayer); 
+	for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam) {
+		uint32_t					playerRoot					= appUI.TeamUI[iTeam].DialogPerState[d1::APP_STATE_Play];
 		gui.Controls.States	[playerRoot].Hidden	= true;
 
+		uint32_t					firstControlPlayer			= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Play] = ::gpk::guiSetupButtonList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_LEFT : ::gpk::ALIGN_TOP_RIGHT);
+		gpk_necs(firstControlPlayer); 
 		//gui.Controls.Modes [firstControlPlayer].FrameOut	= true;
 		//gui.Controls.States[firstControlPlayer].Disabled	= true;
 		//gui.Controls.Modes [firstControlPlayer + 1].FrameOut	= true;
@@ -188,8 +169,8 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 			gpk_necs(iControl = appUI.DialogPerState[iState] = ::gpk::controlCreate(gui));
 			gpk_necs(guiContainerSetupDefaults(gui, iControl, appUI.Dialog.Root));
 			gui.Controls.States[iControl].Hidden	= true;
-			for(uint32_t iPlayer = 0; iPlayer < appUI.PlayerUI.size(); ++iPlayer)
-				gpk_necs(::guiContainerSetupDefaults(gui, appUI.PlayerUI[iPlayer].DialogPerState[iState] = ::gpk::controlCreate(gui), appUI.Dialog.Root));
+			for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam)
+				gpk_necs(::guiContainerSetupDefaults(gui, appUI.TeamUI[iTeam].DialogPerState[iState] = ::gpk::controlCreate(gui), appUI.Dialog.Root));
 		}
 	}
 	gpk_necs(::guiSetupHome(appUI, appGame));

@@ -15,6 +15,7 @@ static	::gpk::error_t		shootCueBall			(::d1p::SPoolGame & pool, const ::d1p::SSt
 
 	engine.SetHidden(activeStickEntity, true);
 	pool.MatchState.Flags.NotInHand	= 1;
+	::d1p::debugPrintStickControl(activeTurn.StickControl);
 	return 1;
 }
 
@@ -74,6 +75,11 @@ static	::gpk::error_t		processEventTurn		(::d1p::SPoolGame & pool, const ::d1p::
 		directionMultiplier			= -1;
 	case ::gpk::AXIS_X_POSITIVE	: {
 		pool.ActiveStick().Angle	+= stickEvent.Value * directionMultiplier;
+		::d1p::SStickControl			& activeStick			= pool.ActiveStick();
+		while(activeStick.Angle >= ::gpk::math_2pi)
+			activeStick.Angle -= (float)::gpk::math_2pi;
+		while(activeStick.Angle <= -::gpk::math_2pi)
+			activeStick.Angle += (float)::gpk::math_2pi;
 
 		const int32_t					activeStickEntity		= pool.ActiveStickEntity();
 		const uint32_t					stickRigidBodyId		= pool.Engine.Entities[activeStickEntity].RigidBody;
@@ -86,7 +92,7 @@ static	::gpk::error_t		processEventTurn		(::d1p::SPoolGame & pool, const ::d1p::
 		directionMultiplier			= -1;
 	case ::gpk::AXIS_Y_POSITIVE	: {
 		constexpr float					angleLimitY				= float(::gpk::math_pi_2 * .99);
-		::d1p::SStickControl				& activeStick			= pool.ActiveStick();
+		::d1p::SStickControl			& activeStick			= pool.ActiveStick();
 		float							angleY					= stickEvent.Value * directionMultiplier;
 #if defined(GPK_DEBUG_ENABLED)
 		if(activeStick.Pitch + angleY < -angleLimitY)

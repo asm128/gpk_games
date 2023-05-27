@@ -12,7 +12,7 @@
 
 ::gpk::error_t		d1p::poolGameSave		(const ::d1p::SPoolGame & game, ::gpk::vcc fileName) {
 	::gpk::au8							serialized;
-	game.Save(serialized);
+	gpk_necs(game.Save(serialized));
 
 	::gpk::au8							deflated;
 	gpk_necs(::gpk::arrayDeflate(serialized, deflated));
@@ -34,7 +34,7 @@
 
 	::gpk::vcu8							viewSerialized				= {(const uint8_t*)inflated.begin(), inflated.size()};
 	if errored(world.Load(viewSerialized)) {
-		::d1p::poolGameReset(world);
+		es_if(errored(::d1p::poolGameReset(world)));
 		return -1;
 	}
 	return 0;
@@ -466,7 +466,7 @@ static	::gpk::error_t	geometryBuildTableCushion			(::gpk::SGeometryIndexedTriang
 
 	uint32_t								iMesh					= (uint32_t)Scene->Graphics->Meshes.Create();
 	::gpk::pobj<::gpk::SGeometryMesh>		& mesh					= Scene->Graphics->Meshes[iMesh];
-	Scene->Graphics->Meshes.Names[iMesh]	= ::gpk::vcs{"Sphere"};
+	Scene->Graphics->Meshes.Names[iMesh]	= ::gpk::vcs{"Cushion"};
 	mesh->GeometryBuffers.append({iIndicesVertex, iVertices, iNormals, iUV});
 
 	mesh->Desc.Mode						= ::gpk::MESH_MODE_List;

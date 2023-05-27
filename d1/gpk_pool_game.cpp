@@ -8,11 +8,11 @@
 	if(ActiveTurn().Continues) 
 		ActiveTurn().Continues	= false;
 	else {
+		++Teams[matchFlags.TeamActive].CurrentPlayer;
+		Teams[matchFlags.TeamActive].CurrentPlayer %= Teams[matchFlags.TeamActive].PlayerCount;
 		++matchFlags.TeamActive;
-		++Teams[ActiveTeam()].CurrentPlayer;
-		Teams[ActiveTeam()].CurrentPlayer %= Teams[ActiveTeam()].PlayerCount;
-		gpk_necs(Engine.SetHidden(ActiveStickEntity(), false));
 	}
+	gpk_necs(Engine.SetHidden(ActiveStickEntity(), false));
 	::d1p::STurnInfo							newTurn						= {{(uint64_t)::gpk::timeCurrentInMs()}, 0, ActivePlayer(), ActiveTeam()};
 	gpk_necs(TurnHistory.push_back(newTurn));
 	return ::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_TurnStart, newTurn);	// Report turn start for player
@@ -25,8 +25,7 @@
 	gpk_necs(::gpk::savePOD (bytes, Entities		));
 	gpk_necs(::gpk::saveView(bytes, TurnHistory		));
 	gpk_necs(::gpk::saveView(bytes, BallEventHistory));
-	gpk_necs(Engine.Save(bytes));
-	return 0;
+	return Engine.Save(bytes);
 }
 
 ::gpk::error_t		d1p::SPoolGame::Load						(::gpk::vcu8 & bytes)			{
@@ -36,8 +35,7 @@
 	gpk_necs(::gpk::loadPOD (bytes, Entities		));
 	gpk_necs(::gpk::loadView(bytes, TurnHistory		));
 	gpk_necs(::gpk::loadView(bytes, BallEventHistory));
-	gpk_necs(Engine.Load(bytes));
-	return 0;
+	return Engine.Load(bytes);
 }
 
 
@@ -54,26 +52,29 @@
 		engine.SetPosition(pool.ActiveStickEntity(), ballPosition);
 		gpk_necs(::d1p::processInputEvents(pool, inputEvents, outputEvents));
 		gpk_necs(engine.Update(secondsElapsed));
+		pool.MatchState.TotalSeconds += secondsElapsed;
 	}
 	else {
-		for(uint8_t iBall = 0; iBall < pool.MatchState.CountBalls; ++iBall)
-			pool.GetBallPosition(iBall, pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].push_back({})].A);
-
+		for(uint8_t iBall = 0; iBall < pool.MatchState.CountBalls; ++iBall) {
+			const uint32_t			lastDelta				= pool.PositionDeltas[iBall].push_back({});
+			pool.GetBallPosition(iBall, pool.PositionDeltas[iBall][lastDelta].A);
+		}
 		gpk_necs(::d1p::poolGamePhysicsUpdate(pool, outputEvents, secondsElapsed));
 
 		const float				radius					= pool.MatchState.Table.BallRadius;
 		const float				diameter				= radius * 2;
 		for(uint8_t iBall = 0; iBall < pool.MatchState.CountBalls; ++iBall) {
-			::gpk::line3<float>		& delta					= pool.PositionDeltas[iBall][pool.PositionDeltas[iBall].size() - 1];
-			pool.GetBallPosition(iBall, delta.B);
 			if(engine.IsPhysicsActive(pool.Entities.Balls[iBall])) {
-				::gpk::SBodyForces		& forces				= engine.Integrator.Forces[engine.Entities[pool.Entities.Balls[iBall]].RigidBody];
+				const uint32_t			lastDelta				= pool.PositionDeltas[iBall].size() - 1;
+				::gpk::line3f32			& delta					= pool.PositionDeltas[iBall][lastDelta];
+				pool.GetBallPosition(iBall, delta.B);
+				::gpk::SBodyForces		& forces				= engine.Integrator.Forces[engine.GetRigidBody(pool.BallToEntity(iBall))];
 				const ::gpk::n3f		rotationResult			= (delta.B - delta.A) / diameter * ::gpk::math_2pi;
 				forces.Rotation		+= {rotationResult.z, 0, -rotationResult.x};
 			}
 			if(pool.PositionDeltas[iBall].size() > 10) {
 				for(uint32_t iDelta = 0; iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {
-					if(false == engine.IsPhysicsActive(pool.Entities.Balls[iBall]))
+					if(false == engine.IsPhysicsActive(pool.BallToEntity(iBall)))
 						pool.PositionDeltas[iBall].remove_unordered(iDelta--);
 				}
 			}

@@ -131,6 +131,15 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(POOL_GAME_MODE, 10Ball, 2);
 	GDEFINE_ENUM_VALUE(POOL_GAME_MODE, Test2Balls, 3);
 
+	inlcxpr	uint8_t		pocketedCount		(const uint64_t pocketed, uint8_t iTeam)	{ 
+		uint8_t					balls				= uint8_t((pocketed >> (iTeam * 8)) & 0xFE);
+		uint8_t					ballCount			= 0;
+		for(uint32_t iBall = 1; iBall < 8; ++iBall) {
+			if((1 << iBall) & balls)
+				++ballCount;
+		}
+		return ballCount; 
+	}
 	inlcxpr	bool		pocketedAll			(const uint64_t pocketed, uint8_t iTeam)	{ return 0xFE == ((pocketed >> (iTeam * 8)) & 0xFE); }
 	inlcxpr	bool		pocketedAny			(const uint64_t pocketed, uint8_t iTeam)	{ return ((pocketed >> (iTeam * 8)) & 0xFE); }
 	inlcxpr	bool		isPocketed			(const uint64_t pocketed, uint8_t iBall)	{ return pocketed & (1ULL << iBall); }
