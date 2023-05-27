@@ -105,7 +105,7 @@ static	::gpk::error_t	handleBALL_EVENT		(::d1p::SPoolGame & pool, const ::gpk::S
 	info_printf("%s", ::gpk::get_value_namep(ballEvent.Type));
 	const ::d1p::SArgsBall		& argsBall				= *(const ::d1p::SArgsBall*)ballEvent.Data.begin(); 
 	switch(ballEvent.Type) { 
-	case d1p::BALL_EVENT_ContactBall		: return handleContactBall		(pool, argsBall, outputEvents);
+	case d1p::BALL_EVENT_ContactBall	: return handleContactBall		(pool, argsBall, outputEvents);
 	case d1p::BALL_EVENT_ContactPocket	: return handleContactPocket	(pool, argsBall, outputEvents);
 	case d1p::BALL_EVENT_ContactCushion	: return handleContactCushion	(pool, argsBall, outputEvents);
 	case d1p::BALL_EVENT_Pocketed		: return handlePocketed			(pool, argsBall, outputEvents);
@@ -187,7 +187,7 @@ static	::gpk::error_t	matchStart				(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p
 	::d1p::SMatchState		& matchState			= pool.MatchState;
 	matchState.TimeStart	= ::gpk::timeCurrentInMs();
 	matchState.TotalSeconds	= 0;
-	gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_MatchStart, matchState));
+	gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_MatchStart, matchState));	// This will likely trigger a TurnStart event.
 	return 0;
 }
 
@@ -198,8 +198,8 @@ static	::gpk::error_t	matchStart				(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p
 	bool						processEvents;
 	if(pool.TurnHistory.size())
 		gpk_necs(processEvents = ::endTurnIfNeeded(pool, outputEvents));
-	else {	// this means the match has just started and that there is no active turn history item for the current player.
-		gpk_necs(::matchStart(pool, outputEvents));	// it is also a good opportunity to generate events reporting the game has just started and that the turn has started for the active player.
+	else {	// this means that we need to start the match as the game has just reset and there is no active turn record for the current player.
+		gpk_necs(::matchStart(pool, outputEvents));	// it is also a good opportunity to generate events reporting the start of the game.
 		processEvents			= true;
 	}
 

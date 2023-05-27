@@ -111,7 +111,7 @@ int													drawScoreParticles
 		starPos												= matrixVPV.Transform(starPos);
 		if(starPos.z > 1 || starPos.z < 0)
 			continue;
-		const ::gpk::n2<int32_t>							pixelCoord			= {(int32_t)starPos.x, (int32_t)starPos.y};
+		const ::gpk::n2<int16_t>							pixelCoord			= {(int16_t)starPos.x, (int16_t)starPos.y};
 		if( pixelCoord.y < 0 || pixelCoord.y >= (int32_t)targetPixels.metrics().y
 		 || pixelCoord.x < 0 || pixelCoord.x >= (int32_t)targetPixels.metrics().x
 		)
@@ -130,11 +130,11 @@ int													drawScoreParticles
 		::gpk::apod<::gpk::n2<uint16_t>>				dstCoords;
 		char													textToShow[64]		= {};
 		sprintf_s(textToShow, "%i", particle.Score);
-		const ::gpk::vcs										finalText			= textToShow;
-		::gpk::rect2<int16_t>								rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
-		rectText.Offset = (pixelCoord - ::gpk::n2<int32_t>{(rectText.Size.x >> 1), (rectText.Size.y >> 1)}).Cast<int16_t>();
+		const ::gpk::vcs							finalText			= textToShow;
+		::gpk::rect2i16								rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
+		rectText.Offset = (pixelCoord - ::gpk::n2i16{int16_t(rectText.Size.x >> 1), int16_t(rectText.Size.y >> 1)});
 
-		gpk_necs(::gpk::textLineRaster(targetPixels.metrics().Cast<uint16_t>(), font.CharSize, rectText, font.Texture, finalText, dstCoords));
+		gpk_necs(::gpk::textLineRaster(targetPixels.metrics(), font.CharSize, rectText, font.Texture, finalText, dstCoords));
 		for(uint32_t iCoord = 0; iCoord < dstCoords.size(); ++iCoord) {
 			::gpk::pixelBlend(targetPixels, dstCoords[iCoord].Cast<int16_t>(), starFinalColor);
 		}
@@ -547,7 +547,7 @@ static	int											drawShip
 	rectText.Offset = (pixelCoord - ::gpk::n2<int32_t>{(rectText.Size.x >> 1), (rectText.Size.y >> 1)}).Cast<int16_t>();
 
 	::gpk::apod<::gpk::n2<uint16_t>>				dstCoords;
-	gpk_necs(::gpk::textLineRaster(targetPixels.metrics().Cast<uint16_t>(), font.CharSize, rectText, font.Texture, finalText, dstCoords));
+	gpk_necs(::gpk::textLineRaster(targetPixels.metrics(), font.CharSize, rectText, font.Texture, finalText, dstCoords));
 	for(uint32_t iCoord = 0; iCoord < dstCoords.size(); ++iCoord) {
 		const ::gpk::n2<uint16_t>										dstCoord												= dstCoords[iCoord];
 		if(::gpk::in_range(dstCoord, {{}, targetPixels.metrics().Cast<uint16_t>()})) {

@@ -67,7 +67,7 @@ static	::gpk::error_t	textureBallNumber			(::gpk::view2d<::gpk::bgra> view, uint
 		, font.CharSize.Cast<int16_t>()
 		};
 	::gpk::apod<::gpk::n2<uint16_t>>		coords;
-	::gpk::textLineRaster(view.metrics().Cast<uint16_t>(), font.CharSize, targetRect, font.Texture, strNumber, coords);
+	::gpk::textLineRaster(view.metrics(), font.CharSize, targetRect, font.Texture, strNumber, coords);
 	for(uint32_t iCoord = 0; iCoord < coords.size(); ++iCoord) {
 		const ::gpk::n2<uint16_t>				coord						= coords[iCoord];
 		view[coord.y][coord.x]					= ::gpk::BLACK;
