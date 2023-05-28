@@ -48,7 +48,7 @@
 		}
 	}
 
-	const gpk::n2<float>							halfDimensions					= pool.MatchState.Table.Dimensions.Slate * .5;
+	const gpk::n2<float>							halfDimensions					= pool.MatchState.Board.Table.Slate * .5;
 
 	wireframePixelCoords.clear();
 	const	::gpk::n3f								limitsBottom	[4]				=
@@ -58,10 +58,10 @@
 		, {-halfDimensions.x, .0f, -halfDimensions.y}
 		};
 	const	::gpk::n3f								limitsTop		[4]				= 
-		{ limitsBottom[0] + ::gpk::n3f{0, pool.MatchState.Table.Dimensions.Height, 0}
-		, limitsBottom[1] + ::gpk::n3f{0, pool.MatchState.Table.Dimensions.Height, 0}
-		, limitsBottom[2] + ::gpk::n3f{0, pool.MatchState.Table.Dimensions.Height, 0}
-		, limitsBottom[3] + ::gpk::n3f{0, pool.MatchState.Table.Dimensions.Height, 0}
+		{ limitsBottom[0] + ::gpk::n3f{0, pool.MatchState.Board.Table.Height, 0}
+		, limitsBottom[1] + ::gpk::n3f{0, pool.MatchState.Board.Table.Height, 0}
+		, limitsBottom[2] + ::gpk::n3f{0, pool.MatchState.Board.Table.Height, 0}
+		, limitsBottom[3] + ::gpk::n3f{0, pool.MatchState.Board.Table.Height, 0}
 		};
 
 	::gpk::drawLine(offscreenMetrics, ::gpk::line3<float>{limitsBottom[3], limitsBottom[2]}, constants.VPS, wireframePixelCoords, backBuffer.DepthStencil);

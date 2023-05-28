@@ -1,9 +1,9 @@
 #include "gpk_d1.h"
 
-stacxpr	bool					BACKGROUND_3D_ONLY			= true;
-stacxpr	::gpk::n2u16			SHOOT_SLIDER_SIZE			= {24, 320};
-stacxpr	::gpk::n2u16			MODULE_VIEWPORT_SIZE		= {128, 64};
-stacxpr	::gpk::n2u16			WEAPON_BAR_SIZE				= {184, 24};
+stacxpr	bool			BACKGROUND_3D_ONLY			= true;
+stacxpr	::gpk::n2u16	SHOOT_SLIDER_SIZE			= {24, 320};
+stacxpr	::gpk::n2u16	MODULE_VIEWPORT_SIZE		= {128, 64};
+stacxpr	::gpk::n2u16	WEAPON_BAR_SIZE				= {184, 24};
 
 static	::gpk::error_t	guiSetupCommon				(::gpk::SGUI & gui, const ::gpk::n2<float> & cursorPos) {
 	gui.ThemeDefault		= ::gpk::ASCII_COLOR_DARKRED * 16 + 10;
@@ -200,7 +200,7 @@ static	::gpk::error_t	guiHandleHome				(::d1::SD1 & app, ::gpk::SGUI & gui, uint
 	switch((::d1::UI_HOME)idControl) {
 	case ::d1::UI_HOME_Start: 
 		if(app.AppUI.TunerTableSize->ValueCurrent)
-			app.MainGame.StartState.Table.Dimensions = ::d1p::TABLE_SIZES[app.AppUI.TunerTableSize->ValueCurrent - app.AppUI.TunerTableSize->ValueLimits.Min - 1];
+			app.MainGame.StartState.Board.Table = ::d1p::TABLE_SIZES[app.AppUI.TunerTableSize->ValueCurrent - app.AppUI.TunerTableSize->ValueLimits.Min - 1];
 		gpk_necs(::d1p::poolGameReset(app.MainGame.Pool, app.MainGame.StartState));
 	case ::d1::UI_HOME_Continue: 
 		appState				= ::d1::APP_STATE_Play;
@@ -238,5 +238,21 @@ static	::gpk::error_t	guiHandleHome				(::d1::SD1 & app, ::gpk::SGUI & gui, uint
 		}
 		return appState;
 	});
+
+	::d1p::SPoolGame			& poolGame					= app.MainGame.Pool;
+	{ // update match time
+		const double				seconds						= poolGame.MatchState.TotalSeconds;
+		const int					minutes						= int(seconds / 60);
+		const int					hours						= int(minutes / 60);
+		sprintf_s(app.AppUI.secdsbuffer.Storage, "%.2i:%.2i:%05.2f", hours % 24, minutes % 60, (int(seconds) % 60) + (seconds - int(seconds)));
+		::gpk::controlTextSet(*app.AppUI.Dialog.GUI, app.AppUI.FirstControl[::d1::APP_STATE_Play] + ::d1::UI_PLAY_Time, app.AppUI.secdsbuffer.Storage);
+	} // update turn time
+	if(poolGame.TurnHistory.size()) {
+		const double				seconds						= poolGame.ActiveTurn().Time.SecondsActive + poolGame.ActiveTurn().Time.SecondsAiming;
+		const int					minutes						= int(seconds / 60);
+		const int					hours						= int(minutes / 60);
+		sprintf_s(app.AppUI.turnsbuffer.Storage, "%.2i:%.2i:%05.2f", hours % 24, minutes % 60, (int(seconds) % 60) + (seconds - int(seconds)));
+		::gpk::controlTextSet(*app.AppUI.Dialog.GUI, app.AppUI.FirstControl[::d1::APP_STATE_Play] + ::d1::UI_PLAY_Turn, app.AppUI.turnsbuffer.Storage);
+	}
 	return appState;
 }

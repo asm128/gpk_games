@@ -83,12 +83,6 @@ namespace d1p
 		},
 	};
 
-	struct SPoolBoard {
-		SPoolTable			Dimensions			= TABLE_SIZES[1];
-		float				BallRadius			= .05715f * .5f;	// meters
-		uint16_t			BallGrams			= 165;	// grams
-	};
-
 	// The value between 0 and 1 we need for this gets compressed this way good enough for our purposes.
 	struct SPoolDamping {
 		uint8_t				ClothDisplacement	= uint8_t(0xFFU * .6f);
@@ -102,7 +96,16 @@ namespace d1p
 	struct SPoolPhysics {
 		SPoolDamping		Damping				= {};
 		uint16_t			Gravity				= 9800;	// mm/s
+		uint16_t			BallGrams			= 165;	// grams
 	};
+
+	struct SPoolBoard {
+		SPoolTable			Table				= TABLE_SIZES[1];
+		float				BallRadius			= .05715f * .5f;	// meters
+	};
+
+	stincxp	float		rackOriginX			(const ::d1p::SPoolBoard & board)		{ return board.Table.PlayingSurface.x / 4; }
+	stincxp	float		headStringX			(const ::d1p::SPoolBoard & board)		{ return rackOriginX(board) * -1.0f; }
 
 	stacxpr	uint8_t		MAX_BALLS			= 64;
 	stacxpr	::gpk::astatic<::gpk::bgra, ::d1p::MAX_BALLS>	BALL_COLORS_8_BALL	=
@@ -129,10 +132,11 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(BALL_TYPE, Stripped	, 1);
 	GDEFINE_ENUM_VALUE(BALL_TYPE, Cue		, 2);
 	GDEFINE_ENUM_VALUE(BALL_TYPE, Black		, 3);
-	inlcxpr	uint8_t		pocketedAny			(const uint64_t pocketed, BALL_TYPE ballType)	{ return (pocketed >> (ballType * 8)) & 0xFE; }
-	inlcxpr	bool		pocketedAll			(const uint64_t pocketed, BALL_TYPE ballType)	{ return 0xFE == pocketedAny(pocketed, ballType); }
-	inlcxpr	bool		isPocketed			(const uint64_t pocketed, uint8_t iBall)		{ return pocketed & (1ULL << iBall); }
-	inlcxpr	uint16_t	setPocketed			(uint16_t & pocketed, uint8_t iBall)			{ return pocketed |= (1ULL << iBall); }
+	typedef uint16_t	TBallField;
+	inlcxpr	uint8_t		pocketedAny			(const TBallField pocketed, BALL_TYPE ballType)	{ return (pocketed >> (ballType * 8)) & 0xFE; }
+	inlcxpr	bool		pocketedAll			(const TBallField pocketed, BALL_TYPE ballType)	{ return 0xFE == pocketedAny(pocketed, ballType); }
+	inlcxpr	bool		isPocketed			(const TBallField pocketed, uint8_t iBall)		{ return pocketed & (1ULL << iBall); }
+	inlcxpr	TBallField	setPocketed			(TBallField & pocketed, uint8_t iBall)			{ return pocketed |= (1ULL << iBall); }
 	inlcxpr	BALL_TYPE 	ballToBallType		(uint8_t iBall)									{ 
 		return (0 == iBall) ? BALL_TYPE_Cue 
 			 : (8 == iBall) ? BALL_TYPE_Black 
@@ -140,7 +144,7 @@ namespace d1p
 			 : BALL_TYPE_Stripped
 		;
 	}
-	inlcxpr	uint8_t		pocketedCount		(const uint64_t pocketed, BALL_TYPE iBallType)	{ 
+	inlcxpr	uint8_t		pocketedCount		(const TBallField pocketed, BALL_TYPE iBallType)	{ 
 		uint8_t					balls				= uint8_t((pocketed >> (iBallType * 8)) & 0xFE);
 		uint8_t					ballCount			= 0;
 		for(uint32_t iBall = 1; iBall < 8; ++iBall) {
@@ -159,8 +163,8 @@ namespace d1p
 		uint64_t			Seed				= (uint64_t)::gpk::timeCurrentInUs();
 		uint64_t			TimeStart			= {};
 		double				TotalSeconds		= 0;
-		uint16_t			Pocketed			= 0;
-		::d1p::SPoolBoard	Table				= {};
+		TBallField			Pocketed			= 0;
+		::d1p::SPoolBoard	Board				= {};
 		::d1p::SPoolPhysics	Physics				= {};
 
 		POOL_GAME_MODE		Mode				= ::d1p::POOL_GAME_MODE_8Ball;
@@ -168,14 +172,15 @@ namespace d1p
 		::d1p::SMatchFlags	Flags				= {};
 		::d1p::STeamInfo	TeamInfo			= {};
 
-		inlcxpr	bool		BallTypeToTeam		(BALL_TYPE iBallType)	const	{ return (iBallType == BALL_TYPE_Stripped) ? Flags.TeamStripped : one_if(0 == Flags.TeamStripped); }
-		inlcxpr	BALL_TYPE 	TeamToBallType		(uint8_t iTeam)			const	{ return (iTeam == Flags.TeamStripped) ? BALL_TYPE_Stripped : BALL_TYPE_Solid; }
-		inlcxpr	uint8_t		BallToTeam			(uint8_t iBall)			const	{ return BallTypeToTeam(ballToBallType(iBall)); }
-		inlcxpr	bool		PocketedAll			(uint8_t iTeam)			const	{ return pocketedAll(Pocketed, TeamToBallType(iTeam)); }
-		inlcxpr	uint8_t		PocketedAny			(uint8_t iTeam)			const	{ return pocketedAny(Pocketed, TeamToBallType(iTeam)); }
-		uint8_t				PocketedCount		(uint8_t iTeam)					{ return pocketedCount(Pocketed, TeamToBallType(iTeam)); }
-		inlcxpr	bool		IsPocketed			(uint8_t iBall)			const	{ return isPocketed	(Pocketed, iBall); }
-		uint64_t			SetPocketed			(uint8_t iBall)					{ return setPocketed(Pocketed, iBall); }
+		inline	TBallField	SetPocketed			(uint8_t iBall)					{ return ::d1p::setPocketed	(Pocketed, iBall); }
+		inlcxpr	bool		IsPocketed			(uint8_t iBall)			const	{ return ::d1p::isPocketed	(Pocketed, iBall); }
+		inlcxpr	bool		BallTypeToTeam		(BALL_TYPE iBallType)	const	{ return (iBallType == ::d1p::BALL_TYPE_Stripped) ? Flags.TeamStripped : one_if(0 == Flags.TeamStripped); }
+		inlcxpr	uint8_t		BallToTeam			(uint8_t iBall)			const	{ return BallTypeToTeam(::d1p::ballToBallType(iBall)); }
+		inlcxpr	bool		PocketedAll			(uint8_t iTeam)			const	{ return ::d1p::pocketedAll	(Pocketed, TeamToBallType(iTeam)); }
+		inline	uint8_t		PocketedCount		(uint8_t iTeam)			const	{ return ::d1p::pocketedCount	(Pocketed, TeamToBallType(iTeam)); }
+		inlcxpr	uint8_t		PocketedAny			(uint8_t iTeam)			const	{ return ::d1p::pocketedAny	(Pocketed, TeamToBallType(iTeam)); }
+		inlcxpr	BALL_TYPE 	TeamToBallType		(uint8_t iTeam)			const	{ return (iTeam == Flags.TeamStripped) ? ::d1p::BALL_TYPE_Stripped : ::d1p::BALL_TYPE_Solid; }
+
 		::gpk::error_t		Reset				(uint8_t firstTeam = 0, uint64_t seed = ::gpk::timeCurrentInUs() ^ ::gpk::noise1DBase(::gpk::timeCurrentInUs()))	{
 			Seed				= seed;
 			TotalSeconds		= 0;

@@ -270,7 +270,7 @@ static	::gpk::error_t		refreshCameras			(::d1::SD1Game & clientGame, double seco
 
 			::gpk::n3f32					direction				= cameraSelected.Position - cameraSelected.Target;
 			double							distance				= direction.Length();
-			if(distance < poolGame.MatchState.Table.Dimensions.Slate.x * 1.25f) 
+			if(distance < poolGame.MatchState.Board.Table.Slate.x * 1.25f) 
 				cameraSelected.Position		= cameraSelected.Target + direction.Normalize() * (distance + secondsElapsed * poolGame.ActiveStick().Velocity);
 
 			if(cameraSelected.Position.y < 1.25f)
@@ -304,21 +304,6 @@ static	::gpk::error_t		handleMATCH_CONTROL		(::d1::SD1 & /*app*/, const ::gpk::S
 	return 0; 
 }
 
-
-static	::gpk::error_t		refreshScoreUI		(::d1::SD1UI & appUI) {
-	for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam) {
-		::gpk::SGUI					& gui		= *appUI.Dialog.GUI;
-		const ::d1::STeamUI			& teamUI	= appUI.TeamUI[iTeam];
-		::gpk::controlTextSet(gui, teamUI.FirstControl[::d1::APP_STATE_Home] + 0, appUI.teamsbuffer[iTeam].Storage);
-		::gpk::controlTextSet(gui, teamUI.FirstControl[::d1::APP_STATE_Home] + 1, appUI.scorebuffer[iTeam].Storage);
-		::gpk::controlTextSet(gui, teamUI.FirstControl[::d1::APP_STATE_Home] + 2, appUI.faultbuffer[iTeam].Storage);
-		::gpk::controlTextSet(gui, teamUI.FirstControl[::d1::APP_STATE_Play] + 0, appUI.teamsbuffer[iTeam].Storage);
-		::gpk::controlTextSet(gui, teamUI.FirstControl[::d1::APP_STATE_Play] + 1, appUI.scorebuffer[iTeam].Storage);
-		::gpk::controlTextSet(gui, teamUI.FirstControl[::d1::APP_STATE_Play] + 2, appUI.faultbuffer[iTeam].Storage);
-	}
-	return 0;
-}
-
 static	::gpk::error_t		handleMATCH_EVENT		(::d1::SD1 & app, const ::gpk::SEventView<::d1p::MATCH_EVENT> & childEvent, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { 
 	info_printf("%s", ::gpk::get_value_namep(childEvent.Type));
 	::d1p::SPoolGame				& pool					= app.MainGame.Pool;
@@ -329,18 +314,16 @@ static	::gpk::error_t		handleMATCH_EVENT		(::d1::SD1 & app, const ::gpk::SEventV
 	case d1p::MATCH_EVENT_StrippedAssigned	: {
 		info_printf("Team: %i.", childEvent.Data[0]); 
 		const uint8_t					iTeam					= childEvent.Data[0];
-		sprintf_s(app.AppUI.teamsbuffer[0].Storage, "Team 1 - %s", iTeam ? "Solid" : "Stripped");
-		sprintf_s(app.AppUI.teamsbuffer[1].Storage, "Team 2 - %s", iTeam ? "Stripped" : "Solid");
-		refreshScoreUI(app.AppUI);
+		app.AppUI.RefreshTeamStrings(iTeam);
+		app.AppUI.RefreshTeamUI();
+		app.AppUI.RefreshPlayUI(pool.ActivePlayer(), pool.ActiveTeam());
 		break;
 	}
-	case d1p::MATCH_EVENT_TurnStart			: {
-		::gpk::controlTextSet(*app.AppUI.Dialog.GUI, app.AppUI.FirstControl[::d1::APP_STATE_Play] + 3, app.AppUI.playrbuffer[pool.ActivePlayer()].Storage);
-		::gpk::controlTextSet(*app.AppUI.Dialog.GUI, app.AppUI.FirstControl[::d1::APP_STATE_Play] + 2, app.AppUI.teamsbuffer[pool.ActiveTeam()].Storage);
-	}
+	case d1p::MATCH_EVENT_TurnStart			: 		
+		app.AppUI.RefreshPlayUI(pool.ActivePlayer(), pool.ActiveTeam());
 	case d1p::MATCH_EVENT_TurnEnd			: {
-		const ::d1p::STurnInfo & turnMsg = pool.TurnHistory[argsMatch->ArgsBall.Turn];
-		const ::d1p::STurnInfo & turnAct = pool.ActiveTurn();
+		const ::d1p::STurnInfo		& turnMsg = pool.TurnHistory[argsMatch->ArgsBall.Turn];
+		const ::d1p::STurnInfo		& turnAct = pool.ActiveTurn();
 		::d1p::debugPrintTurnInfo(turnMsg); 
 		::d1p::debugPrintTurnInfo(turnAct);
 		::d1p::debugPrintMatchState(pool.MatchState);
@@ -356,17 +339,19 @@ static	::gpk::error_t		handleMATCH_EVENT		(::d1::SD1 & app, const ::gpk::SEventV
 			sprintf_s(app.AppUI.teamsbuffer[1].Storage, "Team 2");
 			sprintf_s(app.AppUI.scorebuffer[0].Storage, "Score: 0");
 			sprintf_s(app.AppUI.scorebuffer[1].Storage, "Score: 0");
-			sprintf_s(app.AppUI.faultbuffer[0].Storage, "Fouls: 0");
-			sprintf_s(app.AppUI.faultbuffer[1].Storage, "Fouls: 0");
-			refreshScoreUI(app.AppUI);
+			sprintf_s(app.AppUI.foulsbuffer[0].Storage, "Fouls: 0");
+			sprintf_s(app.AppUI.foulsbuffer[1].Storage, "Fouls: 0");
+			app.AppUI.RefreshTeamUI();
 		}
 		break;
 	case d1p::MATCH_EVENT_Lost				: info_printf("Reason: %s", ::gpk::get_value_namep(argsMatch->Reason));
 	case d1p::MATCH_EVENT_Won				: {
 		const uint8_t				iTeam		= app.MainGame.Pool.TurnHistory[argsMatch->ArgsBall.Turn].Team;
-		sprintf_s(app.AppUI.scorebuffer[0].Storage, "%s - %s", app.AppUI.scorebuffer[0].Storage, iTeam ? "Lost" : "Won");
-		sprintf_s(app.AppUI.scorebuffer[1].Storage, "%s - %s", app.AppUI.scorebuffer[1].Storage, iTeam ? "Won" : "Lost");
-		refreshScoreUI(app.AppUI);
+		stacxpr const char*			strwin[]	= {"Lost", "Won"};
+		sprintf_s(app.AppUI.scorebuffer[0].Storage, "%s - %s", app.AppUI.scorebuffer[0].Storage, strwin[(one_if(childEvent.Type == d1p::MATCH_EVENT_Lost) + one_if(0 == iTeam)) % 2]);
+		sprintf_s(app.AppUI.scorebuffer[1].Storage, "%s - %s", app.AppUI.scorebuffer[1].Storage, strwin[(one_if(childEvent.Type == d1p::MATCH_EVENT_Lost) + one_if(1 == iTeam)) % 2]);
+		app.AppUI.RefreshTeamUI();
+		app.AppUI.RefreshPlayUI(pool.ActivePlayer(), pool.ActiveTeam());
 		break;
 	}
 	} 
@@ -389,7 +374,7 @@ static	::gpk::error_t		handleBALL_EVENT		(::d1::SD1 & app, const ::gpk::SEventVi
 		if(eventData.Ball && 8 != eventData.Ball) {
 			const uint8_t				iBallTeam		= pool.MatchState.BallToTeam(eventData.Ball);
 			sprintf_s(app.AppUI.scorebuffer[iBallTeam].Storage, "Score: %i", pool.MatchState.PocketedCount(iBallTeam));
-			::refreshScoreUI(app.AppUI);
+			app.AppUI.RefreshTeamUI();
 		}
 		break;
 	} 
@@ -403,27 +388,28 @@ static	::gpk::error_t		handleBALL_EVENT		(::d1::SD1 & app, const ::gpk::SEventVi
 static	::gpk::error_t		handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::d1p::FOUL> eventToProcess, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/) { 
 	info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));
 	bool							handled					= true;
-	const ::d1p::SArgsBall			& argsBall				= *(const ::d1p::SArgsBall*)eventToProcess.Data.begin(); 
+	const ::d1p::SArgsBall			* argsBall				= (const ::d1p::SArgsBall*)eventToProcess.Data.begin(); 
 	switch(eventToProcess.Type) { 
 	default: 
 		handled						= false;
-		gpk_warning_unhandled_event(eventToProcess); break; 
+		gpk_warning_unhandled_event(eventToProcess); 
+		break; 
 	case d1p::FOUL_Wrong_ball_first	: { 
-		const ::d1p::SArgsBall::SFirstContact	& eventData		= argsBall.Event.FirstContact; 
+		const ::d1p::SArgsBall::SFirstContact	& eventData		= argsBall->Event.FirstContact; 
 		info_printf("Ball: %i.", eventData.Ball); 
 		break;
 	} 
 	case d1p::FOUL_Cue_ball_scratch	: { 
-		const ::d1p::SArgsBall::SFirstContact	& eventData		= argsBall.Event.FirstContact; 
+		const ::d1p::SArgsBall::SFirstContact	& eventData		= argsBall->Event.FirstContact; 
 		info_printf("Ball: %i.", eventData.Ball); 
 		break;
 	} 
 	} 
 	if(handled) {
 		::gpk::SGUI					& gui		= *app.AppUI.Dialog.GUI;
-		const uint8_t				iTeam		= app.MainGame.Pool.TurnHistory[argsBall.Turn].Team;
+		const uint8_t				iTeam		= app.MainGame.Pool.TurnHistory[argsBall->Turn].Team;
 		const ::d1::STeamUI			& teamUI	= app.AppUI.TeamUI[iTeam];
-		sprintf_s(app.AppUI.faultbuffer[iTeam].Storage, "Fouls: %i", atoi(&gui.Controls.Text[teamUI.FirstControl[::d1::APP_STATE_Play] + 2].Text[7]) + 1);
+		sprintf_s(app.AppUI.foulsbuffer[iTeam].Storage, "Fouls: %i", atoi(&gui.Controls.Text[teamUI.FirstControl[::d1::APP_STATE_Play] + 2].Text[7]) + 1);
 	}
 
 	return 0; 
@@ -452,7 +438,12 @@ static	::gpk::error_t		handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<:
 				gpk_necs(::d1p::poolGameSetup(app.MainGame.Pool));
 		}
 		app.StateSwitch(::d1::APP_STATE_Welcome);
-		::refreshScoreUI(app.AppUI);
+		app.AppUI.RefreshTeamStrings(app.MainGame.Pool.MatchState.Flags.TeamStripped);
+		app.AppUI.RefreshTeamUI();
+		::d1p::debugPrintMatchState(app.MainGame.Pool.MatchState);
+		::d1p::debugPrintStickControl(app.MainGame.Pool.ActiveStick());
+		if(app.MainGame.Pool.TurnHistory.size())
+			::d1p::debugPrintTurnInfo(app.MainGame.Pool.ActiveTurn());
 		break;
 	} // APP_STATE_Init
 	case ::d1::APP_STATE_Play		: {
@@ -465,12 +456,7 @@ static	::gpk::error_t		handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<:
 
 		::gpk::apobj<::d1p::SEventPool>	outputEvents;
 		::d1p::poolGameUpdate(poolGame, clientGame.QueueStick, outputEvents, secondsElapsed * clientGame.TimeScale);
-		const int		minutes		= int(poolGame.MatchState.TotalSeconds / 60);
-		const int		hours		= int(minutes / 60);
-		const float		seconds		= float(poolGame.MatchState.TotalSeconds - minutes * 60 - hours * 3600);
-		
-		sprintf_s(app.AppUI.secdsbuffer.Storage, "%.2i:%.2i:%f", hours, minutes, seconds);
-		::gpk::controlTextSet(*app.AppUI.Dialog.GUI, app.AppUI.FirstControl[::d1::APP_STATE_Play] + 1, app.AppUI.secdsbuffer.Storage);
+
 		outputEvents.for_each([&app, &outputEvents](const ::gpk::pobj<::d1p::SEventPool> & _eventToProcess) { 
 			const ::d1p::SEventPool & eventToProcess = *_eventToProcess;
 			info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));

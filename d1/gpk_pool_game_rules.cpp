@@ -126,23 +126,28 @@ static	::gpk::error_t	handleMATCH_EVENT		(::d1p::SPoolGame & pool, const ::gpk::
 	switch(childEvent.Type) { 
 	case d1p::MATCH_EVENT_StrippedAssigned	: break;
 	case d1p::MATCH_EVENT_Break				: break;
-	case d1p::MATCH_EVENT_MatchEnd			: break;
+	case d1p::MATCH_EVENT_MatchEnd			: 
+		pool.MatchState.Flags.GameOver	= true;
+		break;
 	case d1p::MATCH_EVENT_MatchStart		: {
 		const ::d1p::STurnInfo			newTurn					= {{(uint64_t)::gpk::timeCurrentInMs()}, 0, pool.ActivePlayer(), pool.ActiveTeam()};
 		const ::d1p::SArgsMatchEvent	argsMatch				= {pool.MatchState.TotalSeconds, (uint16_t)pool.TurnHistory.push_back(newTurn)};
 		gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_TurnStart, argsMatch));
 		break;
 	}
-	case d1p::MATCH_EVENT_TurnStart			: break;
+	case d1p::MATCH_EVENT_TurnStart			: 
+		if(pool.MatchState.IsPocketed(0))
+			pool.ResetCueBall();
+		break;
 	case d1p::MATCH_EVENT_TurnEnd			: {
 		const ::d1p::SArgsMatchEvent	* const argsMatchIn		= (const ::d1p::SArgsMatchEvent*)childEvent.Data.begin();
-		::d1p::STurnInfo			& activeTurn			= pool.ActiveTurn();
-		::d1p::debugPrintTurnInfo  (activeTurn);
+		const ::d1p::STurnInfo			& turnInfo				= pool.TurnHistory[argsMatchIn->ArgsBall.Turn];
+		::d1p::debugPrintTurnInfo  (turnInfo);
 		::d1p::debugPrintMatchState(pool.MatchState);
 		if(pool.MatchState.Flags.GameOver)
 			gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_MatchEnd, pool.MatchState));	// Report turn end for player
-		else {
-			if(activeTurn.Foul || false == pool.MatchState.IsPocketed(8)) {
+		else { // evaluate victory
+			if(turnInfo.Foul || false == pool.MatchState.IsPocketed(8)) {
 				if(false == pool.MatchState.IsPocketed(8))
 					gpk_necs(pool.AdvanceTurn(outputEvents)); 
 				else {

@@ -77,8 +77,8 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(MATCH_RESULT, WON_Eight_ball_first_shot			, 2);	
 
 	GDEFINE_ENUM_TYPE(MATCH_EVENT, uint8_t);
-	GDEFINE_ENUM_VALUE(MATCH_EVENT, TurnEnd			, 0); // Arg is the player number
-	GDEFINE_ENUM_VALUE(MATCH_EVENT, TurnStart		, 1); // Arg is the player number
+	GDEFINE_ENUM_VALUE(MATCH_EVENT, TurnEnd			, 0); // 
+	GDEFINE_ENUM_VALUE(MATCH_EVENT, TurnStart		, 1); // 
 	GDEFINE_ENUM_VALUE(MATCH_EVENT, MatchEnd		, 2); // 
 	GDEFINE_ENUM_VALUE(MATCH_EVENT, MatchStart		, 3); // 
 	GDEFINE_ENUM_VALUE(MATCH_EVENT, Break			, 4); // 

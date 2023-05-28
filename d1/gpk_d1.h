@@ -95,10 +95,9 @@ namespace d1
 	stacxpr ::gpk::vcc		TEAM_TEXT[]		= {{6, "Team 1"}, {6, "Team 2"}};
 
 	GDEFINE_ENUM_TYPE (UI_TEAM, uint8_t);
-	GDEFINE_ENUM_VALUE(UI_TEAM, TeamIndex	, 0);
+	GDEFINE_ENUM_VALUE(UI_TEAM, Name		, 0);
 	GDEFINE_ENUM_VALUE(UI_TEAM, Score		, 1);
-	GDEFINE_ENUM_VALUE(UI_TEAM, Faults		, 2);
-
+	GDEFINE_ENUM_VALUE(UI_TEAM, Fouls		, 2);
 	struct STeamUI {
 		::gpk::astu32<::d1::APP_STATE_COUNT>	DialogPerState				= {};	
 		::gpk::astu32<::d1::APP_STATE_COUNT>	FirstControl				= {}; 	
@@ -172,8 +171,8 @@ namespace d1
 			::gpk::quatf32							stickOrientation	= {};
 			Pool.GetBallPosition(0, stickCamera.Target);
 			Pool.GetStickOrientation(iStick, stickOrientation);
-			stickCamera.Target.y				+=  Pool.MatchState.Table.BallRadius * 2;
-			stickCamera.Position				= {-Pool.MatchState.Table.BallRadius * 20 * stickCamera.Zoom, .2f, 0};
+			stickCamera.Target.y				+=  Pool.MatchState.Board.BallRadius * 2;
+			stickCamera.Position				= {-Pool.MatchState.Board.BallRadius * 20 * stickCamera.Zoom, .2f, 0};
 			stickCamera.Position				= stickOrientation.RotateVector(stickCamera.Position);
 			stickCamera.Position				+= stickCamera.Target;
 			return 0;
@@ -200,27 +199,28 @@ namespace d1
 	GDEFINE_ENUM_TYPE (UI_PLAY, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_PLAY, Menu			, 0);
 	GDEFINE_ENUM_VALUE(UI_PLAY, Time			, 1);
-	GDEFINE_ENUM_VALUE(UI_PLAY, Turn			, 2);
+	GDEFINE_ENUM_VALUE(UI_PLAY, Team			, 2);
 	GDEFINE_ENUM_VALUE(UI_PLAY, Player			, 3);
-	//GDEFINE_ENUM_VALUE(UI_PLAY, Level			, 4);
-	GDEFINE_ENUM_VALUE(UI_PLAY, Shoot			, 4);
+	GDEFINE_ENUM_VALUE(UI_PLAY, Turn			, 4);
+	GDEFINE_ENUM_VALUE(UI_PLAY, Shoot			, 5);
 
 	struct SD1UI {
 		typedef ::gpk::rtbgra8d32			TRenderTarget;
 
-		::gpk::SDialog						Dialog						= {};
-		::gpk::pobj<::gpk::SDialogSlider>	ForceSlider					= {};
-		TRenderTarget						ForceSliderRenderTarget		= {};
-		::gpk::astu32<::d1::APP_STATE_COUNT>DialogPerState				= {};
-		::gpk::astu32<::d1::APP_STATE_COUNT>FirstControl				= {}; 	
-		::gpk::astatic<::d1::STeamUI, 2>	TeamUI						= {};
+		::gpk::SDialog						Dialog					= {};
+		::gpk::pobj<::gpk::SDialogSlider>	ForceSlider				= {};
+		TRenderTarget						ForceSliderRenderTarget	= {};
+		::gpk::astu32<::d1::APP_STATE_COUNT>DialogPerState			= {};
+		::gpk::astu32<::d1::APP_STATE_COUNT>FirstControl			= {}; 	
+		::gpk::astatic<::d1::STeamUI, 2>	TeamUI					= {};
 		::gpk::SUIInputBox					NameEditBox;
 		
+		::gpk::astatic<char, 32>			turnsbuffer;
 		::gpk::astatic<char, 32>			secdsbuffer;
-		::gpk::astatic<char, 32>			playrbuffer[6]	=  {{"Player 1"}, {"Player 2"}, {"Player 3"}, {"Player 4"}, {"Player 5"}, {"Player 6"}};
-		::gpk::astatic<char, 32>			teamsbuffer[2]	=  {{"Team 1"}, {"Team 2"}};
-		::gpk::astatic<char, 32>			scorebuffer[2]	=  {{"Score: 0"}, {"Score: 0"}};
-		::gpk::astatic<char, 32>			faultbuffer[2]	=  {{"Fouls: 0"}, {"Fouls: 0"}};
+		::gpk::astatic<char, 32>			playrbuffer[6]			=  {{"Player 1"}, {"Player 2"}, {"Player 3"}, {"Player 4"}, {"Player 5"}, {"Player 6"}};
+		::gpk::astatic<char, 32>			teamsbuffer[2]			=  {{"Team 1"}, {"Team 2"}};
+		::gpk::astatic<char, 32>			scorebuffer[2]			=  {{"Score: 0"}, {"Score: 0"}};
+		::gpk::astatic<char, 32>			foulsbuffer[2]			=  {{"Fouls: 0"}, {"Fouls: 0"}};
 
 		//::gpk::pnco<::gpk::SDialogTuner<uint8_t>>	TunerTeamCount;
 		//::gpk::pnco<::gpk::SDialogTuner<uint8_t>>	TunerPlayerCount;
@@ -228,6 +228,30 @@ namespace d1
 
 		float								ClearColor	[4]				= {.25f, .125f, .35f, 1.0f};
 
+		::gpk::error_t						RefreshTeamStrings			(uint8_t teamStripped)			{
+			stacxpr const char*						strteam[]					= {"Solid", "Stripped"};
+			sprintf_s(teamsbuffer[0].Storage, "Team 1 - %s", strteam[(teamStripped + 1) & 1]);
+			sprintf_s(teamsbuffer[1].Storage, "Team 2 - %s", strteam[teamStripped]);
+			return 0;
+		}
+		::gpk::error_t						RefreshTeamUI				() {
+			::gpk::SGUI						& gui								= *Dialog.GUI;
+			stacxpr	::d1::APP_STATE			states[]							= {::d1::APP_STATE_Home, ::d1::APP_STATE_Play};
+			for(uint32_t iTeam = 0; iTeam < TeamUI.size(); ++iTeam) {
+				const ::d1::STeamUI				& teamUI			= TeamUI[iTeam];
+				for(uint32_t iState = 0; iState < ::gpk::size(states); ++iState) {
+					::gpk::controlTextSet(gui, teamUI.FirstControl[states[iState]] + ::d1::UI_TEAM_Name, teamsbuffer[iTeam].Storage);
+					::gpk::controlTextSet(gui, teamUI.FirstControl[states[iState]] + ::d1::UI_TEAM_Score, scorebuffer[iTeam].Storage);
+					::gpk::controlTextSet(gui, teamUI.FirstControl[states[iState]] + ::d1::UI_TEAM_Fouls, foulsbuffer[iTeam].Storage);
+				}
+			}
+			return 0;
+		}
+		::gpk::error_t						RefreshPlayUI				(uint8_t iPlayer, uint8_t iTeam) {
+			::gpk::controlTextSet(*Dialog.GUI, FirstControl[::d1::APP_STATE_Play] + ::d1::UI_PLAY_Player, playrbuffer[iPlayer].Storage);
+			::gpk::controlTextSet(*Dialog.GUI, FirstControl[::d1::APP_STATE_Play] + ::d1::UI_PLAY_Team	, teamsbuffer[iTeam].Storage);
+			return 0;
+		}
 	};
 
 	struct SD1FileStrings {

@@ -27,6 +27,8 @@ namespace d1p
 		uint64_t				Start				= 0;
 		uint64_t				Shoot				= 0;
 		uint64_t				Ended				= 0;
+		double					SecondsAiming		= 0;
+		double					SecondsActive		= 0;
 	};
 
 	struct STurnInfo {
@@ -95,22 +97,25 @@ namespace d1p
 
 		::gpk::error_t						AdvanceTurn					(::gpk::apobj<::d1p::SEventPool> & outputEvents);
 
-		uint8_t								ActivePlayer				()	const	{ 
+		inlcxpr	bool						FirstTurn					()	const	{ return TurnHistory.size() == 1; }
+		inline	::d1p::STurnInfo&			ActiveTurn					()			{ return TurnHistory[TurnHistory.size() - 1]; }
+		inline	const ::d1p::STurnInfo&		ActiveTurn					()	const	{ return TurnHistory[TurnHistory.size() - 1]; }
+
+		inlcxpr	uint8_t						ActiveTeam					()	const	{ return MatchState.Flags.TeamActive; }
+		inline	uint8_t						ActivePlayer				()	const	{ 
 			const ::d1p::SPoolTeam					& team						= Teams[ActiveTeam()]; 
 			return team.Players[team.CurrentPlayer]; 
 		}
+		inline	uint16_t					ActiveStickEntity			()	const	{ return Entities.Sticks[ActivePlayer()]; }
 		inline	::d1p::SStickControl&		ActiveStick					()			{ return Players[ActivePlayer()].StickControl; }
 		inline	const ::d1p::SStickControl&	ActiveStick					()	const	{ return Players[ActivePlayer()].StickControl; }
-		inline	::d1p::STurnInfo&			ActiveTurn					()			{ return TurnHistory[TurnHistory.size() - 1]; }
-		inline	const ::d1p::STurnInfo&		ActiveTurn					()	const	{ return TurnHistory[TurnHistory.size() - 1]; }
-		inlcxpr	bool						FirstTurn					()	const	{ return TurnHistory.size() == 1; }
-		inlcxpr	uint8_t						ActiveTeam					()	const	{ return MatchState.Flags.TeamActive; }
-		inline	uint16_t					ActiveStickEntity			()	const	{ return Entities.Sticks[ActivePlayer()]; }
+
 		inline	uint8_t						EntityToPocket				(uint16_t iEntity)									const	{ return (uint8_t)::gpk::find(iEntity, ::gpk::vcu16{Entities.Pockets}); }
 		inline	uint8_t						EntityToBall				(uint16_t iEntity)									const	{ return (uint8_t)::gpk::find(iEntity, ::gpk::vcu16{Entities.Balls  }); }
 		inline	::gpk::error_t				BallToEntity				(uint8_t iBall)										const	{ return Entities.Balls[iBall]; }
 		inline	::gpk::error_t				BallToRenderNode			(uint8_t iBall)										const	{ return Engine.Entities[Entities.Balls[iBall]].RenderNode; }
 		inline	::gpk::error_t				BallToBody					(uint8_t iBall)										const	{ return Engine.Entities[Entities.Balls[iBall]].RigidBody; }
+
 		inline	::gpk::error_t				GetPocketPosition			(uint8_t iPocket, ::gpk::n3f & out_position)		const	{ return Engine.GetPosition(Entities.Pockets[iPocket], out_position); }
 		inline	::gpk::error_t				GetBallPosition				(uint8_t iBall  , ::gpk::n3f & out_position)		const	{ return Engine.GetPosition(Entities.Balls  [iBall  ], out_position); }
 		inline	::gpk::error_t				GetStickOrientation			(uint8_t iStick , ::gpk::quatf32 & out_orientation)	const	{ return Engine.GetOrientation(Entities.Sticks[iStick], out_orientation); }
@@ -119,6 +124,13 @@ namespace d1p
 		inline	::gpk::error_t				AddStickVelocity			(float velocity)											{ 
 			::d1p::SStickControl					& activeStick				= ActiveStick(); 
 			return ::gpk::error_t((activeStick.Velocity = ::gpk::clamp(activeStick.Velocity + velocity, 0.0f, ::d1p::MAX_SHOOT_VELOCITY)) * 1000);
+		}
+		::gpk::error_t						ResetCueBall				()			{ 
+			::d1p::SPoolBoard						& board						= MatchState.Board;
+			const float								distanceFromCenter			= ::d1p::rackOriginX(board);
+			gpk_necs(Engine.SetPosition(Entities.Balls[0], {-distanceFromCenter, board.BallRadius, 0}));
+			MatchState.Pocketed					= TBallField(MatchState.Pocketed & -2LL);
+			return 0;
 		}
 	};
 
