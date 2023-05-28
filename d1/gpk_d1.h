@@ -325,7 +325,7 @@ namespace d1
 			//AppUI.TunerPlayerCount->SetValue(MainGame.StartState.CountPlayers);
 			AppUI.TunerTableSize->SetValue(MainGame.StartState.StandardTableSize);
 			for(uint8_t iTeam = 0; iTeam < AppUI.TeamUI.size(); ++iTeam)
-				sprintf_s(AppUI.scorebuffer[iTeam].Storage, "Score: %u", ::d1p::pocketedCount(MainGame.Pool.MatchState.Pocketed, iTeam));
+				sprintf_s(AppUI.scorebuffer[iTeam].Storage, "Score: %u", MainGame.Pool.MatchState.PocketedCount(iTeam));
 
 			return 0;
 		}

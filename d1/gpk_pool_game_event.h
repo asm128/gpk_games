@@ -66,13 +66,15 @@ namespace d1p
 	// d. Pockets the 8-ball in a pocket other than the one designated.
 	// e. Pockets the 8-ball when it is not the legal object ball.
 	// Note: All infractions must be called before another shot is taken, or else it will be deemed that no infraction occurred. 
-	GDEFINE_ENUM_TYPE(LOST, uint8_t);
-	GDEFINE_ENUM_VALUE(LOST, None							, 0);	// a. Fouls when pocketing the 8-ball (exception: see 8-Ball Pocketed On The Break).
-	GDEFINE_ENUM_VALUE(LOST, Eight_ball_foul				, 1);	// a. Fouls when pocketing the 8-ball (exception: see 8-Ball Pocketed On The Break).
-	GDEFINE_ENUM_VALUE(LOST, Eight_ball_not_on_last_stroke	, 2);	// b. Pockets the 8-ball on the same stroke as the last of his group of balls.
-	GDEFINE_ENUM_VALUE(LOST, Eight_ball_off_the_table		, 3);	// c. Jumps the 8-ball off the table at any time.
-	GDEFINE_ENUM_VALUE(LOST, Eight_ball_wrong_pocket		, 4);	// d. Pockets the 8-ball in a pocket other than the one designated.
-	GDEFINE_ENUM_VALUE(LOST, Eight_ball_pocketed			, 5);	// e. Pockets the 8-ball when it is not the legal object ball.
+	GDEFINE_ENUM_TYPE(MATCH_RESULT, uint8_t);
+	GDEFINE_ENUM_VALUE(MATCH_RESULT, None								, 0);	// a. Fouls when pocketing the 8-ball (exception: see 8-Ball Pocketed On The Break).
+	GDEFINE_ENUM_VALUE(MATCH_RESULT, LOST_Eight_ball_foul				, 1);	// a. Fouls when pocketing the 8-ball (exception: see 8-Ball Pocketed On The Break).
+	GDEFINE_ENUM_VALUE(MATCH_RESULT, LOST_Eight_ball_not_on_last_stroke	, 2);	// b. Pockets the 8-ball on the same stroke as the last of his group of balls.
+	GDEFINE_ENUM_VALUE(MATCH_RESULT, LOST_Eight_ball_off_the_table		, 3);	// c. Jumps the 8-ball off the table at any time.
+	GDEFINE_ENUM_VALUE(MATCH_RESULT, LOST_Eight_ball_wrong_pocket		, 4);	// d. Pockets the 8-ball in a pocket other than the one designated.
+	GDEFINE_ENUM_VALUE(MATCH_RESULT, LOST_Eight_ball_pocketed			, 5);	// e. Pockets the 8-ball when it is not the legal object ball.
+	GDEFINE_ENUM_VALUE(MATCH_RESULT, WON_Eight_ball_last_shot			, 1);	
+	GDEFINE_ENUM_VALUE(MATCH_RESULT, WON_Eight_ball_first_shot			, 2);	
 
 	GDEFINE_ENUM_TYPE(MATCH_EVENT, uint8_t);
 	GDEFINE_ENUM_VALUE(MATCH_EVENT, TurnEnd			, 0); // Arg is the player number
@@ -87,7 +89,7 @@ namespace d1p
 
 	struct SArgsMatchEvent {
 		SArgsBall		ArgsBall;
-		LOST			Reason	;
+		MATCH_RESULT	Reason	;
 	};
 
 	// Unsportsmanlike conduct is any intentional behavior that brings disrepute to the sport or which disrupts or changes the game to the extent that it cannot be played fairly. It includes

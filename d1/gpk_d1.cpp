@@ -335,15 +335,17 @@ static	::gpk::error_t		handleMATCH_EVENT		(::d1::SD1 & app, const ::gpk::SEventV
 		break;
 	}
 	case d1p::MATCH_EVENT_TurnStart			: {
-		::d1p::debugPrintMatchState(pool.MatchState);
-		::d1p::debugPrintTurnInfo (pool.ActiveTurn());
-		
 		::gpk::controlTextSet(*app.AppUI.Dialog.GUI, app.AppUI.FirstControl[::d1::APP_STATE_Play] + 3, app.AppUI.playrbuffer[pool.ActivePlayer()].Storage);
-		::gpk::controlTextSet(*app.AppUI.Dialog.GUI, app.AppUI.FirstControl[::d1::APP_STATE_Play] + 2, app.AppUI.teamsbuffer[pool.ActiveTurn().Team].Storage);
+		::gpk::controlTextSet(*app.AppUI.Dialog.GUI, app.AppUI.FirstControl[::d1::APP_STATE_Play] + 2, app.AppUI.teamsbuffer[pool.ActiveTeam()].Storage);
 	}
-	case d1p::MATCH_EVENT_TurnEnd			: 
-		::d1p::debugPrintTurnInfo(*(const ::d1p::STurnInfo*)childEvent.Data.begin()); 
+	case d1p::MATCH_EVENT_TurnEnd			: {
+		const ::d1p::STurnInfo & turnMsg = pool.TurnHistory[argsMatch->ArgsBall.Turn];
+		const ::d1p::STurnInfo & turnAct = pool.ActiveTurn();
+		::d1p::debugPrintTurnInfo(turnMsg); 
+		::d1p::debugPrintTurnInfo(turnAct);
+		::d1p::debugPrintMatchState(pool.MatchState);
 		break;
+	}
 	case d1p::MATCH_EVENT_MatchEnd			: 
 	case d1p::MATCH_EVENT_MatchStart		: 
 		::d1p::debugPrintMatchState(*(const ::d1p::SMatchState*)childEvent.Data.begin()); 
@@ -374,6 +376,7 @@ static	::gpk::error_t		handleMATCH_EVENT		(::d1::SD1 & app, const ::gpk::SEventV
 
 static	::gpk::error_t		handleBALL_EVENT		(::d1::SD1 & app, const ::gpk::SEventView<::d1p::BALL_EVENT> & childEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/) { 
 	info_printf("%s", ::gpk::get_value_namep(childEvent.Type));
+	::d1p::SPoolGame				& pool					= app.MainGame.Pool;
 	const ::d1p::SArgsBall			& argsBall				= *(const ::d1p::SArgsBall*)childEvent.Data.begin(); 
 	switch(childEvent.Type) { 
 	default: gpk_warning_unhandled_event(childEvent); break; 
@@ -383,16 +386,10 @@ static	::gpk::error_t		handleBALL_EVENT		(::d1::SD1 & app, const ::gpk::SEventVi
 	case d1p::BALL_EVENT_Pocketed		: { 
 		const ::d1p::SArgsBall::SPocketed	& eventData = argsBall.Event.Pocketed; 
 		info_printf("Ball: %i, Pocket : %i.", eventData.Ball, eventData.Pocket); 
-
-		::gpk::SGUI					& gui		= *app.AppUI.Dialog.GUI;
-		{
-			const uint8_t				iTeam		= app.MainGame.Pool.TurnHistory[argsBall.Turn].Team;
-			const ::d1::STeamUI			& teamUI	= app.AppUI.TeamUI[iTeam];
-			if(eventData.Ball && 8 != eventData.Ball) {
-				const uint8_t				iBallTeam	= one_if(eventData.Ball > 7 && app.MainGame.Pool.MatchState.Flags.TeamStripped == iTeam);
-				sprintf_s(app.AppUI.scorebuffer[iBallTeam].Storage, "Score: %c", gui.Controls.Text[teamUI.FirstControl[::d1::APP_STATE_Home] + 1].Text[7] + 1);
-				::refreshScoreUI(app.AppUI);
-			}		
+		if(eventData.Ball && 8 != eventData.Ball) {
+			const uint8_t				iBallTeam		= pool.MatchState.BallToTeam(eventData.Ball);
+			sprintf_s(app.AppUI.scorebuffer[iBallTeam].Storage, "Score: %i", pool.MatchState.PocketedCount(iBallTeam));
+			::refreshScoreUI(app.AppUI);
 		}
 		break;
 	} 

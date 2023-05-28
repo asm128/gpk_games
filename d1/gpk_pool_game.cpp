@@ -13,9 +13,9 @@
 		++matchFlags.TeamActive;
 	}
 	gpk_necs(Engine.SetHidden(ActiveStickEntity(), false));
-	::d1p::STurnInfo							newTurn						= {{(uint64_t)::gpk::timeCurrentInMs()}, 0, ActivePlayer(), ActiveTeam()};
-	gpk_necs(TurnHistory.push_back(newTurn));
-	return ::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_TurnStart, newTurn);	// Report turn start for player
+	::d1p::STurnInfo							newTurn					= {{(uint64_t)::gpk::timeCurrentInMs()}, 0, ActivePlayer(), ActiveTeam()};
+	const ::d1p::SArgsMatchEvent				argsMatch				= {MatchState.TotalSeconds, (uint16_t)TurnHistory.push_back(newTurn)};
+	return ::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_TurnStart, argsMatch);	// Report turn start for player
 }
 
 ::gpk::error_t		d1p::SPoolGame::Save						(::gpk::au8 & bytes)	const	{

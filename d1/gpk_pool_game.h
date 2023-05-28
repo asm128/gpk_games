@@ -24,71 +24,71 @@ namespace d1p
 	};
 
 	struct STurnTimestamp {
-		uint64_t				Start						= 0;
-		uint64_t				Shoot						= 0;
-		uint64_t				Ended						= 0;
+		uint64_t				Start				= 0;
+		uint64_t				Shoot				= 0;
+		uint64_t				Ended				= 0;
 	};
 
 	struct STurnInfo {
-		STurnTimestamp			Time						= {};
-		uint8_t					FirstContact				: 4;
-		uint8_t					Player						: 4;
-		uint8_t					Team						: 1;
-		uint8_t					Continues					: 1;
-		uint8_t					Reverse						: 1;
-		uint8_t					Foul						: 5;
-		uint32_t				Pocketed					= 0;
-		::d1p::SStickControl	StickControl				= {};
+		STurnTimestamp			Time				= {};
+		uint8_t					FirstContact		: 4;
+		uint8_t					Player				: 4;
+		uint8_t					Team				: 1;
+		uint8_t					Continues			: 1;
+		uint8_t					Reverse				: 1;
+		uint8_t					Foul				: 5;
+		uint16_t				Pocketed			= 0;
+		::d1p::SStickControl	StickControl		= {};
 
-		inlcxpr	bool			PocketedAny					()				const	{ return ::d1p::pocketedAny	(Pocketed, Team); }
-		inlcxpr	bool			IsPocketed					(uint8_t iBall)	const	{ return ::d1p::isPocketed	(Pocketed, iBall); }
-		inline	uint64_t		SetPocketed					(uint8_t iBall)			{ return ::d1p::setPocketed	(Pocketed, iBall); }
+		inlcxpr	bool			IsPocketed			(uint8_t iBall)	const	{ return ::d1p::isPocketed	(Pocketed, iBall); }
+		inline	uint64_t		SetPocketed			(uint8_t iBall)			{ return ::d1p::setPocketed	(Pocketed, iBall); }
 	};
 
-	stacxpr	uint8_t			MAX_CUSHIONS				= 6;
-	stacxpr	uint8_t			MAX_POCKETS					= 6;
-	stacxpr	uint8_t			MAX_PLAYERS					= 6;
-	stacxpr	float			MAX_SHOOT_VELOCITY			= 20;	// m/s
-
+	stacxpr	uint8_t			MAX_CUSHIONS		= 6;
+	stacxpr	uint8_t			MAX_POCKETS			= 6;
+	stacxpr	uint8_t			MAX_PLAYERS			= 6;
+	stacxpr	float			MAX_SHOOT_VELOCITY	= 20;	// m/s
 	struct SPoolEntityMap {
-		::gpk::astu16<::d1p::MAX_POCKETS>	Pockets						= {};
-		::gpk::astu16<::d1p::MAX_CUSHIONS>	Cushions					= {};
-		::gpk::astu16<::d1p::MAX_PLAYERS>	Sticks						= {};
-		::gpk::astu16<::d1p::MAX_BALLS>		Balls						= {};
-		uint16_t							Table						= 0;
+		::gpk::astu16<MAX_POCKETS>	Pockets			= {};
+		::gpk::astu16<MAX_CUSHIONS>	Cushions		= {};
+		::gpk::astu16<MAX_PLAYERS>	Sticks			= {};
+		::gpk::astu16<MAX_BALLS>	Balls			= {};
+		uint16_t					Table			= 0;
 	};
 
+	stacxpr	uint8_t			TEAM_COUNT			= 2;
+	stacxpr	uint8_t			TEAM_SIZE			= (::d1p::MAX_PLAYERS >> 1);
 	struct SPoolTeam {
-		uint8_t					PlayerCount					= 0;
-		uint8_t					CurrentPlayer				= 0;
-		::gpk::astu8<::d1p::MAX_PLAYERS / 2>	Players						= {};
+		uint8_t					PlayerCount			= 0;
+		uint8_t					CurrentPlayer		= 0;
+		::gpk::astu8<TEAM_SIZE>	Players				= {};
 	};
 
 	struct SPoolPlayer {
-		::d1p::SStickControl	StickControl				= {};
-		::d1p::SPoolStick		StickPhysics				= {};
+		::d1p::SStickControl	StickControl		= {};
+		::d1p::SPoolStick		StickPhysics		= {};
 	};
 #pragma pack(pop)
 	// Extends the base engine to define pool-specific entity creation functions.
 	struct SPoolEngine : public ::gpk::SEngine {
-		::gpk::error_t			CreateTableCushion			();
+		::gpk::error_t						CreateTableCushion			();
 	};
 
 	struct SPoolGame {
-		::d1p::SMatchState				MatchState					= {};
-		::d1p::SPoolEntityMap			Entities;
+		::d1p::SMatchState					MatchState					= {};
+		::d1p::SPoolEntityMap				Entities;
 
-		::d1p::SPoolEngine				Engine						= {}; 
+		::d1p::SPoolEngine					Engine						= {}; 
 
-		::gpk::apod<::d1p::STurnInfo>	TurnHistory					= {};
-		::gpk::apod<::d1p::SArgsBall>	BallEventHistory			= {};
-		::gpk::apod<::gpk::SContact>	LastFrameContactsBall		= {};
-		::gpk::apod<::gpk::SContact>	LastFrameContactsCushion	= {};
+		::gpk::apod<::d1p::STurnInfo>		TurnHistory					= {};
+		::gpk::apod<::d1p::SArgsBall>		BallEventHistory			= {};
+		::gpk::apod<::gpk::SContact>		LastFrameContactsBall		= {};
+		::gpk::apod<::gpk::SContact>		LastFrameContactsCushion	= {};
 
-		::gpk::astatic<::d1p::SPoolTeam				, 2>					Teams			= {};
-		::gpk::astatic<::gpk::bgra					, d1p::MAX_BALLS	>	BallColors		= BALL_COLORS_8_BALL;
-		::gpk::astatic<::gpk::apod<::gpk::line3f32>	, d1p::MAX_BALLS	>	PositionDeltas	= {};
-		::gpk::astatic<::d1p::SPoolPlayer			, d1p::MAX_PLAYERS	>	Players			= {};
+		::gpk::astatic<::d1p::SPoolTeam				, TEAM_COUNT >	Teams			= {};
+		::gpk::astatic<::gpk::bgra					, MAX_BALLS  >	BallColors		= BALL_COLORS_8_BALL;
+		::gpk::astatic<::gpk::apod<::gpk::line3f32>	, MAX_BALLS  >	PositionDeltas	= {};
+		::gpk::astatic<::d1p::SPoolPlayer			, MAX_PLAYERS>	Players			= {};
 
 		::gpk::error_t						Save						(::gpk::au8 & bytes)	const;
 		::gpk::error_t						Load						(::gpk::vcu8 & bytes);

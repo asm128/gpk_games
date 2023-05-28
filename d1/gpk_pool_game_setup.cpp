@@ -222,7 +222,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		const uint32_t								iEntity						= pool.Entities.Balls[iBall];
 		gpk_necs(engine.SetMeshScale(iEntity, {startState.Table.BallRadius * 2, startState.Table.BallRadius * 2, startState.Table.BallRadius * 2}));
 		gpk_necs(engine.SetPosition	(iEntity, {}));
-		gpk_necs(engine.SetMass		(iEntity, startState.Table.BallWeight / 1000.0f));
+		gpk_necs(engine.SetMass		(iEntity, startState.Table.BallGrams / 1000.0f));
 		gpk_necs(engine.SetHidden	(iEntity, true));
 
 		engine.Integrator.Flags				[engine.Entities[iEntity].RigidBody].Collides	= false;
