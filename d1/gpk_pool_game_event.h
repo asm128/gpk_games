@@ -50,9 +50,7 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(PLAYER_INPUT, Ball		, 4);	
 	typedef	::gpk::SEvent<PLAYER_INPUT>		SEventPlayer;
 
-	struct SArgsStickMove	{ float Value = 0; ::gpk::AXIS Direction = ::gpk::AXIS_ORIGIN; }; // I put the members in this order because of floating point variable alignment
-	struct SArgsStickTurn	{ float Value = 0; ::gpk::AXIS Direction = ::gpk::AXIS_ORIGIN; }; // I put the members in this order because of floating point variable alignment
-	struct SArgsStickForce	{ float Value = 0; ::gpk::AXIS Direction = ::gpk::AXIS_ORIGIN; }; // I put the members in this order because of floating point variable alignment
+	struct SArgsPlayerInput	{ float Value = 0; ::gpk::AXIS Direction = ::gpk::AXIS_ORIGIN; }; // I put the members in this order because of floating point variable alignment
 
 	GDEFINE_ENUM_TYPE(MATCH_CONTROL, uint8_t);
 	GDEFINE_ENUM_VALUE(MATCH_CONTROL, Start, 0); // SEvent::Data contains a ::d1p::SMatchState structure containing the start state of the match.

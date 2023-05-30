@@ -30,7 +30,7 @@ static	::gpk::error_t		processEventShoot		(::d1p::SPoolGame & pool, ::gpk::apobj
 	return 1;
 }
 
-static	::gpk::error_t		processEventForce		(::d1p::SPoolGame & pool, const ::d1p::SArgsStickForce & stickEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
+static	::gpk::error_t		processEventForce		(::d1p::SPoolGame & pool, const ::d1p::SArgsPlayerInput & stickEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
 	info_printf("%s", ::gpk::get_value_namep(stickEvent.Direction));
 	float							directionMultiplier		= 1;
 	switch(stickEvent.Direction) { 
@@ -47,7 +47,7 @@ static	::gpk::error_t		processEventForce		(::d1p::SPoolGame & pool, const ::d1p:
 	return 0;
 }
 
-static	::gpk::error_t		processEventMove		(::d1p::SPoolGame & /*pool*/, const ::d1p::SArgsStickMove & stickEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
+static	::gpk::error_t		processEventMove		(::d1p::SPoolGame & /*pool*/, const ::d1p::SArgsPlayerInput & stickEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
 	info_printf("%s", ::gpk::get_value_namep(stickEvent.Direction));
 	float							directionMultiplier		= 1;
 	switch(stickEvent.Direction) { 
@@ -65,7 +65,7 @@ static	::gpk::error_t		processEventMove		(::d1p::SPoolGame & /*pool*/, const ::d
 	return 0;
 }
 
-static	::gpk::error_t		processEventTurn		(::d1p::SPoolGame & pool, const ::d1p::SArgsStickTurn & stickEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
+static	::gpk::error_t		processEventTurn		(::d1p::SPoolGame & pool, const ::d1p::SArgsPlayerInput & stickEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
 	info_printf("%s", ::gpk::get_value_namep(stickEvent.Direction));
 	float							directionMultiplier		= 1;
 	switch(stickEvent.Direction) { 
@@ -117,22 +117,60 @@ static	::gpk::error_t		processEventTurn		(::d1p::SPoolGame & pool, const ::d1p::
 	return 0;
 }
 
-static	::gpk::error_t		processEventBall	(::d1p::SPoolGame & pool, const ::d1p::SArgsStickMove & stickEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
-	info_printf("%s", ::gpk::get_value_namep(stickEvent.Direction));
-	float							directionMultiplier		= 1;
+static	::gpk::error_t		processEventBall	(::d1p::SPoolGame & pool, const ::d1p::SArgsPlayerInput & moveEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
+	info_printf("%s", ::gpk::get_value_namep(moveEvent.Direction));
+	const ::d1p::SMatchState		& matchState		= pool.MatchState;
 	rwws_if(pool.MatchState.Flags.NotInHand);
 
-	switch(stickEvent.Direction) { 
-	default						: gpk_warning_unhandled_value(stickEvent.Direction); break; 
+	float							directionMultiplier	= 1;
+	const ::d1p::SPoolBoard			& boardInfo			= matchState.Board;
+	switch(moveEvent.Direction) { 
+	default						: gpk_warning_unhandled_value(moveEvent.Direction); break; 
 	case ::gpk::AXIS_ORIGIN		: break;
 	case ::gpk::AXIS_X_NEGATIVE	: 
 		directionMultiplier			= -1;
-	case ::gpk::AXIS_X_POSITIVE	: 
+	case ::gpk::AXIS_X_POSITIVE	: {
+		::gpk::n3f32					cueBallPosition			= {};
+		gpk_necs(pool.GetBallPosition(0, cueBallPosition));	// store the original position
+		const ::gpk::n3f32				targetPosition			= cueBallPosition + ::gpk::n3f32{moveEvent.Value * directionMultiplier};
+		if(targetPosition.x > d1p::headStringX(boardInfo) && 0 == matchState.Flags.InHandAnywhere)
+			break;
+
+		const float						tableLimits				= boardInfo.Table.PlayingSurface.x * .5f - boardInfo.BallRadius;
+		if(targetPosition.x >= tableLimits || targetPosition.x <= -tableLimits)
+			break;
+
+		gpk_necs(pool.SetBallPosition(0, targetPosition));	// store the original position
+		::gpk::apod<::gpk::SContact>	contacts;
+		gpk_necs(::gpk::collisionDetect(pool.Engine, matchState.TotalSeconds, contacts));
+		uint32_t						cueBallEntity			= pool.EntityToBall(0);
+		if(contacts.size() > (uint32_t)contacts.find([cueBallEntity](const ::gpk::SContact & contact) { return contact.EntityA == cueBallEntity; }, 0)) {
+			gpk_necs(pool.SetBallPosition(0, cueBallPosition));	// store the original position
+			break;
+		}
 		break;
+	}
 	case ::gpk::AXIS_Y_NEGATIVE	: 
 		directionMultiplier			= -1;
-	case ::gpk::AXIS_Y_POSITIVE	: 
+	case ::gpk::AXIS_Y_POSITIVE	:  {
+		::gpk::n3f32					cueBallPosition			= {};
+		gpk_necs(pool.GetBallPosition(0, cueBallPosition));	// store the original position
+		const ::gpk::n3f32				targetPosition			= cueBallPosition + ::gpk::n3f32{0, 0, moveEvent.Value * directionMultiplier};
+
+		const float						tableLimits				= boardInfo.Table.PlayingSurface.y * .5f - boardInfo.BallRadius;
+		if(targetPosition.z >= tableLimits || targetPosition.z <= -tableLimits)
+			break;
+
+		gpk_necs(pool.SetBallPosition(0, targetPosition));	// store the original position
+		::gpk::apod<::gpk::SContact>	contacts;
+		gpk_necs(::gpk::collisionDetect(pool.Engine, matchState.TotalSeconds, contacts));
+		uint32_t						cueBallEntity			= pool.EntityToBall(0);
+		if(contacts.size() > (uint32_t)contacts.find([cueBallEntity](const ::gpk::SContact & contact) { return contact.EntityA == cueBallEntity; }, 0)) {
+			gpk_necs(pool.SetBallPosition(0, cueBallPosition));	// store the original position
+			break;
+		}
 		break;
+	}
 	}
 	return 0;
 }
@@ -142,10 +180,10 @@ static	::gpk::error_t		processInputEvent		(::d1p::SPoolGame & pool, const ::d1p:
 		return 0;
 
 	switch(stickEvent.Type) {
-	case ::d1p::PLAYER_INPUT_Ball	: return ::processEventBall (pool, *(const ::d1p::SArgsStickMove *)stickEvent.Data.begin(), outputEvents);
-	case ::d1p::PLAYER_INPUT_Move	: return ::processEventMove (pool, *(const ::d1p::SArgsStickMove *)stickEvent.Data.begin(), outputEvents);
-	case ::d1p::PLAYER_INPUT_Turn	: return ::processEventTurn (pool, *(const ::d1p::SArgsStickTurn *)stickEvent.Data.begin(), outputEvents);
-	case ::d1p::PLAYER_INPUT_Force	: return ::processEventForce(pool, *(const ::d1p::SArgsStickForce*)stickEvent.Data.begin(), outputEvents);
+	case ::d1p::PLAYER_INPUT_Ball	: return ::processEventBall (pool, *(const ::d1p::SArgsPlayerInput*)stickEvent.Data.begin(), outputEvents);
+	case ::d1p::PLAYER_INPUT_Move	: return ::processEventMove (pool, *(const ::d1p::SArgsPlayerInput*)stickEvent.Data.begin(), outputEvents);
+	case ::d1p::PLAYER_INPUT_Turn	: return ::processEventTurn (pool, *(const ::d1p::SArgsPlayerInput*)stickEvent.Data.begin(), outputEvents);
+	case ::d1p::PLAYER_INPUT_Force	: return ::processEventForce(pool, *(const ::d1p::SArgsPlayerInput*)stickEvent.Data.begin(), outputEvents);
 	case ::d1p::PLAYER_INPUT_Shoot	: return ::processEventShoot(pool, outputEvents); // once the shoot has been initiated, the stick controls deactivate until the play ends. 
 	default: 
 		gpk_warning_unhandled_event(stickEvent); 

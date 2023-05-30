@@ -50,12 +50,53 @@ static	::gpk::error_t		stickUpdateRotation		(::d1::SD1Game & clientGame, float a
 	if(rotation.y || rotation.x) {
 		::d1p::SEventPlayer				newEvent						= {::d1p::PLAYER_INPUT_Turn};
 		if(rotation.y) {
-			const ::d1p::SArgsStickTurn		turnInfo						= {rotation.y, ::gpk::AXIS_Y_POSITIVE};
+			const ::d1p::SArgsPlayerInput	turnInfo						= {rotation.y, ::gpk::AXIS_Y_POSITIVE};
 			newEvent.Data				= ::gpk::vcu8{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
 			clientGame.QueueStick.push_back(newEvent);
 		}
 		if(rotation.x) {
-			const ::d1p::SArgsStickTurn		turnInfo						= {rotation.x, ::gpk::AXIS_X_POSITIVE};
+			const ::d1p::SArgsPlayerInput	turnInfo						= {rotation.x, ::gpk::AXIS_X_POSITIVE};
+			newEvent.Data				= ::gpk::vcu8{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
+			clientGame.QueueStick.push_back(newEvent);
+		}
+	}
+	return 0;
+}
+
+static	::gpk::error_t		stickUpdateBallInHand	(::d1::SD1Game & clientGame, float actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 mouseDeltas, ::gpk::vcu8 buttonStates) {
+	const bool						slow					= keyStates[VK_SHIFT];
+	// The following aim unit constants should be grabbed from a settings struct.
+	::gpk::n2f						displacement			= {};
+	{
+		const double					aimUnit					= 2.5;
+		const double					aimScaled				= aimUnit * (slow ? .01 : .1);
+		const ::gpk::n2f				displacementKeyValue	= {float(-1.0 * aimScaled), float(1.0 * aimScaled)};
+		// Define a rotation value depending on 
+			 if(keyStates['D'])	displacement.x	= actualSecondsElapsed * displacementKeyValue.x;
+		else if(keyStates['A'])	displacement.x	= actualSecondsElapsed * -displacementKeyValue.x;
+			 if(keyStates['W'])	displacement.y	= actualSecondsElapsed * displacementKeyValue.y;
+		else if(keyStates['S'])	displacement.y	= actualSecondsElapsed * -displacementKeyValue.y;
+	}
+	// Grab rotation from mouse deltas.
+	if(buttonStates[0] && (mouseDeltas.x || mouseDeltas.y)) {
+		const double					aimUnit					= 0.05;
+		const double					aimScaled				= aimUnit * (slow ? .005 : .05);
+		const ::gpk::n2f				displacementMouseValue	= {float(-1.0 * aimScaled), float(-1.0 * aimScaled)};
+		if(mouseDeltas.y)
+			displacement.y				+= mouseDeltas.y * displacementMouseValue.y;
+		if(mouseDeltas.x)
+			displacement.x				+= mouseDeltas.x * displacementMouseValue.x;
+	}
+
+	if(displacement.y || displacement.x) {
+		::d1p::SEventPlayer				newEvent				= {::d1p::PLAYER_INPUT_Ball};
+		if(displacement.y) {
+			const ::d1p::SArgsPlayerInput	turnInfo				= {displacement.y, ::gpk::AXIS_X_POSITIVE};
+			newEvent.Data				= ::gpk::vcu8{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
+			clientGame.QueueStick.push_back(newEvent);
+		}
+		if(displacement.x) {
+			const ::d1p::SArgsPlayerInput	turnInfo				= {displacement.x, ::gpk::AXIS_Y_POSITIVE};
 			newEvent.Data				= ::gpk::vcu8{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
 			clientGame.QueueStick.push_back(newEvent);
 		}
@@ -83,6 +124,9 @@ static	::gpk::error_t		stickUpdate				(::d1::SD1UI & appUI, ::d1::SD1Game & clie
 		if(mouseDeltas.z) {	// Update force slider
 			double							forceDelta				= mouseDeltas.z / double(WHEEL_DELTA) * (slow ? 1.0f : 25.0f);
 			::gpk::sliderSetValue(*appUI.ForceSlider, int64_t(appUI.ForceSlider->ValueCurrent - forceDelta));
+		}
+		if(0 == clientGame.Pool.MatchState.Flags.NotInHand) {
+			::stickUpdateBallInHand(clientGame, actualSecondsElapsed, keyStates, mouseDeltas, buttonStates);
 		}
 	}
 	return 0;

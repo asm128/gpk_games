@@ -1,0 +1,172 @@
+File name: gpk_pool_game_base.h
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Sun May 28 11:39:30 2023
+File code lines: 148
+File directive lines: 8
+File comment lines: 3
+File blank lines: 43
+File bytes: 7760
+
+File name: gpk_d1_gui.cpp
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Sun May 28 12:10:34 2023
+File code lines: 184
+File directive lines: 1
+File comment lines: 16
+File blank lines: 57
+File bytes: 14069
+
+File name: gpk_d1.cpp
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Sun May 28 11:18:12 2023
+File code lines: 355
+File directive lines: 3
+File comment lines: 10
+File blank lines: 126
+File bytes: 22241
+
+File name: gpk_pool_game.cpp
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Sun May 28 11:47:48 2023
+File code lines: 140
+File directive lines: 1
+File comment lines: 2
+File blank lines: 39
+File bytes: 6075
+
+File name: gpk_pool_game_rules.cpp
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Sun May 28 07:46:54 2023
+File code lines: 192
+File directive lines: 1
+File comment lines: 1
+File blank lines: 57
+File bytes: 13116
+
+File name: gpk_pool_shader.h
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Fri May 26 04:12:20 2023
+File code lines: 9
+File directive lines: 3
+File comment lines: 1
+File blank lines: 4
+File bytes: 1098
+
+File name: gpk_pool_shader.cpp
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Fri May 26 04:12:44 2023
+File code lines: 143
+File directive lines: 2
+File comment lines: 0
+File blank lines: 49
+File bytes: 7708
+
+File name: gpk_pool_game.h
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Sun May 28 11:45:56 2023
+File code lines: 103
+File directive lines: 10
+File comment lines: 9
+File blank lines: 40
+File bytes: 7682
+
+File name: gpk_pool_game_input.cpp
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Sat May 27 03:55:34 2023
+File code lines: 125
+File directive lines: 4
+File comment lines: 2
+File blank lines: 31
+File bytes: 6755
+
+File name: gpk_d1.h
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Sun May 28 11:16:18 2023
+File code lines: 260
+File directive lines: 11
+File comment lines: 5
+File blank lines: 90
+File bytes: 14263
+
+File name: gpk_pool_game_physics.cpp
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Sun May 28 07:01:06 2023
+File code lines: 202
+File directive lines: 1
+File comment lines: 39
+File blank lines: 75
+File bytes: 15599
+
+File name: gpk_pool_game_setup.cpp
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Sun May 28 06:20:54 2023
+File code lines: 307
+File directive lines: 8
+File comment lines: 73
+File blank lines: 127
+File bytes: 23098
+
+File name: gpk_pool_game_update.h
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Fri May 26 06:03:16 2023
+File code lines: 7
+File directive lines: 4
+File comment lines: 1
+File blank lines: 5
+File bytes: 835
+
+File name: gpk_pool_game_event.h
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Sun May 28 05:42:00 2023
+File code lines: 95
+File directive lines: 8
+File comment lines: 23
+File blank lines: 23
+File bytes: 12299
+
+File name: gpk_pool_game_draw.cpp
+File folder: E:\d1_env\gpk_games\d1\
+File creation date: Thu May 25 08:44:50 2023
+File modification date: Sun May 28 06:20:54 2023
+File code lines: 68
+File directive lines: 3
+File comment lines: 0
+File blank lines: 23
+File bytes: 5174
+
+
+----------------------------- Total Files: 15
+----------------------------- Total Lines: 3380
+
+Comments: 185
+Code: 2338
+Compiler directives: 68
+Blanks: 789
+Total bytes: 157772
+
+----------------------------- Stats: 
+
+Average lines per file: 225.33333333333334
+Average lines of comments per file: 12.333333333333334
+Average lines of code per file: 155.86666666666667
+Average lines of compiler directives per file: 4.533333333333333
+Average blank lines per file: 52.6
+
+Comments: 5.4733727810650885%
+Code: 69.17159763313609%
+Compiler directives: 2.0118343195266273%
+Blanks: 23.34319526627219%

@@ -142,7 +142,7 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 		const float					newVelocity					= ::d1p::MAX_SHOOT_VELOCITY / limits.Max * (limits.Max - value);
 		const float					currentVelocity				= appGame.Pool.ActiveStick().Velocity;
 		if(newVelocity != currentVelocity) { // only generate the event if the value actually changed. this is because this may be called randomly to ensure the right value is in sync with the server.
-			const ::d1p::SArgsStickForce	eventData					= {newVelocity, ::gpk::AXIS_ORIGIN};
+			const ::d1p::SArgsPlayerInput	eventData					= {newVelocity, ::gpk::AXIS_ORIGIN};
 			appGame.QueueStick.push_back({::d1p::PLAYER_INPUT_Force, ::gpk::vcu8{(const uint8_t*)&eventData, sizeof(eventData)}});
 		}
 		string					= ::gpk::vcc{(uint32_t)sprintf_s(velocityString, "%.02f m/s", newVelocity), velocityString}; 

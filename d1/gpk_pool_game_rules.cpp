@@ -49,24 +49,24 @@ static	::gpk::error_t	handlePocketed			(::d1p::SPoolGame & pool, const ::d1p::SA
 	case 0: {
 		gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_FOUL, turnInfo.Foul = ::d1p::FOUL_Cue_ball_scratch, eventArgs));	// Report scratch
 		turnInfo.Continues		= false;
-		matchFlags.NotInHand		= 0;
+		matchFlags.NotInHand	= 0;
 		break;
 	}
 	case 8: {
 		turnInfo.Continues		= false;
 
 		if(eventArgs.Turn) {
-			::d1p::SArgsMatchEvent		argsMatch	= {eventArgs, };
+			::d1p::SArgsMatchEvent		argsMatch				= {eventArgs, };
 			if(false == pool.MatchState.PocketedAll(turnInfo.Team)) // the team didn't pocket all of its balls 
-				argsMatch.Reason	= ::d1p::MATCH_RESULT_LOST_Eight_ball_pocketed;
+				argsMatch.Reason		= ::d1p::MATCH_RESULT_LOST_Eight_ball_pocketed;
 			else if(turnInfo.Foul || (1 & matchState.Pocketed)) // Foul during eight ball 
-				argsMatch.Reason	= ::d1p::MATCH_RESULT_LOST_Eight_ball_foul;
+				argsMatch.Reason		= ::d1p::MATCH_RESULT_LOST_Eight_ball_foul;
 			else if(::d1p::pocketedAny(turnInfo.Pocketed, matchState.TeamToBallType(turnInfo.Team))) 
-				argsMatch.Reason	= ::d1p::MATCH_RESULT_LOST_Eight_ball_not_on_last_stroke;
+				argsMatch.Reason		= ::d1p::MATCH_RESULT_LOST_Eight_ball_not_on_last_stroke;
 			else {
-				const uint8_t				lastPocket			= turnInfo.Team ? teamInfo.LastPocketTeam1 : teamInfo.LastPocketTeam0;
+				const uint8_t				lastPocket				= turnInfo.Team ? teamInfo.LastPocketTeam1 : teamInfo.LastPocketTeam0;
 				if(lastPocket != eventData.Pocket) 
-					argsMatch.Reason	= ::d1p::MATCH_RESULT_LOST_Eight_ball_wrong_pocket;
+					argsMatch.Reason		= ::d1p::MATCH_RESULT_LOST_Eight_ball_wrong_pocket;
 			}
 			if(argsMatch.Reason) {
 				gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Lost, argsMatch));	// Report player won
@@ -101,6 +101,13 @@ static	::gpk::error_t	handlePocketed			(::d1p::SPoolGame & pool, const ::d1p::SA
 	turnInfo.SetPocketed(eventData.Ball);
 	gpk_necs(pool.BallEventHistory.push_back(eventArgs));
 	return 0; 
+}
+static	::gpk::error_t	handleFOUL				(::d1p::SPoolGame & pool, const ::gpk::SEventView<::d1p::FOUL> & foulEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/) { 
+	info_printf("%s", ::gpk::get_value_namep(foulEvent.Type));
+	const ::d1p::SArgsBall			* argsBall				= (const ::d1p::SArgsBall*)foulEvent.Data.begin(); 
+	pool.MatchState.Flags.NotInHand			= 0;
+	pool.MatchState.Flags.InHandAnywhere	= one_if(argsBall->Turn);
+	return 0;
 }
 
 static	::gpk::error_t	handleBALL_EVENT		(::d1p::SPoolGame & pool, const ::gpk::SEventView<::d1p::BALL_EVENT> & ballEvent, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { 
@@ -141,7 +148,7 @@ static	::gpk::error_t	handleMATCH_EVENT		(::d1p::SPoolGame & pool, const ::gpk::
 		break;
 	case d1p::MATCH_EVENT_TurnEnd			: {
 		const ::d1p::SArgsMatchEvent	* const argsMatchIn		= (const ::d1p::SArgsMatchEvent*)childEvent.Data.begin();
-		const ::d1p::STurnInfo			& turnInfo				= pool.TurnHistory[argsMatchIn->ArgsBall.Turn];
+		const ::d1p::STurnInfo			& turnInfo				= pool.Turn(argsMatchIn->ArgsBall);
 		::d1p::debugPrintTurnInfo  (turnInfo);
 		::d1p::debugPrintMatchState(pool.MatchState);
 		if(pool.MatchState.Flags.GameOver)
@@ -239,6 +246,7 @@ static	::gpk::error_t	matchStart				(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p
 		const ::d1p::SEventPool		& eventToProcess		= *_eventToProcess;
 		info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));
 		switch(eventToProcess.Type) {
+		case ::d1p::POOL_EVENT_FOUL       : return ::d1p::extractAndHandle<::d1p::FOUL       >(eventToProcess, [&pool, &outputEvents](auto ev){ gpk_necs(::handleFOUL       (pool, ev, outputEvents)); return 0; } ); 
 		case ::d1p::POOL_EVENT_BALL_EVENT : return ::d1p::extractAndHandle<::d1p::BALL_EVENT >(eventToProcess, [&pool, &outputEvents](auto ev){ gpk_necs(::handleBALL_EVENT (pool, ev, outputEvents)); return 0; } ); 
 		case ::d1p::POOL_EVENT_MATCH_EVENT: return ::d1p::extractAndHandle<::d1p::MATCH_EVENT>(eventToProcess, [&pool, &outputEvents](auto ev){ gpk_necs(::handleMATCH_EVENT(pool, ev, outputEvents)); return 0; } ); 
 		default: 
