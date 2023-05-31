@@ -34,6 +34,17 @@ namespace d1p
 		::gpk::n2f			Cushion				= {100 * ::d1p::SCALE_INCH_TO_METER,   50 * ::d1p::SCALE_INCH_TO_METER};
 		float				Height				= 30 * ::d1p::SCALE_INCH_TO_METER;
 		float				PocketRadius		= .05715f * 2;	// Pocket Radius == Ball Diameter
+
+		inline	::gpk::n2f	HalfSlate			()	const	noexcept	{ return Slate			* .5f; }
+		inline	::gpk::n2f	HalfPlayingSurface	()	const	noexcept	{ return PlayingSurface	* .5f; }
+		
+		bool				InPlayingSurface	(const ::gpk::n2f & ballPosition)	const	noexcept	{
+			const ::gpk::n2f		halfSpace			= HalfPlayingSurface();
+			return ballPosition.x > -halfSpace.x && ballPosition.x < halfSpace.x 
+				&& ballPosition.y > -halfSpace.y && ballPosition.y < halfSpace.y
+				;
+		}
+
 	};
 
 	GDEFINE_ENUM_TYPE (CUSHION_PROFILE, uint8_t);
@@ -82,6 +93,24 @@ namespace d1p
 		, ::d1p::CUSHION_SIZES[0]
 		},
 	};
+	struct SPoolBoard {
+		SPoolTable			Table				= TABLE_SIZES[1];
+		float				BallRadius			= .05715f * .5f;	// meters
+
+		float				CornerCut			()	const	{
+			const double			ballDiameter		= BallRadius * 2.0;
+			const double			pocketOpening		= ballDiameter * 2;
+			const double			openingSquared		= pocketOpening * pocketOpening;
+			const double			pocketCut			= sqrt(openingSquared * .5);
+			return (float)pocketCut;
+		}
+		float				SideCut				()	const	{
+			const double			ballDiameter		= BallRadius * 2.0;
+			const double			pocketOpening		= ballDiameter * 2 + ballDiameter * .222222222;
+			const double			pocketCut			= pocketOpening * .5;
+			return (float)pocketCut;
+		}
+	};
 
 	// The value between 0 and 1 we need for this gets compressed this way good enough for our purposes.
 	struct SPoolDamping {
@@ -99,10 +128,6 @@ namespace d1p
 		uint16_t			BallGrams			= 165;	// grams
 	};
 
-	struct SPoolBoard {
-		SPoolTable			Table				= TABLE_SIZES[1];
-		float				BallRadius			= .05715f * .5f;	// meters
-	};
 
 	stincxp	float		rackOriginX			(const ::d1p::SPoolBoard & board)		{ return board.Table.PlayingSurface.x / 4; }
 	stincxp	float		headStringX			(const ::d1p::SPoolBoard & board)		{ return rackOriginX(board) * -1.0f; }

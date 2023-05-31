@@ -461,7 +461,7 @@ static	::gpk::error_t		handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<:
 
 
 ::gpk::error_t				d1::d1Update		(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view<::gpk::SSysEvent> & systemEvents) { 
-	app.MainGame.FrameInfo.Frame(uint64_t(secondsElapsed * 1000000));
+	::d1::SD1Game					& clientGame		= app.MainGame;
 
 	const ::gpk::FSysEventConst		funcEvent				= [&app](const ::gpk::SSysEvent & sysEvent) { 
 		e_if(errored(::processSystemEvent(app, sysEvent)), "Error while processing event '%s' (0x%X):", ::gpk::get_value_namep(sysEvent.Type), sysEvent.Type); 
@@ -469,32 +469,32 @@ static	::gpk::error_t		handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<:
 	};
 	gpk_necs(systemEvents.for_each(funcEvent));
 
+	::d1p::SPoolGame				& poolGame			= clientGame.Pool;
+
 	switch(app.ActiveState) {
 	case ::d1::APP_STATE_Quit		: return 1;
 	case ::d1::APP_STATE_Welcome	: app.StateSwitch(::d1::APP_STATE_Home); break;	// APP_STATE_Welcome comes right after APP_STATE_Init.
 	case ::d1::APP_STATE_Init		: {
-		gpk_necs(::d1Setup(app.AppUI, app.MainGame, inputState));
+		gpk_necs(::d1Setup(app.AppUI, clientGame, inputState));
 
 		::gpk::aobj<::gpk::apod<char>>	fileNames				= {};
 		::gpk::pathList(app.FileStrings.SavegameFolder, fileNames, app.FileStrings.ExtensionSaveAuto);
 		if(fileNames.size()) {
 			if errored(app.Load(fileNames[0])) 
-				gpk_necs(::d1p::poolGameSetup(app.MainGame.Pool));
+				gpk_necs(::d1p::poolGameSetup(poolGame));
 		}
 		app.StateSwitch(::d1::APP_STATE_Welcome);
-		app.AppUI.RefreshTeamStrings(app.MainGame.Pool.MatchState.Flags.TeamStripped);
+		app.AppUI.RefreshTeamStrings(poolGame.MatchState.Flags.TeamStripped);
 		app.AppUI.RefreshTeamUI();
-		::d1p::debugPrintMatchState(app.MainGame.Pool.MatchState);
-		::d1p::debugPrintStickControl(app.MainGame.Pool.ActiveStick());
-		if(app.MainGame.Pool.TurnHistory.size())
-			::d1p::debugPrintTurnInfo(app.MainGame.Pool.ActiveTurn());
+		app.AppUI.RefreshPlayUI(poolGame.ActivePlayer(), poolGame.ActiveTeam());
+		::d1p::debugPrintMatchState(poolGame.MatchState);
+		::d1p::debugPrintStickControl(poolGame.ActiveStick());
+		if(poolGame.TurnHistory.size())
+			::d1p::debugPrintTurnInfo(poolGame.ActiveTurn());
 		break;
 	} // APP_STATE_Init
 	case ::d1::APP_STATE_Play		: {
-		::d1::SD1Game				& clientGame			= app.MainGame;
 		gpk_necs(::updateInput(app.AppUI, clientGame, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.Cast<int16_t>(), inputState->MouseCurrent.ButtonState));
-
-		::d1p::SPoolGame					& poolGame				= clientGame.Pool;
 		if(false == poolGame.MatchState.Flags.PhysicsActive)
 			::gpk::sliderSetValue(*app.AppUI.ForceSlider, int64_t(app.AppUI.ForceSlider->ValueLimits.Max - poolGame.ActiveStick().Velocity * (app.AppUI.ForceSlider->ValueLimits.Max / ::d1p::MAX_SHOOT_VELOCITY)));
 

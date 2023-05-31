@@ -87,22 +87,21 @@ static	::gpk::error_t				processSystemEvent					(::SApplication & app, const ::g
 	::gpk::SFrameInfo						& frameInfo							= framework.FrameInfo;
 	{
 		::gpk::STimer							timer;
-		if(::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue))
-			return 1;
+		rvis_if(::d1::APP_STATE_Quit, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue))
 
 		timer.Frame();
 		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
 
 #if !defined(DISABLE_D3D11)
-	if(app.D1.ActiveState != ::d1::APP_STATE_Init && app.D3DApp.Scene.IndexBuffer.size() < app.D1.MainGame.Pool.Engine.Scene->Graphics->Meshes.size()) {
+	if(app.D1.ActiveState >= ::d1::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.D1.MainGame.Pool.Engine.Scene->Graphics->Meshes.size()) {
 		//gpk_necs(app.D3DApp.CreateDeviceDependentEngineResources(app.D3DApp.DeviceResources->GetD3DDevice(), *app.D1.MainGame.Pool.Engine.Scene->Graphics));
 		gpk_necs(app.D3DApp.CreateDeviceResources(*app.D1.MainGame.Pool.Engine.Scene->Graphics));
 	}
 	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (uint32_t)frameInfo.FramesPerSecond);
 #endif
 
-	retval_ginfo_if(1, systemRequestedExit, "%s", "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
+	rvi_if(1, systemRequestedExit, "%s", "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 
 	//-----------------------------
 	::gpk::STimer							& timer								= app.Framework.Timer;

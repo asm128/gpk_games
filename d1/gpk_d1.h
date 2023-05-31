@@ -135,7 +135,6 @@ namespace d1
 	struct SD1Game {
 		::d1p::SPoolGame					Pool				= {};
 		::d1::SD1StartState					StartState			= {};
-		::gpk::SFrameInfo					FrameInfo			= {};
 		float								TimeScale			= 1;
 		::gpk::apod<::gpk::SContact>		ContactsToDraw		= {};
 		::gpk::aobj<::d1p::SEventPlayer>	QueueStick			= {};
@@ -235,10 +234,10 @@ namespace d1
 			return 0;
 		}
 		::gpk::error_t						RefreshTeamUI				() {
-			::gpk::SGUI						& gui								= *Dialog.GUI;
-			stacxpr	::d1::APP_STATE			states[]							= {::d1::APP_STATE_Home, ::d1::APP_STATE_Play};
+			::gpk::SGUI								& gui						= *Dialog.GUI;
+			stacxpr	::d1::APP_STATE					states[]					= {::d1::APP_STATE_Home, ::d1::APP_STATE_Play};
 			for(uint32_t iTeam = 0; iTeam < TeamUI.size(); ++iTeam) {
-				const ::d1::STeamUI				& teamUI			= TeamUI[iTeam];
+				const ::d1::STeamUI						& teamUI					= TeamUI[iTeam];
 				for(uint32_t iState = 0; iState < ::gpk::size(states); ++iState) {
 					::gpk::controlTextSet(gui, teamUI.FirstControl[states[iState]] + ::d1::UI_TEAM_Name, teamsbuffer[iTeam].Storage);
 					::gpk::controlTextSet(gui, teamUI.FirstControl[states[iState]] + ::d1::UI_TEAM_Score, scorebuffer[iTeam].Storage);

@@ -134,8 +134,9 @@ static	::gpk::error_t		handlePockets
 	) {
 	uint8_t							inPocket				= 0;
 	::gpk::SEngine					& engine				= pool.Engine;
-	const float						ballRadius				= pool.MatchState.Board.BallRadius;
-	const float						pocketRadius			= pool.MatchState.Board.Table.PocketRadius;
+	const ::d1p::SPoolBoard			& board					= pool.MatchState.Board;
+	const float						ballRadius				= board.BallRadius;
+	const float						pocketRadius			= board.Table.PocketRadius;
 	const float						maxDistance				= pocketRadius + ballRadius;
 	const float						maxDistanceSquared		= maxDistance * maxDistance;
 	::gpk::n3f						positionBall			= positionA;
@@ -162,10 +163,12 @@ static	::gpk::error_t		handlePockets
 			break;
 		}
 
-		float							w						= (float)(distanceFromPocket.Length() - ballRadius) / (pocketRadius - ballRadius);
 		inPocket					= 1 + iPocket;
-		forces.Acceleration.y		= -(pool.MatchState.Physics.Gravity * .001f) * ::gpk::max(0.0f, (1.0f - w));
-		flags.Falling				= true;
+		if(false == board.Table.InPlayingSurface(positionBall.xz())) {
+			float							w						= (float)(distanceFromPocket.Length() - ballRadius) / (pocketRadius - ballRadius);
+			forces.Acceleration.y		= -(pool.MatchState.Physics.Gravity * .001f) * ::gpk::max(0.0f, (1.0f - w));
+			flags.Falling				= true;
+		}
 		break;
 	}
 	return inPocket;

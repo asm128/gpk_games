@@ -10,10 +10,10 @@ static	::gpk::error_t	handleContactBall		(::d1p::SPoolGame & pool, const ::d1p::
 	::d1p::SArgsBall				firstContactEventArgs	= eventArgs;
 	turnInfo.FirstContact	= eventData.BallB;
 	firstContactEventArgs.Event.FirstContact.Ball	= eventData.BallB;
-	gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_BALL_EVENT, ::d1p::BALL_EVENT_FirstContact, firstContactEventArgs));	// Report turn end for player
+	gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_BALL_EVENT, ::d1p::BALL_EVENT_FirstContact, firstContactEventArgs));	// Report first ball hit
 
 	if(0 == eventArgs.Turn && pool.FirstTurn())
-		gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Break, firstContactEventArgs));	// Report turn end for player
+		gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Break, firstContactEventArgs));	// Report break
 	else if(pool.MatchState.Flags.StrippedChosen) {
 		const bool					isBallStripped		= eventData.BallB > 8;
 		const bool					isTeamStripped		= turnInfo.Team == pool.MatchState.Flags.TeamStripped;
@@ -49,7 +49,6 @@ static	::gpk::error_t	handlePocketed			(::d1p::SPoolGame & pool, const ::d1p::SA
 	case 0: {
 		gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_FOUL, turnInfo.Foul = ::d1p::FOUL_Cue_ball_scratch, eventArgs));	// Report scratch
 		turnInfo.Continues		= false;
-		matchFlags.NotInHand	= 0;
 		break;
 	}
 	case 8: {
@@ -89,10 +88,7 @@ static	::gpk::error_t	handlePocketed			(::d1p::SPoolGame & pool, const ::d1p::SA
 			const bool					isStrippedTeam			= matchFlags.TeamStripped == turnInfo.Team;
 			const bool					isTeamBall				= isStrippedTeam == isStrippedBall;
 			if(isTeamBall && pool.MatchState.PocketedAll(turnInfo.Team)) {
-				if(turnInfo.Team)	
-					teamInfo.LastPocketTeam1	= eventData.Pocket;
-				else					
-					teamInfo.LastPocketTeam0	= eventData.Pocket;
+				(turnInfo.Team ? teamInfo.LastPocketTeam1 : teamInfo.LastPocketTeam0)	= eventData.Pocket;
 			}
 			turnInfo.Continues		= noFoul && one_if(turnInfo.Continues || isTeamBall);
 		}
@@ -152,19 +148,16 @@ static	::gpk::error_t	handleMATCH_EVENT		(::d1p::SPoolGame & pool, const ::gpk::
 		::d1p::debugPrintTurnInfo  (turnInfo);
 		::d1p::debugPrintMatchState(pool.MatchState);
 		if(pool.MatchState.Flags.GameOver)
-			gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_MatchEnd, pool.MatchState));	// Report turn end for player
-		else { // evaluate victory
-			if(turnInfo.Foul || false == pool.MatchState.IsPocketed(8)) {
-				if(false == pool.MatchState.IsPocketed(8))
-					gpk_necs(pool.AdvanceTurn(outputEvents)); 
-				else {
-					::d1p::SArgsMatchEvent		argsMatchOut	= {pool.MatchState.TotalSeconds, argsMatchIn->ArgsBall.Turn};
-					argsMatchOut.Reason		= ::d1p::MATCH_RESULT_LOST_Eight_ball_foul;
-					gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Lost, argsMatchOut));	// Report player won
-				}
+			gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_MatchEnd, pool.MatchState));	// Report match end
+		else if(false == pool.MatchState.IsPocketed(8)) 
+			gpk_necs(pool.AdvanceTurn(outputEvents)); 
+		else {
+			::d1p::SArgsMatchEvent		argsMatchOut	= {pool.MatchState.TotalSeconds, argsMatchIn->ArgsBall.Turn};
+			if(turnInfo.Foul) {
+				argsMatchOut.Reason		= ::d1p::MATCH_RESULT_LOST_Eight_ball_foul;
+				gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Lost, argsMatchOut));	// Report player lost
 			}
 			else {
-				::d1p::SArgsMatchEvent		argsMatchOut	= {pool.MatchState.TotalSeconds, argsMatchIn->ArgsBall.Turn};
 				argsMatchOut.Reason		= argsMatchIn->ArgsBall.Turn ? ::d1p::MATCH_RESULT_WON_Eight_ball_last_shot : ::d1p::MATCH_RESULT_WON_Eight_ball_first_shot;
 				gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Won, argsMatchOut));	// Report player won
 			}
