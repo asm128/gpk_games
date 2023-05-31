@@ -87,7 +87,7 @@ static	::gpk::error_t				processSystemEvent					(::SApplication & app, const ::g
 	::gpk::SFrameInfo						& frameInfo							= framework.FrameInfo;
 	{
 		::gpk::STimer							timer;
-		rvis_if(::d1::APP_STATE_Quit, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue))
+		rvis_if(::gpk::APPLICATION_STATE_EXIT, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue))
 
 		timer.Frame();
 		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
