@@ -14,7 +14,7 @@
 	, double									totalSeconds
 	) {
 
-	const ::gpk::n2<uint16_t>						offscreenMetrics				= backBuffer.Color.View.metrics().Cast<uint16_t>();
+	const ::gpk::n2u16								offscreenMetrics				= backBuffer.Color.View.metrics16();
 
 	::gpk::n3f										cameraFront						= (cameraTarget - cameraPosition).Normalized();
 
