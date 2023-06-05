@@ -5,14 +5,14 @@ stacxpr	::gpk::n2u16	SHOOT_SLIDER_SIZE			= {24, 320};
 stacxpr	::gpk::n2u16	MODULE_VIEWPORT_SIZE		= {128, 64};
 stacxpr	::gpk::n2u16	WEAPON_BAR_SIZE				= {184, 24};
 
-static	::gpk::error_t	guiSetupCommon				(::gpk::SGUI & gui, const ::gpk::n2<float> & cursorPos) {
+static	::gpk::error_t	guiSetupCommon				(::gpk::SGUI & gui, const ::gpk::n2f32 & cursorPos) {
 	gui.ThemeDefault		= ::gpk::ASCII_COLOR_DARKRED * 16 + 10;
 	gui.SelectedFont		= 7;
 	gui.CursorPos			= cursorPos;
 	return 0;
 }
 
-static	::gpk::error_t	dialogCreateCommon			(::gpk::SDialog & dialog, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2<float> & cursorPos) { 
+static	::gpk::error_t	dialogCreateCommon			(::gpk::SDialog & dialog, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2f32 & cursorPos) { 
 	//dialog				= {};
 	dialog.Input			= inputState;
 	gpk_necs(::guiSetupCommon(*dialog.GUI, cursorPos));

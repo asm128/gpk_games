@@ -52,7 +52,7 @@ struct WAVE_STATE
 
 	X3DAUDIO_EMITTER							Emitter					= {};
 	X3DAUDIO_CONE								EmitterCone				= {};
-	::gpk::n3<float>						EmitterPos				= {};
+	::gpk::n3f32						EmitterPos				= {};
 	float										EmitterAzimuths			[INPUTCHANNELS]                     = {};
 	float										MatrixCoefficients		[INPUTCHANNELS * OUTPUTCHANNELS]    = {};
 
@@ -77,7 +77,7 @@ struct WAVE_STATE
 
 		// Read in the wave file
 		const WAVEFORMATEX								* pwfx					= 0;
-		::gpk::view_array<const uint8_t>				audioView				= {};
+		::gpk::view<const uint8_t>				audioView				= {};
 		WaveData.create();
 		gpk_hrcall(DirectX::LoadWAVAudioFromFile(::gpk::vcs{strFilePath}, *WaveData, &pwfx, audioView));
 
@@ -138,8 +138,8 @@ struct AUDIO_STATE
 	X3DAUDIO_EMITTER					emitter					= {};
 	X3DAUDIO_CONE						emitterCone				= {};
 
-	::gpk::n3<float>				vListenerPos			= {};
-	::gpk::n3<float>				vEmitterPos				= {};
+	::gpk::n3f32				vListenerPos			= {};
+	::gpk::n3f32				vEmitterPos				= {};
 	float								fListenerAngle			= (float)(::gpk::math_pi_2 * .5);
 	bool								fUseListenerCone		= true;
 	bool								fUseInnerRadius			= true;

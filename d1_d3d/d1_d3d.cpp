@@ -15,7 +15,7 @@
 
 	d3dResources.GetD3DDeviceContext()->Unmap(guiStuff.Texture2D.get(), 0);
 	// Each vertex is one instance of the VertexPositionColor struct.
-	UINT									stride						= sizeof(::gpk::n3<float>) + sizeof(::gpk::n2<float>);
+	UINT									stride						= sizeof(::gpk::n3f32) + sizeof(::gpk::n2f32);
 	UINT									offset						= 0;
 
 	ID3D11DeviceContext						* context					= d3dResources.GetD3DDeviceContext();

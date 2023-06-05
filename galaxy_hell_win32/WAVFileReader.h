@@ -23,19 +23,19 @@
 
 namespace DirectX
 {
-    HRESULT LoadWAVAudioInMemory(::gpk::view_array<const uint8_t> wavData, _Outptr_ const WAVEFORMATEX** wfx, ::gpk::view_array<const uint8_t>& audioView) noexcept;
-    HRESULT LoadWAVAudioFromFile(::gpk::vcc szFileName, _Inout_ ::gpk::apod<uint8_t>& wavData, _Outptr_ const WAVEFORMATEX** wfx, ::gpk::view_array<const uint8_t>& audioView) noexcept;
+    HRESULT LoadWAVAudioInMemory(::gpk::view<const uint8_t> wavData, _Outptr_ const WAVEFORMATEX** wfx, ::gpk::view<const uint8_t>& audioView) noexcept;
+    HRESULT LoadWAVAudioFromFile(::gpk::vcc szFileName, _Inout_ ::gpk::apod<uint8_t>& wavData, _Outptr_ const WAVEFORMATEX** wfx, ::gpk::view<const uint8_t>& audioView) noexcept;
 
     struct WAVData {
-        const WAVEFORMATEX                  * wfx               = 0;
-        ::gpk::view_array<const uint8_t>    AudioView           = {};
-        uint32_t                            loopStart           = 0;
-        uint32_t                            loopLength          = 0;
-        const uint32_t                      * seek              = 0;       // Note: XMA Seek data is Big-Endian
-        uint32_t                            seekCount           = 0;
+        const WAVEFORMATEX           * wfx               = 0;
+        ::gpk::view<const uint8_t>   AudioView           = {};
+        uint32_t                     loopStart           = 0;
+        uint32_t                     loopLength          = 0;
+        const uint32_t               * seek              = 0;       // Note: XMA Seek data is Big-Endian
+        uint32_t                     seekCount           = 0;
     };
 
-    HRESULT LoadWAVAudioInMemoryEx(::gpk::view_array<const uint8_t> wavData, _Out_ WAVData& result) noexcept;
+    HRESULT LoadWAVAudioInMemoryEx(::gpk::view<const uint8_t> wavData, _Out_ WAVData& result) noexcept;
     HRESULT LoadWAVAudioFromFileEx(::gpk::vcc szFileName, _Inout_ ::gpk::apod<uint8_t>& wavData, _Out_ WAVData& result) noexcept;
 }
 

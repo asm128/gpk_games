@@ -251,7 +251,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		}
 	}
 
-	::gpk::m4<float>							mRotation;
+	::gpk::m4f32							mRotation;
 	mRotation.SetOrientation(::gpk::quatf{0, 0, 1, 1}.Normalize());
 	for(uint8_t iStick = 0; iStick < pool.Entities.Sticks.size(); ++iStick) {
 		const uint16_t								stickEntity			= pool.Entities.Sticks[iStick];

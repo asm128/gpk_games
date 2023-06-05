@@ -54,7 +54,7 @@ namespace d1_win32
 			context->UpdateSubresource1(ConstantBuffer[1], 0, NULL, &ConstantBufferScene, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
 
 			// Each vertex is one instance of the VertexPositionColor struct.
-			UINT										stride							= sizeof(::gpk::n3<float>) * 2 + sizeof(::gpk::n2<float>);
+			UINT										stride							= sizeof(::gpk::n3f32) * 2 + sizeof(::gpk::n2f32);
 			UINT										offset							= 0;
 
 			::gpk::pcom<ID3D11Buffer>					vb								= VertexBuffer[iMesh];
@@ -85,7 +85,7 @@ namespace d1_win32
 			context->DrawIndexed(indexRange.Count, indexRange.Offset, 0);	// Draw the objects.
 		}
 
-		::gpk::error_t							CreateSizeDependentResources	(const ::gpk::n2<float> & outputSize, const DirectX::XMFLOAT4X4 & orientation) {
+		::gpk::error_t							CreateSizeDependentResources	(const ::gpk::n2f32 & outputSize, const DirectX::XMFLOAT4X4 & orientation) {
 			const float									aspectRatio						= outputSize.x / outputSize.y;
 			float										fovAngleY						= 70.0f * DirectX::XM_PI / 180.0f;
 

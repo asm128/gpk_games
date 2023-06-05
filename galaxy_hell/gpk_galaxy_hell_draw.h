@@ -23,9 +23,9 @@ namespace ghg
 		::gpk::apod<::gpk::tri<float>>			PixelVertexWeights		;
 		
 		// Used for pixel shading
-		::gpk::apod<::gpk::n3<float>>				LightPointsWorld		;
+		::gpk::apod<::gpk::n3f32>				LightPointsWorld		;
 		::gpk::apod<::gpk::bgra>					LightColorsWorld		;
-		::gpk::apod<::gpk::n3<float>>				LightPointsModel		;
+		::gpk::apod<::gpk::n3f32>				LightPointsModel		;
 		::gpk::apod<::gpk::bgra>					LightColorsModel		;
 
 		// Gameplay render target. I decided the world will have its own rendertarget to facilitate reuse of the code.

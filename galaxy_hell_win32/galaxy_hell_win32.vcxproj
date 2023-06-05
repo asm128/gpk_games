@@ -101,7 +101,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>../../gpk_games/galaxy_hell; ../../gpk/gpk; ../../gpk/llc; ../../steamworks_sdk_155/public; </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk_engine;  ../../gpk_games/galaxy_hell; ../../steamworks_sdk_155/public; </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -109,7 +109,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir); ../../steamworks_sdk_155/redistributable_bin/win64; ../../steamworks_sdk_155/public/steam/lib/win64</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>galaxy_hell.lib; gpk.lib; llc.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; comctl32.lib; Opengl32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>galaxy_hell.lib; gpk_engine.lib; llc.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; comctl32.lib; Opengl32.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -121,7 +121,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>../../gpk_games/galaxy_hell; ../../gpk/gpk; ../../gpk/llc; ../../steamworks_sdk_155/public; </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk_engine;  ../../gpk_games/galaxy_hell; ../../steamworks_sdk_155/public; </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -131,7 +131,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir); ../../steamworks_sdk_155/redistributable_bin/win64; ../../steamworks_sdk_155/public/steam/lib/win64</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>galaxy_hell.lib; gpk.lib; llc.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; comctl32.lib; Opengl32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>galaxy_hell.lib; gpk_engine.lib; llc.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; comctl32.lib; Opengl32.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -141,7 +141,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>../../gpk_games/galaxy_hell; ../../gpk/gpk; ../../gpk/llc; ../../steamworks_sdk_155/public; </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk_engine;  ../../gpk_games/galaxy_hell; ../../steamworks_sdk_155/public; </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -149,7 +149,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir); ../../steamworks_sdk_155/redistributable_bin/win64; ../../steamworks_sdk_155/public/steam/lib/win64</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>galaxy_hell.lib; gpk.lib; llc.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; comctl32.lib; Opengl32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>galaxy_hell.lib; gpk_engine.lib; llc.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; comctl32.lib; Opengl32.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -161,7 +161,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>../../gpk_games/galaxy_hell; ../../gpk/gpk; ../../gpk/llc; ../../steamworks_sdk_155/public; </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk_engine;  ../../gpk_games/galaxy_hell; ../../steamworks_sdk_155/public; </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -171,7 +171,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir); ../../steamworks_sdk_155/redistributable_bin/win64; ../../steamworks_sdk_155/public/steam/lib/win64</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>galaxy_hell.lib; gpk.lib; llc.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; comctl32.lib; Opengl32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>galaxy_hell.lib; gpk_engine.lib; llc.lib; zlibvc.lib; user32.lib; gdi32.lib; shcore.lib; winmm.lib; xaudio2.lib; comctl32.lib; ole32.lib; dxguid.lib; comctl32.lib; Opengl32.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

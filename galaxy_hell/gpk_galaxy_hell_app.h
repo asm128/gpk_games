@@ -85,19 +85,19 @@ namespace ghg
 	GDEFINE_ENUM_TYPE(UI_SCORE, uint8_t);
 
 	struct SUIRadialGauge {
-		::gpk::apod<::gpk::n3<float>>				Vertices				= {};
-		::gpk::apod<::gpk::tri<int16_t>>			Indices					= {};
-		int16_t											CurrentValue			= 0;
-		int16_t											MaxValue				= 64;
-		::gpk::img<::gpk::bgra>					Image					= {};
+		::gpk::apod<::gpk::n3f32>		Vertices				= {};
+		::gpk::apod<::gpk::trii16>		Indices					= {};
+		int16_t							CurrentValue			= 0;
+		int16_t							MaxValue				= 64;
+		::gpk::img<::gpk::bgra>			Image					= {};
 
-		static constexpr const ::gpk::rgbaf		COLOR_MIN_DEFAULT		= ::gpk::GREEN;
-		static constexpr const ::gpk::rgbaf		COLOR_MID_DEFAULT		= ::gpk::ORANGE;
-		static constexpr const ::gpk::rgbaf		COLOR_MAX_DEFAULT		= ::gpk::RED;
-		static constexpr const ::gpk::rgbaf		COLOR_BKG_DEFAULT		= ::gpk::BROWN * .5 + ::gpk::DARKBLUE * .5;
+		stacxpr	::gpk::rgbaf			COLOR_MIN_DEFAULT		= ::gpk::GREEN;
+		stacxpr	::gpk::rgbaf			COLOR_MID_DEFAULT		= ::gpk::ORANGE;
+		stacxpr	::gpk::rgbaf			COLOR_MAX_DEFAULT		= ::gpk::RED;
+		stacxpr	::gpk::rgbaf			COLOR_BKG_DEFAULT		= ::gpk::BROWN * .5 + ::gpk::DARKBLUE * .5;
 		
-		inline	int16_t									SetValue				(float weight)							noexcept	{ return CurrentValue = int16_t(weight * MaxValue); }
-				int16_t									SetValue				(float currentValue, uint32_t maxValue)	noexcept	{ return SetValue(currentValue / maxValue); }
+		inline	int16_t					SetValue				(float weight)							noexcept	{ return CurrentValue = int16_t(weight * MaxValue); }
+				int16_t					SetValue				(float currentValue, uint32_t maxValue)	noexcept	{ return SetValue(currentValue / maxValue); }
 	};
 
 			::gpk::error_t			gaugeBuildRadial		(::ghg::SUIRadialGauge & gauge, const ::gpk::SCircle<float> & gaugeMetrics, int16_t resolution, int16_t width);
@@ -108,15 +108,15 @@ namespace ghg
 	}
 
 	struct SUIPlayShipPartViewport {
-		int32_t											Viewport		;
-		::gpk::SCamera									Camera			;
-		SUIRadialGauge									GaugeLife		;
-		SUIRadialGauge									GaugeCooldown	;
-		SUIRadialGauge									GaugeDelay		;
-		::gpk::m4	<float>							MatrixProjection;
-		::ghg::TRenderTarget							RenderTargetOrbiter	;
-		::ghg::TRenderTarget							RenderTargetWeaponLoad	;
-		::ghg::TRenderTarget							RenderTargetWeaponType	;
+		int32_t							Viewport		;
+		::gpk::SCameraPoints			Camera			;
+		SUIRadialGauge					GaugeLife		;
+		SUIRadialGauge					GaugeCooldown	;
+		SUIRadialGauge					GaugeDelay		;
+		::gpk::m4f32					MatrixProjection;
+		::ghg::TRenderTarget			RenderTargetOrbiter	;
+		::ghg::TRenderTarget			RenderTargetWeaponLoad	;
+		::ghg::TRenderTarget			RenderTargetWeaponType	;
 	};
 
 
@@ -129,41 +129,41 @@ namespace ghg
 
 	struct SUIPlayer {
 		::gpk::apobj<::ghg::SUIPlayShipPartViewport>	ModuleViewports			= {};
-		::gpk::SDialog									DialogPlay				= {};
-		::gpk::SDialog									DialogHome				= {};
+		::gpk::SDialog					DialogPlay				= {};
+		::gpk::SDialog					DialogHome				= {};
 
-		::gpk::SUIInputBox								InputBox				= {};
+		::gpk::SUIInputBox				InputBox				= {};
 	
-		::gpk::array_static<char, 128>					TextScore				= {};
-		::gpk::array_static<char, 128>					TextHits				= {};
-		::gpk::array_static<char, 128>					TextShots				= {};
-		::gpk::array_static<char, 128>					TextBullets				= {};
-		::gpk::array_static<char, 128>					TextDamageDone			= {};
-		::gpk::array_static<char, 128>					TextDamageReceived		= {};
-		::gpk::array_static<char, 128>					TextHitsSurvived		= {};
-		::gpk::array_static<char, 128>					TextOrbitersLost		= {};
-		::gpk::array_static<char, 128>					TextKilledShips			= {};
-		::gpk::array_static<char, 128>					TextKilledOrbiters		= {};
+		::gpk::astatic<char, 128>		TextScore				= {};
+		::gpk::astatic<char, 128>		TextHits				= {};
+		::gpk::astatic<char, 128>		TextShots				= {};
+		::gpk::astatic<char, 128>		TextBullets				= {};
+		::gpk::astatic<char, 128>		TextDamageDone			= {};
+		::gpk::astatic<char, 128>		TextDamageReceived		= {};
+		::gpk::astatic<char, 128>		TextHitsSurvived		= {};
+		::gpk::astatic<char, 128>		TextOrbitersLost		= {};
+		::gpk::astatic<char, 128>		TextKilledShips			= {};
+		::gpk::astatic<char, 128>		TextKilledOrbiters		= {};
 	};
 
 	struct SUIPlay {
-		::gpk::aobj<::ghg::SUIPlayer>			PlayerUI				= {};
-		::ghg::SGalaxyHellDrawCache				DrawCache				= {};
+		::gpk::aobj<::ghg::SUIPlayer>	PlayerUI				= {};
+		::ghg::SGalaxyHellDrawCache		DrawCache				= {};
 
-		::gpk::array_static<char, 128>			TextLevel				= {};
-		::gpk::array_static<char, 128>			TextTimeStage			= {};
-		::gpk::array_static<char, 128>			TextTimeWorld			= {};
-		::gpk::array_static<char, 128>			TextTimeReal			= {};
+		::gpk::astatic<char, 128>		TextLevel				= {};
+		::gpk::astatic<char, 128>		TextTimeStage			= {};
+		::gpk::astatic<char, 128>		TextTimeWorld			= {};
+		::gpk::astatic<char, 128>		TextTimeReal			= {};
 	};
 
 
 	struct SPlayerShip { 
-		::ghg::SShipCore						Core;
-		::ghg::SShipScore						Score;
-		::gpk::au32								Parts;
-		::gpk::au32								Weapons;
+		::ghg::SShipCore				Core;
+		::ghg::SShipScore				Score;
+		::gpk::au32						Parts;
+		::gpk::au32						Weapons;
 
-		::gpk::error_t							Save			(::gpk::au8 & output) const {
+		::gpk::error_t					Save					(::gpk::au8 & output) const {
 			gpk_necs(::gpk::savePOD (output, Core	));
 			gpk_necs(::gpk::savePOD (output, Score	));
 			gpk_necs(::gpk::saveView(output, Parts	));
@@ -171,7 +171,7 @@ namespace ghg
 			return 0;
 		}
 
-		::gpk::error_t							Load			(::gpk::vcu8 & input) {
+		::gpk::error_t					Load					(::gpk::vcu8 & input) {
 			gpk_necs(::gpk::loadPOD	(input, Core	));
 			gpk_necs(::gpk::loadPOD	(input, Score	));
 			gpk_necs(::gpk::loadView(input, Parts	));
@@ -360,7 +360,7 @@ namespace ghg
 	::gpk::error_t											guiSetup					(::ghg::SGalaxyHellApp & gameui, const ::gpk::pobj<::gpk::SInput> & inputState);
 	::gpk::error_t											guiUpdate					(::ghg::SGalaxyHellApp & gameui, const ::gpk::view<::gpk::SSysEvent> & sysEvents);
 	
-	::gpk::error_t											galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view_array<::gpk::SSysEvent> & systemEvents);
+	::gpk::error_t											galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view<::gpk::SSysEvent> & systemEvents);
 	::gpk::error_t											galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::n2<uint16_t> renderTargetSize);
 
 	::gpk::error_t											listFilesSavegame			(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames);

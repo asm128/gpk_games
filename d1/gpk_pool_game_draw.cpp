@@ -48,7 +48,7 @@
 		}
 	}
 
-	const gpk::n2<float>							halfDimensions					= pool.MatchState.Board.Table.Slate * .5;
+	const gpk::n2f32							halfDimensions					= pool.MatchState.Board.Table.Slate * .5;
 
 	wireframePixelCoords.clear();
 	const	::gpk::n3f								limitsBottom	[4]				=

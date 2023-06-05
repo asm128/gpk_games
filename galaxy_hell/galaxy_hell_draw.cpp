@@ -45,7 +45,7 @@ static	int													drawDebris
 	, const ::ghg::SDebris							& debris
 	, const ::gpk::m4f32					& matrixVPV
 	, ::gpk::view2d<uint32_t>						depthBuffer
-	, const ::gpk::view_array<const ::gpk::bgra>	& debrisColors
+	, const ::gpk::view<const ::gpk::bgra>	& debrisColors
 	)	{
 
 	float prebrightness = 2.5f * (1.0f / debris.Brightness.size());
@@ -384,7 +384,7 @@ int													ghg::getLightArraysFromDebris
 	( const ::ghg::SDecoState								& decoState
 	, ::gpk::apod<::gpk::n3f32>				& lightPoints
 	, ::gpk::apod<::gpk::bgra>					& lightColors
-	, const ::gpk::view_array<const ::gpk::bgra>		& debrisColors
+	, const ::gpk::view<const ::gpk::bgra>		& debrisColors
 	)						{
 	for(uint32_t iParticle = 0; iParticle < decoState.Debris.Particles.Position.size(); ++iParticle) {
 		lightPoints.push_back(decoState.Debris.Particles.Position[iParticle]);
@@ -428,7 +428,7 @@ int												ghg::getLightArrays
 	, const ::ghg::SDecoState							& decoState
 	, ::gpk::apod<::gpk::n3f32>			& lightPoints
 	, ::gpk::apod<::gpk::bgra>				& lightColors
-	, const ::gpk::view_array<const ::gpk::bgra>	& debrisColors
+	, const ::gpk::view<const ::gpk::bgra>	& debrisColors
 	) {
 	::ghg::getLightArraysFromShips(shipState, lightPoints, lightColors);
 	::ghg::getLightArraysFromDebris(decoState, lightPoints, lightColors, debrisColors);
@@ -478,7 +478,7 @@ int												ghg::drawOrbiter
 	, ::ghg::SGalaxyHellDrawCache						& drawCache
 	) {
 	uint32_t												pixelsDrawn				= 0;
-	const ::gpk::apod<uint32_t>						& entityChildren		= shipState.EntitySystem.EntityChildren[shipPart.Entity];
+	const ::gpk::au32						& entityChildren		= shipState.EntitySystem.EntityChildren[shipPart.Entity];
 	double													absanim					= fabsf(sinf(animationTime * 3));
 	const ::gpk::rgbaf								shadedColor				= (absanim < .5) ? ::gpk::rgbaf{} : shipColor * (absanim * .5);
 	for(uint32_t iEntity = 0; iEntity < entityChildren.size(); ++iEntity) {
@@ -523,7 +523,7 @@ static	int											drawShip
 
 	uint32_t												pixelsDrawn			= 0;
 	const ::gpk::bgra									playerColor			= ((uint32_t)iShip < solarSystem.PlayState.CountPlayers) ? solarSystem.Pilots[iShip].Color : ::gpk::bgra(::gpk::RED);
-	const ::gpk::view_array<const uint32_t>					shipParts			= solarSystem.ShipState.ShipParts[iShip];
+	const ::gpk::view<const uint32_t>					shipParts			= solarSystem.ShipState.ShipParts[iShip];
 	for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
 		const ::ghg::SOrbiter									& shipPart				= solarSystem.ShipState.Orbiters[shipParts[iPart]];
 		if(shipPart.Health <= 0)
@@ -625,8 +625,9 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 	}
 
 	::gpk::m4f32									matrixView					= {};
-	const ::gpk::SCamera									& camera					= solarSystem.ShipState.Scene.Global.Camera[solarSystem.ShipState.Scene.Global.CameraMode];
-	matrixView.LookAt(camera.Position, camera.Target, camera.Up);
+	const ::gpk::SCameraPoints						& camera					= solarSystem.ShipState.Scene.Global.Camera[solarSystem.ShipState.Scene.Global.CameraMode];
+	::gpk::n3f32									cameraUp					= {0, 1, 0};
+	matrixView.LookAt(camera.Position, camera.Target, cameraUp);
 	matrixView											*= solarSystem.ShipState.Scene.Global.MatrixProjection;
 	drawCache.LightPointsWorld.clear();
 	drawCache.LightColorsWorld.clear();
@@ -661,14 +662,14 @@ int													ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, :
 		uint32_t					Mesh				;
 		int32_t						Image				;
 		::gpk::SSlice<uint32_t>		Slice				;
-		::gpk::apod<uint16_t>	IndicesPointLight	;
+		::gpk::au32					IndicesPointLight	;
 	};
 #pragma pack(pop)
 	{
 		::std::lock_guard							lockUpdate					(mutexUpdate);
 		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
 			const ::ghg::SShipCore									& shipCore			= solarSystem.ShipState.ShipCores[iShip];
-			const ::gpk::apod<uint32_t>						& shipParts			= solarSystem.ShipState.ShipParts[iShip];
+			const ::gpk::au32						& shipParts			= solarSystem.ShipState.ShipParts[iShip];
 			for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
 				const ::ghg::SOrbiter									& orbiter				= solarSystem.ShipState.Orbiters[shipParts[iPart]];
 				const ::ghg::SWeapon									& weapon				= solarSystem.ShipState.Weapons[orbiter.Weapon];

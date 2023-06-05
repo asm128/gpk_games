@@ -94,8 +94,8 @@ namespace d1_win32
 			{
 	#pragma pack(push, 1)
 				struct SPosUV  {
-					::gpk::n3<float> Position;
-					::gpk::n2<float> UV;
+					::gpk::n3f32 Position;
+					::gpk::n2f32 UV;
 				};
 	#pragma pack(pop)
 				constexpr SPosUV							vertices[4]						= {{{-1, 1}, {0, 0}},{{1, 1}, {1, 0}},{{-1, -1}, {0, 1}}, {{1, -1}, {1, 1}}};

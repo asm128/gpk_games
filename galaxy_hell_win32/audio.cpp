@@ -321,7 +321,7 @@ HRESULT AUDIO_STATE::PrepareAudio( const char* wavname ) {
 
 	// Read in the wave file
     const WAVEFORMATEX* pwfx = 0;
-	::gpk::view_array<const uint8_t> audioView = {};
+	::gpk::view<const uint8_t> audioView = {};
 	gpk_hrcall(DirectX::LoadWAVAudioFromFile( ::gpk::vcs{strFilePath}, WaveData, &pwfx, audioView));
 
     assert(pwfx->nChannels == INPUTCHANNELS);
@@ -361,12 +361,12 @@ HRESULT AUDIO_STATE::UpdateAudio( double fElapsedTime ) {
 		if( vListenerPos.x != listener.Position.x
 			|| vListenerPos.z != listener.Position.z )
 		{
-			::gpk::n3<float> vDelta = vListenerPos - ::gpk::n3<float>{listener.Position.x, listener.Position.y, listener.Position.z};
+			::gpk::n3f32 vDelta = vListenerPos - ::gpk::n3f32{listener.Position.x, listener.Position.y, listener.Position.z};
 
 			fListenerAngle = float( atan2( vDelta.x, vDelta.z ) );
 
 			vDelta.y = 0.0f;
-			::gpk::n3<float> delta = { vDelta.x,vDelta.y,vDelta.z};
+			::gpk::n3f32 delta = { vDelta.x,vDelta.y,vDelta.z};
 			delta.Normalize();
 
 			listener.OrientFront.x = delta.x;
@@ -386,11 +386,11 @@ HRESULT AUDIO_STATE::UpdateAudio( double fElapsedTime ) {
 
 		if( fElapsedTime > 0 )
 		{
-			::gpk::n3<float> lVelocity = ( vListenerPos - ::gpk::n3<float>{listener.Position.x, listener.Position.y, listener.Position.z} ) / fElapsedTime;
+			::gpk::n3f32 lVelocity = ( vListenerPos - ::gpk::n3f32{listener.Position.x, listener.Position.y, listener.Position.z} ) / fElapsedTime;
 			listener.Position = {vListenerPos.x, vListenerPos.y, vListenerPos.z};
 			listener.Velocity = {lVelocity.x, lVelocity.y, lVelocity.z};
 
-			::gpk::n3<float> eVelocity = ( vEmitterPos - ::gpk::n3<float>{emitter.Position.x, emitter.Position.y, emitter.Position.z} ) / fElapsedTime;
+			::gpk::n3f32 eVelocity = ( vEmitterPos - ::gpk::n3f32{emitter.Position.x, emitter.Position.y, emitter.Position.z} ) / fElapsedTime;
 			emitter.Position = {vEmitterPos.x, vEmitterPos.y, vEmitterPos.z};
 			emitter.Velocity = {eVelocity.x, eVelocity.y, eVelocity.z};
 		}

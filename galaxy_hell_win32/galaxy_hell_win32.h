@@ -4,7 +4,7 @@
 
 #include "gpk_framework.h"
 
-#include "gpk_udp_client.h"
+//#include "gpk_udp_client.h"
 
 #ifndef CED_DEMO_08_H_298837492837
 #define CED_DEMO_08_H_298837492837

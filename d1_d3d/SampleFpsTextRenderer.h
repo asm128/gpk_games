@@ -55,7 +55,7 @@ namespace d1_win32
 		// Renders a frame to the screen.
 		::gpk::error_t									Render							() {
 			ID2D1DeviceContext									* context						= DeviceResources->GetD2DDeviceContext();
-			const ::gpk::n2<float>								logicalSize						= DeviceResources->GetLogicalSize();
+			const ::gpk::n2f32								logicalSize						= DeviceResources->GetLogicalSize();
 
 			context->SaveDrawingState(StateBlock);
 			context->BeginDraw();
