@@ -48,7 +48,7 @@ namespace d1_win32
 			IndexBuffer		.clear();
 		}
 
-		void									Render							(uint32_t iMesh, ::gpk::SRange<uint32_t> indexRange, uint32_t iTexture, uint32_t iShader) {
+		void									Render							(uint32_t iMesh, ::gpk::rangeu32 indexRange, uint32_t iTexture, uint32_t iShader) {
 			auto										context							= DeviceResources->GetD3DDeviceContext();
 			context->UpdateSubresource1(ConstantBuffer[0], 0, NULL, &ConstantBufferModel, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.
 			context->UpdateSubresource1(ConstantBuffer[1], 0, NULL, &ConstantBufferScene, 0, 0, 0);	// Prepare the constant buffer to send it to the graphics device.

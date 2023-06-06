@@ -100,8 +100,8 @@ namespace ghg
 				int16_t					SetValue				(float currentValue, uint32_t maxValue)	noexcept	{ return SetValue(currentValue / maxValue); }
 	};
 
-			::gpk::error_t			gaugeBuildRadial		(::ghg::SUIRadialGauge & gauge, const ::gpk::SCircle<float> & gaugeMetrics, int16_t resolution, int16_t width);
-			::gpk::error_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::bgra> target	, ::gpk::rgbaf colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::rgbaf colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::rgbaf colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::bgra colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false);
+			::gpk::error_t			gaugeBuildRadial		(::ghg::SUIRadialGauge & gauge, const ::gpk::circlef32 & gaugeMetrics, int16_t resolution, int16_t width);
+			::gpk::error_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::bgra> target, ::gpk::rgbaf colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::rgbaf colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::rgbaf colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::bgra colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false);
 	inline	::gpk::error_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::rgbaf colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::rgbaf colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::rgbaf colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::bgra colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false) {
 		//gauge.Image.Texels.fill({0, 0, 0, 0});
 		return ::ghg::gaugeImageUpdate(gauge, gauge.Image, colorMin, colorMid, colorMax, colorEmpty, radialColor);
@@ -188,30 +188,30 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(PLAYER_TYPE, Network	, 2);
 
 	struct SPlayerScore { 
-		uint64_t								TimePlayed;
-		uint64_t								TimeDead;
-		uint64_t								KeyPresses;
+		uint64_t			TimePlayed;
+		uint64_t			TimeDead;
+		uint64_t			KeyPresses;
 	};
 
 	struct SPlayerState {
-		PLAYER_TYPE								Type;
-		::gpk::bgra						Color;
-		int32_t									ShipSelected;
-		::ghg::SPlayerScore						Score;
+		PLAYER_TYPE			Type;
+		::gpk::bgra			Color;
+		int32_t				ShipSelected;
+		::ghg::SPlayerScore	Score;
 	};
 #pragma pack(pop)
 
 	struct SPlayer {
-		::gpk::vcc								Name			= {};
-		::ghg::SPlayerState						State			= {};
-		::gpk::apod<::ghg::SWeapon>				Weapons			= {};
-		::gpk::apod<::ghg::SOrbiter>			Orbiters		= {};
-		::gpk::aobj<::ghg::SPlayerShip>			Ships			= {};
+		::gpk::vcc						Name			= {};
+		::ghg::SPlayerState				State			= {};
+		::gpk::apod<::ghg::SWeapon>		Weapons			= {};
+		::gpk::apod<::ghg::SOrbiter>	Orbiters		= {};
+		::gpk::aobj<::ghg::SPlayerShip>	Ships			= {};
 
-		::gpk::error_t							Save			(const ::gpk::vcc & filename) const {
-			::gpk::au8									serialized;
+		::gpk::error_t					Save			(const ::gpk::vcc & filename) const {
+			::gpk::au8							serialized;
 			gpk_necs(Save(serialized));
-			::gpk::au8									deflated;
+			::gpk::au8							deflated;
 			gpk_necs(::gpk::arrayDeflate(serialized, deflated));
 			info_printf("Player size in bytes: %u.", serialized.size());
 			info_printf("Player file size: %u.", deflated.size());
@@ -219,18 +219,18 @@ namespace ghg
 			return 0;
 		}
 
-		::gpk::error_t							Load			(const ::gpk::vcc & filename) {
-			::gpk::au8									serialized;
+		::gpk::error_t					Load			(const ::gpk::vcc & filename) {
+			::gpk::au8							serialized;
 			gpk_necall(::gpk::fileToMemory(filename, serialized), "fileName: %s", ::gpk::toString(filename).begin());
-			::gpk::au8									inflated;
+			::gpk::au8							inflated;
 			gpk_necs(::gpk::arrayInflate(serialized, inflated));
 			info_printf("Player file size: %u.", inflated.size());
 			info_printf("Player size in bytes: %u.", serialized.size());
-			::gpk::vcu8									input		= inflated;
+			::gpk::vcu8							input		= inflated;
 			return Load(input);
 		}
 
-		::gpk::error_t							Save			(::gpk::au8 & output) const {
+		::gpk::error_t					Save			(::gpk::au8 & output) const {
 			gpk_necs(::gpk::saveView(output, Name));
 			gpk_necs(::gpk::savePOD(output, State));
 			gpk_necs(::gpk::saveView(output, Weapons));
@@ -242,13 +242,13 @@ namespace ghg
 			return 0;
 		}
 
-		::gpk::error_t							Load			(::gpk::vcu8 & input) {
+		::gpk::error_t					Load			(::gpk::vcu8 & input) {
 			gpk_necs(::gpk::loadLabel	(input, Name	));
 			gpk_necs(::gpk::loadPOD		(input, State	));
 			gpk_necs(::gpk::loadView	(input, Weapons	));
 			gpk_necs(::gpk::loadView	(input, Orbiters));
 			gpk_necs(Ships.resize(*(uint32_t*)input.begin()));
-			input											= {input.begin() + sizeof(uint32_t), input.size() - 4};
+			input							= {input.begin() + sizeof(uint32_t), input.size() - 4};
 			for(uint32_t iShip = 0; iShip < Ships.size(); ++iShip) {
 				gpk_necall(Ships[iShip].Load(input), "iShip: %u", iShip);
 			}
@@ -261,8 +261,8 @@ namespace ghg
 	};
 
 	struct SUserCredentials {
-		::gpk::vcc								Username;
-		::gpk::vcc								Password;
+		::gpk::vcc		Username;
+		::gpk::vcc		Password;
 	};
 
 	enum SAVE_MODE { SAVE_MODE_AUTO, SAVE_MODE_QUICK, SAVE_MODE_STAGE, SAVE_MODE_USER };
@@ -286,59 +286,59 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 15);
 
 	struct SGalaxyHellApp {
-		::gpk::array_pobj<TRenderTarget>						RenderTargetPool			= {};
-		::gpk::array_pobj<TRenderTarget>						RenderTargetQueue			= {};
-		::std::mutex											RenderTargetLockPool		= {};
-		::std::mutex											RenderTargetLockQueue		= {};
-		volatile uint64_t										CurrentRenderTarget			= 0;
-		int32_t													PlayerSelected				= 0;
+		::gpk::array_pobj<TRenderTarget>	RenderTargetPool			= {};
+		::gpk::array_pobj<TRenderTarget>	RenderTargetQueue			= {};
+		::std::mutex						RenderTargetLockPool		= {};
+		::std::mutex						RenderTargetLockQueue		= {};
+		volatile uint64_t					CurrentRenderTarget			= 0;
+		int32_t								PlayerSelected				= 0;
 
-		bool													Exit						= false;
+		bool								Exit						= false;
 		::gpk::astatic<::gpk::SDialog, ::ghg::APP_STATE_COUNT>	DialogPerState				= {};
 
-		::gpk::SVirtualKeyboard									VirtualKeyboard				= {};
-		::ghg::SUIPlay											UIPlay;
+		::gpk::SVirtualKeyboard				VirtualKeyboard				= {};
+		::ghg::SUIPlay						UIPlay;
 
-		::gpk::SDialog											DialogDesktop				= {};
-		::gpk::aobj<::ghg::SPlayer>								Players						= {};
-		::gpk::pnco<::gpk::SDialogTuner<uint8_t>>				TunerPlayerCount;
+		::gpk::SDialog						DialogDesktop				= {};
+		::gpk::aobj<::ghg::SPlayer>			Players						= {};
+		::gpk::pnco<::gpk::SDialogTuner<uint8_t>>	TunerPlayerCount;
 
-		::ghg::SGalaxyHell										Game;
-		::gpk::aobj<::ghg::SUserCredentials>					UserCredentials				= {};
+		::ghg::SGalaxyHell						Game;
+		::gpk::aobj<::ghg::SUserCredentials>	UserCredentials				= {};
 
-		::gpk::pobj<::gpk::SDialogViewport>						Inputbox;
-		::gpk::apod<char>										InputboxText;
+		::gpk::pobj<::gpk::SDialogViewport>	Inputbox;
+		::gpk::apod<char>					InputboxText;
 
-		::gpk::aobj<::gpk::apod<char>>							FileNames					= {};
-		::gpk::vcs												SavegameFolder				= ".";
-		::gpk::vcs												ExtensionSaveAuto			= ".auto.ghz";
-		::gpk::vcs												ExtensionSaveStage			= ".stage.ghz";
-		::gpk::vcs												ExtensionSaveQuick			= ".quick.ghz";
-		::gpk::vcs												ExtensionSaveUser			= ".user.ghz";
-		::gpk::vcs												ExtensionSave				= ".ghz";
-		::gpk::vcs												ExtensionImages				= ".png";
+		::gpk::aobj<::gpk::apod<char>>	FileNames					= {};
+		::gpk::vcs						SavegameFolder				= ".";
+		::gpk::vcs						ExtensionSaveAuto			= ".auto.ghz";
+		::gpk::vcs						ExtensionSaveStage			= ".stage.ghz";
+		::gpk::vcs						ExtensionSaveQuick			= ".quick.ghz";
+		::gpk::vcs						ExtensionSaveUser			= ".user.ghz";
+		::gpk::vcs						ExtensionSave				= ".ghz";
+		::gpk::vcs						ExtensionImages				= ".png";
 
-		::gpk::vcs												ExtensionProfile			= ".ghp";
-		::gpk::vcs												ExtensionCredentials		= ".ghc";
+		::gpk::vcs						ExtensionProfile			= ".ghp";
+		::gpk::vcs						ExtensionCredentials		= ".ghc";
 
-		::ghg::APP_STATE										ActiveState					= APP_STATE_Init;
+		::ghg::APP_STATE				ActiveState					= APP_STATE_Init;
 
-		::gpk::error_t											AddNewPlayer				(::gpk::vcc playerName)			{
+		::gpk::error_t					AddNewPlayer				(::gpk::vcc playerName)			{
 			::gpk::trim(playerName);
 			return Players.push_back({::gpk::label(::gpk::vcs{playerName})});
 		}
 
-		::gpk::error_t											Save						(SAVE_MODE autosaveMode)				{
-			char														fileName[4096]				= {};
-			::gpk::au8													b64PlayerName				= {};
+		::gpk::error_t					Save						(SAVE_MODE autosaveMode)				{
+			char								fileName[4096]				= {};
+			::gpk::au8							b64PlayerName				= {};
 			for(uint32_t iPlayer = 0; iPlayer < Players.size(); ++iPlayer) {
 				b64PlayerName.clear();
-				const ::ghg::SPlayer										& player					= Players[iPlayer];
+				const ::ghg::SPlayer				& player					= Players[iPlayer];
 				::gpk::base64Encode(player.Name, b64PlayerName);
 				sprintf_s(fileName, "%s/%s.%llu%s", SavegameFolder.begin(), b64PlayerName.begin(), 0ULL, ExtensionProfile.begin());
 				gpk_necall(player.Save(fileName), "iPlayer: %i", iPlayer);
 			}
-			::gpk::vcc													extension;
+			::gpk::vcc							extension;
 			switch(autosaveMode) {
 			case SAVE_MODE_USER		: extension = ExtensionSaveUser		; break;
 			case SAVE_MODE_STAGE	: extension = ExtensionSaveStage	; break;
@@ -346,24 +346,24 @@ namespace ghg
 			case SAVE_MODE_AUTO		: extension = ExtensionSaveAuto		; break;
 			}
 
-			const uint64_t												timeCurrent					= (SAVE_MODE_USER != autosaveMode) ? 0 : ::gpk::timeCurrent();
-			const uint64_t												timeStart					= (SAVE_MODE_AUTO == autosaveMode) ? 0 : Game.PlayState.TimeStart;
+			const uint64_t						timeCurrent					= (SAVE_MODE_USER != autosaveMode) ? 0 : ::gpk::timeCurrent();
+			const uint64_t						timeStart					= (SAVE_MODE_AUTO == autosaveMode) ? 0 : Game.PlayState.TimeStart;
 			sprintf_s(fileName, "%s/%llu.%llu%s", SavegameFolder.begin(), timeStart, timeCurrent, extension.begin());
 
-			const int32_t												totalHealth					= Game.ShipState.GetTeamHealth(0);
+			const int32_t						totalHealth					= Game.ShipState.GetTeamHealth(0);
 			if(totalHealth > 0) // Save only if a player is alive
 				return ::ghg::solarSystemSave(Game, fileName);
 			return 0;
 		}
 	};
 
-	::gpk::error_t											guiSetup					(::ghg::SGalaxyHellApp & gameui, const ::gpk::pobj<::gpk::SInput> & inputState);
-	::gpk::error_t											guiUpdate					(::ghg::SGalaxyHellApp & gameui, const ::gpk::view<::gpk::SSysEvent> & sysEvents);
+	::gpk::error_t	guiSetup			(::ghg::SGalaxyHellApp & gameui, const ::gpk::pobj<::gpk::SInput> & inputState);
+	::gpk::error_t	guiUpdate			(::ghg::SGalaxyHellApp & gameui, const ::gpk::view<::gpk::SSysEvent> & sysEvents);
 	
-	::gpk::error_t											galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view<::gpk::SSysEvent> & systemEvents);
-	::gpk::error_t											galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::n2<uint16_t> renderTargetSize);
+	::gpk::error_t	galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view<::gpk::SSysEvent> & systemEvents);
+	::gpk::error_t	galaxyHellDraw		(::ghg::SGalaxyHellApp & app, ::gpk::n2u16 renderTargetSize);
 
-	::gpk::error_t											listFilesSavegame			(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames);
-	::gpk::error_t											listFilesProfile			(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames);
+	::gpk::error_t	listFilesSavegame	(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames);
+	::gpk::error_t	listFilesProfile	(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames);
 
 }

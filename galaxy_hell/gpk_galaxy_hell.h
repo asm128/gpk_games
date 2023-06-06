@@ -16,8 +16,8 @@
 
 namespace ghg
 {
-	stacxpr uint16_t		MAX_PLAYERS				= 4;
-	stacxpr uint32_t		MAX_ORBITER_COUNT		= 6;
+	stacxpr uint16_t	MAX_PLAYERS				= 4;
+	stacxpr uint32_t	MAX_ORBITER_COUNT		= 6;
 
 #pragma pack(push, 1)
 	stacxpr ::gpk::astatic<::gpk::bgra, 16>	PLAYER_COLORS	= 
@@ -112,11 +112,11 @@ namespace ghg
 				gpk_necs(::gpk::saveView(output, Pilots[iPlayer].Name));
 				gpk_necs(::gpk::savePOD(output, Pilots[iPlayer].Color));
 			}
-
 			gpk_necs(::gpk::saveView(output, ShipControllers));
 			gpk_necs(ShipState.Save(output));
 			return 0;
 		}
+
 		::gpk::error_t						Load					(::gpk::vcu8 & input) {
 			::std::lock_guard						lock(LockUpdate);
 			::gpk::view<const ::ghg::SPlayState>	readPlayState			= {};
@@ -131,7 +131,6 @@ namespace ghg
 			gpk_necs(ShipState.Load(input));
 			return 0;
 		}
-
 	};
 
 	::gpk::error_t						stageSetup						(::ghg::SGalaxyHell & solarSystem);
@@ -144,32 +143,34 @@ namespace ghg
 	
 	::gpk::error_t						getLightArraysFromDebris
 		( const ::ghg::SDecoState				& decoState
-		, ::gpk::apod<::gpk::n3f32>			& lightPoints
+		, ::gpk::apod<::gpk::n3f32>				& lightPoints
 		, ::gpk::apod<::gpk::bgra>				& lightColors
 		, const ::gpk::view<const ::gpk::bgra>	& debrisColors
 		);
+
 	::gpk::error_t						getLightArraysFromShips
-		( const ::ghg::SShipManager				& shipState
-		, ::gpk::apod<::gpk::n3f32>			& lightPoints
-		, ::gpk::apod<::gpk::bgra>				& lightColors
+		( const ::ghg::SShipManager	& shipState
+		, ::gpk::apod<::gpk::n3f32>	& lightPoints
+		, ::gpk::apod<::gpk::bgra>	& lightColors
 		);
+
 	::gpk::error_t						getLightArrays
 		( const ::ghg::SShipManager				& shipState
 		, const ::ghg::SDecoState				& decoState
-		, ::gpk::apod<::gpk::n3f32>			& lightPoints
+		, ::gpk::apod<::gpk::n3f32>				& lightPoints
 		, ::gpk::apod<::gpk::bgra>				& lightColors
 		, const ::gpk::view<const ::gpk::bgra>	& debrisColors
 		);
 
 	::gpk::error_t						drawOrbiter
-		( const ::ghg::SShipManager				& shipState
-		, const ::ghg::SOrbiter					& shipPart
-		, const ::gpk::rgbaf					& shipColor	
-		, float									animationTime
+		( const ::ghg::SShipManager			& shipState
+		, const ::ghg::SOrbiter				& shipPart
+		, const ::gpk::rgbaf				& shipColor	
+		, float								animationTime
 		, const ::gpk::m4f32				& matrixVP
-		, ::gpk::view2d<::gpk::bgra>			& targetPixels
-		, ::gpk::view2d<uint32_t>				depthBuffer
-		, ::ghg::SGalaxyHellDrawCache			& drawCache
+		, ::gpk::view2d<::gpk::bgra>		& targetPixels
+		, ::gpk::view2d<uint32_t>			depthBuffer
+		, ::ghg::SGalaxyHellDrawCache		& drawCache
 		);
 }
 

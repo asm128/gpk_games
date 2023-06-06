@@ -34,8 +34,8 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Galaxy Hell v0.4");
 
-::gpk::error_t							cleanup							(::SApplication & app)						{ 
-	::gpk::SFramework							& framework						= app.Framework;
+::gpk::error_t			cleanup				(::SApplication & app)						{ 
+	::gpk::SFramework			& framework			= app.Framework;
 	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, framework.RootWindow.EventQueue);
 	app.AudioState.CleanupAudio(); 
 
@@ -89,7 +89,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 }
 #endif
 
-::gpk::error_t							setup							(::SApplication & app)						{
+::gpk::error_t			setup				(::SApplication & app)						{
 #ifdef USE_STEAM_CLIENT
 	// if Steam is not running or the game wasn't started through Steam, SteamAPI_RestartAppIfNecessary starts the local Steam client and also launches this game again.
 	// Once you get a public Steam AppID assigned for this game, you need to replace k_uAppIdInvalid with it and removed steam_appid.txt from the game depot.
@@ -133,22 +133,22 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 
 	//gpk_necall(::gpk::tcpipInitialize(), "Failed to initialize network subsystem: '%s'.", "Unknown error");
 
-	::gpk::SFramework							& framework						= app.Framework;
-	::gpk::SWindow								& mainWindow					= framework.RootWindow;
+	::gpk::SFramework			& framework			= app.Framework;
+	::gpk::SWindow				& mainWindow		= framework.RootWindow;
 
-	mainWindow.Size							= {1280, 720};
+	mainWindow.Size			= {1280, 720};
 
-	gerror_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)), "Failed to create main window. %s.", "why?!");
+	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
 
 	srand((uint32_t)time(0));
 
-	::ghg::SGalaxyHellDrawCache					& drawCache						= app.GalaxyHellApp.Game.DrawCache;
+	::ghg::SGalaxyHellDrawCache	& drawCache			= app.GalaxyHellApp.Game.DrawCache;
 	::gpk::resize(4096 * 1024, drawCache.PixelCoords, drawCache.PixelVertexWeights, drawCache.LightColorsModel, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightPointsWorld);
 
 	app.AudioState.InitAudio();
 	app.AudioState.PrepareAudio("thrust.wav");
 
-	//app.Client.AddressConnect											= {};
+	//app.Client.AddressConnect	= {};
 	//::gpk::tcpipAddress(9898, 0, ::gpk::TRANSPORT_PROTOCOL_UDP, app.Client.AddressConnect);	// If loading the remote IP from the json fails, we fall back to the local address.
 	//app.Client.AddressConnect.IP[0] = 192;
 	//app.Client.AddressConnect.IP[1] = 168;
@@ -167,8 +167,8 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 
 
 	// create a rendering context  
-	app.DrawingContext				= GetDC(framework.RootWindow.PlatformDetail.WindowHandle);
-	app.GLRenderContext				= wglCreateContext(app.DrawingContext); 
+	app.DrawingContext		= GetDC(framework.RootWindow.PlatformDetail.WindowHandle);
+	app.GLRenderContext		= wglCreateContext(app.DrawingContext); 
  
 	// make it the calling thread's current rendering context 
 	wglMakeCurrent (app.DrawingContext, app.GLRenderContext);
@@ -179,9 +179,9 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	return 0;
 }
 
-int										update				(SApplication & app, bool exitSignal)	{
-	::gpk::SFramework							& framework			= app.Framework;
-	//::gpk::STimer								timer;
+::gpk::error_t			update				(SApplication & app, bool exitSignal)	{
+	::gpk::SFramework			& framework			= app.Framework;
+	//::gpk::STimer				timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 
 	for(uint32_t iEvent = 0; iEvent < framework.RootWindow.EventQueue.size(); ++iEvent) {
@@ -249,7 +249,7 @@ int										update				(SApplication & app, bool exitSignal)	{
 	SteamAPI_RunCallbacks();
 #endif
 
-	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework), "%s", "Exit requested by framework update.");
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework));
 
 	//for(uint32_t i = 0; i < 4; ++i) {
 	//	DirectX::GamePad::State padState = app.GamePad.GetState(i);
@@ -269,7 +269,7 @@ int										update				(SApplication & app, bool exitSignal)	{
 	return 0;
 }
 
-int														draw					(SApplication & app) {
+::gpk::error_t			draw					(SApplication & app) {
     /* rotate a triangle around */
     //glClear(GL_COLOR_BUFFER_BIT);
     //glBegin(GL_TRIANGLES);

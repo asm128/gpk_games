@@ -70,12 +70,12 @@ namespace d1
 	GDEFINE_ENUM_VALUE(PLAYER_TYPE, Network	, 2);
 
 	struct SD1Player {
-		::gpk::vcc							Name;
-		::d1::SPlayerCameras				Cameras						= {};
-		::gpk::bgra							Color;
-		PLAYER_TYPE							Type;
+		::gpk::vcc					Name;
+		::d1::SPlayerCameras		Cameras						= {};
+		::gpk::bgra					Color;
+		PLAYER_TYPE					Type;
 
-		::gpk::error_t						Save			(::gpk::apod<uint8_t> & output) const {
+		::gpk::error_t				Save			(::gpk::apod<uint8_t> & output) const {
 			gpk_necs(::gpk::savePOD		(output, Cameras));
 			gpk_necs(::gpk::savePOD		(output, Color));
 			gpk_necs(::gpk::savePOD		(output, Type));
@@ -83,7 +83,7 @@ namespace d1
 			return 0;
 		}
 
-		::gpk::error_t						Load			(::gpk::vcu8 & input) {
+		::gpk::error_t				Load			(::gpk::vcu8 & input) {
 			gpk_necs(::gpk::loadPOD		(input, Cameras	));
 			gpk_necs(::gpk::loadPOD		(input, Color	));
 			gpk_necs(::gpk::loadPOD		(input, Type	));
@@ -121,8 +121,8 @@ namespace d1
 
 	// This structure extends the game setup to include enumerations used by the UI but which are irrelevant to the game mechanics.
 	struct SD1StartState : public ::d1p::SMatchState {
-		::d1p::TABLE_SIZE					StandardTableSize	= ::d1p::TABLE_SIZE_8_00_FOOT;
-		uint8_t								CountPlayers		= 0;
+		::d1p::TABLE_SIZE			StandardTableSize	= ::d1p::TABLE_SIZE_8_00_FOOT;
+		uint8_t						CountPlayers		= 0;
 	};
 #pragma pack(pop)
 
@@ -254,25 +254,25 @@ namespace d1
 	};
 
 	struct SD1FileStrings {
-		::gpk::vcc							SavegameFolder				= {1, "."};
-		::gpk::vcc							ExtensionImages				= {4, ".png"};
-		::gpk::vcc							ExtensionProfile			= {4, ".d1p"};
-		::gpk::vcc							ExtensionCredentials		= {4, ".d1c"};
-		::gpk::vcc							ExtensionSave				= {4, ".d1z"};
-		::gpk::vcc							ExtensionSaveUser			= {9, ".user.d1z"};
-		::gpk::vcc							ExtensionSaveAuto			= {9, ".auto.d1z"};
-		::gpk::vcc							ExtensionSaveStage			= {10, ".stage.d1z"};
-		::gpk::vcc							ExtensionSaveQuick			= {10, ".quick.d1z"};
+		::gpk::vcc				SavegameFolder				= {1, "."};
+		::gpk::vcc				ExtensionImages				= {4, ".png"};
+		::gpk::vcc				ExtensionProfile			= {4, ".d1p"};
+		::gpk::vcc				ExtensionCredentials		= {4, ".d1c"};
+		::gpk::vcc				ExtensionSave				= {4, ".d1z"};
+		::gpk::vcc				ExtensionSaveUser			= {9, ".user.d1z"};
+		::gpk::vcc				ExtensionSaveAuto			= {9, ".auto.d1z"};
+		::gpk::vcc				ExtensionSaveStage			= {10, ".stage.d1z"};
+		::gpk::vcc				ExtensionSaveQuick			= {10, ".quick.d1z"};
 	};
 	
 	struct SD1 {
-		::d1::SD1Game						MainGame					= {};
-		::d1::SD1UI							AppUI						= {};
-		::d1::APP_STATE						ActiveState					= {};
+		::d1::SD1Game			MainGame					= {};
+		::d1::SD1UI				AppUI						= {};
+		::d1::APP_STATE			ActiveState					= {};
 
-		::d1::SD1FileStrings				FileStrings					= {};
+		::d1::SD1FileStrings	FileStrings					= {};
 
-		::gpk::error_t						StateSwitch					(::d1::APP_STATE newState)			{
+		::gpk::error_t			StateSwitch					(::d1::APP_STATE newState)			{
 			if(newState != ActiveState) {
 				AppUI.Dialog.GUI->Controls.States[AppUI.DialogPerState[newState]].Hidden = false;
 				if(ActiveState >= ::d1::APP_STATE_Home && AppUI.DialogPerState[ActiveState])
@@ -280,13 +280,13 @@ namespace d1
 				if(newState == ::d1::APP_STATE_Home && ActiveState > ::d1::APP_STATE_Home) // Don't autosave first time we enter Home.
 					gpk_necs(Save(::d1::SAVE_MODE_AUTO));
 
-				ActiveState							= newState;
+				ActiveState				= newState;
 			}
 			return ActiveState;
 		}
 
-		::gpk::error_t						Save						(SAVE_MODE autosaveMode)	const	{
-			::gpk::vcc								extension;
+		::gpk::error_t			Save			(SAVE_MODE autosaveMode)	const	{
+			::gpk::vcc					extension;
 			switch(autosaveMode) {
 			case SAVE_MODE_USER		: extension = FileStrings.ExtensionSaveUser		; break;
 			case SAVE_MODE_STAGE	: extension = FileStrings.ExtensionSaveStage	; break;
@@ -294,9 +294,9 @@ namespace d1
 			case SAVE_MODE_AUTO		: extension = FileStrings.ExtensionSaveAuto		; break;
 			}
 
-			const uint64_t							timeCurrent					= (SAVE_MODE_USER != autosaveMode) ? 0 : ::gpk::timeCurrent();
-			const uint64_t							timeStart					= (SAVE_MODE_AUTO == autosaveMode) ? 0 : MainGame.Pool.MatchState.TimeStart;
-			char									fileName[4096]				= {};
+			const uint64_t				timeCurrent		= (SAVE_MODE_USER != autosaveMode) ? 0 : ::gpk::timeCurrent();
+			const uint64_t				timeStart		= (SAVE_MODE_AUTO == autosaveMode) ? 0 : MainGame.Pool.MatchState.TimeStart;
+			char						fileName[4096]	= {};
 			sprintf_s(fileName, "%s/%llu.%llu%s", FileStrings.SavegameFolder.begin(), timeStart, timeCurrent, extension.begin());
 
 			if(false == MainGame.Pool.MatchState.Flags.GameOver) // Save only if a player is alive
@@ -304,15 +304,15 @@ namespace d1
 			return 0;
 		}
 
-		::gpk::error_t						Save						(::gpk::vcc fileName)		const	{
-			::gpk::au8								serialized;
+		::gpk::error_t			Save						(::gpk::vcc fileName)		const	{
+			::gpk::au8					serialized;
 			gpk_necs(MainGame.Save(serialized));
 			for(uint32_t iPlayer = 0; iPlayer < MainGame.Players.size(); ++iPlayer) {
-				const ::d1::SD1Player					& player					= MainGame.Players[iPlayer];
+				const ::d1::SD1Player		& player					= MainGame.Players[iPlayer];
 				gpk_necall(player.Save(serialized), "iPlayer: %i", iPlayer);
 			}
 
-			::gpk::au8								deflated;
+			::gpk::au8					deflated;
 			gpk_necs(::gpk::arrayDeflate(serialized, deflated));
 
 			info_printf("Savegame size in bytes: %u.", serialized.size());
@@ -321,23 +321,23 @@ namespace d1
 			return ::gpk::fileFromMemory(fileName, deflated);
 		}
 
-		::gpk::error_t						Load						(::gpk::vcc filename)				{
-			::gpk::au8								serialized;
+		::gpk::error_t			Load						(::gpk::vcc filename)				{
+			::gpk::au8					serialized;
 			gpk_necs(::gpk::fileToMemory(filename, serialized));
 
-			::gpk::au8								inflated;
+			::gpk::au8					inflated;
 			::gpk::arrayInflate(serialized, inflated);
 
 			info_printf("Savegame file size: %u.", inflated.size());
 			info_printf("Savegame size in bytes: %u.", serialized.size());
 
-			::gpk::vcu8								viewSerialized				= inflated;
+			::gpk::vcu8					viewSerialized				= inflated;
 			if errored(MainGame.Load(viewSerialized)) {
 				es_if(errored(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
 				return -1;
 			}
 			for(uint32_t iPlayer = 0; iPlayer < MainGame.Players.size(); ++iPlayer) {
-				::d1::SD1Player						& player					= MainGame.Players[iPlayer];
+				::d1::SD1Player				& player					= MainGame.Players[iPlayer];
 				if errored(player.Load(viewSerialized)) {
 					error_printf("Failed to load player %i.", iPlayer);
 					es_if(errored(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
@@ -355,11 +355,11 @@ namespace d1
 
 	};
 
-	::gpk::error_t							d1Update				(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view<::gpk::SSysEvent> & systemEvents);
-	::gpk::error_t							d1Draw					(::d1::SD1UI & appUI, ::d1::SD1Game & poolGame, ::gpk::rt<::gpk::bgra, uint32_t> & backBuffer, double totalSeconds, bool onlyGUI = false);
+	::gpk::error_t			d1Update				(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view<::gpk::SSysEvent> & systemEvents);
+	::gpk::error_t			d1Draw					(::d1::SD1UI & appUI, ::d1::SD1Game & poolGame, ::gpk::rt<::gpk::bgra, uint32_t> & backBuffer, double totalSeconds, bool onlyGUI = false);
 
-	::gpk::error_t							guiSetup					(::d1::SD1UI & appUI, ::d1::SD1Game & appGame, const ::gpk::pobj<::gpk::SInput> & input);
-	::d1::APP_STATE							guiUpdate					(::d1::SD1 & app, ::gpk::view<::gpk::SSysEvent> sysEvents);
+	::gpk::error_t			guiSetup				(::d1::SD1UI & appUI, ::d1::SD1Game & appGame, const ::gpk::pobj<::gpk::SInput> & input);
+	::d1::APP_STATE			guiUpdate				(::d1::SD1 & app, ::gpk::view<::gpk::SSysEvent> sysEvents);
 } // namespace
 
 #endif
