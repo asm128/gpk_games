@@ -173,16 +173,16 @@ namespace ghg
 	struct SShipManager {
 		::gpk::apod<::ghg::SShipScore			>	ShipScores						= {}; // One per core
 		::gpk::apod<::ghg::SShipCore			>	ShipCores						= {}; // One per core
-		::gpk::aobj<::gpk::au32					>	ShipParts						= {}; // One per core, each one mapping to a list of orbiters.
+		::gpk::aobj<::gpk::au16					>	ShipParts						= {}; // One per core, each one mapping to a list of orbiters.
 
 		::gpk::apod<::ghg::SOrbiter				>	Orbiters						= {};	// One per orbiter	
 		::gpk::apod<::ghg::SWeapon				>	Weapons							= {};	// One per orbiter	
 		::gpk::aobj<::gpk::apod<::gpk::n3f32>	>	ShipOrbitersDistanceToTargets	= {};	// One per orbiter, each one mapping to a list of orbiters
 		::gpk::aobj<::ghg::SShots				>	Shots							= {};	// One per weapon
 		::gpk::aobj<::gpk::apod<SHIP_ACTION>	>	ShipOrbiterActionQueue			= {};
-		
-		
-		::gpk::au32									ShipToEntityMap					= {};
+
+		::gpk::au32									ShipCoreToEntityMap				= {};
+		::gpk::au32									ShipPartToEntityMap				= {};
 
 		::gpk::SEngine								Engine;
 
@@ -201,7 +201,11 @@ namespace ghg
 				, Shots
 				, ShipOrbiterActionQueue
 				, Scene.Transforms
+				, ShipCoreToEntityMap
+				, ShipPartToEntityMap
 			);
+			Engine										= {};
+
 			ShipPhysics									= {};
 			EntitySystem								= {};
 			return 0;
@@ -209,7 +213,7 @@ namespace ghg
 
 		int32_t										GetShipHealth					(uint32_t iShipCore)				{ 
 			int32_t											totalHealth						= 0;
-			::gpk::view<const uint32_t>						shipCoreParts					= ShipParts[iShipCore];
+			::gpk::vcu16									shipCoreParts					= ShipParts[iShipCore];
 			for(uint32_t iShipCorePart = 0, countParts = shipCoreParts.size(); iShipCorePart < countParts; ++iShipCorePart)
 				totalHealth += Orbiters[shipCoreParts[iShipCorePart]].Health;
 
@@ -222,14 +226,14 @@ namespace ghg
 				if(ShipCores[iShipCore].Team != teamId) 
 					continue;
 
-				::gpk::vcu32									shipCoreParts					= ShipParts[iShipCore];
+				::gpk::vcu16									shipCoreParts					= ShipParts[iShipCore];
 				for(uint32_t iShipCorePart = 0, countParts = shipCoreParts.size(); iShipCorePart < countParts; ++iShipCorePart) 
 					totalHealth += Orbiters[shipCoreParts[iShipCorePart]].Health;
 			}
 			return totalHealth;
 		}
 
-		::gpk::n3f32&							GetShipPosition					(const SShipCore & ship)	{ return ShipPhysics.Centers[EntitySystem.Entities[ship.Entity].Body].Position; }
+		::gpk::n3f32&								GetShipPosition					(const SShipCore & ship)	{ return ShipPhysics.Centers[EntitySystem.Entities[ship.Entity].Body].Position; }
 
 		::gpk::error_t								GetShipPosition					(uint32_t iShip, ::gpk::n3f32 & output) const {
 			output = ShipPhysics.Centers[EntitySystem.Entities[ShipCores[iShip].Entity].Body].Position;
@@ -239,14 +243,14 @@ namespace ghg
 		::gpk::SBodyCenter&							GetOrbiterTransform				(const SOrbiter & shipPart)	{ return ShipPhysics.Centers	[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
 		::gpk::SBodyForces&							GetShipOrbiterForces			(const SOrbiter & shipPart)	{ return ShipPhysics.Forces		[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
 
-		inline	::gpk::n3f32&					GetShipPosition					(uint32_t indexShip)		{ return GetShipPosition(ShipCores[indexShip]); }
+		inline	::gpk::n3f32&						GetShipPosition					(uint32_t indexShip)		{ return GetShipPosition(ShipCores[indexShip]); }
 
 		::gpk::error_t								Save							(::gpk::au8 & output) const { 
 			gpk_necs(::gpk::saveView(output, ShipScores	));
 			gpk_necs(::gpk::saveView(output, ShipCores	));
 			uint32_t										totalEntityChildren				= 0;
 			for(uint32_t iShipCore = 0; iShipCore < ShipCores.size(); ++iShipCore) {
-				::gpk::view<const uint32_t>		v	{ShipParts[iShipCore]};
+				::gpk::vcu16		v	{ShipParts[iShipCore]};
 				::gpk::saveView(output, v);
 				totalEntityChildren += v.size();
 			}
