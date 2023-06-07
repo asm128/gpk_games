@@ -32,7 +32,7 @@ namespace d1_win32
 		
 												~Sample3DSceneRenderer			() { ReleaseDeviceResources(); }
 
-		::gpk::error_t							Initialize						(const ::gpk::pobj<DX::D3DDeviceResources> & deviceResources) {
+		::gpk::error_t							Initialize		(const ::gpk::pobj<DX::D3DDeviceResources> & deviceResources) {
 			DeviceResources							= deviceResources;
 			gpk_necs(CreateDeviceResources(DeviceResources->GetD3DDevice()));
 			gpk_necs(CreateSizeDependentResources(DeviceResources->GetLogicalSize(), DeviceResources->GetOrientationTransform3D()));

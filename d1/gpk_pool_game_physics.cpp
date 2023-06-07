@@ -1,6 +1,6 @@
 #include "gpk_pool_game_update.h"
 
-static	::gpk::error_t		resolveCollision							
+static	::gpk::error_t	resolveCollision							
 	( const ::gpk::n3d	& initialVelocityA
 	, const ::gpk::n3d	& initialRotationA
 	, const ::gpk::n3d	& distanceDirection
@@ -54,7 +54,7 @@ static	::gpk::error_t		resolveCollision
 }
 
 // this shoulnd't exist really but it will be here until we handle ball collisions properly
-static	::gpk::error_t		handleBallContact	(::d1p::SPoolGame & pool, const ::gpk::SContact & contact, ::gpk::SContactResult & contactResult) {
+static	::gpk::error_t	handleBallContact	(::d1p::SPoolGame & pool, const ::gpk::SContact & contact, ::gpk::SContactResult & contactResult) {
 	::gpk::SEngine					& engine			= pool.Engine;
 	const ::gpk::SVirtualEntity		& entityA			= engine.Entities[contact.EntityA]; 
 	const ::gpk::SVirtualEntity		& entityB			= engine.Entities[contact.EntityB]; 
@@ -123,7 +123,7 @@ static	::gpk::error_t		handleBallContact	(::d1p::SPoolGame & pool, const ::gpk::
 	return 0;
 }
 
-static	::gpk::error_t		handlePockets	
+static	::gpk::error_t	handlePockets	
 	( ::d1p::SPoolGame					& pool
 	, uint8_t							iBall
 	, ::gpk::SBodyFlags					& flags	
@@ -175,7 +175,7 @@ static	::gpk::error_t		handlePockets
 }
 
 // this shoulnd't exist really but it will be here until we handle cushion collisions properly
-static	::gpk::error_t		handleBoundaries				(::d1p::SPoolGame & pool, float ballRadius, ::gpk::n3f & positionA, ::gpk::SBodyForces & forcesA, const ::d1p::SPoolTable & tableDimensions, const gpk::n2f & tableHalfDimensions) {
+static	::gpk::error_t	handleBoundaries				(::d1p::SPoolGame & pool, float ballRadius, ::gpk::n3f & positionA, ::gpk::SBodyForces & forcesA, const ::d1p::SPoolTable & tableDimensions, const gpk::n2f & tableHalfDimensions) {
 	::gpk::n2f						ballLimits						= tableHalfDimensions - ::gpk::n2f{ballRadius, ballRadius};
 	::gpk::n3f						pocketPosition					= {};
 	double							pocketRadius					= tableDimensions.PocketRadius;
@@ -219,22 +219,22 @@ static	::gpk::error_t		handleBoundaries				(::d1p::SPoolGame & pool, float ballR
 	return 0;
 }
 
-static	::gpk::error_t		handleFalling					(::d1p::SPoolGame & pool, uint32_t iRigidBody, ::gpk::n3f & positionA, ::gpk::SBodyFlags & flagsA, ::gpk::SBodyForces & forcesA, ::gpk::SBodyMass & massA) {
+static	::gpk::error_t	handleFalling					(::d1p::SPoolGame & pool, uint32_t iRigidBody, ::gpk::n3f & positionA, ::gpk::SBodyFlags & flagsA, ::gpk::SBodyForces & forcesA, ::gpk::SBodyMass & massA) {
 	if(positionA.y < pool.MatchState.Board.BallRadius) { // if the ball is falling through the top of the table we make it bounce up
-		positionA.y						= (positionA.y - pool.MatchState.Board.BallRadius) * -.95f + pool.MatchState.Board.BallRadius;
+		positionA.y				= (positionA.y - pool.MatchState.Board.BallRadius) * -.95f + pool.MatchState.Board.BallRadius;
 
-		forcesA.Velocity.y				*= -1.0f;
-		forcesA.Velocity.y				*= pool.MatchState.Physics.Damping.Ground * (1.0f / 255.0f);
+		forcesA.Velocity.y		*= -1.0f;
+		forcesA.Velocity.y		*= pool.MatchState.Physics.Damping.Ground * (1.0f / 255.0f);
 		pool.Engine.Integrator.Frames[iRigidBody].AccumulatedForce.y	= -float(pool.MatchState.Physics.Gravity * .001f * massA.GetMass());
 	}
 	else if(fabs(forcesA.Velocity.y) > 0.0000075 || positionA.y > pool.MatchState.Board.BallRadius) { // if the ball is falling, we continue falling
 		pool.Engine.Integrator.Frames[iRigidBody].AccumulatedForce.y	= -float(pool.MatchState.Physics.Gravity * .001f * massA.GetMass());
 	} 
 	else { // else, no velocity, so we disable falling
-		forcesA.Acceleration.y			=  0;
-		forcesA.Velocity.y				=  0;
-		positionA.y						= pool.MatchState.Board.BallRadius;
-		flagsA.Falling					= false;
+		forcesA.Acceleration.y	=  0;
+		forcesA.Velocity.y		=  0;
+		positionA.y				= pool.MatchState.Board.BallRadius;
+		flagsA.Falling			= false;
 	}
 	return 0;
 }

@@ -26,7 +26,7 @@ namespace d1_win32
 		void											ReleaseDeviceResources	() { WhiteBrush = {}; }
 
 		// Initializes D2D resources used for text rendering.
-		::gpk::error_t									Initialize						(const ::gpk::pobj<DX::D3DDeviceResources> & deviceResources)  {
+		::gpk::error_t									Initialize		(const ::gpk::pobj<DX::D3DDeviceResources> & deviceResources)  {
 			DeviceResources									= deviceResources;
 			// Create device independent resources
 			::gpk::pcom<IDWriteTextFormat>						textFormat						= {};

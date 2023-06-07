@@ -28,7 +28,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "D1");
 	return 0;
 }
 
-static	::gpk::error_t				updateSizeDependentResources		(::SApplication& app)											{
+static	::gpk::error_t	updateSizeDependentResources		(::SApplication& app)											{
 	::gpk::SWindow							& mainWindow						= app.Framework.RootWindow;
 	const ::gpk::n2<uint16_t>				newSize								= mainWindow.Size;
 #if !defined(DISABLE_D3D11)
@@ -41,7 +41,7 @@ static	::gpk::error_t				updateSizeDependentResources		(::SApplication& app)				
 	return 0;
 }
 
-static	::gpk::error_t				processSystemEvent					(::SApplication & app, const ::gpk::SSysEvent & sysEvent) { 
+static	::gpk::error_t	processSystemEvent					(::SApplication & app, const ::gpk::SSysEvent & sysEvent) { 
 	switch(sysEvent.Type) {
 	default								: break;
 	case ::gpk::SYSEVENT_WINDOW_CREATE	: 

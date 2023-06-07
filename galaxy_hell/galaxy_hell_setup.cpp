@@ -12,32 +12,21 @@
 ::gpk::error_t			ghg::solarSystemSave	(const ::ghg::SGalaxyHell & game, ::gpk::vcc fileName) {
 	::gpk::au8					serialized;
 	gpk_necs(game.Save(serialized));
-
-	::gpk::au8					deflated;
-	gpk_necs(::gpk::arrayDeflate(serialized, deflated));
-
-	info_printf("Savegame size in bytes: %u.", serialized.size());
-	info_printf("Savegame file size: %u.", deflated.size());
-
-	return ::gpk::fileFromMemory(fileName, deflated);
+	gpk_necs(::gpk::deflateFromMemory(fileName, serialized));
+	return 0;
 }
 
 ::gpk::error_t			ghg::solarSystemLoad	(::ghg::SGalaxyHell & world,::gpk::vcc filename) {
 	::gpk::au8					serialized;
-	world.PlayState.TimeLast	= ::gpk::timeCurrent();
+	gpk_necs(::gpk::inflateToMemory(filename, serialized));
 
-	gpk_necall(::gpk::fileToMemory(filename, serialized), "%s", "");
-	::gpk::au8					inflated;
-	gpk_necs(::gpk::arrayInflate(serialized, inflated));
-
-	info_printf("Savegame file size: %u.", inflated.size());
-	info_printf("Savegame size in bytes: %u.", serialized.size());
-
-	::gpk::vcu8					viewSerialized			= inflated;
+	::gpk::vcu8					viewSerialized			= serialized;
 	if errored(world.Load(viewSerialized)) {
 		gpk_necs(::ghg::solarSystemReset(world));
 		return -1;
 	}
+
+	world.PlayState.TimeLast	= ::gpk::timeCurrent();
 	world.PlayState.Paused	= true;
 	return 0;
 }
