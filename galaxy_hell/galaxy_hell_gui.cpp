@@ -10,6 +10,8 @@ stacxpr	bool					BACKGROUND_3D_ONLY		= true;
 stacxpr	::gpk::n2u16			MODULE_CAMERA_SIZE		= {48, 48};
 stacxpr	::gpk::n2u16			MODULE_VIEWPORT_SIZE	= {128, 64};
 stacxpr	::gpk::n2u16			WEAPON_BAR_SIZE			= {96, 16};
+stacxpr	::gpk::n2u16			PLAYER_UI_SIZE			= {256, 40};
+stacxpr	::gpk::n2u16			HOME_BUTTON_SIZE		= {160, 24};
 
 static	::gpk::error_t	guiSetupCommon		(::gpk::SGUI & gui) {
 	gui.ColorModeDefault	= ::gpk::GUI_COLOR_MODE_3D;
@@ -35,7 +37,7 @@ static	::gpk::error_t	dialogCreateCommon	(::gpk::SDialog & dialogLoad, const ::g
 // -------------------------------- Set up player GUI for home screen
 static	::gpk::error_t	uiPlayerSetupHome	(::ghg::SUIPlayer & uiPlayer, ::gpk::pobj<::gpk::SInput> input, ::gpk::n2f32 cursorPos, uint32_t iPlayer, const ::gpk::vcc playerName) {
 	::gpk::ALIGN				playerAlign		;
-	::gpk::n2i16			playerPosition	;
+	::gpk::n2i16				playerPosition	;
 	switch(iPlayer) {
 	default:
 	case 0: playerAlign = ::gpk::ALIGN_BOTTOM_LEFT;		break;
@@ -57,7 +59,7 @@ static	::gpk::error_t	uiPlayerSetupHome	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
-	::gpk::guiSetupButtonList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, {240, 40}, playerPosition, playerAlign, ::gpk::ALIGN_CENTER);
+	::gpk::guiSetupButtonList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, PLAYER_UI_SIZE, playerPosition, playerAlign, ::gpk::ALIGN_CENTER);
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Name; iButton < iStop; ++iButton) {
 		playerGUI.Controls.Controls		[iOffset + iButton].Margin				= {}; 
 		//playerGUI.Controls.Controls		[iButton].Border				= {2, 2, 2, 2};
@@ -110,7 +112,7 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
-	::gpk::guiSetupButtonList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, {240, 40}, playerPosition, playerAlign, ::gpk::ALIGN_CENTER);
+	::gpk::guiSetupButtonList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, PLAYER_UI_SIZE, playerPosition, playerAlign, ::gpk::ALIGN_CENTER);
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Name; iButton < iStop; ++iButton) {
 		playerGUI.Controls.Controls	[iOffset + iButton].Margin		= {}; 
 		//playerGUI.Controls.Controls	[iOffset + iButton].Border	= {};
@@ -200,8 +202,7 @@ static	::gpk::error_t	guiSetupLoad		(::gpk::SDialog & dialog) {
 }
 
 static	::gpk::error_t	guiSetupHome		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { 
-	constexpr int				BUTTON_HEIGHT		= 24;
-	gpk_necs(::gpk::guiSetupButtonList<::ghg::UI_HOME>(*dialog.GUI, dialog.Root, {160, BUTTON_HEIGHT}, {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::ghg::UI_HOME>() / 2)}, ::gpk::ALIGN_CENTER)); 
+	gpk_necs(::gpk::guiSetupButtonList<::ghg::UI_HOME>(*dialog.GUI, dialog.Root, HOME_BUTTON_SIZE, {0, int16_t(-HOME_BUTTON_SIZE.y * ::gpk::get_value_count<::ghg::UI_HOME>() / 2)}, ::gpk::ALIGN_CENTER)); 
 	for(uint32_t iButton = 0; iButton < ::gpk::get_value_count<::ghg::UI_HOME>(); ++iButton)
 		dialog.GUI->Controls.Controls[iButton + 1].Area.Offset.y += 0;
 
@@ -451,7 +452,7 @@ static	::gpk::error_t	sprintfTime			(const char *prefix, char (&dest)[_nStorageS
 }
 
 static	::gpk::error_t	uiPlayerUpdateHome	(::ghg::SUIPlayer & uiPlayer, uint16_t iPlayer, const ::gpk::vcc playerName, const ::gpk::bgra & shipColor, const ::ghg::SShipScore & shipScore) { 
-	sprintf_s(uiPlayer.TextScore.Storage, "%c %llu  %c %llu  %c %llu", 4, shipScore.Score, 1, (uint64_t)shipScore.KilledShips, 2, (uint64_t)shipScore.KilledOrbiters);
+	sprintf_s(uiPlayer.TextScore.Storage, "%c %llu  %c %llu  %c %llu  %c %llu", 4, shipScore.Score, 94, shipScore.Shots, 1, (uint64_t)shipScore.KilledShips, 2, (uint64_t)shipScore.KilledOrbiters);
 	::gpk::SDialog				& playerDialog		= uiPlayer.DialogHome;
 	::gpk::SGUI					& playerGUI			= *playerDialog.GUI;
 	gpk_necs(::gpk::controlTextSet(playerGUI, playerDialog.Root + 1 + ::ghg::UI_PROFILE_Score, uiPlayer.TextScore.Storage));
@@ -474,7 +475,7 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 	::gpk::SDialog				& playerDialog		= uiPlayer.DialogPlay;
 	::gpk::SGUI					& playerGUI			= *playerDialog.GUI;
 
-	sprintf_s(uiPlayer.TextScore.Storage, "%c %llu  %c %llu  %c %llu", 4, shipScore.Score, 1, (uint64_t)shipScore.KilledShips, 2, (uint64_t)shipScore.KilledOrbiters);
+	sprintf_s(uiPlayer.TextScore.Storage, "%c %llu  %c %llu  %c %llu  %c %llu", 4, shipScore.Score, 94, shipScore.Shots, 1, (uint64_t)shipScore.KilledShips, 2, (uint64_t)shipScore.KilledOrbiters);
 	const ::ghg::SShipCore		& shipCore			= game.ShipState.ShipCores[iPlayer];
 	const ::gpk::rgbaf			shipColor			= (shipCore.Team ? ::gpk::RED : ::gpk::rgbaf(game.Pilots[iPlayer].Color));
 	gpk_necs(::gpk::controlTextSet(playerGUI, 1 + ::ghg::UI_PILOT_Name	, game.Pilots[iPlayer].Name));
