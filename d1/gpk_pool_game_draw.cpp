@@ -23,7 +23,7 @@
 	constants.CameraFront						= cameraFront;
 	constants.LightPosition						= {0, 10, 0};
 	constants.LightDirection					= {0, -1, 0};
-	::gpk::SMinMax									nearFar 						= {.0001f, 10.0f}; 
+	::gpk::minmax									nearFar 						= {.0001f, 10.0f}; 
 
 	constants.View.LookAt(cameraPosition, cameraTarget, cameraUp);
 	constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Min, nearFar.Max);

@@ -48,7 +48,7 @@
 
 ::gpk::error_t						d1_win32::d3dDrawEngineScene	(::d1_win32::Sample3DSceneRenderer & d3dScene, const ::gpk::SEngineScene & engineScene, const ::gpk::n2u16 & targetMetrics, const ::gpk::n3f & lightPos, const ::gpk::n3f & cameraPosition, const gpk::n3f & cameraTarget)	{
 	::gpk::n3f								cameraFront						= (cameraTarget - cameraPosition).Normalize();
-	::gpk::SMinMax<float>					nearFar 						= {.0001f, 10.0f}; 
+	::gpk::minmax<float>					nearFar 						= {.0001f, 10.0f}; 
 
 	::gpk::SEngineSceneConstants			& constants						= d3dScene.ConstantBufferScene;
 	constants.CameraPosition			= cameraPosition;

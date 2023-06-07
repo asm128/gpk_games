@@ -55,12 +55,12 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 		gpk_necs(::gpk::controlSetParent(gui, appUI.TunerTableSize->IdGUIControl, appUI.DialogPerState[::d1::APP_STATE_Home]));
 		appUI.TunerTableSize->ValueLimits.Min	= 0;
 		appUI.TunerTableSize->ValueLimits.Max	= uint8_t(::gpk::get_value_count<::d1p::TABLE_SIZE>() - 1);
-		appUI.TunerTableSize->FuncValueFormat	= [&appGame, &appUI](::gpk::vcc & string, uint8_t value, const ::gpk::SMinMax<uint8_t> &)			mutable { 
+		appUI.TunerTableSize->FuncValueFormat	= [&appGame, &appUI](::gpk::vcc & string, uint8_t value, const ::gpk::minmax<uint8_t> &)			mutable { 
 			appGame.StartState.StandardTableSize	= (::d1p::TABLE_SIZE)value;
 			string					= ::gpk::get_value_descv(appGame.StartState.StandardTableSize); 
 			return 0; 
 		};
-		appUI.TunerTableSize->FuncGetString		= [&appGame, &appUI](::gpk::vcc & string, uint8_t, const ::gpk::SMinMax<uint8_t> &)	mutable { 
+		appUI.TunerTableSize->FuncGetString		= [&appGame, &appUI](::gpk::vcc & string, uint8_t, const ::gpk::minmax<uint8_t> &)	mutable { 
 			string		= {appUI.TunerTableSize->ValueString, (uint32_t)snprintf(appUI.TunerTableSize->ValueString, ::gpk::size(appUI.TunerTableSize->ValueString) - 2, "%s Table", ::gpk::toString(string).begin())}; 
 			return 0; 
 		};
@@ -138,7 +138,7 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Image = appUI.ForceSliderRenderTarget.Color;
 
 	static char					velocityString[32]			= {};
-	appUI.ForceSlider->FuncValueFormat	= [&appGame](::gpk::vcc & string, int64_t value, const ::gpk::SMinMax<int64_t> & limits) mutable { 
+	appUI.ForceSlider->FuncValueFormat	= [&appGame](::gpk::vcc & string, int64_t value, const ::gpk::minmax<int64_t> & limits) mutable { 
 		const float					newVelocity					= ::d1p::MAX_SHOOT_VELOCITY / limits.Max * (limits.Max - value);
 		const float					currentVelocity				= appGame.Pool.ActiveStick().Velocity;
 		if(newVelocity != currentVelocity) { // only generate the event if the value actually changed. this is because this may be called randomly to ensure the right value is in sync with the server.

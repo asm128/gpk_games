@@ -214,7 +214,7 @@ static	::gpk::error_t	guiSetupHome		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog
 	gpk_necs(::gpk::tunerCreate(dialog, app.TunerPlayerCount));
 	app.TunerPlayerCount->ValueLimits.Min	= 1;
 	app.TunerPlayerCount->ValueLimits.Max	= ::ghg::MAX_PLAYERS;
-	app.TunerPlayerCount->FuncValueFormat	= [](::gpk::vcc & string, uint8_t value, const ::gpk::SMinMax<uint8_t> & /*limits*/) { 
+	app.TunerPlayerCount->FuncValueFormat	= [](::gpk::vcc & string, uint8_t value, const ::gpk::minmax<uint8_t> & /*limits*/) { 
 		string = (value == 1) ? ::gpk::vcs("%lli Player") : ::gpk::vcs("%lli Players"); 
 		return 0; 
 	};
@@ -461,9 +461,9 @@ static	::gpk::error_t	uiPlayerUpdateHome	(::ghg::SUIPlayer & uiPlayer, uint16_t 
 		::gpk::SControl				& control			= playerGUI.Controls.Controls[playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name];
 		control.ColorTheme		= int16_t(3 + iPlayer);
 		const ::gpk::SControlTheme	& theme				= (*playerGUI.Colors->ControlThemes)[(0 == control.ColorTheme) ? playerGUI.ThemeDefault : control.ColorTheme - 1];
-		const ::gpk::astu32<::gpk::GUI_CONTROL_AREA_EX_COUNT>	& colorCombo	= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
-		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_AREA_EX_TEXT_FACE	]] = shipColor;
-		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_AREA_EX_BACKGROUND	]] = shipColor;
+		const ::gpk::astu32<::gpk::UI_CONTROL_AREA_COUNT>	& colorCombo	= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
+		(*playerGUI.Colors->Palette)[colorCombo[::gpk::UI_CONTROL_AREA_TEXT_FACE	]] = shipColor;
+		(*playerGUI.Colors->Palette)[colorCombo[::gpk::UI_CONTROL_AREA_BACKGROUND	]] = shipColor;
 		playerGUI.Controls.Controls[uiPlayer.InputBox.IdText].ColorTheme = control.ColorTheme;
 		playerGUI.Controls.Modes[uiPlayer.InputBox.IdText].NoBackgroundRect = true;
 
@@ -484,9 +484,9 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 		::gpk::SControl				& control		= playerGUI.Controls.Controls[1 + ::ghg::UI_PILOT_Name];
 		control.ColorTheme		= int16_t(3 + iPlayer);
 		const ::gpk::SControlTheme	& theme			= (*playerGUI.Colors->ControlThemes)[(0 == control.ColorTheme) ? playerGUI.ThemeDefault : control.ColorTheme - 1];
-		const ::gpk::astu32<::gpk::GUI_CONTROL_AREA_EX_COUNT>	& colorCombo			= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
-		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_AREA_EX_TEXT_FACE	]] = shipColor;
-		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_AREA_EX_BACKGROUND	]] = shipColor;
+		const ::gpk::astu32<::gpk::UI_CONTROL_AREA_COUNT>	& colorCombo			= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
+		(*playerGUI.Colors->Palette)[colorCombo[::gpk::UI_CONTROL_AREA_TEXT_FACE	]] = shipColor;
+		(*playerGUI.Colors->Palette)[colorCombo[::gpk::UI_CONTROL_AREA_BACKGROUND	]] = shipColor;
 	}
 	for(uint32_t iOrbiter = 0, countViewports = game.ShipState.ShipParts[iPlayer].size(); iOrbiter < countViewports; ++iOrbiter) {
 		::ghg::SUIPlayShipPartViewport	& viewport	= *uiPlayer.ModuleViewports[iOrbiter];
