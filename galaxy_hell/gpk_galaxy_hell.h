@@ -67,19 +67,19 @@ namespace ghg
 	};
 	 
 	struct SShipController {
-		uint8_t				Forward				: 1;
-		uint8_t				Back				: 1;
-		uint8_t				Left				: 1;
-		uint8_t				Right				: 1;
-		uint8_t				Turbo				: 1;
-		::gpk::n3i16		PointerDeltas		= {};
-		::gpk::n3i16		PointerPosition		= {};
+		uint8_t				Forward					: 1;
+		uint8_t				Back					: 1;
+		uint8_t				Left					: 1;
+		uint8_t				Right					: 1;
+		uint8_t				Turbo					: 1;
+		::gpk::n3i16		PointerDeltas			= {};
+		::gpk::n3i16		PointerPosition			= {};
 	};
 #pragma pack(pop)
 
 	struct SShipPilot {
-		::gpk::vcc							Name					= "Evil Dead";
-		::gpk::bgra							Color					= ::gpk::MAGENTA;
+		::gpk::vcc			Name					= "Evil Dead";
+		::gpk::bgra			Color					= ::gpk::MAGENTA;
 	};
 
 	struct SGalaxyHell {
@@ -133,13 +133,13 @@ namespace ghg
 		}
 	};
 
-	::gpk::error_t						stageSetup						(::ghg::SGalaxyHell & solarSystem);
-	::gpk::error_t						solarSystemSetup				(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2<uint16_t> & windowSize);
-	::gpk::error_t						solarSystemReset				(::ghg::SGalaxyHell & solarSystem); 
-	::gpk::error_t						solarSystemDraw					(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
-	::gpk::error_t						solarSystemUpdate				(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, const ::gpk::view<::gpk::SSysEvent> & frameEvents);
-	::gpk::error_t						solarSystemLoad					(::ghg::SGalaxyHell & world,::gpk::vcc filename);
-	::gpk::error_t						solarSystemSave					(const ::ghg::SGalaxyHell & world,::gpk::vcc filename);
+	::gpk::error_t						stageSetup				(::ghg::SGalaxyHell & solarSystem);
+	::gpk::error_t						solarSystemSetup		(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2<uint16_t> & windowSize);
+	::gpk::error_t						solarSystemReset		(::ghg::SGalaxyHell & solarSystem); 
+	::gpk::error_t						solarSystemDraw			(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
+	::gpk::error_t						solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, const ::gpk::view<::gpk::SSysEvent> & frameEvents);
+	::gpk::error_t						solarSystemLoad			(::ghg::SGalaxyHell & world,::gpk::vcc filename);
+	::gpk::error_t						solarSystemSave			(const ::ghg::SGalaxyHell & world,::gpk::vcc filename);
 	
 	::gpk::error_t						getLightArraysFromDebris
 		( const ::ghg::SDecoState				& decoState

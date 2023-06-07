@@ -184,7 +184,7 @@ static	::gpk::error_t	shipGeometryBuildShred		(::gpk::SGeometryQuads & geometry)
 	return 0;
 }
 
-static	::gpk::error_t	modelsSetup				(::ghg::SShipScene & scene)			{
+static	::gpk::error_t	modelsSetupOld			(::ghg::SShipScene & scene)			{
 	scene.Geometry.resize(::gpk::get_value_count<ghg::SHIP_GEOMETRY>() * 1024);
 
 	::shipGeometryBuildEngine		(scene.Geometry[::ghg::SHIP_GEOMETRY_ENGINE			]);
@@ -226,6 +226,52 @@ static	::gpk::error_t	modelsSetup				(::ghg::SShipScene & scene)			{
 	return 0;
 }
 
+static	::gpk::error_t	shipNodeCreateRoot	(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) {
+	gpk::SMeshManager			& meshes			= graphics.Meshes;
+	const uint32_t				rootNode			= (uint32_t)nodes.Create();
+	nodes[rootNode].Mesh	= (uint32_t)meshes.Create();
+	return rootNode;
+}
+
+static	::gpk::error_t	shipNodeBuildEngine			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildWafer			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildWaferShotgun	(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildGun			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildShotgun		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildCannon			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildCannonball		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildRocket			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildMissile		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildBullet			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildShred			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+
+static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
+	gpk::pobj<gpk::SEngineScene>	scene			= engine.Scene;
+
+	gpk::SRenderNodeManager		& nodes				= scene->RenderNodes;
+	gpk::pobj<gpk::SEngineGraphics>	& graphics		= scene->Graphics;
+	if(!graphics) 
+		graphics.create();
+
+	::shipNodeBuildEngine		(nodes, *graphics);
+	::shipNodeBuildGun			(nodes, *graphics);
+	::shipNodeBuildWafer		(nodes, *graphics);
+	::shipNodeBuildCannon		(nodes, *graphics);
+	::shipNodeBuildShotgun		(nodes, *graphics);
+	::shipNodeBuildWaferShotgun	(nodes, *graphics);
+	::shipNodeBuildCannonball	(nodes, *graphics);
+	::shipNodeBuildRocket		(nodes, *graphics);
+	::shipNodeBuildMissile		(nodes, *graphics);
+	::shipNodeBuildBullet		(nodes, *graphics);
+	::shipNodeBuildShred		(nodes, *graphics);
+
+	//::gpk::geometryBuildCube		(scene.Geometry[::ghg::SHIP_GEOMETRY_CUBE			], {1, 1, 1});
+	//::gpk::geometryBuildSphere		(scene.Geometry[::ghg::SHIP_GEOMETRY_SPHERE			], 16U, 16U, .5f, {0, 0});
+	//::gpk::geometryBuildCylinder	(scene.Geometry[::ghg::SHIP_GEOMETRY_CYLINDER		],  1U, 32U, .5, .5, {0, 0}, {1, 1, 1});
+
+	return 0;
+}
+
 ::gpk::error_t			ghg::solarSystemReset	(::ghg::SGalaxyHell & solarSystem)	{	// Set up enemy ships
 	::std::lock_guard			lock(solarSystem.LockUpdate);
 	solarSystem.ShipControllers.clear();
@@ -244,7 +290,7 @@ static	::gpk::error_t	modelsSetup				(::ghg::SShipScene & scene)			{
 	solarSystem.PlayState.TimeStage		= 0;
 	solarSystem.PlayState.TimeRealStage	= 0;
 	if(0 == solarSystem.PlayState.Stage) {
-		::std::lock_guard					lock(solarSystem.LockUpdate);
+		::std::lock_guard			lock(solarSystem.LockUpdate);
 		solarSystem.DecoState.Stars.Reset(solarSystem.DrawCache.RenderTargetMetrics);
 		solarSystem.PlayState.TimeStart = solarSystem.PlayState.TimeLast = ::gpk::timeCurrent();
 		memset(solarSystem.ShipState.ShipScores.begin(), 0, solarSystem.ShipState.ShipScores.byte_count());
@@ -416,8 +462,9 @@ static	::gpk::error_t	modelsSetup				(::ghg::SShipScene & scene)			{
 }
 
 ::gpk::error_t			ghg::solarSystemSetup	(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2<uint16_t> & windowSize)	{
-	::ghg::SShipScene			& scene					= solarSystem.ShipState.Scene;
-	gpk_necs(::modelsSetup(scene));
+	gpk_necs(::modelsSetup(solarSystem.ShipState.Engine));
+	gpk_necs(::modelsSetupOld(solarSystem.ShipState.Scene));
+
 	solarSystem.DecoState.FontManager.Fonts.clear();
 	gpk_necs(::gpk::rasterFontDefaults(solarSystem.DecoState.FontManager));
 
@@ -425,6 +472,7 @@ static	::gpk::error_t	modelsSetup				(::ghg::SShipScene & scene)			{
 
 	::gpk::m4f32				& matrixProjection		= solarSystem.ShipState.Scene.Global.MatrixProjection;
 	matrixProjection.FieldOfView(::gpk::math_pi * .25, windowSize.x / (double)windowSize.y, 0.01, 500.0);
+
 	::gpk::m4f32				matrixViewport			= {};
 	matrixViewport.ViewportLH(windowSize.Cast<uint16_t>());
 	matrixProjection		*= matrixViewport;

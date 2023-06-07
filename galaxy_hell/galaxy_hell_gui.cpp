@@ -373,11 +373,12 @@ static	::gpk::error_t	guiHandleHome		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI &
 		game.PlayState.Paused	= false;
 		return ::ghg::APP_STATE_Play;
 	case ::ghg::UI_HOME_Save:
-		gerror_if(0 > app.Save(::ghg::SAVE_MODE_USER), "%s", "");
+		es_if(0 > app.Save(::ghg::SAVE_MODE_USER));
 		break;
 	case ::ghg::UI_HOME_Load: {
 		::gpk::aobj<::gpk::vcc>	pathFileNames;
 		::ghg::listFilesSavegame(app, app.SavegameFolder, pathFileNames);
+
 		pathFileNames.push_back(::gpk::vcs{"Back"});
 		dialogCreateLoad(app.DialogPerState[::ghg::APP_STATE_Load], pathFileNames, app.DialogPerState[::ghg::APP_STATE_Home].Input, app.DialogPerState[::ghg::APP_STATE_Home].GUI->CursorPos);
 		return ::ghg::APP_STATE_Load;
@@ -386,7 +387,7 @@ static	::gpk::error_t	guiHandleHome		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI &
 	case ::ghg::UI_HOME_Credits: return ::ghg::APP_STATE_About; 
 	case ::ghg::UI_HOME_Shop: return ::ghg::APP_STATE_Shop; 
 	case ::ghg::UI_HOME_Exit: 
-		game.PlayState.Paused						= true;
+		game.PlayState.Paused	= true;
 		return ::ghg::APP_STATE_Quit;
 	}
 	return ::ghg::APP_STATE_Home; 
@@ -597,7 +598,7 @@ static	::gpk::error_t	guiUpdatePlay		(::ghg::SGalaxyHellApp & app) {
 	for(uint32_t iPlayer = 0; iPlayer < app.TunerPlayerCount->ValueCurrent && iPlayer < app.UIPlay.PlayerUI.size() ; ++iPlayer) { app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI->Controls.States[0].Hidden = false; }
 	for(uint32_t iPlayer = (uint32_t)app.TunerPlayerCount->ValueCurrent; iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) { app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI->Controls.States[0].Hidden = true; }
 
-	::ghg::SGalaxyHellDrawCache	& drawCache				= app.UIPlay.DrawCache;
+	::ghg::SGalaxyHellDrawCache	& drawCache			= app.UIPlay.DrawCache;
 	drawCache.LightPointsWorld.clear();
 	drawCache.LightColorsWorld.clear();
 	::ghg::getLightArraysFromShips(game.ShipState, drawCache.LightPointsWorld, drawCache.LightColorsWorld);
@@ -605,7 +606,7 @@ static	::gpk::error_t	guiUpdatePlay		(::ghg::SGalaxyHellApp & app) {
 	drawCache.LightColorsModel.reserve(drawCache.LightColorsWorld.size());
 	if(app.ActiveState == ::ghg::APP_STATE_Play) {
 		for(uint32_t iPlayer = 0; iPlayer < game.PlayState.CountPlayers; ++iPlayer) {
-			::ghg::SUIPlayer			& uiPlayer				= app.UIPlay.PlayerUI[iPlayer];
+			::ghg::SUIPlayer			& uiPlayer			= app.UIPlay.PlayerUI[iPlayer];
 			gpk_necall(::uiPlayerUpdatePlay(uiPlayer, iPlayer, app.Game, app.Game.ShipState.ShipScores[iPlayer], app.Game.LockUpdate, drawCache), "iPlayer: %i", iPlayer);
 			uiPlayer.DialogPlay.GUI->Controls.States[0].Hidden = false; 
 		}
@@ -630,10 +631,10 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 			app.AddNewPlayer(text);
 		}
 
-		::gpk::rgbaf		shipColor					= ::ghg::PLAYER_COLORS[iPlayer];
+		::gpk::rgbaf				shipColor					= ::ghg::PLAYER_COLORS[iPlayer];
 		if((iPlayer < app.Game.ShipState.ShipCores.size())) {
-			const ::ghg::SShipCore	& shipCore				= app.Game.ShipState.ShipCores[iPlayer];
-			shipColor		= (shipCore.Team ? ::ghg::PLAYER_COLORS[iPlayer] : app.Game.Pilots[iPlayer].Color);
+			const ::ghg::SShipCore		& shipCore				= app.Game.ShipState.ShipCores[iPlayer];
+			shipColor				= (shipCore.Team ? ::ghg::PLAYER_COLORS[iPlayer] : app.Game.Pilots[iPlayer].Color);
 		}
 
 		gpk_necall(::uiPlayerUpdateHome(uiPlayer, int16_t(iPlayer), app.Players[iPlayer].Name, shipColor
@@ -641,11 +642,11 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 			), "iPlayer: %i", iPlayer
 		);
 
-		::gpk::au32			controlsToProcess		= {};
+		::gpk::au32					controlsToProcess			= {};
 		::gpk::guiGetProcessableControls(gui, controlsToProcess);
 		if(int32_t result = uiPlayer.InputBox.Update(gui, frameEvents, controlsToProcess)) {
 			if(result == INT_MAX) {
-				::gpk::vcc			trimmed				= {uiPlayer.InputBox.Text.begin(), ::gpk::min(uiPlayer.InputBox.Text.size(), 16U)};
+				::gpk::vcc					trimmed						= {uiPlayer.InputBox.Text.begin(), ::gpk::min(uiPlayer.InputBox.Text.size(), 16U)};
 				::gpk::trim(trimmed);
 				if(trimmed.size()) {
 					app.Players[iPlayer].Name	= ::gpk::label(trimmed);
@@ -657,7 +658,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 		}
 		else {
 			::gpk::guiProcessControls(gui, controlsToProcess, [&](uint32_t iControl) {
-				uint32_t						offsetControl				= dialog.Root + 1;
+				uint32_t					offsetControl				= dialog.Root + 1;
 				switch(iControl - (offsetControl)) {
 				case ::ghg::UI_PROFILE_Name:
 					uiPlayer.InputBox.SetText(gui, gui.Controls.Text[offsetControl + ::ghg::UI_PROFILE_Name].Text);
