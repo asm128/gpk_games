@@ -461,9 +461,9 @@ static	::gpk::error_t	uiPlayerUpdateHome	(::ghg::SUIPlayer & uiPlayer, uint16_t 
 		::gpk::SControl				& control			= playerGUI.Controls.Controls[playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name];
 		control.ColorTheme		= int16_t(3 + iPlayer);
 		const ::gpk::SControlTheme	& theme				= (*playerGUI.Colors->ControlThemes)[(0 == control.ColorTheme) ? playerGUI.ThemeDefault : control.ColorTheme - 1];
-		const ::gpk::astu32<::gpk::GUI_CONTROL_COLOR_COUNT>	& colorCombo	= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
-		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_COLOR_TEXT_FACE	]] = shipColor;
-		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_COLOR_BACKGROUND	]] = shipColor;
+		const ::gpk::astu32<::gpk::GUI_CONTROL_AREA_EX_COUNT>	& colorCombo	= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
+		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_AREA_EX_TEXT_FACE	]] = shipColor;
+		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_AREA_EX_BACKGROUND	]] = shipColor;
 		playerGUI.Controls.Controls[uiPlayer.InputBox.IdText].ColorTheme = control.ColorTheme;
 		playerGUI.Controls.Modes[uiPlayer.InputBox.IdText].NoBackgroundRect = true;
 
@@ -484,9 +484,9 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 		::gpk::SControl				& control		= playerGUI.Controls.Controls[1 + ::ghg::UI_PILOT_Name];
 		control.ColorTheme		= int16_t(3 + iPlayer);
 		const ::gpk::SControlTheme	& theme			= (*playerGUI.Colors->ControlThemes)[(0 == control.ColorTheme) ? playerGUI.ThemeDefault : control.ColorTheme - 1];
-		const ::gpk::astu32<::gpk::GUI_CONTROL_COLOR_COUNT>	& colorCombo			= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
-		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_COLOR_TEXT_FACE	]] = shipColor;
-		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_COLOR_BACKGROUND	]] = shipColor;
+		const ::gpk::astu32<::gpk::GUI_CONTROL_AREA_EX_COUNT>	& colorCombo			= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
+		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_AREA_EX_TEXT_FACE	]] = shipColor;
+		(*playerGUI.Colors->Palette)[colorCombo[::gpk::GUI_CONTROL_AREA_EX_BACKGROUND	]] = shipColor;
 	}
 	for(uint32_t iOrbiter = 0, countViewports = game.ShipState.ShipParts[iPlayer].size(); iOrbiter < countViewports; ++iOrbiter) {
 		::ghg::SUIPlayShipPartViewport	& viewport	= *uiPlayer.ModuleViewports[iOrbiter];
