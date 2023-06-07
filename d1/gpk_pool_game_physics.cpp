@@ -10,17 +10,17 @@ static	::gpk::error_t	resolveCollision
 	, ::gpk::n3f		& out_finalVelocityA
 	, ::gpk::n3f		& out_finalVelocityB
 	) {
-	::gpk::n3d						directionA			= initialVelocityA.Cast<double>();
+	::gpk::n3d						directionA			= initialVelocityA.f64();
 	directionA.Normalize();
 	out_forceTransferRatioB		= ::gpk::max(0.0f, (float)distanceDirection.Dot(directionA));
 	if(0 >= out_forceTransferRatioB) {
-		out_finalVelocityA			+= initialVelocityA.Cast<float>();
-		out_finalRotationA			+= initialRotationA.Cast<float>();
+		out_finalVelocityA			+= initialVelocityA.f32();
+		out_finalRotationA			+= initialRotationA.f32();
 		return 0;
 	}
 	if(1.0 <= out_forceTransferRatioB) {
-		out_finalVelocityB			+= initialVelocityA.Cast<float>();
-		out_finalRotationB			+= initialRotationA.Cast<float>();
+		out_finalVelocityB			+= initialVelocityA.f32();
+		out_finalRotationB			+= initialRotationA.f32();
 		return 0;
 	}
 
@@ -30,8 +30,8 @@ static	::gpk::error_t	resolveCollision
 		const ::gpk::n3d				vUp					= {0, revert ? -1 : 1.0f, 0};
 		::gpk::n3d						finalVelocityB		= distanceDirection * speedA * out_forceTransferRatioB;
 		::gpk::n3d						finalVelocityA		= ::gpk::n3d{finalVelocityB}.Normalize().Cross(vUp).Normalize() * speedA * (1.0f - out_forceTransferRatioB);
-		out_finalVelocityA			+= finalVelocityA.Cast<float>();
-		out_finalVelocityB			+= finalVelocityB.Cast<float>();
+		out_finalVelocityA			+= finalVelocityA.f32();
+		out_finalVelocityB			+= finalVelocityB.f32();
 	//	const double					totalFinalSpeed		= finalVelocityA.Length() + finalVelocityB.Length();
 	//	const double					totalInitialSpeed	= initialVelocityA.Length();
 	//	gwarn_if((totalFinalSpeed - totalInitialSpeed) >  0.0001f, "Invalid resulting force: initial: %f, final: %f, gained: %f", totalInitialSpeed, totalFinalSpeed, (totalFinalSpeed - totalInitialSpeed));
@@ -44,8 +44,8 @@ static	::gpk::error_t	resolveCollision
 		const ::gpk::n3d				initialRotationANormalized	= initialRotationA * (1.0 / rotA);
 		const ::gpk::n3d				finalRotationB		= initialRotationANormalized * rotA * out_forceTransferRatioB;
 		const ::gpk::n3d				finalRotationA		= initialRotationANormalized * rotA * (1.0 - out_forceTransferRatioB);
-		out_finalRotationA			+= finalRotationA.Cast<float>();
-		out_finalRotationB			+= finalRotationB.Cast<float>();
+		out_finalRotationA			+= finalRotationA.f32();
+		out_finalRotationB			+= finalRotationB.f32();
 		//const double					finalRotA			= finalRotationB.Length();
 		//const double					finalRotB			= finalRotationA.Length();
 		//info_printf("Total final rotation: %f", (float)(finalRotA + finalRotB));
@@ -88,7 +88,7 @@ static	::gpk::error_t	handleBallContact	(::d1p::SPoolGame & pool, const ::gpk::S
 		engine.Integrator.SetActive(entityB.RigidBody, true);
 		::gpk::n3f						lvelocityB					= {};
 		::gpk::n3f						lvelocityA					= {};
-		::resolveCollision(contactResult.InitialVelocityA.Cast<double>(), contactResult.InitialRotationA.Cast<double>(), contactResult.DistanceDirection.Cast<double>(), contactResult.ForceTransferRatioB, rotationA, rotationB, lvelocityA, lvelocityB);
+		::resolveCollision(contactResult.InitialVelocityA.f64(), contactResult.InitialRotationA.f64(), contactResult.DistanceDirection.f64(), contactResult.ForceTransferRatioB, rotationA, rotationB, lvelocityA, lvelocityB);
 		velocityB					+= lvelocityB;
 		velocityA					+= lvelocityA;
 	}
@@ -97,7 +97,7 @@ static	::gpk::error_t	handleBallContact	(::d1p::SPoolGame & pool, const ::gpk::S
 		engine.Integrator.SetActive(entityA.RigidBody, true);
 		::gpk::n3f						lvelocityB					= {};
 		::gpk::n3f						lvelocityA					= {};
-		::resolveCollision(contactResult.InitialVelocityB.Cast<double>(), contactResult.InitialRotationB.Cast<double>(), contactResult.DistanceDirection.Cast<double>() * -1, contactResult.ForceTransferRatioA, rotationB, rotationA, lvelocityB, lvelocityA);
+		::resolveCollision(contactResult.InitialVelocityB.f64(), contactResult.InitialRotationB.f64(), contactResult.DistanceDirection.f64() * -1, contactResult.ForceTransferRatioA, rotationB, rotationA, lvelocityB, lvelocityA);
 		velocityB					+= lvelocityB;
 		velocityA					+= lvelocityA;
 		//{

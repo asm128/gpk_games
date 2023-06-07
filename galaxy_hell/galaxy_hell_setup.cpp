@@ -474,7 +474,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 	matrixProjection.FieldOfView(::gpk::math_pi * .25, windowSize.x / (double)windowSize.y, 0.01, 500.0);
 
 	::gpk::m4f32				matrixViewport			= {};
-	matrixViewport.ViewportLH(windowSize.Cast<uint16_t>());
+	matrixViewport.ViewportLH(windowSize.u16());
 	matrixProjection		*= matrixViewport;
 	return 0;
 }

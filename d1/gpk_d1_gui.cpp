@@ -114,12 +114,12 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 
 	gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Border			= {};
 	gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Area.Offset		= {offsetX + 36};
-	gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Area.Size		= SHOOT_SLIDER_SIZE.Cast<int16_t>();
+	gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Area.Size		= SHOOT_SLIDER_SIZE.i16();
 	gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Align			= ::gpk::ALIGN_CENTER_RIGHT;
 	gui.Controls.Controls[appUI.ForceSlider->IdButton].Area.Size.y			= 8;
 	//gui.Controls.Modes[app.ForceSlider->IdGUIControl].NoBackgroundRect	= true;
 	gui.Controls.Modes[appUI.ForceSlider->IdGUIControl].NoHoverEffect		= true;
-	appUI.ForceSliderRenderTarget.resize(gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Area.Size.Cast<uint32_t>()); 
+	appUI.ForceSliderRenderTarget.resize(gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Area.Size.u32()); 
 
 	cnstxpr ::gpk::rgbaf		min							= ::gpk::GREEN;
 	cnstxpr ::gpk::rgbaf		mid							= ::gpk::YELLOW;

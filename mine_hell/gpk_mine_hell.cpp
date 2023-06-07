@@ -74,14 +74,14 @@ static	::gpk::n2u32	getLocalCoordFromCoord		(const ::gpk::n2u32 boardMetrics, co
 		uint8_t									& out				= out_Cells[y][x]		= 0;
 		::gpk::n2i32					coordToTest			= {};	// actually by making this uint32_t we could easily change all the conditions to be coordToTest.i < gridMetrix.i. However, I'm too lazy to start optimizing what's hardly the bottleneck
 		const ::gpkg::SMineHellCell				* cellValueToTest	= 0;
-		coordToTest	= {x - 1, y - 1	};	if(coordToTest.y >= 0 && coordToTest.x >= 0)										{ if(-1 != GetCell(coordToTest.Cast<uint32_t>(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
-		coordToTest	= {x	, y - 1	};	if(coordToTest.y >= 0)																{ if(-1 != GetCell(coordToTest.Cast<uint32_t>(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
-		coordToTest	= {x + 1, y - 1	};	if(coordToTest.y >= 0 && coordToTest.x < (int32_t)gridMetrix.x)						{ if(-1 != GetCell(coordToTest.Cast<uint32_t>(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
-		coordToTest	= {x - 1, y		};	if(coordToTest.x >= 0)																{ if(-1 != GetCell(coordToTest.Cast<uint32_t>(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
-		coordToTest	= {x + 1, y		};	if(coordToTest.x < (int32_t)gridMetrix.x)											{ if(-1 != GetCell(coordToTest.Cast<uint32_t>(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
-		coordToTest	= {x - 1, y + 1	};	if(coordToTest.y < (int32_t)gridMetrix.y && coordToTest.x >= 0)						{ if(-1 != GetCell(coordToTest.Cast<uint32_t>(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
-		coordToTest	= {x	, y + 1	};	if(coordToTest.y < (int32_t)gridMetrix.y)											{ if(-1 != GetCell(coordToTest.Cast<uint32_t>(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
-		coordToTest	= {x + 1, y + 1	};	if(coordToTest.y < (int32_t)gridMetrix.y && coordToTest.x < (int32_t)gridMetrix.x)	{ if(-1 != GetCell(coordToTest.Cast<uint32_t>(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
+		coordToTest	= {x - 1, y - 1	};	if(coordToTest.y >= 0 && coordToTest.x >= 0)										{ if(-1 != GetCell(coordToTest.u32(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
+		coordToTest	= {x	, y - 1	};	if(coordToTest.y >= 0)																{ if(-1 != GetCell(coordToTest.u32(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
+		coordToTest	= {x + 1, y - 1	};	if(coordToTest.y >= 0 && coordToTest.x < (int32_t)gridMetrix.x)						{ if(-1 != GetCell(coordToTest.u32(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
+		coordToTest	= {x - 1, y		};	if(coordToTest.x >= 0)																{ if(-1 != GetCell(coordToTest.u32(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
+		coordToTest	= {x + 1, y		};	if(coordToTest.x < (int32_t)gridMetrix.x)											{ if(-1 != GetCell(coordToTest.u32(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
+		coordToTest	= {x - 1, y + 1	};	if(coordToTest.y < (int32_t)gridMetrix.y && coordToTest.x >= 0)						{ if(-1 != GetCell(coordToTest.u32(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
+		coordToTest	= {x	, y + 1	};	if(coordToTest.y < (int32_t)gridMetrix.y)											{ if(-1 != GetCell(coordToTest.u32(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
+		coordToTest	= {x + 1, y + 1	};	if(coordToTest.y < (int32_t)gridMetrix.y && coordToTest.x < (int32_t)gridMetrix.x)	{ if(-1 != GetCell(coordToTest.u32(), &cellValueToTest) && 0 != cellValueToTest && cellValueToTest->Mine) ++out; }
 	}
 	return 0;
 }
@@ -95,7 +95,7 @@ static	::gpk::error_t	uncoverCellIfNeeded				(::gpk::view2d<::gpkg::SMineHellCel
 }
 
 static	::gpk::error_t	enqueueCellIfNeeded				(const ::gpk::n2u32 & cellOffset, const ::gpk::n2u32 & boardSize, const ::gpk::n2i32 localCellCoord, ::gpk::apod<::gpk::n2u32> & outOfRangeCells) {
-	const ::gpk::n2u32			globalCoordToTest				= cellOffset + localCellCoord.Cast<uint32_t>();
+	const ::gpk::n2u32			globalCoordToTest				= cellOffset + localCellCoord.u32();
 	if(::gpk::in_range(globalCoordToTest, {{}, boardSize}) && 0 > ::gpk::find(globalCoordToTest, {outOfRangeCells.begin(), outOfRangeCells.size()}))
 		gpk_necall(outOfRangeCells.push_back(globalCoordToTest), "%s", "Out of memory?");
 	return 0;
@@ -119,7 +119,7 @@ static	::gpk::error_t	uncoverCell						(::gpk::view2d<::gpkg::SMineHellCell> & b
 	if(false == currentCell.Mine && false == currentCell.Show) {
 		currentCell.Show		= true;
 		const ::gpk::n2u32			gridMetrix						= block.metrics();
-		const ::gpk::n2u32			globalCellCoord					= localCellCoord.Cast<uint32_t>() + cellOffset;
+		const ::gpk::n2u32			globalCellCoord					= localCellCoord.u32() + cellOffset;
 		if(::gpk::in_range(globalCellCoord, {{}, boardSize}) && 0 == hints[cellOffset.y + localCellCoord.y][cellOffset.x + localCellCoord.x]) {
 			::gpk::n2i32			coordToTest						= {};	//
 			coordToTest	= ::SURROUNDING_CELLS_OFFSETS[0] + localCellCoord; if(coordToTest.y >= 0 && coordToTest.x >= 0)											::uncoverCellIfNeeded(block, hints, cellOffset, boardSize, coordToTest, outOfRangeCells); else ::enqueueCellIfNeeded(cellOffset, boardSize, coordToTest, outOfRangeCells);
@@ -148,14 +148,14 @@ static	::gpk::error_t	uncoverCell						(::gpk::view2d<::gpkg::SMineHellCell> & b
 			GetHints(hints.View);
 			::gpk::apod<::gpk::n2u32>	outOfRangeCells;
 			if(false == GameState.BlockBased)
-				gpk_necall(::uncoverCell(Board.View, hints.View, {}, boardMetrics, cellCoord.Cast<int32_t>(), outOfRangeCells), "%s", "Out of memory?");
+				gpk_necall(::uncoverCell(Board.View, hints.View, {}, boardMetrics, cellCoord.i32(), outOfRangeCells), "%s", "Out of memory?");
 			else {
 				::gpk::n2u32				cellBlock						= getBlockFromCoord		(cellCoord		, GameState.BlockSize);
 				::gpk::n2u32				cellPosition					= getLocalCoordFromCoord(cellCoord		, GameState.BlockSize);
 				::gpk::n2u32				blockCount						= getBlockCount			(boardMetrics	, GameState.BlockSize);
 				uint32_t					blockIndex						= cellBlock.y * blockCount.x + cellBlock.x;
-				::gpk::n2i32				localCellCoord					= cellCoord.Cast<int32_t>();
-				localCellCoord			-= ::gpk::n2u32{cellBlock.x * GameState.BlockSize.x, cellBlock.y * GameState.BlockSize.y}.Cast<int32_t>();
+				::gpk::n2i32				localCellCoord					= cellCoord.i32();
+				localCellCoord			-= ::gpk::n2u32{cellBlock.x * GameState.BlockSize.x, cellBlock.y * GameState.BlockSize.y}.i32();
 				if(0 == BoardBlocks[blockIndex].get_ref())
 					gpk_necall(BoardBlocks[blockIndex]->resize(GameState.BlockSize, {}), "%s", "Out of memory?");
 				gpk_necall(::uncoverCell(BoardBlocks[blockIndex]->View, hints.View, {cellBlock.x * GameState.BlockSize.x, cellBlock.y * GameState.BlockSize.y}, boardMetrics, localCellCoord, outOfRangeCells), "%s", "Out of memory?");
@@ -165,8 +165,8 @@ static	::gpk::error_t	uncoverCell						(::gpk::view2d<::gpkg::SMineHellCell> & b
 					cellPosition			= getLocalCoordFromCoord(globalCellCoord, GameState.BlockSize);
 					blockCount				= getBlockCount			(boardMetrics	, GameState.BlockSize);
 					blockIndex				= cellBlock.y * blockCount.x + cellBlock.x;
-					localCellCoord			= globalCellCoord.Cast<int32_t>();
-					localCellCoord			-= ::gpk::n2u32{cellBlock.x * GameState.BlockSize.x, cellBlock.y * GameState.BlockSize.y}.Cast<int32_t>();
+					localCellCoord			= globalCellCoord.i32();
+					localCellCoord			-= ::gpk::n2u32{cellBlock.x * GameState.BlockSize.x, cellBlock.y * GameState.BlockSize.y}.i32();
 					if(0 == BoardBlocks[blockIndex].get_ref())
 						gpk_necall(BoardBlocks[blockIndex]->resize(GameState.BlockSize, {}), "%s", "Out of memory?");
 					gpk_necall(::uncoverCell(BoardBlocks[blockIndex]->View, hints.View, {cellBlock.x * GameState.BlockSize.x, cellBlock.y * GameState.BlockSize.y}, boardMetrics, localCellCoord, outOfRangeCells), "%s", "Out of memory?");

@@ -39,7 +39,7 @@ namespace d1_win32
 		}
 
 		::gpk::error_t							CreateSizeDependentResources	(ID3D11Device3 * d3dDevice, ::gpk::n2<uint16_t> windowSize)	{
-			gpk_necs(RenderTarget.resize(windowSize.Cast<uint32_t>(), {0, 0, 0, 0}));
+			gpk_necs(RenderTarget.resize(windowSize.u32(), {0, 0, 0, 0}));
 			gpk_necs(::gpk::d3dCreateTextureDynamic(d3dDevice, Texture2D, SRV, RenderTarget));
 			return 0;
 		}
@@ -200,7 +200,7 @@ namespace d1_win32
 		}
 
 		::gpk::error_t							SetWindowSize							(::gpk::n2u16 windowSize)	{
-			gpk_necs(DeviceResources->SetLogicalSize(windowSize.Cast<float>()));
+			gpk_necs(DeviceResources->SetLogicalSize(windowSize.f32()));
 			gpk_necs(CreateSizeDependentResources(windowSize));
 			return 0;
 		}

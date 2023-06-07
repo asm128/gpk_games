@@ -93,7 +93,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		material.Color.Diffuse	= color;
   		material.Color.Ambient	= material.Color.Diffuse * .1f;
 		if(iBall) {
-			::gpk::view2d<::gpk::bgra>	view					= {(::gpk::bgra*)surface.Data.begin(), surface.Desc.Dimensions.Cast<uint32_t>()};
+			::gpk::view2d<::gpk::bgra>	view					= {(::gpk::bgra*)surface.Data.begin(), surface.Desc.Dimensions.u32()};
 			textureBallNumber(view, iBall, font);
 			//if(0 == iBall)
 			//	textureBallCue(view, ::gpk::RED);
@@ -345,7 +345,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 //}
 //
 //static	::gpk::error_t	textureBallCue			(::gpk::view2d<::gpk::bgra> view, ::gpk::bgra color) {
-//	::gpk::n2f						viewCenter				= view.metrics().Cast<float>() / 2;
+//	::gpk::n2f						viewCenter				= view.metrics().f32() / 2;
 //	::gpk::n2f						pointCenters[]			= 
 //		{ {0, viewCenter.y}
 //		, {view.metrics().x / 4.0f * 1, viewCenter.y}
@@ -483,7 +483,7 @@ static	::gpk::error_t	geometryBuildTableCushion	(::gpk::STrianglesIndexed & outp
 	surface->Desc.Dimensions			= {32, 32};
 	surface->Data.resize(surface->Desc.Dimensions.Area() * sizeof(::gpk::bgra));
 	memset(surface->Data.begin(), 0xFF, surface->Data.size());
-	::gpk::view2d<::gpk::bgra>				view					= {(::gpk::bgra*)surface->Data.begin(), surface->Desc.Dimensions.Cast<uint32_t>()};
+	::gpk::view2d<::gpk::bgra>				view					= {(::gpk::bgra*)surface->Data.begin(), surface->Desc.Dimensions.u32()};
 	::gpk::rgba								color					= {::gpk::ASCII_PALETTE[rand() % 16]};
 	for(uint32_t y = surface->Desc.Dimensions.y / 3; y < surface->Desc.Dimensions.y / 3U * 2U; ++y)
 	for(uint32_t x = 0; x < surface->Desc.Dimensions.x; ++x)

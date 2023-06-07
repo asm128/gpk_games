@@ -152,11 +152,11 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 		else if(3 == iPlayer) controlOrbiter.Align = controlWeaponLoad.Align = controlWeaponType.Align = ::gpk::ALIGN_CENTER_TOP	;
 		if(1 >= iPlayer)	controlOrbiter.Area.Offset	= controlWeaponLoad.Area.Offset	= controlWeaponType.Area.Offset	= {0, int16_t(-(int16_t(countViewports * (MODULE_CAMERA_SIZE.y + 4)) >> 1) + (MODULE_CAMERA_SIZE.y + 4) * iOrbiter)};
 		else	 			controlOrbiter.Area.Offset	= controlWeaponLoad.Area.Offset	= controlWeaponType.Area.Offset	= {int16_t(-(int16_t(countViewports * (WEAPON_BAR_SIZE.x + 4)) >> 1) + (WEAPON_BAR_SIZE.x + 4) * iOrbiter)};
-		controlOrbiter.Area.Size	= MODULE_CAMERA_SIZE.Cast<int16_t>();
+		controlOrbiter.Area.Size	= MODULE_CAMERA_SIZE.i16();
 		controlOrbiter.Border		= {};
 		controlOrbiter.Margin		= {};
 
-		controlWeaponLoad.Area.Size	= controlWeaponType.Area.Size	= WEAPON_BAR_SIZE.Cast<int16_t>();	//MODULE_VIEWPORT_SIZE.Cast<int16_t>();
+		controlWeaponLoad.Area.Size	= controlWeaponType.Area.Size	= WEAPON_BAR_SIZE.i16();	//MODULE_VIEWPORT_SIZE.i16();
 		controlWeaponLoad.Border	= controlWeaponType.Border		= {1, 1, 1, 1};
 		controlWeaponLoad.Margin	= controlWeaponType.Margin		= {};
 
@@ -181,7 +181,7 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 		::gpk::m4f32				& matrixProjection	= viewport.MatrixProjection;
 		matrixProjection.FieldOfView(::gpk::math_pi * .25, MODULE_CAMERA_SIZE.x / (double)MODULE_CAMERA_SIZE.y, 0.01, 500.0);
 		::gpk::m4f32				matrixViewport		= {};
-		matrixViewport.ViewportLH(MODULE_CAMERA_SIZE.Cast<uint16_t>());
+		matrixViewport.ViewportLH(MODULE_CAMERA_SIZE.u16());
 		matrixProjection		*= matrixViewport;
 
 
@@ -545,7 +545,7 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 			if(ratioDelay) {
 				drawCache.PixelCoords.clear();
 				for(uint32_t iLine = 0; iLine < targetPixels.metrics().y; ++iLine)
-					::gpk::drawLine(targetPixels.metrics().Cast<uint16_t>(), ::gpk::line2<int16_t>{{0, (int16_t)iLine}, {int16_t((targetPixels.metrics().x - 1) * ratioDelay), (int16_t)iLine}}, drawCache.PixelCoords);
+					::gpk::drawLine(targetPixels.metrics().u16(), ::gpk::line2<int16_t>{{0, (int16_t)iLine}, {int16_t((targetPixels.metrics().x - 1) * ratioDelay), (int16_t)iLine}}, drawCache.PixelCoords);
 				
 				for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) {
 					const ::gpk::n2i16		& pixelCoord = drawCache.PixelCoords[iPixel];
@@ -566,11 +566,11 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 			if(ratioOverheat) {
 				drawCache.PixelCoords.clear();
 				for(uint32_t iLine = 0; iLine < targetPixels.metrics().y; ++iLine)
-					::gpk::drawLine(targetPixels.metrics().Cast<uint16_t>(), ::gpk::line2<int16_t>{{0, (int16_t)iLine}, {int16_t((targetPixels.metrics().x - 1) * ratioOverheat), (int16_t)iLine}}, drawCache.PixelCoords);
+					::gpk::drawLine(targetPixels.metrics().u16(), ::gpk::line2<int16_t>{{0, (int16_t)iLine}, {int16_t((targetPixels.metrics().x - 1) * ratioOverheat), (int16_t)iLine}}, drawCache.PixelCoords);
 				
 				for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) {
 					const ::gpk::n2i16			& pixelCoord		= drawCache.PixelCoords[iPixel];
-					const ::gpk::n2f32			floatCoord			= pixelCoord.Cast<float>();
+					const ::gpk::n2f32			floatCoord			= pixelCoord.f32();
 					const double				distanceFromCenter	= fabs((floatCoord.y / (targetPixels.metrics().y)) - .5) * 2.0;
 					::gpk::setPixel(targetPixels, drawCache.PixelCoords[iPixel], ::gpk::interpolate_linear(colorCooldown, ::gpk::GRAY * .25, distanceFromCenter));
 				}
@@ -755,8 +755,8 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 			{ sinCos.Sin * outerRadius
 	  		, sinCos.Cos * outerRadius
 			};
-		gauge.Vertices.push_back(sphereMetrics.Center + relativePosSmall.Cast<float>());
-		gauge.Vertices.push_back(sphereMetrics.Center + relativePos.Cast<float>());
+		gauge.Vertices.push_back(sphereMetrics.Center + relativePosSmall.f32());
+		gauge.Vertices.push_back(sphereMetrics.Center + relativePos.f32());
 	}
 	for(int16_t iStep = 0, stepCount = (int16_t)(resolution * 2) - 3; iStep < stepCount; ++iStep) {
 		gauge.Indices.push_back({int16_t(0 + iStep), int16_t(1 + iStep), int16_t(2 + iStep)});
@@ -801,7 +801,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 			const ::gpk::n2i16		pixelCoord					= pixelCoords[iPixelCoords];
 //#define GAUGE_NO_SHADING
 #ifndef GAUGE_NO_SHADING
-			const ::gpk::n2f32				floatCoord					= pixelCoord.Cast<float>();
+			const ::gpk::n2f32				floatCoord					= pixelCoord.f32();
 			const double					distanceFromCenter			= (floatCoord - center2).Length();
 			const double					distanceFromRadiusCenter	= fabs(distanceFromCenter - radiusCenter) / ((radiusLarge - radiusSmall) / 2);
 			finalColor.a				= (float)(1.f - distanceFromRadiusCenter);

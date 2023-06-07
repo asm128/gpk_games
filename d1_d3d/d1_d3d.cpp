@@ -108,7 +108,7 @@
 		context->ClearDepthStencilView(d3dApp.DeviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);	
 	}
 	{ // Render 3d scene
-		gpk_necs(::d1_win32::d3dDrawEngineScene(d3dApp.Scene, engineScene, d3dApp.DeviceResources->GetLogicalSize().Cast<uint16_t>(), lightPos, cameraPosition, cameraTarget));
+		gpk_necs(::d1_win32::d3dDrawEngineScene(d3dApp.Scene, engineScene, d3dApp.DeviceResources->GetLogicalSize().u16(), lightPos, cameraPosition, cameraTarget));
 	}
 	{ // Render GUI
 		gpk_necs(::d1_win32::d3dGUIDraw(*d3dApp.DeviceResources, d3dApp.GUIStuff)); 

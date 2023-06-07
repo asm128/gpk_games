@@ -494,7 +494,7 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 		break;
 	} // APP_STATE_Init
 	case ::d1::APP_STATE_Play		: {
-		gpk_necs(::updateInput(app.AppUI, clientGame, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.Cast<int16_t>(), inputState->MouseCurrent.ButtonState));
+		gpk_necs(::updateInput(app.AppUI, clientGame, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.i16(), inputState->MouseCurrent.ButtonState));
 		if(false == poolGame.MatchState.Flags.PhysicsActive)
 			::gpk::sliderSetValue(*app.AppUI.ForceSlider, int64_t(app.AppUI.ForceSlider->ValueLimits.Max - poolGame.ActiveStick().Velocity * (app.AppUI.ForceSlider->ValueLimits.Max / ::d1p::MAX_SHOOT_VELOCITY)));
 

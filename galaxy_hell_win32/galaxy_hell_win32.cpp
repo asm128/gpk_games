@@ -281,5 +281,5 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
     //glVertex2i(1, -1);
     //glEnd();
     //glFlush();
-	return ::ghg::galaxyHellDraw(app.GalaxyHellApp, app.Framework.RootWindow.Size.Cast<uint16_t>());
+	return ::ghg::galaxyHellDraw(app.GalaxyHellApp, app.Framework.RootWindow.Size.u16());
 }

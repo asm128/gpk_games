@@ -580,7 +580,7 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 	//else
 	//	matrixProjection.FieldOfView(::gpk::math_pi * .25, targetMetrics.y / (double)targetMetrics.x, 0.1, 5000.0);
 	::gpk::m4f32				matrixViewport			= {};
-	matrixViewport.ViewportLH(targetMetrics.Cast<uint16_t>());
+	matrixViewport.ViewportLH(targetMetrics.u16());
 	matrixProjection		*= matrixViewport;
 
 	//solarSystem.Scene.LightVector	= solarSystem.Scene.LightVector.RotateY(secondsLastFrame * 2);

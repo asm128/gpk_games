@@ -140,7 +140,7 @@
 		controllerPlayer[0].Right					= input.KeyboardCurrent.KeyState[VK_RIGHT	] || input.KeyboardCurrent.KeyState['D'];
 		controllerPlayer[0].Turbo					= input.KeyboardCurrent.KeyState[VK_RCONTROL] || input.KeyboardCurrent.KeyState[VK_CONTROL] || input.KeyboardCurrent.KeyState[VK_LSHIFT] || input.KeyboardCurrent.KeyState[VK_SHIFT];
 		if(input.MouseCurrent.Deltas.x || input.MouseCurrent.Deltas.y || input.MouseCurrent.Deltas.z)
-			controllerPlayer[0].PointerDeltas			= input.MouseCurrent.Deltas.Cast<int16_t>();
+			controllerPlayer[0].PointerDeltas			= input.MouseCurrent.Deltas.i16();
 		else 
 			controllerPlayer[0].PointerDeltas			= {};
 		//or(uint32_t i = 0; i < input.JoystickCurrent.size(); ++i) {
@@ -208,7 +208,7 @@
 		}
 	}
 
-	target->resize(renderTargetSize.Cast<uint32_t>(), {0, 0, 0, 1}, 0xFFFFFFFFU);
+	target->resize(renderTargetSize.u32(), {0, 0, 0, 1}, 0xFFFFFFFFU);
 
 	::gpk::view2d<::gpk::bgra>							targetPixels			= target->Color.View;
 	::gpk::view2d<uint32_t>									depthBuffer				= target->DepthStencil.View;
@@ -222,15 +222,15 @@
 			break;
 
 		::gpk::view2d<::gpk::bgra>			cameraView			= sourceRT->Color.View;
-		::gpk::n2i16						cameraViewMetrics	= cameraView.metrics().Cast<int16_t>();
+		::gpk::n2i16						cameraViewMetrics	= cameraView.metrics().i16();
 		::gpk::grid_copy(targetPixels, cameraView, ::gpk::n2<uint32_t>
 				{ (targetPixels.metrics().x >> 1) - (cameraView.metrics().x >> 1)
 				, (targetPixels.metrics().y >> 1) - (cameraView.metrics().y >> 1)
 				}
 			);
 
-		const ::gpk::n2i16		targetCenter		= targetPixels.metrics().Cast<int16_t>() / 2;
-		const ::gpk::n2i16		cameraCenter		= cameraView.metrics().Cast<int16_t>() / 2;
+		const ::gpk::n2i16		targetCenter		= targetPixels.metrics().i16() / 2;
+		const ::gpk::n2i16		cameraCenter		= cameraView.metrics().i16() / 2;
 		::gpk::n2i16				cornerTopLeft		= targetCenter + ::gpk::n2i16{int16_t(-cameraCenter.x), int16_t(-cameraCenter.y)};
 		::gpk::n2i16				cornerTopRight		= targetCenter + ::gpk::n2i16{int16_t( cameraCenter.x), int16_t(-cameraCenter.y)};
 		::gpk::n2i16				cornerBottomLeft	= targetCenter + ::gpk::n2i16{int16_t(-cameraCenter.x), int16_t( cameraCenter.y)};
