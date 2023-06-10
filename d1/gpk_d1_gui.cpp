@@ -225,7 +225,7 @@ static	::gpk::error_t	guiHandleHome				(::d1::SD1 & app, ::gpk::SGUI & gui, uint
 
 	::gpk::au32					controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
-	app.AppUI.NameEditBox.Update(gui, sysEvents, controlsToProcess);
+	app.AppUI.NameEditBox.Update(gui, app.AppUI.NameEditBox.VirtualKeyboard, sysEvents, controlsToProcess);
 	::d1::APP_STATE				appState					= app.ActiveState; 
 	::gpk::guiProcessControls(gui, [&app, &gui, &controlsToProcess, &appState](int32_t idControl) {
 		bool						handled						= false;

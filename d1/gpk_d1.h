@@ -2,6 +2,7 @@
 #include "gpk_pool_game.h"
 
 #include "gpk_gui_control.h"
+#include "gpk_gui_inputbox.h"
 #include "gpk_dialog_controls.h"
 #include "gpk_deflate.h"
 #include "gpk_file.h"

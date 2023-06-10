@@ -4,6 +4,7 @@
 #include "gpk_deflate.h"
 #include "gpk_file.h"
 #include "gpk_circle.h"
+#include "gpk_gui_inputbox.h"
 
 namespace ghg
 {
@@ -298,9 +299,11 @@ namespace ghg
 		int32_t								PlayerSelected				= 0;
 
 		bool								Exit						= false;
-		::gpk::astatic<::gpk::SDialog, ::ghg::APP_STATE_COUNT>	DialogPerState				= {};
+		::gpk::astatic<::gpk::SDialog, ::ghg::APP_STATE_COUNT>	
+											DialogPerState				= {};
+
 		::gpk::astatic<::gpk::ai32, APP_STATE_COUNT>	
-											DialogControls			= {}; 	
+											DialogControls				= {}; 	
 
 		::gpk::SVirtualKeyboard				VirtualKeyboard				= {};
 		::ghg::SUIPlay						UIPlay;

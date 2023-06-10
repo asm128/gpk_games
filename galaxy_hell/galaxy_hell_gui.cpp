@@ -649,7 +649,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 
 		::gpk::au32					controlsToProcess			= {};
 		::gpk::guiGetProcessableControls(gui, controlsToProcess);
-		if(int32_t result = uiPlayer.InputBox.Update(gui, frameEvents, controlsToProcess)) {
+		if(int32_t result = uiPlayer.InputBox.Update(gui, uiPlayer.InputBox.VirtualKeyboard, frameEvents, controlsToProcess)) {
 			if(result == INT_MAX) {
 				::gpk::vcc					trimmed						= {uiPlayer.InputBox.Text.begin(), ::gpk::min(uiPlayer.InputBox.Text.size(), 16U)};
 				::gpk::trim(trimmed);
