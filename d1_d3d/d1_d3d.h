@@ -16,29 +16,29 @@ namespace d1_win32
 	struct SD3DGUIStuff {
 		typedef	::gpk::img<_tColor>				TRenderTarget;
 
-		TRenderTarget							RenderTarget					= {};
+		TRenderTarget							RenderTarget				= {};
 
 		// We need to render the GUI separately to compose DirectX target from a dynamic texture.
 		// Device-dependent
 		::gpk::pcom<ID3D11Buffer>				VertexBuffer		;
 		::gpk::pcom<ID3D11Buffer>				IndexBuffer			;
-		::gpk::pcom<ID3D11SamplerState	>		SamplerStates		;
+		::gpk::pcom<ID3D11SamplerState>			SamplerStates		;
 		// -- 
 		::gpk::pcom<ID3D11ShaderResourceView>	SRV					;
 		::gpk::pcom<ID3D11Texture2D>			Texture2D			;
-		::gpk::pcom<ID3D11InputLayout	>		InputLayout			;
-		::gpk::pcom<ID3D11VertexShader	>		VertexShader		;
-		::gpk::pcom<ID3D11PixelShader	>		PixelShader			;
-		::gpk::pcom<ID3D11Buffer		>		ConstantBuffer		;
+		::gpk::pcom<ID3D11InputLayout>			InputLayout			;
+		::gpk::pcom<ID3D11VertexShader>			VertexShader		;
+		::gpk::pcom<ID3D11PixelShader>			PixelShader			;
+		::gpk::pcom<ID3D11Buffer>				ConstantBuffer		;
 		::gpk::pcom<ID3D11ShaderResourceView>	ShaderResourceView	;
-		::gpk::pcom<ID3D11Buffer		>		ConstantBufferNode, ConstantBufferScene;
+		::gpk::pcom<ID3D11Buffer>				ConstantBufferNode, ConstantBufferScene;
 
-		void									ReleaseDeviceResources	() {
+		void									ReleaseDeviceResources		() {
 			SRV										= {};
 			Texture2D								= {};
 		}
 
-		::gpk::error_t							CreateSizeDependentResources	(ID3D11Device3 * d3dDevice, ::gpk::n2<uint16_t> windowSize)	{
+		::gpk::error_t							CreateSizeDependentResources	(ID3D11Device3 * d3dDevice, ::gpk::n2u16 windowSize)	{
 			gpk_necs(RenderTarget.resize(windowSize.u32(), {0, 0, 0, 0}));
 			gpk_necs(::gpk::d3dCreateTextureDynamic(d3dDevice, Texture2D, SRV, RenderTarget));
 			return 0;

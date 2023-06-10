@@ -59,7 +59,8 @@ static	::gpk::error_t	uiPlayerSetupHome	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
-	::gpk::guiSetupButtonList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, PLAYER_UI_SIZE, playerPosition, playerAlign, ::gpk::ALIGN_CENTER);
+	uiPlayer.ControlsDialogHome.resize(::gpk::get_value_count<::ghg::UI_PROFILE>());
+	::gpk::guiSetupControlList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, PLAYER_UI_SIZE, playerPosition, playerAlign, ::gpk::ALIGN_CENTER, uiPlayer.ControlsDialogHome);
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Name; iButton < iStop; ++iButton) {
 		playerGUI.Controls.Controls		[iOffset + iButton].Margin				= {}; 
 		//playerGUI.Controls.Controls		[iButton].Border				= {2, 2, 2, 2};
@@ -112,7 +113,8 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
-	::gpk::guiSetupButtonList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, PLAYER_UI_SIZE, playerPosition, playerAlign, ::gpk::ALIGN_CENTER);
+	uiPlayer.ControlsDialogPlay.resize(::gpk::get_value_count<::ghg::UI_PROFILE>());
+	::gpk::guiSetupControlList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, PLAYER_UI_SIZE, playerPosition, playerAlign, ::gpk::ALIGN_CENTER, uiPlayer.ControlsDialogPlay);
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Name; iButton < iStop; ++iButton) {
 		playerGUI.Controls.Controls	[iOffset + iButton].Margin		= {}; 
 		//playerGUI.Controls.Controls	[iOffset + iButton].Border	= {};
@@ -196,13 +198,15 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 }
 
 //static ::gpk::error_t	guiSetupInit		(::gpk::SDialog & dialog) { return guiSetupButtonList<::ghg::UI_LOAD>(*dialog.GUI,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT); }
-static	::gpk::error_t	guiSetupLoad		(::gpk::SDialog & dialog) { 
-	gpk_necall(::gpk::guiSetupButtonList<::ghg::UI_LOAD>(*dialog.GUI, dialog.Root, 60, 0, ::gpk::ALIGN_CENTER), "%s", ""); 
+static	::gpk::error_t	guiSetupLoad		(::gpk::SDialog & /*dialog*/) { 
+	//::gpk::ai32					temp;
+	//temp.resize();
+	//gpk_necs(::gpk::guiSetupButtonList<::ghg::UI_LOAD>(*dialog.GUI, dialog.Root, 60, 0, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, {})); 
 	return 0;
 }
 
 static	::gpk::error_t	guiSetupHome		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { 
-	gpk_necs(::gpk::guiSetupButtonList<::ghg::UI_HOME>(*dialog.GUI, dialog.Root, HOME_BUTTON_SIZE, {0, int16_t(-HOME_BUTTON_SIZE.y * ::gpk::get_value_count<::ghg::UI_HOME>() / 2)}, ::gpk::ALIGN_CENTER)); 
+	gpk_necs(::gpk::guiSetupControlList<::ghg::UI_HOME>(*dialog.GUI, dialog.Root, HOME_BUTTON_SIZE, {0, int16_t(-HOME_BUTTON_SIZE.y * ::gpk::get_value_count<::ghg::UI_HOME>() / 2)}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Home])); 
 	for(uint32_t iButton = 0; iButton < ::gpk::get_value_count<::ghg::UI_HOME>(); ++iButton)
 		dialog.GUI->Controls.Controls[iButton + 1].Area.Offset.y += 0;
 
@@ -233,10 +237,10 @@ static	::gpk::error_t	guiSetupHome		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog
 	}
 	return 0;
 }
-static	::gpk::error_t	guiSetupProfile		(::gpk::SDialog & dialog) { return ::gpk::guiSetupButtonList<::ghg::UI_PLAY>(*dialog.GUI, dialog.Root,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT); }
-static	::gpk::error_t	guiSetupShop		(::gpk::SDialog & dialog) { 
+static	::gpk::error_t	guiSetupProfile		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { return ::gpk::guiSetupControlList<::ghg::UI_PLAY>(*dialog.GUI, dialog.Root,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Profile]); }
+static	::gpk::error_t	guiSetupShop		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { 
 	::gpk::SGUI					& gui				= *dialog.GUI;
-	gpk_necall(::gpk::guiSetupButtonList<::ghg::UI_SHOP>(gui, dialog.Root, 60, 0, ::gpk::ALIGN_BOTTOM_RIGHT), "%s", "");
+	gpk_necs(::gpk::guiSetupControlList<::ghg::UI_SHOP>(gui, dialog.Root, 60, 0, ::gpk::ALIGN_BOTTOM_RIGHT, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Shop]));
 
 	::gpk::pobj<::gpk::SDialogViewport>	viewport	= {};
 	gpk_necs(::gpk::viewportCreate(dialog, viewport));
@@ -251,7 +255,7 @@ static	::gpk::error_t	guiSetupShop		(::gpk::SDialog & dialog) {
 
 static	::gpk::error_t	guiSetupWelcome		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { 
 	::gpk::SGUI					& gui				= *dialog.GUI;
-	gpk_necs(::gpk::guiSetupButtonList<::ghg::UI_WELCOME>(gui, dialog.Root, ::gpk::n2<uint16_t>{128, 32}, ::gpk::n2i16{0, 64}, ::gpk::ALIGN_CENTER));
+	gpk_necs(::gpk::guiSetupControlList<::ghg::UI_WELCOME>(gui, dialog.Root, ::gpk::n2u16{128, 32}, ::gpk::n2i16{0, 64}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Welcome]));
 	::gpk::viewportCreate(dialog, app.Inputbox);
 	::gpk::pobj<::gpk::SDialogViewport>	viewport	= app.Inputbox;
 	gui.Controls.Controls	[viewport->IdGUIControl	].Align			= ::gpk::ALIGN_CENTER;
@@ -266,7 +270,7 @@ static	::gpk::error_t	guiSetupWelcome		(::ghg::SGalaxyHellApp & app, ::gpk::SDia
 static	::gpk::error_t	guiSetupPlay		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { 
 	dialog.GUI->SelectedFont	= 6;
 
-	::gpk::guiSetupButtonList<::ghg::UI_PLAY>(*dialog.GUI, dialog.Root, {220, 18}, {}, ::gpk::ALIGN_TOP_RIGHT); 
+	gpk_necs(::gpk::guiSetupControlList<::ghg::UI_PLAY>(*dialog.GUI, dialog.Root, {220, 18}, {}, ::gpk::ALIGN_TOP_RIGHT, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Play]));
 	for(uint32_t iButton = 0; iButton < ::ghg::UI_PLAY_Level; ++iButton) {
 		//dialog.GUI->Controls.Text	[iButton + 1].FontSelected	= ::gpk::ALIGN_TOP_LEFT;
 	}
@@ -287,10 +291,10 @@ static	::gpk::error_t	guiSetupPlay		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog
 	return 0;
 }
 
-static	::gpk::error_t	guiSetupAbout		(::gpk::SDialog & dialog) { return ::gpk::guiSetupButtonList<::ghg::UI_CREDITS>(*dialog.GUI, -1, 160, int16_t(-20 * ::gpk::get_value_count<::ghg::UI_CREDITS>() / 2), ::gpk::ALIGN_CENTER); }
-static	::gpk::error_t	guiSetupSettings	(::gpk::SDialog & dialog) { 
+static	::gpk::error_t	guiSetupAbout		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { return ::gpk::guiSetupControlList<::ghg::UI_CREDITS>(*dialog.GUI, -1, 160, int16_t(-20 * ::gpk::get_value_count<::ghg::UI_CREDITS>() / 2), ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_About]); }
+static	::gpk::error_t	guiSetupSettings	(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { 
 	::gpk::SGUI					& gui				= *dialog.GUI;
-	::gpk::guiSetupButtonList<::ghg::UI_SETTINGS>(gui, -1, {160,20}, {}, ::gpk::ALIGN_CENTER); 
+	::gpk::guiSetupControlList<::ghg::UI_SETTINGS>(gui, -1, {160,20}, {}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Settings]); 
 	return 0;
 }
 
@@ -303,10 +307,10 @@ static	::gpk::error_t	guiSetupSettings	(::gpk::SDialog & dialog) {
 	es_if(errored(::guiSetupWelcome	(app, app.DialogPerState[::ghg::APP_STATE_Welcome	])));
 	es_if(errored(::guiSetupHome	(app, app.DialogPerState[::ghg::APP_STATE_Home		])));
 	es_if(errored(::guiSetupPlay	(app, app.DialogPerState[::ghg::APP_STATE_Play		])));
-	es_if(errored(::guiSetupShop	(app.DialogPerState[::ghg::APP_STATE_Shop			])));
-	es_if(errored(::guiSetupProfile	(app.DialogPerState[::ghg::APP_STATE_Profile		])));
-	es_if(errored(::guiSetupSettings(app.DialogPerState[::ghg::APP_STATE_Settings		])));
-	es_if(errored(::guiSetupAbout	(app.DialogPerState[::ghg::APP_STATE_About			])));
+	es_if(errored(::guiSetupShop	(app, app.DialogPerState[::ghg::APP_STATE_Shop		])));
+	es_if(errored(::guiSetupProfile	(app, app.DialogPerState[::ghg::APP_STATE_Profile	])));
+	es_if(errored(::guiSetupSettings(app, app.DialogPerState[::ghg::APP_STATE_Settings	])));
+	es_if(errored(::guiSetupAbout	(app, app.DialogPerState[::ghg::APP_STATE_About		])));
 	es_if(errored(::guiSetupLoad	(app.DialogPerState[::ghg::APP_STATE_Load			])));
 
 	es_if(errored(::gpk::virtualKeyboardSetup437(*app.DialogDesktop.GUI, app.VirtualKeyboard)));;
@@ -347,9 +351,9 @@ static	::gpk::error_t	guiHandleLoad		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI &
 	return ::ghg::APP_STATE_Home; 
 }
 
-static	::gpk::error_t	dialogCreateLoad	(::gpk::SDialog & dialogLoad, ::gpk::view<::gpk::vcc> pathFileNames, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2f32 & cursorPos) { 
+static	::gpk::error_t	dialogCreateLoad	(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialogLoad, ::gpk::view<::gpk::vcc> pathFileNames, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2f32 & cursorPos) { 
 	::dialogCreateCommon(dialogLoad, inputState, cursorPos);
-	return ::gpk::guiSetupButtonList(*dialogLoad.GUI, pathFileNames, dialogLoad.Root, 256, (int16_t)(-20 * pathFileNames.size() / 2), ::gpk::ALIGN_CENTER, ::gpk::ALIGN_LEFT);
+	return ::gpk::guiSetupControlList(*dialogLoad.GUI, pathFileNames, dialogLoad.Root, {256, 20}, {0, int16_t(-20 * pathFileNames.size() / 2)}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_LEFT, app.DialogControls[::ghg::APP_STATE_Load]);
 }
 
 static	::gpk::error_t	guiHandleHome		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & /*gui*/, uint32_t idControl, ::ghg::SGalaxyHell & game) { 
@@ -381,7 +385,7 @@ static	::gpk::error_t	guiHandleHome		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI &
 		::ghg::listFilesSavegame(app, app.SavegameFolder, pathFileNames);
 
 		pathFileNames.push_back(::gpk::vcs{"Back"});
-		dialogCreateLoad(app.DialogPerState[::ghg::APP_STATE_Load], pathFileNames, app.DialogPerState[::ghg::APP_STATE_Home].Input, app.DialogPerState[::ghg::APP_STATE_Home].GUI->CursorPos);
+		::dialogCreateLoad(app, app.DialogPerState[::ghg::APP_STATE_Load], pathFileNames, app.DialogPerState[::ghg::APP_STATE_Home].Input, app.DialogPerState[::ghg::APP_STATE_Home].GUI->CursorPos);
 		return ::ghg::APP_STATE_Load;
 	}
 	case ::ghg::UI_HOME_Settings: return ::ghg::APP_STATE_Settings; 

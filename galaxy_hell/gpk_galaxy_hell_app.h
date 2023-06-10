@@ -128,22 +128,26 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(SHIP_CONTROLLER, Turbo	, 0x05);
 
 	struct SUIPlayer {
-		::gpk::apobj<::ghg::SUIPlayShipPartViewport>	ModuleViewports			= {};
-		::gpk::SDialog					DialogPlay				= {};
-		::gpk::SDialog					DialogHome				= {};
+		::gpk::apobj<::ghg::SUIPlayShipPartViewport>	
+								ModuleViewports			= {};
+		::gpk::SDialog			DialogPlay				= {};
+		::gpk::SDialog			DialogHome				= {};
 
-		::gpk::SUIInputBox				InputBox				= {};
+		::gpk::ai32				ControlsDialogPlay		= {};
+		::gpk::ai32				ControlsDialogHome		= {};
+
+		::gpk::SUIInputBox		InputBox				= {};
 	
-		::gpk::astatic<char, 128>		TextScore				= {};
-		::gpk::astatic<char, 128>		TextHits				= {};
-		::gpk::astatic<char, 128>		TextShots				= {};
-		::gpk::astatic<char, 128>		TextBullets				= {};
-		::gpk::astatic<char, 128>		TextDamageDone			= {};
-		::gpk::astatic<char, 128>		TextDamageReceived		= {};
-		::gpk::astatic<char, 128>		TextHitsSurvived		= {};
-		::gpk::astatic<char, 128>		TextOrbitersLost		= {};
-		::gpk::astatic<char, 128>		TextKilledShips			= {};
-		::gpk::astatic<char, 128>		TextKilledOrbiters		= {};
+		::gpk::astc<128>		TextScore				= {};
+		::gpk::astc<128>		TextHits				= {};
+		::gpk::astc<128>		TextShots				= {};
+		::gpk::astc<128>		TextBullets				= {};
+		::gpk::astc<128>		TextDamageDone			= {};
+		::gpk::astc<128>		TextDamageReceived		= {};
+		::gpk::astc<128>		TextHitsSurvived		= {};
+		::gpk::astc<128>		TextOrbitersLost		= {};
+		::gpk::astc<128>		TextKilledShips			= {};
+		::gpk::astc<128>		TextKilledOrbiters		= {};
 	};
 
 	struct SUIPlay {
@@ -286,8 +290,8 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 15);
 
 	struct SGalaxyHellApp {
-		::gpk::array_pobj<TRenderTarget>	RenderTargetPool			= {};
-		::gpk::array_pobj<TRenderTarget>	RenderTargetQueue			= {};
+		::gpk::apobj<TRenderTarget>			RenderTargetPool			= {};
+		::gpk::apobj<TRenderTarget>			RenderTargetQueue			= {};
 		::std::mutex						RenderTargetLockPool		= {};
 		::std::mutex						RenderTargetLockQueue		= {};
 		volatile uint64_t					CurrentRenderTarget			= 0;
@@ -295,6 +299,8 @@ namespace ghg
 
 		bool								Exit						= false;
 		::gpk::astatic<::gpk::SDialog, ::ghg::APP_STATE_COUNT>	DialogPerState				= {};
+		::gpk::astatic<::gpk::ai32, APP_STATE_COUNT>	
+											DialogControls			= {}; 	
 
 		::gpk::SVirtualKeyboard				VirtualKeyboard				= {};
 		::ghg::SUIPlay						UIPlay;
@@ -302,6 +308,7 @@ namespace ghg
 		::gpk::SDialog						DialogDesktop				= {};
 		::gpk::aobj<::ghg::SPlayer>			Players						= {};
 		::gpk::pnco<::gpk::SDialogTuner<uint8_t>>	TunerPlayerCount;
+		::gpk::ai32							DesktopControls			= {}; 	
 
 		::ghg::SGalaxyHell						Game;
 		::gpk::aobj<::ghg::SUserCredentials>	UserCredentials				= {};

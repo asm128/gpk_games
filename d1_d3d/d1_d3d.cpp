@@ -81,13 +81,14 @@
 		const ::gpk::SGeometryMesh				& mesh							= *engineScene.Graphics->Meshes[node.Mesh];
 		verbose_printf("Drawing node %i, mesh %i, slice %i, mesh name: %s", iNode, node.Mesh, node.Slice, engineScene.Graphics->Meshes.Names[node.Mesh].begin());
 
-		const ::gpk::vcu16						indices						
-			= (mesh.GeometryBuffers.size() > 0) ? ::gpk::vcu16{(const uint16_t*)engineScene.Graphics->Buffers[mesh.GeometryBuffers[0]]->Data.begin(), engineScene.Graphics->Buffers[mesh.GeometryBuffers[0]]->Data.size() / sizeof(const uint16_t)} 
-			: ::gpk::vcu16{}
-			;
+		uint32_t				indexCount			= 0;
+		if(mesh.GeometryBuffers.size() > 0) {
+			auto					pindices			= engineScene.Graphics->Buffers[mesh.GeometryBuffers[0]];
+			indexCount			= pindices->Data.size() / pindices->Desc.Format.TotalBytes();
+		}
 
 		const ::gpk::SSkin						& skin							= *engineScene.Graphics->Skins.Elements[node.Skin];
-		const ::gpk::SGeometrySlice				slice							= (node.Slice < mesh.GeometrySlices.size()) ? mesh.GeometrySlices[node.Slice] : ::gpk::SGeometrySlice{{0, indices.size() / 3}};
+		const ::gpk::SGeometrySlice				slice							= (node.Slice < mesh.GeometrySlices.size()) ? mesh.GeometrySlices[node.Slice] : ::gpk::SGeometrySlice{{0, indexCount / 3}};
 		nodeConstants.Material				= skin.Material;
 
 		d3dScene.Render(node.Mesh, slice.Slice, skin.Textures[0], node.Shader);

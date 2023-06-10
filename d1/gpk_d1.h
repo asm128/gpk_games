@@ -101,6 +101,8 @@ namespace d1
 	struct STeamUI {
 		::gpk::astu32<::d1::APP_STATE_COUNT>	DialogPerState				= {};	
 		::gpk::astu32<::d1::APP_STATE_COUNT>	FirstControl				= {}; 	
+		::gpk::astatic<::gpk::ai32, APP_STATE_COUNT>	
+												DialogControls			= {}; 	
 	};
 
 	GDEFINE_ENUM_TYPE(CAMERA_INPUT, uint8_t);
@@ -209,8 +211,10 @@ namespace d1
 		::gpk::SDialog						Dialog					= {};
 		::gpk::pobj<::gpk::SDialogSlider>	ForceSlider				= {};
 		TRenderTarget						ForceSliderRenderTarget	= {};
-		::gpk::astu32<::d1::APP_STATE_COUNT>DialogPerState			= {};
-		::gpk::astu32<::d1::APP_STATE_COUNT>FirstControl			= {}; 	
+		::gpk::astu32<APP_STATE_COUNT>		DialogPerState			= {};
+		::gpk::astu32<APP_STATE_COUNT>		FirstControl			= {}; 	
+		::gpk::astatic<::gpk::ai32, APP_STATE_COUNT>	
+											DialogControls			= {}; 	
 		::gpk::astatic<::d1::STeamUI, 2>	TeamUI					= {};
 		::gpk::SUIInputBox					NameEditBox;
 		

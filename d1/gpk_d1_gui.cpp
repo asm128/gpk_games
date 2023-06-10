@@ -33,11 +33,14 @@ static	::gpk::error_t	guiContainerSetupDefaults	(::gpk::SGUI & gui, uint32_t iCo
 }
 
 static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appGame) { ::gpk::SDialog	& dialog = appUI.Dialog; 
-	cnstxpr uint16_t			BUTTON_HEIGHT				= 24;
-	cnstxpr uint16_t			BUTTON_WIDTH_SMALL			= 160;
-	cnstxpr uint16_t			BUTTON_WIDTH_LARGE			= 184;
+	cnstxpr	uint16_t			BUTTON_HEIGHT				= 24;
+	cnstxpr	uint16_t			BUTTON_WIDTH_SMALL			= 160;
+	cnstxpr	uint16_t			BUTTON_WIDTH_LARGE			= 184;
 	::gpk::SGUI					& gui						= *dialog.GUI;
-	uint32_t					firstControlHome			= appUI.FirstControl[::d1::APP_STATE_Home] = ::gpk::guiSetupButtonList<::d1::UI_HOME>(gui, appUI.DialogPerState[::d1::APP_STATE_Home], {BUTTON_WIDTH_SMALL, BUTTON_HEIGHT}, {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::d1::UI_HOME>() / 2)}, ::gpk::ALIGN_CENTER);
+	cnstxpr	::gpk::n2u16		buttonSize					= {BUTTON_WIDTH_SMALL, BUTTON_HEIGHT};
+	const ::gpk::n2i16			buttonOffset				= {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::d1::UI_HOME>() / 2)};
+	appUI.DialogControls[::d1::APP_STATE_Home].resize(::gpk::get_value_count<::d1::UI_HOME>());
+	uint32_t					firstControlHome			= appUI.FirstControl[::d1::APP_STATE_Home] = ::gpk::guiSetupControlList<::d1::UI_HOME>(gui, appUI.DialogPerState[::d1::APP_STATE_Home], buttonSize, buttonOffset, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Home]);
 	gpk_necs(firstControlHome); 
 	for(uint32_t iButton = firstControlHome; iButton < firstControlHome + ::gpk::get_value_count<::d1::UI_HOME>(); ++iButton) {
 		gui.Controls.Controls[iButton].Area.Offset.y	+= 0;
@@ -76,9 +79,9 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 
 	for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam) {
 		uint32_t					playerRoot					= appUI.TeamUI[iTeam].DialogPerState[::d1::APP_STATE_Home];
-		gui.Controls.Controls[playerRoot].Align			= iTeam ? ::gpk::ALIGN_LEFT : ::gpk::ALIGN_RIGHT;
+		gui.Controls.Controls[playerRoot].Align	= iTeam ? ::gpk::ALIGN_LEFT : ::gpk::ALIGN_RIGHT;
 
-		uint32_t					firstControl				= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Home] = ::gpk::guiSetupButtonList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_RIGHT : ::gpk::ALIGN_TOP_LEFT);
+		uint32_t					firstControl				= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Home] = ::gpk::guiSetupControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_RIGHT : ::gpk::ALIGN_TOP_LEFT, ::gpk::ALIGN_CENTER, appUI.TeamUI[iTeam].DialogControls[::d1::APP_STATE_Home]);
 		gpk_necs(firstControl);
 		//gui.Controls.States[firstControl].Hidden		= true;
 		//gui.Controls.States[firstControl].Disabled	= true;
@@ -90,13 +93,13 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	cnstxpr int					BUTTON_HEIGHT				= 24;
 	::gpk::SGUI					& gui						= *dialog.GUI;
 	const uint32_t				iDialog						= appUI.DialogPerState[::d1::APP_STATE_Play];
-	uint32_t					firstControl				=  appUI.FirstControl[d1::APP_STATE_Play] = ::gpk::guiSetupButtonList<::d1::UI_PLAY>(gui, iDialog, {160, BUTTON_HEIGHT}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM);
+	uint32_t					firstControl				=  appUI.FirstControl[d1::APP_STATE_Play] = ::gpk::guiSetupControlList<::d1::UI_PLAY>(gui, iDialog, {160, BUTTON_HEIGHT}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Play]);
 	gpk_necs(firstControl); 
 	for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam) {
 		uint32_t					playerRoot					= appUI.TeamUI[iTeam].DialogPerState[d1::APP_STATE_Play];
 		gui.Controls.States	[playerRoot].Hidden	= true;
 
-		uint32_t					firstControlPlayer			= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Play] = ::gpk::guiSetupButtonList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_LEFT : ::gpk::ALIGN_TOP_RIGHT);
+		uint32_t					firstControlPlayer			= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Play] = ::gpk::guiSetupControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_LEFT : ::gpk::ALIGN_TOP_RIGHT, ::gpk::ALIGN_CENTER, appUI.TeamUI[iTeam].DialogControls[::d1::APP_STATE_Play]);
 		gpk_necs(firstControlPlayer); 
 		//gui.Controls.Modes [firstControlPlayer].FrameOut	= true;
 		//gui.Controls.States[firstControlPlayer].Disabled	= true;
