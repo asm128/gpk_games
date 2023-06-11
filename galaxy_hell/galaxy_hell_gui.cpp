@@ -79,9 +79,9 @@ static	::gpk::error_t	uiPlayerSetupHome	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 	case 3: playerAlign = ::gpk::ALIGN_TOP_LEFT		; break;
 	}
 	gpk_necs(::gpk::inputBoxCreate(uiPlayer.InputBox, *playerDialog.GUI, playerDialog.Root));
-	playerGUI.Controls.States	[uiPlayer.InputBox.IdRoot].Hidden = true;
-	playerGUI.Controls.Controls	[uiPlayer.InputBox.IdRoot].Align = playerAlign;
-	playerGUI.Controls.Controls	[uiPlayer.InputBox.IdRoot].Area.Offset.x = 240;
+	playerGUI.Controls.States	[uiPlayer.InputBox.IdRoot].Hidden			= true;
+	playerGUI.Controls.Controls	[uiPlayer.InputBox.IdRoot].Align			= playerAlign;
+	playerGUI.Controls.Controls	[uiPlayer.InputBox.IdRoot].Area.Offset.x	= 240;
 
 	gpk_necs(::gpk::controlFontSet(playerGUI, playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name, 10));
 	gpk_necs(::gpk::controlTextSet(playerGUI, playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name, playerName));
