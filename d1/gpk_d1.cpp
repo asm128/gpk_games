@@ -78,7 +78,7 @@ static	::gpk::error_t	stickUpdateBallInHand	(::d1::SD1Game & clientGame, float a
 		else if(keyStates['S'])	displacement.y	= actualSecondsElapsed * -displacementKeyValue.y;
 	}
 	// Grab rotation from mouse deltas.
-	if(buttonStates[0] && (mouseDeltas.x || mouseDeltas.y)) {
+	if(buttonStates[0] && (mouseDeltas.x || mouseDeltas.y) && 0 == buttonStates[1]) {
 		const double					aimUnit					= 0.05;
 		const double					aimScaled				= aimUnit * (slow ? .005 : .05);
 		const ::gpk::n2f				displacementMouseValue	= {float(-1.0 * aimScaled), float(-1.0 * aimScaled)};
