@@ -3,7 +3,7 @@
 #	include "gpk_engine_d3d_app.h"
 #endif
 #ifndef DISABLE_XAUDIO2
-#	include "audio.h"
+#	include "gpk_xaudio2.h"
 #endif
 
 #include "gpk_d1.h"
@@ -21,7 +21,7 @@ struct SApplication {
 	::gpk::SD3DApplication	D3DApp			;
 #endif
 #ifndef DISABLE_XAUDIO2
-	AUDIO_STATE				AudioState;
+	::gpk::AUDIO_STATE		AudioState;
 #endif
 							SApplication	(::gpk::SRuntimeValues & runtimeValues)	noexcept
 		: Framework(runtimeValues) { 

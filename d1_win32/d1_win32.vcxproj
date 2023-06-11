@@ -163,17 +163,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="audio.cpp" />
     <ClCompile Include="d1_win32.cpp" />
-    <ClCompile Include="WaveBankReader.cpp" />
-    <ClCompile Include="WAVFileReader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="audio.h" />
     <ClInclude Include="d1_win32.h" />
-    <ClInclude Include="WaveBankReader.h" />
-    <ClInclude Include="WAVFileReader.h" />
-    <ClInclude Include="XAudio2Versions.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

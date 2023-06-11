@@ -1,4 +1,4 @@
-#include "audio.h"
+#include "gpk_xaudio2.h"
 
 #include "gpk_galaxy_hell_app.h"
 
@@ -17,7 +17,7 @@ struct SApplication {
 
 	bool					DebugUIEnabled		= true;
 	::gpk::SGUI				DebugUI				= {};
-	AUDIO_STATE				AudioState;
+	::gpk::AUDIO_STATE		AudioState;
 
 	::ghg::SGalaxyHellApp	GalaxyHellApp;
 
