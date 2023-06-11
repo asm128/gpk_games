@@ -39,7 +39,6 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	::gpk::SGUI					& gui						= *dialog.GUI;
 	cnstxpr	::gpk::n2u16		buttonSize					= {BUTTON_WIDTH_SMALL, BUTTON_HEIGHT};
 	const ::gpk::n2i16			buttonOffset				= {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::d1::UI_HOME>() / 2)};
-	appUI.DialogControls[::d1::APP_STATE_Home].resize(::gpk::get_value_count<::d1::UI_HOME>());
 	uint32_t					firstControlHome			= appUI.FirstControl[::d1::APP_STATE_Home] = ::gpk::guiSetupControlList<::d1::UI_HOME>(gui, appUI.DialogPerState[::d1::APP_STATE_Home], buttonSize, buttonOffset, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Home]);
 	gpk_necs(firstControlHome); 
 	for(uint32_t iButton = firstControlHome; iButton < firstControlHome + ::gpk::get_value_count<::d1::UI_HOME>(); ++iButton) {

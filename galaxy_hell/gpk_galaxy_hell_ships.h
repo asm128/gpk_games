@@ -6,6 +6,7 @@
 #include "gpk_model.h"
 #include "gpk_engine.h"
 #include "gpk_camera.h"
+#include "gpk_image_color.h"
 
 #ifndef GPK_GALAXY_HELL_SHIPS_H
 #define GPK_GALAXY_HELL_SHIPS_H

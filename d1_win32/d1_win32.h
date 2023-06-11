@@ -1,6 +1,6 @@
 //#define DISABLE_D3D11
 #ifndef DISABLE_D3D11
-#	include "d1_d3d.h"
+#	include "gpk_engine_d3d_app.h"
 #endif
 #ifndef DISABLE_XAUDIO2
 #	include "audio.h"
@@ -15,15 +15,15 @@
 #define APPLICATION_H_098273498237423
 
 struct SApplication {
-	::gpk::SFramework			Framework		;
+	::gpk::SFramework		Framework		;
 	::d1::SD1				D1			= {};
 #ifndef DISABLE_D3D11
-	::d1_win32::SD3DApplication	D3DApp			;
+	::gpk::SD3DApplication	D3DApp			;
 #endif
 #ifndef DISABLE_XAUDIO2
-	AUDIO_STATE					AudioState;
+	AUDIO_STATE				AudioState;
 #endif
-								SApplication	(::gpk::SRuntimeValues & runtimeValues)	noexcept
+							SApplication	(::gpk::SRuntimeValues & runtimeValues)	noexcept
 		: Framework(runtimeValues) { 
 		D1.MainGame.Pool.Engine.Scene->Graphics.create(); 
 	}

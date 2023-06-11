@@ -48,4 +48,13 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="psBallStripped.hlsl" />
+    <FxCompile Include="psPocket.hlsl" />
+    <FxCompile Include="psStick.hlsl" />
+    <FxCompile Include="psTableCloth.hlsl" />
+    <FxCompile Include="psTableCushion.hlsl" />
+    <FxCompile Include="psBallCue.hlsl" />
+    <FxCompile Include="psBallSolid.hlsl" />
+  </ItemGroup>
 </Project>

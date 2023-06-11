@@ -124,7 +124,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 	const ::gpk::rgbaf			clearColor				= app.D1.AppUI.ClearColor;
 	const ::gpk::n3f			& lightPos				= app.D1.MainGame.LightPos;
 
-	gpk_necs(::d1_win32::d3dAppDraw(app.D3DApp, engineScene, clearColor, lightPos, cameraSelected.Position, cameraSelected.Target));
+	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, lightPos, cameraSelected.Position, cameraSelected.Target));
 #else 
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::pobj<::gpk::rtgbra8d32>	backBuffer	= framework.RootWindow.BackBuffer;

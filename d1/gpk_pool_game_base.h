@@ -2,6 +2,8 @@
 #include "gpk_color.h"
 #include "gpk_array_static.h"
 #include "gpk_noise.h"
+#include "gpk_n3.h"
+#include "gpk_enum.h"
 
 #ifndef GPK_POOL_GAME_BASE_H_098273498237423
 #define GPK_POOL_GAME_BASE_H_098273498237423
