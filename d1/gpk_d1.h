@@ -279,9 +279,9 @@ namespace d1
 
 		::gpk::error_t			StateSwitch					(::d1::APP_STATE newState)			{
 			if(newState != ActiveState) {
-				AppUI.Dialog.GUI->Controls.States[AppUI.DialogPerState[newState]].Hidden = false;
+				AppUI.Dialog.GUI->Controls.Modes[AppUI.DialogPerState[newState]].Hidden = false;
 				if(ActiveState >= ::d1::APP_STATE_Home && AppUI.DialogPerState[ActiveState])
-					AppUI.Dialog.GUI->Controls.States[AppUI.DialogPerState[ActiveState]].Hidden = true;
+					AppUI.Dialog.GUI->Controls.Modes[AppUI.DialogPerState[ActiveState]].Hidden = true;
 				if(newState == ::d1::APP_STATE_Home && ActiveState > ::d1::APP_STATE_Home) // Don't autosave first time we enter Home.
 					gpk_necs(Save(::d1::SAVE_MODE_AUTO));
 

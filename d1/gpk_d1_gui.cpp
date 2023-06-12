@@ -16,16 +16,16 @@ static	::gpk::error_t	dialogCreateCommon			(::gpk::SDialog & dialog, const ::gpk
 	//dialog				= {};
 	dialog.Input			= inputState;
 	gpk_necs(::guiSetupCommon(*dialog.GUI, cursorPos));
-	dialog.GUI->Controls.Modes[0].NoBackgroundRect	= true;
+	dialog.GUI->Controls.Draw[0].NoBackgroundRect	= true;
 	gpk_necs(dialog.Update());
 	return 0;
 }
 
 static	::gpk::error_t	guiContainerSetupDefaults	(::gpk::SGUI & gui, uint32_t iControl, uint32_t iParent) { 
 	gui.Controls.Constraints[iControl].AttachSizeToControl	= {(int32_t)iControl, (int32_t)iControl};
-	gui.Controls.Modes		[iControl].NoHoverEffect		= true;
-	gui.Controls.Modes		[iControl].NoBackgroundRect		= true;
-	gui.Controls.Modes		[iControl].Design				= true;
+	gui.Controls.Modes		[iControl].NoHover				= true;
+	gui.Controls.Draw		[iControl].NoBackgroundRect		= true;
+	gui.Controls.Draw		[iControl].Design				= true;
 	gui.Controls.Controls	[iControl].Border				= {};
 	gui.Controls.Controls	[iControl].Margin				= {};
 	gpk_necs(::gpk::controlSetParent(gui, iControl, iParent));
@@ -96,7 +96,7 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	gpk_necs(firstControl); 
 	for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam) {
 		uint32_t					playerRoot					= appUI.TeamUI[iTeam].DialogPerState[d1::APP_STATE_Play];
-		gui.Controls.States	[playerRoot].Hidden	= true;
+		gui.Controls.Modes[playerRoot].Hidden	= true;
 
 		uint32_t					firstControlPlayer			= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Play] = ::gpk::guiSetupControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_LEFT : ::gpk::ALIGN_TOP_RIGHT, ::gpk::ALIGN_CENTER, appUI.TeamUI[iTeam].DialogControls[::d1::APP_STATE_Play]);
 		gpk_necs(firstControlPlayer); 
@@ -120,7 +120,7 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Align			= ::gpk::ALIGN_CENTER_RIGHT;
 	gui.Controls.Controls[appUI.ForceSlider->IdButton].Area.Size.y			= 8;
 	//gui.Controls.Modes[app.ForceSlider->IdGUIControl].NoBackgroundRect	= true;
-	gui.Controls.Modes[appUI.ForceSlider->IdGUIControl].NoHoverEffect		= true;
+	gui.Controls.Modes[appUI.ForceSlider->IdGUIControl].NoHover				= true;
 	appUI.ForceSliderRenderTarget.resize(gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Area.Size.u32()); 
 
 	cnstxpr ::gpk::rgbaf		min							= ::gpk::GREEN;
@@ -170,7 +170,7 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 			uint32_t					iControl;
 			gpk_necs(iControl = appUI.DialogPerState[iState] = ::gpk::controlCreate(gui));
 			gpk_necs(guiContainerSetupDefaults(gui, iControl, appUI.Dialog.Root));
-			gui.Controls.States[iControl].Hidden	= true;
+			gui.Controls.Modes[iControl].Hidden	= true;
 			for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam)
 				gpk_necs(::guiContainerSetupDefaults(gui, appUI.TeamUI[iTeam].DialogPerState[iState] = ::gpk::controlCreate(gui), appUI.Dialog.Root));
 		}
