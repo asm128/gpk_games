@@ -23,7 +23,7 @@ namespace ghg
 		uint16_t					Padding1				;
 	};
 
-	struct SEntity {
+	struct SGHEntity {
 		int32_t						Parent					= -1;
 		int32_t						Geometry				= -1;
 		int32_t						Transform				= -1;
@@ -34,10 +34,10 @@ namespace ghg
 #pragma pack(pop)
 
 	struct SEntitySystem {
-		::gpk::apod<::ghg::SEntity>	Entities				= {};
+		::gpk::apod<::ghg::SGHEntity>	Entities				= {};
 		::gpk::aobj<::gpk::au32>	EntityChildren			= {};
 
-		::gpk::error_t				Create					(const ::ghg::SEntity & newEntity, ::gpk::vcu32 entityChildren = {}) { EntityChildren.push_back(entityChildren); return Entities.push_back(newEntity); }
+		::gpk::error_t				Create					(const ::ghg::SGHEntity & newEntity, ::gpk::vcu32 entityChildren = {}) { EntityChildren.push_back(entityChildren); return Entities.push_back(newEntity); }
 		::gpk::error_t				Create					()																{ Create({}); }
 
 		::gpk::error_t				Save					(::gpk::au8 & output) const { 

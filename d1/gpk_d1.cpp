@@ -22,11 +22,11 @@ static	::gpk::error_t	d1Setup				(::d1::SD1UI & appUI, ::d1::SD1Game & game, con
 static	::gpk::error_t	stickUpdateRotation		(::d1::SD1Game & clientGame, float actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 mouseDeltas, ::gpk::vcu8 buttonStates) {
 	const bool						slow						= keyStates[VK_SHIFT];
 	// The following aim unit constants should be grabbed from a settings struct.
-	::gpk::n2f						rotation					= {};
+	::gpk::n2f32					rotation					= {};
 	{
 		const double					aimUnit						= 2.5;
 		const double					aimScaled					= aimUnit * (slow ? .1 : 1);
-		const ::gpk::n2f				rotationKeyValue			= {float(-1.0 / ::gpk::math_2pi * aimScaled), float(1.0 / ::gpk::math_2pi * aimScaled)};
+		const ::gpk::n2f32				rotationKeyValue			= {float(-1.0 / ::gpk::math_2pi * aimScaled), float(1.0 / ::gpk::math_2pi * aimScaled)};
 		// Define a rotation value depending on 
 			 if(keyStates[VK_UP		])	rotation.y	= actualSecondsElapsed * rotationKeyValue.y;
 		else if(keyStates[VK_DOWN	])	rotation.y	= actualSecondsElapsed * -rotationKeyValue.y;
@@ -38,7 +38,7 @@ static	::gpk::error_t	stickUpdateRotation		(::d1::SD1Game & clientGame, float ac
 	if(buttonStates[1] && (mouseDeltas.x || mouseDeltas.y)) {
 		const double					aimUnit						= 0.05;
 		const double					aimScaled					= aimUnit * (slow ? .1 : 1);
-		const ::gpk::n2f				rotationMouseValue			= {float(-1.0 / ::gpk::math_2pi * aimScaled), float(-1.0 / ::gpk::math_2pi * aimScaled)};
+		const ::gpk::n2f32				rotationMouseValue			= {float(-1.0 / ::gpk::math_2pi * aimScaled), float(-1.0 / ::gpk::math_2pi * aimScaled)};
 		if(buttonStates[0]) {
 			if(mouseDeltas.y) 
 				rotation.y					+= mouseDeltas.y * rotationMouseValue.y;
@@ -66,11 +66,11 @@ static	::gpk::error_t	stickUpdateRotation		(::d1::SD1Game & clientGame, float ac
 static	::gpk::error_t	stickUpdateBallInHand	(::d1::SD1Game & clientGame, float actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 mouseDeltas, ::gpk::vcu8 buttonStates) {
 	const bool						slow					= keyStates[VK_SHIFT];
 	// The following aim unit constants should be grabbed from a settings struct.
-	::gpk::n2f						displacement			= {};
+	::gpk::n2f32						displacement			= {};
 	{
 		const double					aimUnit					= 2.5;
 		const double					aimScaled				= aimUnit * (slow ? .01 : .1);
-		const ::gpk::n2f				displacementKeyValue	= {float(-1.0 * aimScaled), float(1.0 * aimScaled)};
+		const ::gpk::n2f32				displacementKeyValue	= {float(-1.0 * aimScaled), float(1.0 * aimScaled)};
 		// Define a rotation value depending on 
 			 if(keyStates['D'])	displacement.x	= actualSecondsElapsed * displacementKeyValue.x;
 		else if(keyStates['A'])	displacement.x	= actualSecondsElapsed * -displacementKeyValue.x;
@@ -81,7 +81,7 @@ static	::gpk::error_t	stickUpdateBallInHand	(::d1::SD1Game & clientGame, float a
 	if(buttonStates[0] && (mouseDeltas.x || mouseDeltas.y) && 0 == buttonStates[1]) {
 		const double					aimUnit					= 0.05;
 		const double					aimScaled				= aimUnit * (slow ? .005 : .05);
-		const ::gpk::n2f				displacementMouseValue	= {float(-1.0 * aimScaled), float(-1.0 * aimScaled)};
+		const ::gpk::n2f32				displacementMouseValue	= {float(-1.0 * aimScaled), float(-1.0 * aimScaled)};
 		if(mouseDeltas.y)
 			displacement.y				+= mouseDeltas.y * displacementMouseValue.y;
 		if(mouseDeltas.x)

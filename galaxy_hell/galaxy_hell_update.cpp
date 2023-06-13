@@ -52,7 +52,7 @@ static	::gpk::error_t	handleCollisionPoint		(::ghg::SGalaxyHell & solarSystem, i
 		solarSystem.DecoState.ScoreParticles.Create(collisionPoint, bounceVector, 10.0f + weaponDamage * .001f, {weaponDamage * 10, 2});
 		attackerScore.KilledOrbiters	+= 1;
 		damagedScore.OrbitersLost		+= 1;
-		const ::ghg::SEntity		& entityGeometry			= solarSystem.ShipState.EntitySystem.Entities[damagedPart.Entity + 1];
+		const ::ghg::SGHEntity		& entityGeometry			= solarSystem.ShipState.EntitySystem.Entities[damagedPart.Entity + 1];
 		const int32_t				indexMesh					= entityGeometry.Geometry;
 		const uint32_t				countTriangles				= solarSystem.ShipState.Scene.Geometry[indexMesh].Triangles.size();
 		::ghg::decoExplosionAdd(solarSystem.DecoState.Explosions, indexMesh, entityGeometry.Image, countTriangles, collisionPoint, 60);
@@ -76,8 +76,8 @@ static	::gpk::error_t	handleCollisionPoint		(::ghg::SGalaxyHell & solarSystem, i
 	return 0;
 }
 
-static	::gpk::error_t	updateEntityTransforms		(uint32_t iEntity, const ::gpk::view<const ::ghg::SEntity> & entities, const ::gpk::view<const ::gpk::au32> & entitiesChildren, ::ghg::SShipScene & scene, ::gpk::SRigidBodyIntegrator & bodies)	{
-	const ::ghg::SEntity		& entity					= entities[iEntity];
+static	::gpk::error_t	updateEntityTransforms		(uint32_t iEntity, const ::gpk::view<const ::ghg::SGHEntity> & entities, const ::gpk::view<const ::gpk::au32> & entitiesChildren, ::ghg::SShipScene & scene, ::gpk::SRigidBodyIntegrator & bodies)	{
+	const ::ghg::SGHEntity		& entity					= entities[iEntity];
 	if(-1 == entity.Body) {
 		if(-1 == entity.Parent)
 			scene.Transforms[iEntity].Identity();
@@ -128,7 +128,7 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 					if(shipPartAttacked.Health <= 0)
 						continue;
 					const ::ghg::SWeapon		& weaponAttacker		= solarSystem.ShipState.Weapons[shipPartAttacker.Weapon];
-					const ::ghg::SEntity		& entity				= solarSystem.ShipState.EntitySystem.Entities[shipPartAttacked.Entity];
+					const ::ghg::SGHEntity		& entity				= solarSystem.ShipState.EntitySystem.Entities[shipPartAttacked.Entity];
 					if(-1 != entity.Geometry) {
 						const ::gpk::n3f32			attackedPosition		= solarSystem.ShipState.Scene.Transforms[shipPartAttacked.Entity].GetTranslation();
 						::std::lock_guard			lockUpdate				(solarSystem.LockUpdate);
@@ -139,7 +139,7 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 					}
 					const ::gpk::au32			& entityChildren		= solarSystem.ShipState.EntitySystem.EntityChildren[shipPartAttacked.Entity];
 					for(uint32_t iEntity = 0; iEntity < entityChildren.size(); ++iEntity) {
-						::ghg::SEntity				& entityChild			= solarSystem.ShipState.EntitySystem.Entities[entityChildren[iEntity]];
+						::ghg::SGHEntity				& entityChild			= solarSystem.ShipState.EntitySystem.Entities[entityChildren[iEntity]];
 						if(-1 == entityChild.Parent)
 							continue;
 
@@ -565,7 +565,7 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 		}
 
 		for(uint32_t iEntity = 0; iEntity < solarSystem.ShipState.EntitySystem.Entities.size(); ++iEntity) {
-			const ::ghg::SEntity		& entity			= solarSystem.ShipState.EntitySystem.Entities[iEntity];
+			const ::ghg::SGHEntity		& entity			= solarSystem.ShipState.EntitySystem.Entities[iEntity];
 			if(-1 == entity.Parent)	// process root entities
 				updateEntityTransforms(iEntity, solarSystem.ShipState.EntitySystem.Entities, solarSystem.ShipState.EntitySystem.EntityChildren, solarSystem.ShipState.Scene, solarSystem.ShipState.ShipPhysics);
 		}

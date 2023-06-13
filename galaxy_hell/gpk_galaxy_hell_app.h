@@ -1,6 +1,6 @@
 #include "gpk_galaxy_hell.h"
 #include "gpk_dialog_controls.h"
-#include "gpk_gui_control.h"
+#include "gpk_gui_control_list.h"
 #include "gpk_deflate.h"
 #include "gpk_file.h"
 #include "gpk_circle.h"

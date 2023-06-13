@@ -16,18 +16,20 @@ static	::gpk::error_t	dialogCreateCommon			(::gpk::SDialog & dialog, const ::gpk
 	//dialog				= {};
 	dialog.Input			= inputState;
 	gpk_necs(::guiSetupCommon(*dialog.GUI, cursorPos));
-	dialog.GUI->Controls.Draw[0].NoBackgroundRect	= true;
+	dialog.GUI->Controls.Draw[0].NoBorder	= true;
+	dialog.GUI->Controls.Draw[0].NoClient	= true;
 	gpk_necs(dialog.Update());
 	return 0;
 }
 
 static	::gpk::error_t	guiContainerSetupDefaults	(::gpk::SGUI & gui, uint32_t iControl, uint32_t iParent) { 
 	gui.Controls.Constraints[iControl].AttachSizeToControl	= {(int32_t)iControl, (int32_t)iControl};
-	gui.Controls.Modes		[iControl].NoHover				= true;
-	gui.Controls.Draw		[iControl].NoBackgroundRect		= true;
-	gui.Controls.Draw		[iControl].Design				= true;
-	gui.Controls.Controls	[iControl].Border				= {};
-	gui.Controls.Controls	[iControl].Margin				= {};
+	gui.Controls.Modes		[iControl].NoHover		= true;
+	gui.Controls.Modes		[iControl].NoExecute	= true;
+	gui.Controls.Draw		[iControl].NoBorder	= true;
+	gui.Controls.Draw		[iControl].NoClient	= true;
+	gui.Controls.Placement	[iControl].Border	= {};
+	gui.Controls.Placement	[iControl].Margin	= {};
 	gpk_necs(::gpk::controlSetParent(gui, iControl, iParent));
 	return 0; 
 }
@@ -39,15 +41,15 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	::gpk::SGUI					& gui						= *dialog.GUI;
 	cnstxpr	::gpk::n2u16		buttonSize					= {BUTTON_WIDTH_SMALL, BUTTON_HEIGHT};
 	const ::gpk::n2i16			buttonOffset				= {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::d1::UI_HOME>() / 2)};
-	uint32_t					firstControlHome			= appUI.FirstControl[::d1::APP_STATE_Home] = ::gpk::guiSetupControlList<::d1::UI_HOME>(gui, appUI.DialogPerState[::d1::APP_STATE_Home], buttonSize, buttonOffset, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Home]);
+	uint32_t					firstControlHome			= appUI.FirstControl[::d1::APP_STATE_Home] = ::gpk::guiCreateControlList<::d1::UI_HOME>(gui, appUI.DialogPerState[::d1::APP_STATE_Home], buttonSize, buttonOffset, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Home]);
 	gpk_necs(firstControlHome); 
 	for(uint32_t iButton = firstControlHome; iButton < firstControlHome + ::gpk::get_value_count<::d1::UI_HOME>(); ++iButton) {
-		gui.Controls.Controls[iButton].Area.Offset.y	+= 0;
+		gui.Controls.Placement[iButton].Area.Offset.y	+= 0;
 	}
 
 	for(uint32_t iButton = firstControlHome + ::d1::UI_HOME_Start; iButton < firstControlHome + ::gpk::get_value_count<::d1::UI_HOME>(); ++iButton) {
-		gui.Controls.Controls[iButton].Area.Offset.y	+= 36 * 3;
-		gui.Controls.Controls[iButton].Area.Size.x		= BUTTON_WIDTH_LARGE;
+		gui.Controls.Placement[iButton].Area.Offset.y	+= 36 * 3;
+		gui.Controls.Placement[iButton].Area.Size.x		= BUTTON_WIDTH_LARGE;
 	}
 
 	gpk_necs(::gpk::inputBoxCreate(appUI.NameEditBox, gui, firstControlHome));
@@ -69,18 +71,18 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 
 		appUI.TunerTableSize->SetValue(::d1p::TABLE_SIZE_8_00_FOOT);
 
-		::gpk::SControl				& control					= dialog.GUI->Controls.Controls[appUI.TunerTableSize->IdGUIControl];
+		::gpk::SControlPlacement	& control					= dialog.GUI->Controls.Placement[appUI.TunerTableSize->IdGUIControl];
 		control.Area.Size.x		= BUTTON_WIDTH_LARGE;
 		control.Area.Size.y		= 24;
-		control.Area.Offset.y	= int16_t(dialog.GUI->Controls.Controls[firstControlHome + ::d1::UI_HOME_Start].Area.Offset.y - (dialog.GUI->Controls.Controls[firstControlHome + ::d1::UI_HOME_Start].Area.Size.y >> 1) - (control.Area.Size.y >> 1));
+		control.Area.Offset.y	= int16_t(dialog.GUI->Controls.Placement[firstControlHome + ::d1::UI_HOME_Start].Area.Offset.y - (dialog.GUI->Controls.Placement[firstControlHome + ::d1::UI_HOME_Start].Area.Size.y >> 1) - (control.Area.Size.y >> 1));
 		control.Align			= ::gpk::ALIGN_CENTER;
 	}
 
 	for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam) {
 		uint32_t					playerRoot					= appUI.TeamUI[iTeam].DialogPerState[::d1::APP_STATE_Home];
-		gui.Controls.Controls[playerRoot].Align	= iTeam ? ::gpk::ALIGN_LEFT : ::gpk::ALIGN_RIGHT;
+		gui.Controls.Placement[playerRoot].Align	= iTeam ? ::gpk::ALIGN_LEFT : ::gpk::ALIGN_RIGHT;
 
-		uint32_t					firstControl				= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Home] = ::gpk::guiSetupControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_RIGHT : ::gpk::ALIGN_TOP_LEFT, ::gpk::ALIGN_CENTER, appUI.TeamUI[iTeam].DialogControls[::d1::APP_STATE_Home]);
+		uint32_t					firstControl				= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Home] = ::gpk::guiCreateControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_RIGHT : ::gpk::ALIGN_TOP_LEFT, ::gpk::ALIGN_CENTER, appUI.TeamUI[iTeam].DialogControls[::d1::APP_STATE_Home]);
 		gpk_necs(firstControl);
 		//gui.Controls.States[firstControl].Hidden		= true;
 		//gui.Controls.States[firstControl].Disabled	= true;
@@ -92,13 +94,13 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	cnstxpr int					BUTTON_HEIGHT				= 24;
 	::gpk::SGUI					& gui						= *dialog.GUI;
 	const uint32_t				iDialog						= appUI.DialogPerState[::d1::APP_STATE_Play];
-	uint32_t					firstControl				=  appUI.FirstControl[d1::APP_STATE_Play] = ::gpk::guiSetupControlList<::d1::UI_PLAY>(gui, iDialog, {160, BUTTON_HEIGHT}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Play]);
+	uint32_t					firstControl				=  appUI.FirstControl[d1::APP_STATE_Play] = ::gpk::guiCreateControlList<::d1::UI_PLAY>(gui, iDialog, {160, BUTTON_HEIGHT}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Play]);
 	gpk_necs(firstControl); 
 	for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam) {
 		uint32_t					playerRoot					= appUI.TeamUI[iTeam].DialogPerState[d1::APP_STATE_Play];
-		gui.Controls.Modes[playerRoot].Hidden	= true;
+		gui.Controls.States[playerRoot].Hidden	= true;
 
-		uint32_t					firstControlPlayer			= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Play] = ::gpk::guiSetupControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_LEFT : ::gpk::ALIGN_TOP_RIGHT, ::gpk::ALIGN_CENTER, appUI.TeamUI[iTeam].DialogControls[::d1::APP_STATE_Play]);
+		uint32_t					firstControlPlayer			= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Play] = ::gpk::guiCreateControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_LEFT : ::gpk::ALIGN_TOP_RIGHT, ::gpk::ALIGN_CENTER, appUI.TeamUI[iTeam].DialogControls[::d1::APP_STATE_Play]);
 		gpk_necs(firstControlPlayer); 
 		//gui.Controls.Modes [firstControlPlayer].FrameOut	= true;
 		//gui.Controls.States[firstControlPlayer].Disabled	= true;
@@ -114,14 +116,14 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 
 	cnstxpr uint16_t			offsetX						= 8;
 
-	gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Border			= {};
-	gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Area.Offset		= {offsetX + 36};
-	gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Area.Size		= SHOOT_SLIDER_SIZE.i16();
-	gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Align			= ::gpk::ALIGN_CENTER_RIGHT;
-	gui.Controls.Controls[appUI.ForceSlider->IdButton].Area.Size.y			= 8;
+	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Border			= {};
+	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Offset		= {offsetX + 36};
+	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Size		= SHOOT_SLIDER_SIZE.i16();
+	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Align			= ::gpk::ALIGN_CENTER_RIGHT;
+	gui.Controls.Placement[appUI.ForceSlider->IdButton].Area.Size.y			= 8;
 	//gui.Controls.Modes[app.ForceSlider->IdGUIControl].NoBackgroundRect	= true;
 	gui.Controls.Modes[appUI.ForceSlider->IdGUIControl].NoHover				= true;
-	appUI.ForceSliderRenderTarget.resize(gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Area.Size.u32()); 
+	appUI.ForceSliderRenderTarget.resize(gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Size.u32()); 
 
 	cnstxpr ::gpk::rgbaf		min							= ::gpk::GREEN;
 	cnstxpr ::gpk::rgbaf		mid							= ::gpk::YELLOW;
@@ -137,7 +139,7 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 		for(uint32_t x = 0; x < appUI.ForceSliderRenderTarget.metrics().x; ++x)
 			appUI.ForceSliderRenderTarget.Color[lastRow - (y + halfHeight)][x] = ::gpk::interpolate_linear(mid, max, colorScale * y);
 
-	gui.Controls.Controls[appUI.ForceSlider->IdGUIControl].Image = appUI.ForceSliderRenderTarget.Color;
+	gui.Controls.Images[appUI.ForceSlider->IdGUIControl].Image = appUI.ForceSliderRenderTarget.Color;
 
 	static char					velocityString[32]			= {};
 	appUI.ForceSlider->FuncValueFormat	= [&appGame](::gpk::vcc & string, int64_t value, const ::gpk::minmax<int64_t> & limits) mutable { 
@@ -152,11 +154,19 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	};
 	gpk_necs(::gpk::sliderSetValue(*appUI.ForceSlider, int64_t(appUI.ForceSlider->ValueLimits.Max - appGame.Pool.ActiveStick().Velocity * (appUI.ForceSlider->ValueLimits.Max / ::d1p::MAX_SHOOT_VELOCITY))));
 
-	gui.Controls.Controls[firstControl + ::d1::UI_PLAY_Shoot].Align			= ::gpk::ALIGN_CENTER_RIGHT;
-	gui.Controls.Controls[firstControl + ::d1::UI_PLAY_Shoot].Area.Offset.x	= offsetX;
-	gui.Controls.Controls[firstControl + ::d1::UI_PLAY_Shoot].Area.Offset.y	= SHOOT_SLIDER_SIZE.y / 2 + 16;
-	gui.Controls.Controls[firstControl + ::d1::UI_PLAY_Shoot].Area.Size.x	= SHOOT_SLIDER_SIZE.x * 4;
+	gui.Controls.Placement[firstControl + ::d1::UI_PLAY_Shoot].Align			= ::gpk::ALIGN_CENTER_RIGHT;
+	gui.Controls.Placement[firstControl + ::d1::UI_PLAY_Shoot].Area.Offset.x	= offsetX;
+	gui.Controls.Placement[firstControl + ::d1::UI_PLAY_Shoot].Area.Offset.y	= SHOOT_SLIDER_SIZE.y / 2 + 16;
+	gui.Controls.Placement[firstControl + ::d1::UI_PLAY_Shoot].Area.Size.x	= SHOOT_SLIDER_SIZE.x * 4;
 
+	firstControl			= ::gpk::guiCreateControlList<::d1::UI_HELP>(gui, iDialog, {160 + 128 , BUTTON_HEIGHT - 4}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Play]);
+	for(uint32_t iControl = 0; iControl < ::gpk::get_value_count<::d1::UI_HELP>(); ++iControl) {
+		gui.Controls.Placement	[firstControl + iControl].Align = ::gpk::ALIGN_BOTTOM_RIGHT;
+		gui.Controls.Text		[firstControl + iControl].Align = ::gpk::ALIGN_CENTER_LEFT;
+	}
+	::gpk::controlTextSet(gui, firstControl + 0, "Yaw         : Left + Right buttons");
+	::gpk::controlTextSet(gui, firstControl + 1, "Ball-in-hand: Left button");
+	::gpk::controlTextSet(gui, firstControl + 2, "Aim         : Right button");
 	return 0; 
 }
 
@@ -170,7 +180,7 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 			uint32_t					iControl;
 			gpk_necs(iControl = appUI.DialogPerState[iState] = ::gpk::controlCreate(gui));
 			gpk_necs(guiContainerSetupDefaults(gui, iControl, appUI.Dialog.Root));
-			gui.Controls.Modes[iControl].Hidden	= true;
+			gui.Controls.States[iControl].Hidden	= true;
 			for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam)
 				gpk_necs(::guiContainerSetupDefaults(gui, appUI.TeamUI[iTeam].DialogPerState[iState] = ::gpk::controlCreate(gui), appUI.Dialog.Root));
 		}

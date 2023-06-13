@@ -31,17 +31,17 @@ namespace d1p
 	};
 
 	struct SPoolTable {
-		::gpk::n2f			Slate				= {  9 * ::d1p::SCALE_FOOT_TO_METER, 4.5f * ::d1p::SCALE_FOOT_TO_METER};
-		::gpk::n2f			PlayingSurface		= {100 * ::d1p::SCALE_INCH_TO_METER,   50 * ::d1p::SCALE_INCH_TO_METER};
-		::gpk::n2f			Cushion				= {100 * ::d1p::SCALE_INCH_TO_METER,   50 * ::d1p::SCALE_INCH_TO_METER};
+		::gpk::n2f32		Slate				= {  9 * ::d1p::SCALE_FOOT_TO_METER, 4.5f * ::d1p::SCALE_FOOT_TO_METER};
+		::gpk::n2f32		PlayingSurface		= {100 * ::d1p::SCALE_INCH_TO_METER,   50 * ::d1p::SCALE_INCH_TO_METER};
+		::gpk::n2f32		Cushion				= {100 * ::d1p::SCALE_INCH_TO_METER,   50 * ::d1p::SCALE_INCH_TO_METER};
 		float				Height				= 30 * ::d1p::SCALE_INCH_TO_METER;
 		float				PocketRadius		= .05715f * 2;	// Pocket Radius == Ball Diameter
 
-		inline	::gpk::n2f	HalfSlate			()	const	noexcept	{ return Slate			* .5f; }
-		inline	::gpk::n2f	HalfPlayingSurface	()	const	noexcept	{ return PlayingSurface	* .5f; }
+		inline	::gpk::n2f32	HalfSlate			()	const	noexcept	{ return Slate			* .5f; }
+		inline	::gpk::n2f32	HalfPlayingSurface	()	const	noexcept	{ return PlayingSurface	* .5f; }
 		
-		bool				InPlayingSurface	(const ::gpk::n2f & ballPosition)	const	noexcept	{
-			const ::gpk::n2f		halfSpace			= HalfPlayingSurface();
+		bool					InPlayingSurface	(const ::gpk::n2f32 & ballPosition)	const	noexcept	{
+			const ::gpk::n2f32		halfSpace			= HalfPlayingSurface();
 			return ballPosition.x > -halfSpace.x && ballPosition.x < halfSpace.x 
 				&& ballPosition.y > -halfSpace.y && ballPosition.y < halfSpace.y
 				;
@@ -54,7 +54,7 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(CUSHION_PROFILE, K55, 1);
 	GDEFINE_ENUM_VALUE(CUSHION_PROFILE, U23, 2);
 	GDEFINE_ENUM_VALUE(CUSHION_PROFILE, Century, 3);
-	stacxpr	::gpk::n2f	CUSHION_SIZES[]		=
+	stacxpr	::gpk::n2f32	CUSHION_SIZES[]		=
 		{ {(1 + 1.0f / 8) * ::d1p::SCALE_INCH_TO_METER, (1 + 3.0f / 16.f) * ::d1p::SCALE_INCH_TO_METER}
 		, {(1 + 1.0f / 4) * ::d1p::SCALE_INCH_TO_METER, (1 + 5.0f / 16.f) * ::d1p::SCALE_INCH_TO_METER}
 		, {(0 + 1.0f / 1) * ::d1p::SCALE_INCH_TO_METER, (1 + 1.0f / 8.0f) * ::d1p::SCALE_INCH_TO_METER}

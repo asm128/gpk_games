@@ -67,8 +67,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 	const ::gpk::FSysEvent		funcEvent				= [&app](const ::gpk::SSysEvent & sysEvent) { return ::processSystemEvent(app, sysEvent); };
 	gpk_necs(mainWindow.EventQueue.for_each(funcEvent));
 
-	if(::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue))
-		return 1;
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue));
 
 	return 0;
 }
@@ -77,7 +76,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::error_t				frameworkResult			= ::gpk::updateFramework(framework);
 	gpk_necs(frameworkResult);
-	rvi_if(1, frameworkResult == 1, "Framework requested close. Terminating execution.");
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, frameworkResult == ::gpk::APPLICATION_STATE_EXIT);
 
 	::gpk::SWindow				& mainWindow			= app.Framework.RootWindow;
 
@@ -93,6 +92,8 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
 
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, systemRequestedExit);
+
 #if !defined(DISABLE_D3D11)
 	if(app.D1.ActiveState >= ::d1::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.D1.MainGame.Pool.Engine.Scene->Graphics->Meshes.size()) {
 		//gpk_necs(app.D3DApp.CreateDeviceDependentEngineResources(app.D3DApp.DeviceResources->GetD3DDevice(), *app.D1.MainGame.Pool.Engine.Scene->Graphics));
@@ -100,8 +101,6 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 	}
 	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (uint32_t)frameInfo.FramesPerSecond);
 #endif
-
-	rvi_if(1, systemRequestedExit, "%s", "Exiting because the runtime asked for close. We could also ignore this value and just continue execution if we don't want to exit.");
 
 	//-----------------------------
 	::gpk::STimer				& timer					= app.Framework.Timer;

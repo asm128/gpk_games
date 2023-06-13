@@ -175,15 +175,15 @@ static	::gpk::error_t	handlePockets
 }
 
 // this shoulnd't exist really but it will be here until we handle cushion collisions properly
-static	::gpk::error_t	handleBoundaries				(::d1p::SPoolGame & pool, float ballRadius, ::gpk::n3f & positionA, ::gpk::SBodyForces & forcesA, const ::d1p::SPoolTable & tableDimensions, const gpk::n2f & tableHalfDimensions) {
-	::gpk::n2f						ballLimits						= tableHalfDimensions - ::gpk::n2f{ballRadius, ballRadius};
-	::gpk::n3f						pocketPosition					= {};
-	double							pocketRadius					= tableDimensions.PocketRadius;
-	double							pocketRadiusSquared				= pocketRadius * pocketRadius;
+static	::gpk::error_t	handleBoundaries				(::d1p::SPoolGame & pool, float ballRadius, ::gpk::n3f32 & positionA, ::gpk::SBodyForces & forcesA, const ::d1p::SPoolTable & tableDimensions, const gpk::n2f32 & tableHalfDimensions) {
+	::gpk::n2f32				ballLimits						= tableHalfDimensions - ::gpk::n2f32{ballRadius, ballRadius};
+	::gpk::n3f32				pocketPosition					= {};
+	double						pocketRadius					= tableDimensions.PocketRadius;
+	double						pocketRadiusSquared				= pocketRadius * pocketRadius;
 	for(uint8_t iPocket = 0; iPocket < ::d1p::MAX_POCKETS; ++iPocket) {
 		pool.GetPocketPosition(iPocket, pocketPosition);
 		if((positionA - pocketPosition).LengthSquared() < pocketRadiusSquared + ballRadius * ballRadius)
-			ballLimits	+= ::gpk::n2f{(float)pocketRadius, (float)pocketRadius};
+			ballLimits	+= ::gpk::n2f32{(float)pocketRadius, (float)pocketRadius};
 	}
 
 	::gpk::n2<bool>					outOfBounds						= 
@@ -239,7 +239,7 @@ static	::gpk::error_t	handleFalling					(::d1p::SPoolGame & pool, uint32_t iRigi
 	return 0;
 }
 
-static	::gpk::error_t	handlePocketsAndBoundaries		(::d1p::SPoolGame & pool, uint8_t iBall, const ::d1p::SPoolTable & tableDimensions, const gpk::n2f & tableHalfDimensions, ::gpk::apobj<::d1p::SEventPool> & outputEvents) {
+static	::gpk::error_t	handlePocketsAndBoundaries		(::d1p::SPoolGame & pool, uint8_t iBall, const ::d1p::SPoolTable & tableDimensions, const gpk::n2f32 & tableHalfDimensions, ::gpk::apobj<::d1p::SEventPool> & outputEvents) {
 	::gpk::SEngine				& engine						= pool.Engine;
 	const float					ballRadius						= pool.MatchState.Board.BallRadius;
 	const ::gpk::SVirtualEntity	& entityA						= engine.Entities[pool.Entities.Balls[iBall]]; 
@@ -268,7 +268,7 @@ static	::gpk::error_t	handlePocketsAndBoundaries		(::d1p::SPoolGame & pool, uint
 	double							step						= .001f;
 
 	const ::d1p::SPoolTable			& tableDimensions			= pool.MatchState.Board.Table;
-	const gpk::n2f					tableHalfDimensions			= tableDimensions.Slate * .5f;
+	const gpk::n2f32				tableHalfDimensions			= tableDimensions.Slate * .5f;
 	while(secondsElapsed > 0) { 
 		double							secondsThisStep				= ::gpk::min(step, secondsElapsed);
 		secondsElapsed				-= secondsThisStep;

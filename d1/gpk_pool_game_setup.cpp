@@ -377,17 +377,17 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 //}
 
 static	::gpk::error_t	geometryBuildTableCushion	(::gpk::STrianglesIndexed & output) {
-	stacxpr	::gpk::n3f			TABLE_CUSHION_POSITIONS	[8]		= 
+	stacxpr	::gpk::n3f32			TABLE_CUSHION_POSITIONS	[8]		= 
 		{ {0, 1, 0}, {1, 1, 0}, {0, 1, 1}, {1, 1, 1}	// top face
 		, {0, 0, 0}, {1, 0, 0}, {0, 1, 1}, {1, 1, 1}	// diagonal face
 		};
 
-	stacxpr	::gpk::n2f			TABLE_CUSHION_UV		[8]		= 
+	stacxpr	::gpk::n2f32			TABLE_CUSHION_UV		[8]		= 
 		{ {0, 0}, {1, 0}, {0, 1}, {1, 1}
 		, {0, 0}, {1, 0}, {0, 1}, {1, 1}
 		};
 
-	stacxpr	::gpk::n3f			TABLE_CUSHION_NORMALS	[8]		= 
+	stacxpr	::gpk::n3f32			TABLE_CUSHION_NORMALS	[8]		= 
 		{ {0, 1, 0}, {0, 1, 0}, {0, 1, 0}, {0, 1, 0}
 		, {0, -1, -1}, {0, -1, -1}, {0, -1, -1}, {0, -1, -1}
 		};

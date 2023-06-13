@@ -429,7 +429,7 @@ static	::gpk::error_t	drawShots			(::gpk::view2d<::gpk::bgra> targetPixels
 	double													absanim					= fabsf(sinf(animationTime * 3));
 	const ::gpk::rgbaf								shadedColor				= (absanim < .5) ? ::gpk::rgbaf{} : shipColor * (absanim * .5);
 	for(uint32_t iEntity = 0; iEntity < entityChildren.size(); ++iEntity) {
-		const ::ghg::SEntity									& entityChild				= shipState.EntitySystem.Entities[entityChildren[iEntity]];
+		const ::ghg::SGHEntity									& entityChild				= shipState.EntitySystem.Entities[entityChildren[iEntity]];
 		if(-1 == entityChild.Parent)
 			continue;
 		if(-1 == entityChild.Geometry)
@@ -481,7 +481,7 @@ static	::gpk::error_t	drawShip
 	if(iShip >= (int32_t)solarSystem.PlayState.CountPlayers || shipCore.Team)
 		return 0;
 
-	const ::ghg::SEntity				& entity			= solarSystem.ShipState.EntitySystem.Entities[shipCore.Entity];
+	const ::ghg::SGHEntity				& entity			= solarSystem.ShipState.EntitySystem.Entities[shipCore.Entity];
 	const ::gpk::m4f32					& matrixTransform	= solarSystem.ShipState.Scene.Transforms[entity.Transform];
 	::gpk::n3f32						starPos				= matrixTransform.GetTranslation() + ::gpk::n3f32{0.0f, 8.0f, 0.0f};
 	starPos							= matrixVP.Transform(starPos);

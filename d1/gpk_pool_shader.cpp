@@ -59,15 +59,15 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	, const ::gpk::SPSIn					& inPS
 	, ::gpk::bgra							& outputPixel
 	) { 
-	::gpk::n2f									relativeToCenter			= ::gpk::n2f{inPS.WeightedUV.x, inPS.WeightedUV.y} - ::gpk::n2f{.5f, .5f};
+	::gpk::n2f32									relativeToCenter			= ::gpk::n2f32{inPS.WeightedUV.x, inPS.WeightedUV.y} - ::gpk::n2f32{.5f, .5f};
 	relativeToCenter.x						*= 2;
 
 	const ::gpk::bgra							surfacecolor				
-		= ((::gpk::n2f{ 0.0f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
-		: ((::gpk::n2f{ 1.0f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
-		: ((::gpk::n2f{-1.0f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
-		: ((::gpk::n2f{ 0.5f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
-		: ((::gpk::n2f{-0.5f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
+		= ((::gpk::n2f32{ 0.0f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
+		: ((::gpk::n2f32{ 1.0f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
+		: ((::gpk::n2f32{-1.0f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
+		: ((::gpk::n2f32{ 0.5f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
+		: ((::gpk::n2f32{-0.5f, 0.0f} - relativeToCenter).LengthSquared() < .0025f) ? ::gpk::RED 
 		: (( 0.5f - relativeToCenter.y) <  .05f) ? ::gpk::RED 
 		: ((-0.5f - relativeToCenter.y) > -.05f) ? ::gpk::RED 
 		: ::gpk::WHITE;
@@ -87,13 +87,13 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	, ::gpk::bgra							& outputPixel
 	) { 
 	const ::gpk::n2u32						& surfaceSize				= inPS.Surface.metrics();
-	::gpk::n2f									relativeToCenter			= ::gpk::n2f{inPS.WeightedUV.x, inPS.WeightedUV.y} - ::gpk::n2f{.5f, .5f};
+	::gpk::n2f32									relativeToCenter			= ::gpk::n2f32{inPS.WeightedUV.x, inPS.WeightedUV.y} - ::gpk::n2f32{.5f, .5f};
 	relativeToCenter.x						*= 2;
 
 	::gpk::rgbaf								materialColor;
 	bool										shade						= false;
 	float										ambientFactor				= ::LIGHT_FACTOR_AMBIENT;
-	if((::gpk::n2f{0.0f, 0.0f} - relativeToCenter).LengthSquared() >= .0225f) {
+	if((::gpk::n2f32{0.0f, 0.0f} - relativeToCenter).LengthSquared() >= .0225f) {
 		materialColor							= inPS.Material.Color.Diffuse;
 		shade									= true;
 	}
@@ -141,13 +141,13 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	, ::gpk::bgra							& outputPixel
 	) { 
 	const ::gpk::n2u32							& surfaceSize				= inPS.Surface.metrics();
-	::gpk::n2f									relativeToCenter			= ::gpk::n2f{inPS.WeightedUV.x, inPS.WeightedUV.y} - ::gpk::n2f{.5f, .5f};
+	::gpk::n2f32									relativeToCenter			= ::gpk::n2f32{inPS.WeightedUV.x, inPS.WeightedUV.y} - ::gpk::n2f32{.5f, .5f};
 	relativeToCenter.x						*= 2;
 
 	::gpk::rgbaf								materialColor;
 	bool										shade						= false;
 	float										ambientFactor				= ::LIGHT_FACTOR_AMBIENT;
-	if((::gpk::n2f{0.0f, 0.0f} - relativeToCenter).LengthSquared() >= .0225f) {
+	if((::gpk::n2f32{0.0f, 0.0f} - relativeToCenter).LengthSquared() >= .0225f) {
 		materialColor							
 			= (relativeToCenter.y >  .20f) ? ::gpk::WHITE
 			: (relativeToCenter.y < -.20f) ? ::gpk::WHITE

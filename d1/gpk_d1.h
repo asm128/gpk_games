@@ -1,7 +1,7 @@
 #include "gpk_frameinfo.h"
 #include "gpk_pool_game.h"
 
-#include "gpk_gui_control.h"
+#include "gpk_gui_control_list.h"
 #include "gpk_gui_inputbox.h"
 #include "gpk_dialog_controls.h"
 #include "gpk_deflate.h"
@@ -206,6 +206,11 @@ namespace d1
 	GDEFINE_ENUM_VALUE(UI_PLAY, Turn			, 4);
 	GDEFINE_ENUM_VALUE(UI_PLAY, Shoot			, 5);
 
+	GDEFINE_ENUM_TYPE (UI_HELP, uint8_t);
+	GDEFINE_ENUM_VALUE(UI_HELP, Yaw				, 0);
+	GDEFINE_ENUM_VALUE(UI_HELP, Ball			, 1);
+	GDEFINE_ENUM_VALUE(UI_HELP, Aim				, 2);
+
 	struct SD1UI {
 		typedef ::gpk::rtbgra8d32			TRenderTarget;
 
@@ -279,9 +284,9 @@ namespace d1
 
 		::gpk::error_t			StateSwitch					(::d1::APP_STATE newState)			{
 			if(newState != ActiveState) {
-				AppUI.Dialog.GUI->Controls.Modes[AppUI.DialogPerState[newState]].Hidden = false;
+				AppUI.Dialog.GUI->Controls.States[AppUI.DialogPerState[newState]].Hidden = false;
 				if(ActiveState >= ::d1::APP_STATE_Home && AppUI.DialogPerState[ActiveState])
-					AppUI.Dialog.GUI->Controls.Modes[AppUI.DialogPerState[ActiveState]].Hidden = true;
+					AppUI.Dialog.GUI->Controls.States[AppUI.DialogPerState[ActiveState]].Hidden = true;
 				if(newState == ::d1::APP_STATE_Home && ActiveState > ::d1::APP_STATE_Home) // Don't autosave first time we enter Home.
 					gpk_necs(Save(::d1::SAVE_MODE_AUTO));
 

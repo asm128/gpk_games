@@ -25,10 +25,11 @@ static	::gpk::error_t	guiSetupCommon		(::gpk::SGUI & gui) {
 }
 
 static	::gpk::error_t	dialogCreateCommon	(::gpk::SDialog & dialogLoad, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2f32 & cursorPos) { 
-	dialogLoad						= {};
-	dialogLoad.Input				= inputState;
-	dialogLoad.GUI->CursorPos		= cursorPos;
-	dialogLoad.GUI->Controls.Draw[0].NoBackgroundRect	= true;
+	dialogLoad					= {};
+	dialogLoad.Input			= inputState;
+	dialogLoad.GUI->CursorPos	= cursorPos;
+	dialogLoad.GUI->Controls.Draw[0].NoClient	= true;
+	dialogLoad.GUI->Controls.Draw[0].NoBorder	= true;
 	::guiSetupCommon(*dialogLoad.GUI);
 	dialogLoad.Update();
 	return 0;
@@ -59,15 +60,16 @@ static	::gpk::error_t	uiPlayerSetupHome	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
-	::gpk::guiSetupControlList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, PLAYER_UI_SIZE, playerPosition, playerAlign, ::gpk::ALIGN_CENTER, uiPlayer.ControlsDialogHome);
+	::gpk::guiCreateControlList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, PLAYER_UI_SIZE, playerPosition, playerAlign, ::gpk::ALIGN_CENTER, uiPlayer.ControlsDialogHome);
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Name; iButton < iStop; ++iButton) {
-		playerGUI.Controls.Controls		[iOffset + iButton].Margin				= {}; 
+		playerGUI.Controls.Placement	[iOffset + iButton].Margin				= {}; 
 		//playerGUI.Controls.Controls		[iButton].Border				= {2, 2, 2, 2};
-		playerGUI.Controls.Draw			[iOffset + iButton].NoBackgroundRect		= true;
+		playerGUI.Controls.Draw			[iOffset + iButton].NoBorder		= true;
+		playerGUI.Controls.Draw			[iOffset + iButton].NoClient		= true;
 	}
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Score; iButton < iStop; ++iButton) {
-		playerGUI.Controls.Controls		[iOffset + iButton].Area.Offset.y		-= int16_t(16 * iButton);
-		playerGUI.Controls.Controls		[iOffset + iButton].Area.Size.y			= 24; 
+		playerGUI.Controls.Placement[iOffset + iButton].Area.Offset.y		-= int16_t(16 * iButton);
+		playerGUI.Controls.Placement[iOffset + iButton].Area.Size.y			= 24; 
 	}
 
 	switch(iPlayer) {
@@ -78,9 +80,9 @@ static	::gpk::error_t	uiPlayerSetupHome	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 	case 3: playerAlign = ::gpk::ALIGN_TOP_LEFT		; break;
 	}
 	gpk_necs(::gpk::inputBoxCreate(uiPlayer.InputBox, *playerDialog.GUI, playerDialog.Root));
-	playerGUI.Controls.Modes	[uiPlayer.InputBox.IdRoot].Hidden			= true;
-	playerGUI.Controls.Controls	[uiPlayer.InputBox.IdRoot].Align			= playerAlign;
-	playerGUI.Controls.Controls	[uiPlayer.InputBox.IdRoot].Area.Offset.x	= 240;
+	playerGUI.Controls.States	[uiPlayer.InputBox.IdRoot].Hidden			= true;
+	playerGUI.Controls.Placement[uiPlayer.InputBox.IdRoot].Align			= playerAlign;
+	playerGUI.Controls.Placement[uiPlayer.InputBox.IdRoot].Area.Offset.x	= 240;
 
 	gpk_necs(::gpk::controlFontSet(playerGUI, playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name, 10));
 	gpk_necs(::gpk::controlTextSet(playerGUI, playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name, playerName));
@@ -112,15 +114,16 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
-	::gpk::guiSetupControlList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, PLAYER_UI_SIZE, playerPosition, playerAlign, ::gpk::ALIGN_CENTER, uiPlayer.ControlsDialogPlay);
+	::gpk::guiCreateControlList<::ghg::UI_PROFILE>(playerGUI, playerDialog.Root, PLAYER_UI_SIZE, playerPosition, playerAlign, ::gpk::ALIGN_CENTER, uiPlayer.ControlsDialogPlay);
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Name; iButton < iStop; ++iButton) {
-		playerGUI.Controls.Controls	[iOffset + iButton].Margin		= {}; 
+		playerGUI.Controls.Placement[iOffset + iButton].Margin		= {}; 
 		//playerGUI.Controls.Controls	[iOffset + iButton].Border	= {};
-		playerGUI.Controls.Draw		[iOffset + iButton].NoBackgroundRect	= true;
+		playerGUI.Controls.Draw		[iOffset + iButton].NoBorder	= true;
+		playerGUI.Controls.Draw		[iOffset + iButton].NoClient	= true;
 	}
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Score; iButton < iStop; ++iButton) {
-		playerGUI.Controls.Controls	[iOffset + iButton].Area.Offset.y	-= int16_t(16 * iButton);
-		playerGUI.Controls.Controls	[iOffset + iButton].Area.Size.y		= 24; 
+		playerGUI.Controls.Placement[iOffset + iButton].Area.Offset.y	-= int16_t(16 * iButton);
+		playerGUI.Controls.Placement[iOffset + iButton].Area.Size.y		= 24; 
 	}
 
 	gpk_necs(::gpk::controlFontSet(playerGUI, playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name, 10));
@@ -138,13 +141,18 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 		viewport.RenderTargetOrbiter.resize(::MODULE_CAMERA_SIZE);
 		viewport.RenderTargetWeaponLoad.resize(::WEAPON_BAR_SIZE);
 		viewport.RenderTargetWeaponType.resize(::WEAPON_BAR_SIZE);
-		::gpk::SControl				& controlOrbiter	= playerGUI.Controls.Controls [viewport.Viewport + 0];
-		::gpk::SControl				& controlWeaponType	= playerGUI.Controls.Controls [viewport.Viewport + 2];
-		::gpk::SControl				& controlWeaponLoad	= playerGUI.Controls.Controls [viewport.Viewport + 1];
-		controlOrbiter		.Image	= viewport.RenderTargetOrbiter.Color.View;
-		controlWeaponLoad	.Image	= viewport.RenderTargetWeaponLoad.Color.View;
-		controlWeaponType	.Image	= viewport.RenderTargetWeaponType.Color.View;
-		controlOrbiter.ImageAlign	= controlWeaponType.ImageAlign	= controlWeaponLoad.ImageAlign	= ::gpk::ALIGN_CENTER;
+		::gpk::SControlPlacement	& controlOrbiter	= playerGUI.Controls.Placement[viewport.Viewport + 0];
+		::gpk::SControlPlacement	& controlWeaponType	= playerGUI.Controls.Placement[viewport.Viewport + 2];
+		::gpk::SControlPlacement	& controlWeaponLoad	= playerGUI.Controls.Placement[viewport.Viewport + 1];
+		{
+			::gpk::SControlImage	& imageOrbiter		= playerGUI.Controls.Images[viewport.Viewport + 0];
+			::gpk::SControlImage	& imageWeaponType	= playerGUI.Controls.Images[viewport.Viewport + 2];
+			::gpk::SControlImage	& imageWeaponLoad	= playerGUI.Controls.Images[viewport.Viewport + 1];
+			imageOrbiter	.Image	= viewport.RenderTargetOrbiter.Color.View;
+			imageWeaponType	.Image	= viewport.RenderTargetWeaponLoad.Color.View;
+			imageWeaponLoad	.Image	= viewport.RenderTargetWeaponType.Color.View;
+			imageOrbiter.ImageAlign	= imageWeaponType.ImageAlign = imageWeaponLoad.ImageAlign	= ::gpk::ALIGN_CENTER;
+		}
 
 			 if(0 == iPlayer) controlOrbiter.Align = controlWeaponLoad.Align = controlWeaponType.Align = ::gpk::ALIGN_CENTER_LEFT	;
 		else if(1 == iPlayer) controlOrbiter.Align = controlWeaponLoad.Align = controlWeaponType.Align = ::gpk::ALIGN_CENTER_RIGHT	;
@@ -174,9 +182,12 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 		playerGUI.Controls.Text		[viewport.Viewport + 1].Align	= ::gpk::ALIGN_CENTER; //iPlayer ? ::gpk::ALIGN_CENTER_RIGHT : ::gpk::ALIGN_CENTER_LEFT;
 		playerGUI.Controls.Text		[viewport.Viewport + 2].Align	= ::gpk::ALIGN_CENTER; //iPlayer ? ::gpk::ALIGN_CENTER_RIGHT : ::gpk::ALIGN_CENTER_LEFT;
 
-		playerGUI.Controls.Draw	[viewport.Viewport + 0].NoBackgroundRect	= 
-		playerGUI.Controls.Draw	[viewport.Viewport + 1].NoBackgroundRect	= 
-		playerGUI.Controls.Draw	[viewport.Viewport + 2].NoBackgroundRect	= true;
+		playerGUI.Controls.Draw	[viewport.Viewport + 0].NoClient	= 
+		playerGUI.Controls.Draw	[viewport.Viewport + 1].NoClient	= 
+		playerGUI.Controls.Draw	[viewport.Viewport + 2].NoClient	= true;
+		playerGUI.Controls.Draw	[viewport.Viewport + 0].NoBorder	= 
+		playerGUI.Controls.Draw	[viewport.Viewport + 1].NoBorder	= 
+		playerGUI.Controls.Draw	[viewport.Viewport + 2].NoBorder	= true;
 
 		::gpk::m4f32				& matrixProjection	= viewport.MatrixProjection;
 		matrixProjection.FieldOfView(::gpk::math_pi * .25, MODULE_CAMERA_SIZE.x / (double)MODULE_CAMERA_SIZE.y, 0.01, 500.0);
@@ -204,12 +215,12 @@ static	::gpk::error_t	guiSetupLoad		(::gpk::SDialog & /*dialog*/) {
 }
 
 static	::gpk::error_t	guiSetupHome		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { 
-	gpk_necs(::gpk::guiSetupControlList<::ghg::UI_HOME>(*dialog.GUI, dialog.Root, HOME_BUTTON_SIZE, {0, int16_t(-HOME_BUTTON_SIZE.y * ::gpk::get_value_count<::ghg::UI_HOME>() / 2)}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Home])); 
+	gpk_necs(::gpk::guiCreateControlList<::ghg::UI_HOME>(*dialog.GUI, dialog.Root, HOME_BUTTON_SIZE, {0, int16_t(-HOME_BUTTON_SIZE.y * ::gpk::get_value_count<::ghg::UI_HOME>() / 2)}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Home])); 
 	for(uint32_t iButton = 0; iButton < ::gpk::get_value_count<::ghg::UI_HOME>(); ++iButton)
-		dialog.GUI->Controls.Controls[iButton + 1].Area.Offset.y += 0;
+		dialog.GUI->Controls.Placement[iButton + 1].Area.Offset.y += 0;
 
 	for(uint32_t iButton = ::ghg::UI_HOME_Start; iButton < ::gpk::get_value_count<::ghg::UI_HOME>(); ++iButton)
-		dialog.GUI->Controls.Controls[iButton + 1].Area.Offset.y += 36;
+		dialog.GUI->Controls.Placement[iButton + 1].Area.Offset.y += 36;
 
 	dialog.GUI->Controls.Text[::ghg::UI_HOME_Start + 1].Text = "Start new game";
 
@@ -222,10 +233,10 @@ static	::gpk::error_t	guiSetupHome		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog
 	};
 	app.TunerPlayerCount->SetValue(1);
 	//tuner->IdGUIControl
-	::gpk::SControl				& control					= dialog.GUI->Controls.Controls[app.TunerPlayerCount->IdGUIControl];
+	::gpk::SControlPlacement	& control					= dialog.GUI->Controls.Placement[app.TunerPlayerCount->IdGUIControl];
 	control.Area.Size.x		= 160;
 	control.Area.Size.y		= 24;
-	control.Area.Offset.y	= int16_t(dialog.GUI->Controls.Controls[::ghg::UI_HOME_Start + 1].Area.Offset.y - (dialog.GUI->Controls.Controls[::ghg::UI_HOME_Start + 1].Area.Size.y >> 1) - (control.Area.Size.y >> 1));
+	control.Area.Offset.y	= int16_t(dialog.GUI->Controls.Placement[::ghg::UI_HOME_Start + 1].Area.Offset.y - (dialog.GUI->Controls.Placement[::ghg::UI_HOME_Start + 1].Area.Size.y >> 1) - (control.Area.Size.y >> 1));
 	control.Align			= ::gpk::ALIGN_CENTER;
 
 	app.UIPlay.PlayerUI.resize(::ghg::MAX_PLAYERS);	
@@ -235,49 +246,49 @@ static	::gpk::error_t	guiSetupHome		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog
 	}
 	return 0;
 }
-static	::gpk::error_t	guiSetupProfile		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { return ::gpk::guiSetupControlList<::ghg::UI_PLAY>(*dialog.GUI, dialog.Root,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Profile]); }
+static	::gpk::error_t	guiSetupProfile		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { return ::gpk::guiCreateControlList<::ghg::UI_PLAY>(*dialog.GUI, dialog.Root,  60, 0, ::gpk::ALIGN_BOTTOM_RIGHT, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Profile]); }
 static	::gpk::error_t	guiSetupShop		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { 
 	::gpk::SGUI					& gui				= *dialog.GUI;
-	gpk_necs(::gpk::guiSetupControlList<::ghg::UI_SHOP>(gui, dialog.Root, 60, 0, ::gpk::ALIGN_BOTTOM_RIGHT, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Shop]));
+	gpk_necs(::gpk::guiCreateControlList<::ghg::UI_SHOP>(gui, dialog.Root, 60, 0, ::gpk::ALIGN_BOTTOM_RIGHT, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Shop]));
 
 	::gpk::pobj<::gpk::SDialogViewport>	viewport	= {};
 	gpk_necs(::gpk::viewportCreate(dialog, viewport));
 	//viewport->Settings.DisplacementLockX	= false;;
 	//viewport->Settings.DisplacementLockY	= false;;
-	gui.Controls.Controls	[viewport->IdGUIControl	].Align			= ::gpk::ALIGN_CENTER;
-	gui.Controls.Controls	[viewport->IdGUIControl	].Area.Offset	= {};
-	gui.Controls.Controls	[viewport->IdGUIControl	].Area.Size		= {640, 480};
-	gui.Controls.Controls	[viewport->IdClient		].ImageInvertY	= true;
+	gui.Controls.Placement[viewport->IdGUIControl	].Align			= ::gpk::ALIGN_CENTER;
+	gui.Controls.Placement[viewport->IdGUIControl	].Area.Offset	= {};
+	gui.Controls.Placement[viewport->IdGUIControl	].Area.Size		= {640, 480};
+	gui.Controls.Images		[viewport->IdClient		].ImageInvertY	= true;
 	return 0;
 }
 
 static	::gpk::error_t	guiSetupWelcome		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { 
 	::gpk::SGUI					& gui				= *dialog.GUI;
-	gpk_necs(::gpk::guiSetupControlList<::ghg::UI_WELCOME>(gui, dialog.Root, ::gpk::n2u16{128, 32}, ::gpk::n2i16{0, 64}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Welcome]));
+	gpk_necs(::gpk::guiCreateControlList<::ghg::UI_WELCOME>(gui, dialog.Root, ::gpk::n2u16{128, 32}, ::gpk::n2i16{0, 64}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Welcome]));
 	::gpk::viewportCreate(dialog, app.Inputbox);
 	::gpk::pobj<::gpk::SDialogViewport>	viewport	= app.Inputbox;
-	gui.Controls.Controls	[viewport->IdGUIControl	].Align			= ::gpk::ALIGN_CENTER;
-	gui.Controls.Controls	[viewport->IdGUIControl	].Area.Offset	= {};
-	gui.Controls.Controls	[viewport->IdClient		].Area.Size		= {256, 20};
+	gui.Controls.Placement[viewport->IdGUIControl	].Align			= ::gpk::ALIGN_CENTER;
+	gui.Controls.Placement[viewport->IdGUIControl	].Area.Offset	= {};
+	gui.Controls.Placement[viewport->IdClient		].Area.Size		= {256, 20};
 	gui.Controls.Text		[viewport->IdTitle		].Text			= "Enter your name:";
-	::gpk::viewportAdjustSize(gui.Controls.Controls[viewport->IdGUIControl].Area.Size, gui.Controls.Controls[viewport->IdClient].Area.Size);
-	gui.Controls.Controls	[viewport->IdClient		].ImageInvertY	= true;
+	::gpk::viewportAdjustSize(gui.Controls.Placement[viewport->IdGUIControl].Area.Size, gui.Controls.Placement[viewport->IdClient].Area.Size);
+	gui.Controls.Images		[viewport->IdClient		].ImageInvertY	= true;
 	return 0;
 }
 
 static	::gpk::error_t	guiSetupPlay		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { 
 	dialog.GUI->SelectedFont	= 6;
 
-	gpk_necs(::gpk::guiSetupControlList<::ghg::UI_PLAY>(*dialog.GUI, dialog.Root, {220, 18}, {}, ::gpk::ALIGN_TOP_RIGHT, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Play]));
+	gpk_necs(::gpk::guiCreateControlList<::ghg::UI_PLAY>(*dialog.GUI, dialog.Root, {220, 18}, {}, ::gpk::ALIGN_TOP_RIGHT, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Play]));
 	for(uint32_t iButton = 0; iButton < ::ghg::UI_PLAY_Level; ++iButton) {
 		//dialog.GUI->Controls.Text	[iButton + 1].FontSelected	= ::gpk::ALIGN_TOP_LEFT;
 	}
 	for(uint32_t iButton = ::ghg::UI_PLAY_Level; iButton < ::gpk::get_value_count<::ghg::UI_PLAY>(); ++iButton) {
 		dialog.GUI->Controls.Text		[iButton + 1].FontSelected	= 7;
-		dialog.GUI->Controls.Controls	[iButton + 1].ColorTheme	= ::gpk::ASCII_COLOR_GREEN * 16 + 6;
-		dialog.GUI->Controls.Controls	[iButton + 1].Align			= ::gpk::ALIGN_TOP_LEFT;
-		dialog.GUI->Controls.Controls	[iButton + 1].Area.Offset.y	-= int16_t(18 - 2 * (iButton - 1));
-		dialog.GUI->Controls.Controls	[iButton + 1].Area.Size.y	+= 2;
+		dialog.GUI->Controls.Draw		[iButton + 1].ColorTheme	= ::gpk::ASCII_COLOR_GREEN * 16 + 6;
+		dialog.GUI->Controls.Placement[iButton + 1].Align			= ::gpk::ALIGN_TOP_LEFT;
+		dialog.GUI->Controls.Placement[iButton + 1].Area.Offset.y	-= int16_t(18 - 2 * (iButton - 1));
+		dialog.GUI->Controls.Placement[iButton + 1].Area.Size.y	+= 2;
 	}
 
 	// Setup new viewports if necessary. This may happen if the ship acquires new modules while playing the stage
@@ -289,12 +300,8 @@ static	::gpk::error_t	guiSetupPlay		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog
 	return 0;
 }
 
-static	::gpk::error_t	guiSetupAbout		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { return ::gpk::guiSetupControlList<::ghg::UI_CREDITS>(*dialog.GUI, -1, 160, int16_t(-20 * ::gpk::get_value_count<::ghg::UI_CREDITS>() / 2), ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_About]); }
-static	::gpk::error_t	guiSetupSettings	(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { 
-	::gpk::SGUI					& gui				= *dialog.GUI;
-	::gpk::guiSetupControlList<::ghg::UI_SETTINGS>(gui, -1, {160,20}, {}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Settings]); 
-	return 0;
-}
+static	::gpk::error_t	guiSetupAbout		(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { return ::gpk::guiCreateControlList<::ghg::UI_CREDITS>(*dialog.GUI, -1, 160, int16_t(-20 * ::gpk::get_value_count<::ghg::UI_CREDITS>() / 2), ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_About]); }
+static	::gpk::error_t	guiSetupSettings	(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { return ::gpk::guiCreateControlList<::ghg::UI_SETTINGS>(*dialog.GUI, -1, {160,20}, {}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Settings]); }
 
 ::gpk::error_t			ghg::guiSetup		(::ghg::SGalaxyHellApp & app, const ::gpk::pobj<::gpk::SInput> & input) {
 	es_if(errored(::dialogCreateCommon(app.DialogDesktop, input, {})));
@@ -326,19 +333,19 @@ static	::gpk::error_t	guiHandleLoad		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI &
 		}
 		app.TunerPlayerCount->SetValue(app.Game.PlayState.CountPlayers);
 		for(uint32_t iPilot = 0; iPilot < app.Game.PlayState.CountPlayers; ++iPilot) {
-			const ::gpk::vcc namePilot	= app.Game.Pilots[iPilot].Name;
+			const ::gpk::vcc			namePilot	= app.Game.Pilots[iPilot].Name;
 			for(uint32_t iPlayer = 0; iPlayer < app.Game.PlayState.CountPlayers; ++iPlayer) {
 				if(iPlayer >= app.Players.size())
 					app.AddNewPlayer(namePilot);
 
-				const ::gpk::vcc namePlayer	= app.Players[iPlayer].Name;
+				const ::gpk::vcc			namePlayer	= app.Players[iPlayer].Name;
 				if(namePilot == namePlayer) {
 					::std::swap(app.Players[iPlayer], app.Players[iPilot]);
 					break;
 				}
 			}
 			for(uint32_t iPlayer = app.Game.PlayState.CountPlayers; iPlayer < app.Players.size(); ++iPlayer) {
-				const ::gpk::vcc namePlayer	= app.Players[iPlayer].Name;
+				const ::gpk::vcc			namePlayer	= app.Players[iPlayer].Name;
 				if(namePilot == namePlayer) {
 					::std::swap(app.Players[iPlayer], app.Players[iPilot]);
 					break;
@@ -351,7 +358,7 @@ static	::gpk::error_t	guiHandleLoad		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI &
 
 static	::gpk::error_t	dialogCreateLoad	(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialogLoad, ::gpk::view<::gpk::vcc> pathFileNames, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2f32 & cursorPos) { 
 	::dialogCreateCommon(dialogLoad, inputState, cursorPos);
-	return ::gpk::guiSetupControlList(*dialogLoad.GUI, pathFileNames, dialogLoad.Root, {256, 20}, {0, int16_t(-20 * pathFileNames.size() / 2)}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_LEFT, app.DialogControls[::ghg::APP_STATE_Load]);
+	return ::gpk::guiCreateControlList(*dialogLoad.GUI, pathFileNames, dialogLoad.Root, {256, 20}, {0, int16_t(-20 * pathFileNames.size() / 2)}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_LEFT, app.DialogControls[::ghg::APP_STATE_Load]);
 }
 
 static	::gpk::error_t	guiHandleHome		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & /*gui*/, uint32_t idControl, ::ghg::SGalaxyHell & game) { 
@@ -460,14 +467,15 @@ static	::gpk::error_t	uiPlayerUpdateHome	(::ghg::SUIPlayer & uiPlayer, uint16_t 
 	gpk_necs(::gpk::controlTextSet(playerGUI, playerDialog.Root + 1 + ::ghg::UI_PROFILE_Score, uiPlayer.TextScore.Storage));
 	gpk_necs(::gpk::controlTextSet(playerGUI, playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name, playerName));
 	{
-		::gpk::SControl				& control			= playerGUI.Controls.Controls[playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name];
-		control.ColorTheme		= int16_t(3 + iPlayer);
-		const ::gpk::SControlTheme	& theme				= (*playerGUI.Colors->ControlThemes)[(0 == control.ColorTheme) ? playerGUI.ThemeDefault : control.ColorTheme - 1];
+		::gpk::SControlDraw			& controlDraw		= playerGUI.Controls.Draw[playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name];
+		controlDraw.ColorTheme		= int16_t(3 + iPlayer);
+		const ::gpk::SControlTheme	& theme				= (*playerGUI.Colors->ControlThemes)[(0 == controlDraw.ColorTheme) ? playerGUI.ThemeDefault : controlDraw.ColorTheme - 1];
 		const ::gpk::astu32<::gpk::UI_CONTROL_AREA_COUNT>	& colorCombo	= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
 		(*playerGUI.Colors->Palette)[colorCombo[::gpk::UI_CONTROL_AREA_TEXT_FACE	]] = shipColor;
 		(*playerGUI.Colors->Palette)[colorCombo[::gpk::UI_CONTROL_AREA_BACKGROUND	]] = shipColor;
-		playerGUI.Controls.Controls[uiPlayer.InputBox.IdText].ColorTheme = control.ColorTheme;
-		playerGUI.Controls.Draw[uiPlayer.InputBox.IdText].NoBackgroundRect = true;
+		playerGUI.Controls.Draw[uiPlayer.InputBox.IdText].ColorTheme = controlDraw.ColorTheme;
+		playerGUI.Controls.Draw[uiPlayer.InputBox.IdText].NoClient = true;
+		playerGUI.Controls.Draw[uiPlayer.InputBox.IdText].NoBorder = true;
 
 	}
 	return 0;
@@ -483,15 +491,15 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 	gpk_necs(::gpk::controlTextSet(playerGUI, 1 + ::ghg::UI_PILOT_Name	, game.Pilots[iPlayer].Name));
 	gpk_necs(::gpk::controlTextSet(playerGUI, 1 + ::ghg::UI_PILOT_Score, uiPlayer.TextScore.Storage));
 	{
-		::gpk::SControl				& control		= playerGUI.Controls.Controls[1 + ::ghg::UI_PILOT_Name];
-		control.ColorTheme		= int16_t(3 + iPlayer);
-		const ::gpk::SControlTheme	& theme			= (*playerGUI.Colors->ControlThemes)[(0 == control.ColorTheme) ? playerGUI.ThemeDefault : control.ColorTheme - 1];
+		::gpk::SControlDraw			& controlDraw		= playerGUI.Controls.Draw[1 + ::ghg::UI_PILOT_Name];
+		controlDraw.ColorTheme	= int16_t(3 + iPlayer);
+		const ::gpk::SControlTheme	& theme				= (*playerGUI.Colors->ControlThemes)[(0 == controlDraw.ColorTheme) ? playerGUI.ThemeDefault : controlDraw.ColorTheme - 1];
 		const ::gpk::astu32<::gpk::UI_CONTROL_AREA_COUNT>	& colorCombo			= theme.ColorCombos[::gpk::GUI_CONTROL_PALETTE_NORMAL];
 		(*playerGUI.Colors->Palette)[colorCombo[::gpk::UI_CONTROL_AREA_TEXT_FACE	]] = shipColor;
 		(*playerGUI.Colors->Palette)[colorCombo[::gpk::UI_CONTROL_AREA_BACKGROUND	]] = shipColor;
 	}
 	for(uint32_t iOrbiter = 0, countViewports = game.ShipState.ShipParts[iPlayer].size(); iOrbiter < countViewports; ++iOrbiter) {
-		::ghg::SUIPlayShipPartViewport	& viewport	= *uiPlayer.ModuleViewports[iOrbiter];
+		::ghg::SUIPlayShipPartViewport	& viewport		= *uiPlayer.ModuleViewports[iOrbiter];
 
 		const ::ghg::SOrbiter		& orbiter		= game.ShipState.Orbiters[game.ShipState.ShipParts[iPlayer][iOrbiter]];
 		const ::ghg::SWeapon		& weapon		= game.ShipState.Weapons[orbiter.Weapon];
@@ -598,8 +606,8 @@ static	::gpk::error_t	guiUpdatePlay		(::ghg::SGalaxyHellApp & app) {
 	if(0 == game.ShipState.ShipCores.size())
 		return 0;
 
-	for(uint32_t iPlayer = 0; iPlayer < app.TunerPlayerCount->ValueCurrent && iPlayer < app.UIPlay.PlayerUI.size() ; ++iPlayer) { app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI->Controls.Modes[0].Hidden = false; }
-	for(uint32_t iPlayer = (uint32_t)app.TunerPlayerCount->ValueCurrent; iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) { app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI->Controls.Modes[0].Hidden = true; }
+	for(uint32_t iPlayer = 0; iPlayer < app.TunerPlayerCount->ValueCurrent && iPlayer < app.UIPlay.PlayerUI.size() ; ++iPlayer) { app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI->Controls.States[0].Hidden = false; }
+	for(uint32_t iPlayer = (uint32_t)app.TunerPlayerCount->ValueCurrent; iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) { app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI->Controls.States[0].Hidden = true; }
 
 	::ghg::SGalaxyHellDrawCache	& drawCache			= app.UIPlay.DrawCache;
 	drawCache.LightPointsWorld.clear();
@@ -611,10 +619,10 @@ static	::gpk::error_t	guiUpdatePlay		(::ghg::SGalaxyHellApp & app) {
 		for(uint32_t iPlayer = 0; iPlayer < game.PlayState.CountPlayers; ++iPlayer) {
 			::ghg::SUIPlayer			& uiPlayer			= app.UIPlay.PlayerUI[iPlayer];
 			gpk_necall(::uiPlayerUpdatePlay(uiPlayer, iPlayer, app.Game, app.Game.ShipState.ShipScores[iPlayer], app.Game.LockUpdate, drawCache), "iPlayer: %i", iPlayer);
-			uiPlayer.DialogPlay.GUI->Controls.Modes[0].Hidden = false; 
+			uiPlayer.DialogPlay.GUI->Controls.States[0].Hidden = false; 
 		}
 		for(uint32_t iPlayer = app.Game.PlayState.CountPlayers; iPlayer < ghg::MAX_PLAYERS; ++iPlayer) { 
-			app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI->Controls.Modes[0].Hidden = true; 
+			app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI->Controls.States[0].Hidden = true; 
 		}
 	}
 	return 0;
@@ -625,7 +633,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 		::ghg::SUIPlayer			& uiPlayer					= app.UIPlay.PlayerUI[iPlayer];
 		::gpk::SDialog				& dialog					= uiPlayer.DialogHome;
 		::gpk::SGUI					& gui						= *dialog.GUI;
-		gui.Controls.Modes[dialog.Root].Hidden = false; 
+		gui.Controls.States[dialog.Root].Hidden = false; 
 
 		if(app.Players.size() <= iPlayer) {
 			::std::lock_guard			lock						(app.Game.LockUpdate);
@@ -676,7 +684,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 		::ghg::SUIPlayer			& uiPlayer		= app.UIPlay.PlayerUI[iPlayer];
 		::gpk::SDialog				& dialog		= uiPlayer.DialogHome;
 		::gpk::SGUI					& gui			= *dialog.GUI;
-		gui.Controls.Modes[dialog.Root].Hidden = true; 
+		gui.Controls.States[dialog.Root].Hidden = true; 
 	}
 
 	return 0;

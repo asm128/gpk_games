@@ -13,7 +13,7 @@ namespace d1p
 
 #pragma pack(push, 1)
 	struct SStickControl {
-		::gpk::n2f				Shift				= {};
+		::gpk::n2f32			Shift				= {};
 		float					Angle				= 0;
 		float					Pitch				= 0;
 		float					Velocity			= 2;
