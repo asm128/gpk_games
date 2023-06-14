@@ -283,10 +283,15 @@ namespace d1
 		::d1::SD1FileStrings	FileStrings					= {};
 
 		::gpk::error_t			StateSwitch					(::d1::APP_STATE newState)			{
+			::gpk::SControlTable		& table						= AppUI.Dialog.GUI->Controls;
 			if(newState != ActiveState) {
-				AppUI.Dialog.GUI->Controls.States[AppUI.DialogPerState[newState]].Hidden = false;
-				if(ActiveState >= ::d1::APP_STATE_Home && AppUI.DialogPerState[ActiveState])
-					AppUI.Dialog.GUI->Controls.States[AppUI.DialogPerState[ActiveState]].Hidden = true;
+				const uint32_t iDialogNew = AppUI.DialogPerState[newState];
+				table.States[iDialogNew].SetHidden(table.Events[iDialogNew], false);
+
+				const uint32_t iDialogActive = AppUI.DialogPerState[ActiveState];
+				if(ActiveState >= ::d1::APP_STATE_Home && iDialogActive) {
+					table.States[iDialogActive].SetHidden(table.Events[iDialogActive], true);
+				}
 				if(newState == ::d1::APP_STATE_Home && ActiveState > ::d1::APP_STATE_Home) // Don't autosave first time we enter Home.
 					gpk_necs(Save(::d1::SAVE_MODE_AUTO));
 

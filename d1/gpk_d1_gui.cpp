@@ -98,7 +98,7 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	gpk_necs(firstControl); 
 	for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam) {
 		uint32_t					playerRoot					= appUI.TeamUI[iTeam].DialogPerState[d1::APP_STATE_Play];
-		gui.Controls.States[playerRoot].Hidden	= true;
+		gui.Controls.SetHidden(playerRoot, true);
 
 		uint32_t					firstControlPlayer			= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Play] = ::gpk::guiCreateControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_LEFT : ::gpk::ALIGN_TOP_RIGHT, ::gpk::ALIGN_CENTER, appUI.TeamUI[iTeam].DialogControls[::d1::APP_STATE_Play]);
 		gpk_necs(firstControlPlayer); 
@@ -180,7 +180,7 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 			uint32_t					iControl;
 			gpk_necs(iControl = appUI.DialogPerState[iState] = ::gpk::controlCreate(gui));
 			gpk_necs(guiContainerSetupDefaults(gui, iControl, appUI.Dialog.Root));
-			gui.Controls.States[iControl].Hidden	= true;
+			gui.Controls.SetHidden(iControl, true);
 			for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam)
 				gpk_necs(::guiContainerSetupDefaults(gui, appUI.TeamUI[iTeam].DialogPerState[iState] = ::gpk::controlCreate(gui), appUI.Dialog.Root));
 		}

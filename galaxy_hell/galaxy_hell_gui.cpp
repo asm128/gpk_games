@@ -80,7 +80,7 @@ static	::gpk::error_t	uiPlayerSetupHome	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 	case 3: playerAlign = ::gpk::ALIGN_TOP_LEFT		; break;
 	}
 	gpk_necs(::gpk::inputBoxCreate(uiPlayer.InputBox, *playerDialog.GUI, playerDialog.Root));
-	playerGUI.Controls.States	[uiPlayer.InputBox.IdRoot].Hidden			= true;
+	playerGUI.Controls.SetHidden(uiPlayer.InputBox.IdRoot, true);
 	playerGUI.Controls.Placement[uiPlayer.InputBox.IdRoot].Align			= playerAlign;
 	playerGUI.Controls.Placement[uiPlayer.InputBox.IdRoot].Area.Offset.x	= 240;
 
@@ -606,8 +606,8 @@ static	::gpk::error_t	guiUpdatePlay		(::ghg::SGalaxyHellApp & app) {
 	if(0 == game.ShipState.ShipCores.size())
 		return 0;
 
-	for(uint32_t iPlayer = 0; iPlayer < app.TunerPlayerCount->ValueCurrent && iPlayer < app.UIPlay.PlayerUI.size() ; ++iPlayer) { app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI->Controls.States[0].Hidden = false; }
-	for(uint32_t iPlayer = (uint32_t)app.TunerPlayerCount->ValueCurrent; iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) { app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI->Controls.States[0].Hidden = true; }
+	for(uint32_t iPlayer = 0; iPlayer < app.TunerPlayerCount->ValueCurrent &&	iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) { app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI->Controls.SetHidden(0, false); }
+	for(uint32_t iPlayer = (uint32_t)app.TunerPlayerCount->ValueCurrent;		iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) { app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI->Controls.SetHidden(0, true); }
 
 	::ghg::SGalaxyHellDrawCache	& drawCache			= app.UIPlay.DrawCache;
 	drawCache.LightPointsWorld.clear();
@@ -619,10 +619,10 @@ static	::gpk::error_t	guiUpdatePlay		(::ghg::SGalaxyHellApp & app) {
 		for(uint32_t iPlayer = 0; iPlayer < game.PlayState.CountPlayers; ++iPlayer) {
 			::ghg::SUIPlayer			& uiPlayer			= app.UIPlay.PlayerUI[iPlayer];
 			gpk_necall(::uiPlayerUpdatePlay(uiPlayer, iPlayer, app.Game, app.Game.ShipState.ShipScores[iPlayer], app.Game.LockUpdate, drawCache), "iPlayer: %i", iPlayer);
-			uiPlayer.DialogPlay.GUI->Controls.States[0].Hidden = false; 
+			uiPlayer.DialogPlay.GUI->Controls.SetHidden(0, false);
 		}
 		for(uint32_t iPlayer = app.Game.PlayState.CountPlayers; iPlayer < ghg::MAX_PLAYERS; ++iPlayer) { 
-			app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI->Controls.States[0].Hidden = true; 
+			app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI->Controls.SetHidden(0, true); 
 		}
 	}
 	return 0;
@@ -633,7 +633,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 		::ghg::SUIPlayer			& uiPlayer					= app.UIPlay.PlayerUI[iPlayer];
 		::gpk::SDialog				& dialog					= uiPlayer.DialogHome;
 		::gpk::SGUI					& gui						= *dialog.GUI;
-		gui.Controls.States[dialog.Root].Hidden = false; 
+		gui.Controls.SetHidden(dialog.Root, false); 
 
 		if(app.Players.size() <= iPlayer) {
 			::std::lock_guard			lock						(app.Game.LockUpdate);
@@ -684,7 +684,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 		::ghg::SUIPlayer			& uiPlayer		= app.UIPlay.PlayerUI[iPlayer];
 		::gpk::SDialog				& dialog		= uiPlayer.DialogHome;
 		::gpk::SGUI					& gui			= *dialog.GUI;
-		gui.Controls.States[dialog.Root].Hidden = true; 
+		gui.Controls.SetHidden(dialog.Root, true);
 	}
 
 	return 0;

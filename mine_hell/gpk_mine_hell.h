@@ -9,24 +9,24 @@ namespace gpkg
 #pragma pack(push, 1)	// 0.5 would be much better, but I suppose this will do as it isn't even necessary for our small struct
 	// Holds the state for a single cell
 	struct SMineHellCell {
-		bool				Show			: 1;
-		bool				Mine			: 1;
-		bool				Flag			: 1;
-		bool				What			: 1;
-		bool				Boom			: 1;
+		bool			Show			: 1;
+		bool			Mine			: 1;
+		bool			Flag			: 1;
+		bool			What			: 1;
+		bool			Boom			: 1;
 	};
 
 	struct SMineHellState {
-		::gpk::rangeu64		Time			= {};
-		::gpk::n2u32		BlastCoord		= {(uint32_t)-1, (uint32_t)-1};
-		::gpk::n2u32		BoardSize		= {32, 32};	// Note that it's quite easy to hit stack overflow with more than 20 x 20 cells per block
-		::gpk::n2u32		BlockSize		= {16, 16};	// Note that it's quite easy to hit stack overflow with more than 20 x 20 cells per block
-		uint32_t			MineCount		= 10;
-		//char				PlayerId[127]	= {};
-		bool				Blast			: 1;
-		bool				BlockBased		: 1;
+		::gpk::rangeu64	Time			= {};
+		::gpk::n2u32	BlastCoord		= {(uint32_t)-1, (uint32_t)-1};
+		::gpk::n2u32	BoardSize		= {32, 32};	// Note that it's quite easy to hit stack overflow with more than 20 x 20 cells per block
+		::gpk::n2u32	BlockSize		= {16, 16};	// Note that it's quite easy to hit stack overflow with more than 20 x 20 cells per block
+		uint32_t		MineCount		= 10;
+		//char			PlayerId[127]	= {};
+		bool			Blast			: 1;
+		bool			BlockBased		: 1;
 
-							SMineHellState	() : Blast(false), BlockBased(true) {}		// it's faster to initialize these now than check if they're false by default
+						SMineHellState	() : Blast(false), BlockBased(true) {}		// it's faster to initialize these now than check if they're false by default
 	};
 	//static constexpr const size_t asdsasdasdjnwlef = sizeof(SMineHellState);
 #pragma pack(pop)
