@@ -653,7 +653,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 			), "iPlayer: %i", iPlayer
 		);
 
-		::gpk::au32					controlsToProcess			= {};
+		::gpk::acid					controlsToProcess			= {};
 		::gpk::guiGetProcessableControls(gui, controlsToProcess);
 		if(int32_t result = uiPlayer.InputBox.Update(gui, uiPlayer.InputBox.VirtualKeyboard, frameEvents, controlsToProcess)) {
 			if(result == INT_MAX) {
@@ -722,7 +722,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 	::gpk::SDialog				& dialog					= app.DialogPerState[appState];
 	dialog.Update();
 	::gpk::SGUI					& gui						= *dialog.GUI;
-	::gpk::au32					controlsToProcess			= {};
+	::gpk::acid					controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 
 	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {

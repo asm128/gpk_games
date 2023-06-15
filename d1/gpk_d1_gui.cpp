@@ -23,7 +23,7 @@ static	::gpk::error_t	dialogCreateCommon			(::gpk::SDialog & dialog, const ::gpk
 }
 
 static	::gpk::error_t	guiContainerSetupDefaults	(::gpk::SGUI & gui, uint32_t iControl, uint32_t iParent) { 
-	gui.Controls.Constraints[iControl].AttachSizeToControl	= {(int32_t)iControl, (int32_t)iControl};
+	gui.Controls.Constraints[iControl].AttachSizeToControl	= {(::gpk::cid_t)iControl, (::gpk::cid_t)iControl};
 	gui.Controls.Modes		[iControl].NoHover		= true;
 	gui.Controls.Modes		[iControl].NoExecute	= true;
 	gui.Controls.Draw		[iControl].NoBorder	= true;
@@ -41,7 +41,7 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	::gpk::SGUI					& gui						= *dialog.GUI;
 	cnstxpr	::gpk::n2u16		buttonSize					= {BUTTON_WIDTH_SMALL, BUTTON_HEIGHT};
 	const ::gpk::n2i16			buttonOffset				= {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::d1::UI_HOME>() / 2)};
-	uint32_t					firstControlHome			= appUI.FirstControl[::d1::APP_STATE_Home] = ::gpk::guiCreateControlList<::d1::UI_HOME>(gui, appUI.DialogPerState[::d1::APP_STATE_Home], buttonSize, buttonOffset, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Home]);
+	::gpk::cid_t				firstControlHome			= appUI.FirstControl[::d1::APP_STATE_Home] = ::gpk::guiCreateControlList<::d1::UI_HOME>(gui, appUI.DialogPerState[::d1::APP_STATE_Home], buttonSize, buttonOffset, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Home]);
 	gpk_necs(firstControlHome); 
 	for(uint32_t iButton = firstControlHome; iButton < firstControlHome + ::gpk::get_value_count<::d1::UI_HOME>(); ++iButton) {
 		gui.Controls.Placement[iButton].Area.Offset.y	+= 0;
@@ -232,11 +232,11 @@ static	::gpk::error_t	guiHandleHome				(::d1::SD1 & app, ::gpk::SGUI & gui, uint
 	dialog.Update();
 	::gpk::SGUI					& gui						= *dialog.GUI;
 
-	::gpk::au32					controlsToProcess			= {};
+	::gpk::acid					controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
 	app.AppUI.NameEditBox.Update(gui, app.AppUI.NameEditBox.VirtualKeyboard, sysEvents, controlsToProcess);
 	::d1::APP_STATE				appState					= app.ActiveState; 
-	::gpk::guiProcessControls(gui, [&app, &gui, &controlsToProcess, &appState](int32_t idControl) {
+	::gpk::guiProcessControls(gui, [&app, &gui, &controlsToProcess, &appState](::gpk::cid_t idControl) {
 		bool						handled						= false;
 		switch(appState) {
 		case ::d1::APP_STATE_Home		: appState = (::d1::APP_STATE)::guiHandleHome		(app, gui, idControl, appState);	handled = true; break;
