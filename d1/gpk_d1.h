@@ -217,9 +217,9 @@ namespace d1
 		::gpk::SDialog						Dialog					= {};
 		::gpk::pobj<::gpk::SDialogSlider>	ForceSlider				= {};
 		TRenderTarget						ForceSliderRenderTarget	= {};
-		::gpk::astu32<APP_STATE_COUNT>		DialogPerState			= {};
-		::gpk::astu32<APP_STATE_COUNT>		FirstControl			= {}; 	
-		::gpk::astatic<::gpk::ai32, APP_STATE_COUNT>	
+		::gpk::astcid<APP_STATE_COUNT>		DialogPerState			= {};
+		::gpk::astcid<APP_STATE_COUNT>		FirstControl			= {}; 	
+		::gpk::astatic<::gpk::acid, APP_STATE_COUNT>	
 											DialogControls			= {}; 	
 		::gpk::astatic<::d1::STeamUI, 2>	TeamUI					= {};
 		::gpk::SUIInputBox					NameEditBox;

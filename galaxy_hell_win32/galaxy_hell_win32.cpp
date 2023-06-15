@@ -36,7 +36,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Galaxy Hell v0.4");
 
 ::gpk::error_t			cleanup				(::SApplication & app)						{ 
 	::gpk::SFramework			& framework			= app.Framework;
-	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, framework.RootWindow.EventQueue);
+	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, framework.RootWindow.EventQueueOld);
 	app.AudioState.CleanupAudio(); 
 
 
@@ -184,15 +184,15 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	//::gpk::STimer				timer;
 	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
 
-	for(uint32_t iEvent = 0; iEvent < framework.RootWindow.EventQueue.size(); ++iEvent) {
-		switch(framework.RootWindow.EventQueue[iEvent].Type) {
+	for(uint32_t iEvent = 0; iEvent < framework.RootWindow.EventQueueOld.size(); ++iEvent) {
+		switch(framework.RootWindow.EventQueueOld[iEvent].Type) {
 		case ::gpk::SYSEVENT_WINDOW_ACTIVATE:
 			break;
 		case ::gpk::SYSEVENT_WINDOW_DEACTIVATE:
 			break;
 		case ::gpk::SYSEVENT_SYSKEY_DOWN:
 		case ::gpk::SYSEVENT_KEY_DOWN:
-			switch(framework.RootWindow.EventQueue[iEvent].Data[0]) {
+			switch(framework.RootWindow.EventQueueOld[iEvent].Data[0]) {
 			case VK_RETURN:
 				if(GetAsyncKeyState(VK_MENU) & 0xFFF0)
 					gpk_necs(::gpk::fullScreenToggle(app.Framework.RootWindow));
@@ -201,7 +201,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 		}
 	}
 
-	if(1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, framework.RootWindow.EventQueue))
+	if(1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, framework.RootWindow.EventQueueOld))
 		return ::gpk::APPLICATION_STATE_EXIT;
 
 	{
