@@ -1,0 +1,162 @@
+File name: gpk_galaxy_hell_planet.h
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:44:02 2023
+File modification date: Sat May 20 08:08:34 2023
+File code lines: 7
+File directive lines: 5
+File comment lines: 1
+File blank lines: 7
+File bytes: 386
+
+File name: galaxy_hell_app.cpp
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:43:46 2023
+File modification date: Mon Jun  5 17:06:10 2023
+File code lines: 200
+File directive lines: 6
+File comment lines: 14
+File blank lines: 85
+File bytes: 13833
+
+File name: galaxy_hell_deco.cpp
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:43:46 2023
+File modification date: Mon Jun  5 17:06:10 2023
+File code lines: 35
+File directive lines: 2
+File comment lines: 3
+File blank lines: 13
+File bytes: 2584
+
+File name: gpk_galaxy_hell_draw.h
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:43:46 2023
+File modification date: Mon Jun  5 17:06:10 2023
+File code lines: 25
+File directive lines: 6
+File comment lines: 4
+File blank lines: 14
+File bytes: 1197
+
+File name: gpk_galaxy_hell_entity.h
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:43:46 2023
+File modification date: Mon Jun  5 17:06:10 2023
+File code lines: 38
+File directive lines: 7
+File comment lines: 1
+File blank lines: 17
+File bytes: 1954
+
+File name: galaxy_hell_draw.cpp
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:43:46 2023
+File modification date: Wed Jun  7 09:12:14 2023
+File code lines: 466
+File directive lines: 8
+File comment lines: 22
+File blank lines: 141
+File bytes: 28849
+
+File name: galaxy_hell_gui.cpp
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:43:46 2023
+File modification date: Wed Jun  7 09:12:14 2023
+File code lines: 599
+File directive lines: 8
+File comment lines: 15
+File blank lines: 196
+File bytes: 42393
+
+File name: galaxy_hell_setup.cpp
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:43:46 2023
+File modification date: Wed Jun  7 09:12:14 2023
+File code lines: 308
+File directive lines: 12
+File comment lines: 14
+File blank lines: 98
+File bytes: 21109
+
+File name: galaxy_hell_update.cpp
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:43:46 2023
+File modification date: Wed Jun  7 09:12:14 2023
+File code lines: 404
+File directive lines: 6
+File comment lines: 19
+File blank lines: 159
+File bytes: 28866
+
+File name: gpk_galaxy_hell.h
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:43:46 2023
+File modification date: Wed Jun  7 09:12:14 2023
+File code lines: 117
+File directive lines: 12
+File comment lines: 0
+File blank lines: 49
+File bytes: 5382
+
+File name: gpk_galaxy_hell_app.h
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:43:46 2023
+File modification date: Wed Jun  7 09:12:14 2023
+File code lines: 274
+File directive lines: 8
+File comment lines: 3
+File blank lines: 84
+File bytes: 13886
+
+File name: gpk_galaxy_hell_deco.h
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:43:46 2023
+File modification date: Wed Jun  7 09:12:14 2023
+File code lines: 125
+File directive lines: 8
+File comment lines: 2
+File blank lines: 56
+File bytes: 5822
+
+File name: gpk_galaxy_hell_ships.h
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:43:46 2023
+File modification date: Wed Jun  7 09:12:14 2023
+File code lines: 223
+File directive lines: 14
+File comment lines: 5
+File blank lines: 70
+File bytes: 10452
+
+File name: gpk_galaxy_hell_weapon.h
+File folder: E:\bundle_galaxy_hell\gpk_games\galaxy_hell\
+File creation date: Tue Jan 10 15:43:46 2023
+File modification date: Wed Jun  7 09:12:14 2023
+File code lines: 164
+File directive lines: 7
+File comment lines: 8
+File blank lines: 46
+File bytes: 7657
+
+
+----------------------------- Total Files: 14
+----------------------------- Total Lines: 4240
+
+Comments: 111
+Code: 2985
+Compiler directives: 109
+Blanks: 1035
+Total bytes: 184370
+
+----------------------------- Stats: 
+
+Average lines per file: 302.85714285714283
+Average lines of comments per file: 7.928571428571429
+Average lines of code per file: 213.21428571428572
+Average lines of compiler directives per file: 7.785714285714286
+Average blank lines per file: 73.92857142857143
+
+Comments: 2.617924528301887%
+Code: 70.40094339622642%
+Compiler directives: 2.5707547169811322%
+Blanks: 24.410377358490567%
