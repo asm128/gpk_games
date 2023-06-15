@@ -100,9 +100,9 @@ namespace d1
 	GDEFINE_ENUM_VALUE(UI_TEAM, Score		, 1);
 	GDEFINE_ENUM_VALUE(UI_TEAM, Fouls		, 2);
 	struct STeamUI {
-		::gpk::astu32<::d1::APP_STATE_COUNT>	DialogPerState				= {};	
-		::gpk::astu32<::d1::APP_STATE_COUNT>	FirstControl				= {}; 	
-		::gpk::astatic<::gpk::ai32, APP_STATE_COUNT>	
+		::gpk::astcid<::d1::APP_STATE_COUNT>	DialogPerState				= {};	
+		::gpk::astcid<::d1::APP_STATE_COUNT>	FirstControl				= {}; 	
+		::gpk::astatic<::gpk::acid, APP_STATE_COUNT>	
 												DialogControls			= {}; 	
 	};
 

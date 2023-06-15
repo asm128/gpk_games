@@ -109,7 +109,7 @@ namespace ghg
 	}
 
 	struct SUIPlayShipPartViewport {
-		int32_t							Viewport		;
+		::gpk::cid_t					Viewport		;
 		::gpk::SCameraPoints			Camera			;
 		SUIRadialGauge					GaugeLife		;
 		SUIRadialGauge					GaugeCooldown	;
@@ -134,8 +134,8 @@ namespace ghg
 		::gpk::SDialog			DialogPlay				= {};
 		::gpk::SDialog			DialogHome				= {};
 
-		::gpk::ai32				ControlsDialogPlay		= {};
-		::gpk::ai32				ControlsDialogHome		= {};
+		::gpk::acid				ControlsDialogPlay		= {};
+		::gpk::acid				ControlsDialogHome		= {};
 
 		::gpk::SUIInputBox		InputBox				= {};
 	
@@ -302,7 +302,7 @@ namespace ghg
 		::gpk::astatic<::gpk::SDialog, ::ghg::APP_STATE_COUNT>	
 											DialogPerState				= {};
 
-		::gpk::astatic<::gpk::ai32, APP_STATE_COUNT>	
+		::gpk::astatic<::gpk::acid, APP_STATE_COUNT>	
 											DialogControls				= {}; 	
 
 		::gpk::SVirtualKeyboard				VirtualKeyboard				= {};
@@ -311,7 +311,7 @@ namespace ghg
 		::gpk::SDialog						DialogDesktop				= {};
 		::gpk::aobj<::ghg::SPlayer>			Players						= {};
 		::gpk::pnco<::gpk::SDialogTuner<uint8_t>>	TunerPlayerCount;
-		::gpk::ai32							DesktopControls			= {}; 	
+		::gpk::acid							DesktopControls			= {}; 	
 
 		::ghg::SGalaxyHell						Game;
 		::gpk::aobj<::ghg::SUserCredentials>	UserCredentials				= {};

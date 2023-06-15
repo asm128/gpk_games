@@ -22,8 +22,8 @@ static	::gpk::error_t	dialogCreateCommon			(::gpk::SDialog & dialog, const ::gpk
 	return 0;
 }
 
-static	::gpk::error_t	guiContainerSetupDefaults	(::gpk::SGUI & gui, uint32_t iControl, uint32_t iParent) { 
-	gui.Controls.Constraints[iControl].AttachSizeToControl	= {(::gpk::cid_t)iControl, (::gpk::cid_t)iControl};
+static	::gpk::error_t	guiContainerSetupDefaults	(::gpk::SGUI & gui, ::gpk::cid_t iControl, ::gpk::cid_t iParent) { 
+	gui.Controls.Constraints[iControl].AttachSizeToControl	= {iControl, iControl};
 	gui.Controls.Modes		[iControl].NoHover		= true;
 	gui.Controls.Modes		[iControl].NoExecute	= true;
 	gui.Controls.Draw		[iControl].NoBorder	= true;
@@ -34,7 +34,9 @@ static	::gpk::error_t	guiContainerSetupDefaults	(::gpk::SGUI & gui, uint32_t iCo
 	return 0; 
 }
 
-static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appGame) { ::gpk::SDialog	& dialog = appUI.Dialog; 
+static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appGame) { 
+	::gpk::SDialog				& dialog					= appUI.Dialog; 
+
 	cnstxpr	uint16_t			BUTTON_HEIGHT				= 24;
 	cnstxpr	uint16_t			BUTTON_WIDTH_SMALL			= 160;
 	cnstxpr	uint16_t			BUTTON_WIDTH_LARGE			= 184;
@@ -79,10 +81,10 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	}
 
 	for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam) {
-		uint32_t					playerRoot					= appUI.TeamUI[iTeam].DialogPerState[::d1::APP_STATE_Home];
+		::gpk::cid_t					playerRoot					= appUI.TeamUI[iTeam].DialogPerState[::d1::APP_STATE_Home];
 		gui.Controls.Placement[playerRoot].Align	= iTeam ? ::gpk::ALIGN_LEFT : ::gpk::ALIGN_RIGHT;
 
-		uint32_t					firstControl				= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Home] = ::gpk::guiCreateControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_RIGHT : ::gpk::ALIGN_TOP_LEFT, ::gpk::ALIGN_CENTER, appUI.TeamUI[iTeam].DialogControls[::d1::APP_STATE_Home]);
+		::gpk::cid_t					firstControl				= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Home] = ::gpk::guiCreateControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_RIGHT : ::gpk::ALIGN_TOP_LEFT, ::gpk::ALIGN_CENTER, appUI.TeamUI[iTeam].DialogControls[::d1::APP_STATE_Home]);
 		gpk_necs(firstControl);
 		//gui.Controls.States[firstControl].Hidden		= true;
 		//gui.Controls.States[firstControl].Disabled	= true;
@@ -93,14 +95,14 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appGame) { ::gpk::SDialog	& dialog = appUI.Dialog; 
 	cnstxpr int					BUTTON_HEIGHT				= 24;
 	::gpk::SGUI					& gui						= *dialog.GUI;
-	const uint32_t				iDialog						= appUI.DialogPerState[::d1::APP_STATE_Play];
-	uint32_t					firstControl				=  appUI.FirstControl[d1::APP_STATE_Play] = ::gpk::guiCreateControlList<::d1::UI_PLAY>(gui, iDialog, {160, BUTTON_HEIGHT}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Play]);
+	const ::gpk::cid_t			iDialog						= appUI.DialogPerState[::d1::APP_STATE_Play];
+	::gpk::cid_t				firstControl				=  appUI.FirstControl[d1::APP_STATE_Play] = ::gpk::guiCreateControlList<::d1::UI_PLAY>(gui, iDialog, {160, BUTTON_HEIGHT}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Play]);
 	gpk_necs(firstControl); 
 	for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam) {
-		uint32_t					playerRoot					= appUI.TeamUI[iTeam].DialogPerState[d1::APP_STATE_Play];
+		::gpk::cid_t				playerRoot					= appUI.TeamUI[iTeam].DialogPerState[d1::APP_STATE_Play];
 		gui.Controls.SetHidden(playerRoot, true);
 
-		uint32_t					firstControlPlayer			= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Play] = ::gpk::guiCreateControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_LEFT : ::gpk::ALIGN_TOP_RIGHT, ::gpk::ALIGN_CENTER, appUI.TeamUI[iTeam].DialogControls[::d1::APP_STATE_Play]);
+		::gpk::cid_t				firstControlPlayer			= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Play] = ::gpk::guiCreateControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_LEFT : ::gpk::ALIGN_TOP_RIGHT, ::gpk::ALIGN_CENTER, appUI.TeamUI[iTeam].DialogControls[::d1::APP_STATE_Play]);
 		gpk_necs(firstControlPlayer); 
 		//gui.Controls.Modes [firstControlPlayer].FrameOut	= true;
 		//gui.Controls.States[firstControlPlayer].Disabled	= true;
@@ -172,12 +174,12 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 
 ::gpk::error_t			d1::guiSetup				(::d1::SD1UI & appUI, ::d1::SD1Game & appGame, const ::gpk::pobj<::gpk::SInput> & input) {
 	gpk_necs(::dialogCreateCommon(appUI.Dialog, input, appUI.Dialog.GUI->CursorPos));
-	gpk_necs(::guiContainerSetupDefaults(*appUI.Dialog.GUI, 0, (uint32_t)-1));
+	gpk_necs(::guiContainerSetupDefaults(*appUI.Dialog.GUI, 0, (::gpk::cid_t)-1));
 
 	::gpk::SGUI					& gui						= *appUI.Dialog.GUI;
 	for(uint32_t iState = 0; iState < appUI.DialogPerState.size(); ++iState) {
 		if(iState == ::d1::APP_STATE_Home || iState == ::d1::APP_STATE_Play) {
-			uint32_t					iControl;
+			::gpk::cid_t					iControl;
 			gpk_necs(iControl = appUI.DialogPerState[iState] = ::gpk::controlCreate(gui));
 			gpk_necs(guiContainerSetupDefaults(gui, iControl, appUI.Dialog.Root));
 			gui.Controls.SetHidden(iControl, true);
@@ -190,9 +192,9 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	return 0;
 }
 
-static	::gpk::error_t	guiHandlePlay				(::d1::SD1 & app, ::gpk::SGUI & gui, uint32_t idControl, d1::APP_STATE appState) { 
-	uint32_t					idDialog					= app.AppUI.DialogPerState[appState];
-	const ::gpk::ai32			& children					= gui.Controls.Children[idDialog];
+static	::gpk::error_t	guiHandlePlay				(::d1::SD1 & app, ::gpk::SGUI & gui, ::gpk::cid_t idControl, d1::APP_STATE appState) { 
+	::gpk::cid_t				idDialog					= app.AppUI.DialogPerState[appState];
+	const ::gpk::acid			& children					= gui.Controls.Children[idDialog];
 	idControl				= idControl - children[0];
 	switch((::d1::UI_PLAY)idControl) {
 	case ::d1::UI_PLAY_Menu: 
@@ -207,7 +209,7 @@ static	::gpk::error_t	guiHandlePlay				(::d1::SD1 & app, ::gpk::SGUI & gui, uint
 
 static	::gpk::error_t	guiHandleHome				(::d1::SD1 & app, ::gpk::SGUI & gui, uint32_t idControl, d1::APP_STATE appState) { 
 	uint32_t					idDialog					= app.AppUI.DialogPerState[appState];
-	const ::gpk::ai32			& children					= gui.Controls.Children[idDialog];
+	const ::gpk::acid			& children					= gui.Controls.Children[idDialog];
 	idControl				= idControl - children[0];
 	switch((::d1::UI_HOME)idControl) {
 	case ::d1::UI_HOME_Start: 

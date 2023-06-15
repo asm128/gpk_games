@@ -135,7 +135,7 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 		::gpk::controlCreate(playerGUI); // Weapon Load
 		::gpk::controlCreate(playerGUI); // Weapon Type
 		for(uint32_t iControl = 0; iControl < 3; ++iControl)
-			::gpk::controlSetParent(playerGUI, uiPlayer.ModuleViewports[indexVP]->Viewport + iControl, playerDialog.Root); // Weapon Load
+			::gpk::controlSetParent(playerGUI, ::gpk::cid_t(uiPlayer.ModuleViewports[indexVP]->Viewport + iControl), playerDialog.Root); // Weapon Load
 
 		::ghg::SUIPlayShipPartViewport	& viewport		= *uiPlayer.ModuleViewports[indexVP];
 		viewport.RenderTargetOrbiter.resize(::MODULE_CAMERA_SIZE);
