@@ -146,7 +146,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	::gpk::resize(4096 * 1024, drawCache.PixelCoords, drawCache.PixelVertexWeights, drawCache.LightColorsModel, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightPointsWorld);
 
 	app.AudioState.InitAudio();
-	app.AudioState.PrepareAudio("thrust.wav");
+	app.AudioState.PrepareAudio("./thrust.wav");
 
 	//app.Client.AddressConnect	= {};
 	//::gpk::tcpipAddress(9898, 0, ::gpk::TRANSPORT_PROTOCOL_UDP, app.Client.AddressConnect);	// If loading the remote IP from the json fails, we fall back to the local address.

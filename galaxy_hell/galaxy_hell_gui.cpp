@@ -673,7 +673,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 				switch(iControl - (offsetControl)) {
 				case ::ghg::UI_PROFILE_Name:
 					uiPlayer.InputBox.SetText(gui, gui.Controls.Text[offsetControl + ::ghg::UI_PROFILE_Name].Text);
-					uiPlayer.InputBox.Edit(gui, gui.Controls.Events[offsetControl + ::ghg::UI_PROFILE_Name].Execute);
+					uiPlayer.InputBox.Edit(gui, true);
 				}
 				return 0;
 			});
@@ -720,32 +720,25 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 		::guiUpdateHome(app, sysEvents);
 
 	::gpk::SDialog				& dialog					= app.DialogPerState[appState];
-	dialog.Update();
 	::gpk::SGUI					& gui						= *dialog.GUI;
+	dialog.Update();
 	::gpk::acid					controlsToProcess			= {};
-	::gpk::guiGetProcessableControls(gui, controlsToProcess);
-
-	for(uint32_t iControl = 0, countControls = controlsToProcess.size(); iControl < countControls; ++iControl) {
-		uint32_t					idControl			= controlsToProcess		[iControl];
-		const ::gpk::SControlEvent	& controlState		= gui.Controls.Events[idControl];
-		bool						handled				= false;
-		if(controlState.Execute) {
+	::gpk::guiProcessControls(gui, [&app, &gui, &game, &appState](::gpk::cid_t idControl) {
 			idControl = idControl - 1;
 			info_printf("Executed %u.", idControl);
 			switch(appState) {
-			case ::ghg::APP_STATE_Play		: appState = (::ghg::APP_STATE)::guiHandlePlay	(app, gui, idControl, game); handled = true; break;
-			case ::ghg::APP_STATE_Home		: appState = (::ghg::APP_STATE)::guiHandleHome	(app, gui, idControl, game); handled = true; break;
-			case ::ghg::APP_STATE_Welcome	: appState = (::ghg::APP_STATE)::guiHandleWelcome	(app, gui, idControl, game); handled = true; break;
-			case ::ghg::APP_STATE_Load		: appState = (::ghg::APP_STATE)::guiHandleLoad	(app, gui, idControl, game); handled = true; break;
-			case ::ghg::APP_STATE_Profile	: appState = (::ghg::APP_STATE)::guiHandleUser	(gui, idControl, game); handled = true; break;
-			case ::ghg::APP_STATE_Shop		: appState = (::ghg::APP_STATE)::guiHandleShop	(gui, idControl, game); handled = true; break;
-			case ::ghg::APP_STATE_Settings	: appState = (::ghg::APP_STATE)::guiHandleSetup	(gui, idControl, game); handled = true; break;
-			case ::ghg::APP_STATE_About		: appState = (::ghg::APP_STATE)::guiHandleAbout	(gui, idControl, game); handled = true; break;
+			case ::ghg::APP_STATE_Play		: return appState = (::ghg::APP_STATE)::guiHandlePlay		(app, gui, idControl, game);
+			case ::ghg::APP_STATE_Home		: return appState = (::ghg::APP_STATE)::guiHandleHome		(app, gui, idControl, game);
+			case ::ghg::APP_STATE_Welcome	: return appState = (::ghg::APP_STATE)::guiHandleWelcome	(app, gui, idControl, game);
+			case ::ghg::APP_STATE_Load		: return appState = (::ghg::APP_STATE)::guiHandleLoad		(app, gui, idControl, game);
+			case ::ghg::APP_STATE_Profile	: return appState = (::ghg::APP_STATE)::guiHandleUser		(gui, idControl, game);
+			case ::ghg::APP_STATE_Shop		: return appState = (::ghg::APP_STATE)::guiHandleShop		(gui, idControl, game);
+			case ::ghg::APP_STATE_Settings	: return appState = (::ghg::APP_STATE)::guiHandleSetup		(gui, idControl, game);
+			case ::ghg::APP_STATE_About		: return appState = (::ghg::APP_STATE)::guiHandleAbout		(gui, idControl, game);
 			}
-			if(handled)
-				break;
-		}
-	}
+			return appState;
+		});
+
 	return appState;
 }
 

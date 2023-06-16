@@ -24,8 +24,8 @@ static	::gpk::error_t	dialogCreateCommon			(::gpk::SDialog & dialog, const ::gpk
 
 static	::gpk::error_t	guiContainerSetupDefaults	(::gpk::SGUI & gui, ::gpk::cid_t iControl, ::gpk::cid_t iParent) { 
 	gui.Controls.Constraints[iControl].AttachSizeToControl	= {iControl, iControl};
-	gui.Controls.Modes		[iControl].NoHover		= true;
-	gui.Controls.Modes		[iControl].NoExecute	= true;
+	gui.Controls.States[iControl].Mask |= ::gpk::GUI_CONTROL_FLAG_Hovered; gui.Controls.Modes[iControl].NoHover		= true; // TODO: Remove Controls.Modes
+	gui.Controls.States[iControl].Mask |= ::gpk::GUI_CONTROL_FLAG_Action ; gui.Controls.Modes[iControl].NoExecute	= true; // TODO: Remove Controls.Modes
 	gui.Controls.Draw		[iControl].NoBorder	= true;
 	gui.Controls.Draw		[iControl].NoClient	= true;
 	gui.Controls.Placement	[iControl].Border	= {};
@@ -231,8 +231,8 @@ static	::gpk::error_t	guiHandleHome				(::d1::SD1 & app, ::gpk::SGUI & gui, uint
 	::gpk::SDialog				& dialog					= app.AppUI.Dialog;
 	::gpk::guiProcessInput(*dialog.GUI, *dialog.Input, sysEvents); 
 	
-	dialog.Update();
 	::gpk::SGUI					& gui						= *dialog.GUI;
+	dialog.Update();
 
 	::gpk::acid					controlsToProcess			= {};
 	::gpk::guiGetProcessableControls(gui, controlsToProcess);
