@@ -24,8 +24,8 @@ static	::gpk::error_t	dialogCreateCommon			(::gpk::SDialog & dialog, const ::gpk
 
 static	::gpk::error_t	guiContainerSetupDefaults	(::gpk::SGUI & gui, ::gpk::cid_t iControl, ::gpk::cid_t iParent) { 
 	gui.Controls.Constraints[iControl].AttachSizeToControl	= {iControl, iControl};
-	gui.Controls.States[iControl].Mask |= ::gpk::GUI_CONTROL_FLAG_Hovered; gui.Controls.Modes[iControl].NoHover		= true; // TODO: Remove Controls.Modes
-	gui.Controls.States[iControl].Mask |= ::gpk::GUI_CONTROL_FLAG_Action ; gui.Controls.Modes[iControl].NoExecute	= true; // TODO: Remove Controls.Modes
+	gui.Controls.States		[iControl].Mask		&= ~::gpk::GUI_CONTROL_FLAG_Hovered; 
+	gui.Controls.States		[iControl].Mask		&= ~::gpk::GUI_CONTROL_FLAG_Action ; 
 	gui.Controls.Draw		[iControl].NoBorder	= true;
 	gui.Controls.Draw		[iControl].NoClient	= true;
 	gui.Controls.Placement	[iControl].Border	= {};
@@ -124,7 +124,7 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Align			= ::gpk::ALIGN_CENTER_RIGHT;
 	gui.Controls.Placement[appUI.ForceSlider->IdButton].Area.Size.y			= 8;
 	//gui.Controls.Modes[app.ForceSlider->IdGUIControl].NoBackgroundRect	= true;
-	gui.Controls.Modes[appUI.ForceSlider->IdGUIControl].NoHover				= true;
+	gui.Controls.States[appUI.ForceSlider->IdGUIControl].Mask				&= ~::gpk::GUI_CONTROL_FLAG_Hovered;
 	appUI.ForceSliderRenderTarget.resize(gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Size.u32()); 
 
 	cnstxpr ::gpk::rgbaf		min							= ::gpk::GREEN;

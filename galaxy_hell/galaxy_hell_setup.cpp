@@ -27,7 +27,7 @@
 	}
 
 	world.PlayState.TimeLast	= ::gpk::timeCurrent();
-	world.PlayState.Paused	= true;
+	world.PlayState.Paused		= true;
 	return 0;
 }
 
@@ -39,7 +39,7 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 	//shipState.Engine.CreateSphere();
 
 	{	// Create main ship entity
-		::ghg::SGHEntity				entity					= {-1};
+		::ghg::SGHEntity			entity					= {-1};
 		entity					= {-1};
 		entity.Geometry			= -1;	//1 + (iGeometry % 5);
 		entity.Transform		= scene.Transforms.push_back(shipState.ShipPhysics.MatrixIdentity4);
@@ -55,9 +55,9 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 	shipState.ShipScores.push_back({});
 
 	//ship.Parts.reserve(countParts);
-	::ghg::SGHEntity				entityOrbit				= {ship.Entity};
+	::ghg::SGHEntity			entityOrbit				= {ship.Entity};
 	for(uint32_t iPart = 0; iPart < countParts; ++iPart) {	// Create child parts
-		::ghg::SGHEntity				entityPart				= {-1};
+		::ghg::SGHEntity			entityPart				= {-1};
 		entityOrbit.Parent		= ship.Entity;
 		entityOrbit.Geometry	= -1;
 		entityOrbit.Transform	= scene.Transforms.push_back(shipState.ShipPhysics.MatrixIdentity4);
