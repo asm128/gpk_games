@@ -130,6 +130,7 @@ namespace d1p
 		::gpk::error_t						ResetCueBall				()			{ 
 			::d1p::SPoolBoard						& board						= MatchState.Board;
 			const float								distanceFromCenter			= ::d1p::rackOriginX(board);
+			Engine.SetOrientation	(BallToEntity(0), {0, 0, 0, 1});
 			gpk_necs(SetBallPosition(0, {-distanceFromCenter, board.BallRadius, 0}));
 			MatchState.Pocketed					= TBallField(MatchState.Pocketed & -2LL);
 			return 0;

@@ -76,7 +76,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 
 		const uint32_t				iEntity					= pool.Entities.Balls[iBall];
 
-		engine.SetOrientation	(iEntity, {0, 0, 1, -1});
+		engine.SetOrientation	(iEntity, {0, 0, iBall ? 1.0f : 0.0f, -1});
 		engine.SetDampingLinear	(iEntity, startState.Physics.Damping.ClothDisplacement	* (1.0f / 255.0f));
 		engine.SetDampingAngular(iEntity, startState.Physics.Damping.ClothRotation		* (1.0f / 255.0f));
 		engine.SetCollides		(iEntity, true);
@@ -135,7 +135,8 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 
 	::d1p::SPoolBoard			& board					= startState.Board;
 	const float					distanceFromCenter		= ::d1p::rackOriginX(board);
-	gpk_necs(engine.SetPosition(pool.Entities.Balls[0], {-distanceFromCenter, board.BallRadius, 0}));
+	gpk_necs(engine.SetPosition		(pool.BallToEntity(0), {-distanceFromCenter, board.BallRadius, 0}));
+	gpk_necs(engine.SetOrientation	(pool.BallToEntity(0), {0, 0, 0, 1}));
 
 	uint8_t						rowLen					= 5;
 	float						ballDiameter			= board.BallRadius * 2;
@@ -210,10 +211,11 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	for(uint32_t iBall = 0; iBall < ::d1p::MAX_BALLS; ++iBall) {
 		pool.PositionDeltas[iBall].clear();
 		const uint32_t			iEntity					= pool.Entities.Balls[iBall];
-		gpk_necs(engine.SetMeshScale(iEntity, {board.BallRadius * 2, board.BallRadius * 2, board.BallRadius * 2}));
-		gpk_necs(engine.SetPosition	(iEntity, {}));
-		gpk_necs(engine.SetMass		(iEntity, startState.Physics.BallGrams / 1000.0f));
-		gpk_necs(engine.SetHidden	(iEntity, true));
+		gpk_necs(engine.SetMeshScale	(iEntity, {board.BallRadius * 2, board.BallRadius * 2, board.BallRadius * 2}));
+		//gpk_necs(engine.SetPosition		(iEntity, {}));
+		//gpk_necs(engine.SetOrientation	(iEntity, {0, 0, iBall ? 1.0f : 0.0f, -1}));
+		gpk_necs(engine.SetMass			(iEntity, startState.Physics.BallGrams / 1000.0f));
+		gpk_necs(engine.SetHidden		(iEntity, true));
 
 		engine.Integrator.Flags				[engine.Entities[iEntity].RigidBody].Collides	= false;
 		engine.Integrator.BoundingVolumes	[engine.Entities[iEntity].RigidBody].HalfSizes	= {board.BallRadius, board.BallRadius, board.BallRadius};
@@ -280,11 +282,10 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 
 	// table
 	::gpk::SParamsGrid		argsGrid					= {};
-	argsGrid.CellCount	= {10, 4};
-	argsGrid.Size		= {1, 1};
-	argsGrid.Center		= {.5, .5};
+	argsGrid.CellCount	= {9, 4};
 	gpk_necs(pool.Entities.Table = (uint16_t)engine.CreateGrid(argsGrid));
 	gpk_necs(engine.SetShader(pool.Entities.Table, ::d1p::psTableCloth, "psTableCloth"));
+	gpk_necs(engine.SetColorDiffuse(pool.Entities.Table, ::gpk::RED * .5f));
 	//for(uint32_t iFace = 0; iFace < 6; ++iFace)
 	//	gpk_necs(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[iFace], ::d1p::psTableCloth, "psHidden"));
 
