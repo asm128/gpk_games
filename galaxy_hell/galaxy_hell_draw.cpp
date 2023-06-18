@@ -10,7 +10,7 @@
 
 stacxpr	uint32_t		MAX_LIGHT_RANGE		= 10;
 
-static	::gpk::error_t	drawStars			(const ::ghg::SStars & stars, ::gpk::view2d<::gpk::bgra> targetPixels)	{
+static	::gpk::error_t	drawStars			(const ::ghg::SStars & stars, ::gpk::g8bgra targetPixels)	{
 	::gpk::bgra					colors[]			=
 		{ {0xfF, 0xfF, 0xfF, }
 		, {0xC0, 0xC0, 0xfF, }
@@ -41,10 +41,10 @@ static	::gpk::error_t	drawStars			(const ::ghg::SStars & stars, ::gpk::view2d<::
 }
 
 static	::gpk::error_t	drawDebris
-	( ::gpk::view2d<::gpk::bgra>			targetPixels
+	( ::gpk::g8bgra			targetPixels
 	, const ::ghg::SDebris					& debris
 	, const ::gpk::m4f32					& matrixVPV
-	, ::gpk::view2d<uint32_t>				depthBuffer
+	, ::gpk::grid<uint32_t>				depthBuffer
 	, const ::gpk::view<const ::gpk::bgra>	& debrisColors
 	)	{
 
@@ -96,10 +96,10 @@ static	::gpk::error_t	drawDebris
 }
 
 static	::gpk::error_t	drawScoreParticles
-	( ::gpk::view2d<::gpk::bgra>	targetPixels
+	( ::gpk::g8bgra	targetPixels
 	, const ::ghg::SScoreParticles	& debris
 	, const ::gpk::m4f32			& matrixVPV
-	, ::gpk::view2d<uint32_t>		depthBuffer
+	, ::gpk::grid<uint32_t>		depthBuffer
 	, const ::gpk::SRasterFont		& font
 	)	{
 
@@ -143,7 +143,7 @@ static	::gpk::error_t	drawScoreParticles
 	return 0;
 }
 
-typedef ::gpk::error_t (FSetPixel)	(::gpk::view2d<::gpk::bgra> targetPixels, const ::gpk::n2i16 & pixelCoord, const ::gpk::bgra & color);
+typedef ::gpk::error_t (FSetPixel)	(::gpk::g8bgra targetPixels, const ::gpk::n2i16 & pixelCoord, const ::gpk::bgra & color);
 
 static	::gpk::error_t	drawCannonball
 	( const ::ghg::SShipManager		& shipState
@@ -153,8 +153,8 @@ static	::gpk::error_t	drawCannonball
 	, const ::gpk::rgbaf			& bulletColor
 	, float							animationTime
 	, const ::gpk::m4f32			& matrixVP
-	, ::gpk::view2d<::gpk::bgra>	& targetPixels
-	, ::gpk::view2d<uint32_t>		depthBuffer
+	, ::gpk::g8bgra	& targetPixels
+	, ::gpk::grid<uint32_t>		depthBuffer
 	, ::ghg::SGalaxyHellDrawCache	& drawCache
 	) {
 	uint32_t					pixelsDrawn				= 0;
@@ -172,7 +172,7 @@ static	::gpk::error_t	drawCannonball
 		for(uint32_t iTriangle = 0; iTriangle < mesh.Triangles.size(); ++iTriangle) {
 			::gpk::clear(drawCache.PixelCoords, drawCache.PixelVertexWeights);
 			pixelsDrawn += ::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformVP, shipState.Scene.Global.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer
-				, [bulletColor, absanim](::gpk::view2d<::gpk::bgra> targetPixels, const ::gpk::n2i16 & pixelCoord, const ::gpk::bgra & color) {
+				, [bulletColor, absanim](::gpk::g8bgra targetPixels, const ::gpk::n2i16 & pixelCoord, const ::gpk::bgra & color) {
 					targetPixels[pixelCoord.y][pixelCoord.x] = ::gpk::interpolate_linear(::gpk::rgbaf(color), bulletColor, absanim).Clamp(); 
 					return 0;
 			});
@@ -212,7 +212,7 @@ static	::gpk::error_t	drawCannonball
 		for(uint32_t iTriangle = 0; iTriangle < mesh.Triangles.size(); ++iTriangle) {
 			::gpk::clear(drawCache.PixelCoords, drawCache.PixelVertexWeights);
 			pixelsDrawn += ::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformVP, shipState.Scene.Global.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer
-				, [](::gpk::view2d<::gpk::bgra> targetPixels, const ::gpk::n2i16 & pixelCoord, const ::gpk::bgra & color) {
+				, [](::gpk::g8bgra targetPixels, const ::gpk::n2i16 & pixelCoord, const ::gpk::bgra & color) {
 					::gpk::bgra			& tp						= targetPixels[pixelCoord.y][pixelCoord.x];
 					tp				= ::gpk::interpolate_linear(color, tp, color.a / 255.0f); 
 					return 0;
@@ -222,14 +222,14 @@ static	::gpk::error_t	drawCannonball
 	return pixelsDrawn;
 }
 
-static	::gpk::error_t	drawShots			(::gpk::view2d<::gpk::bgra> targetPixels
+static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 	, const ::ghg::SShipManager		& shipState
 	, const ::ghg::SShots			& shots
 	, const ::gpk::m4f32			& matrixVPV
 	, float							animationTime
 	, const ::ghg::SShipCore		& shipCore
 	, const ::ghg::SWeapon			& weapon
-	, ::gpk::view2d<uint32_t>		depthBuffer
+	, ::gpk::grid<uint32_t>		depthBuffer
 	, ::gpk::apod<::gpk::n3f32>		pixelCoordsCache
 	, ::ghg::SGalaxyHellDrawCache	& drawCache
 	) {
@@ -330,7 +330,7 @@ static	::gpk::error_t	drawShots			(::gpk::view2d<::gpk::bgra> targetPixels
 ::gpk::error_t			ghg::getLightArraysFromDebris
 	( const ::ghg::SDecoState								& decoState
 	, ::gpk::apod<::gpk::n3f32>				& lightPoints
-	, ::gpk::apod<::gpk::bgra>					& lightColors
+	, ::gpk::a8bgra					& lightColors
 	, const ::gpk::view<const ::gpk::bgra>		& debrisColors
 	)						{
 	for(uint32_t iParticle = 0; iParticle < decoState.Debris.Particles.Position.size(); ++iParticle) {
@@ -345,7 +345,7 @@ static	::gpk::error_t	drawShots			(::gpk::view2d<::gpk::bgra> targetPixels
 ::gpk::error_t			ghg::getLightArraysFromShips
 	( const ::ghg::SShipManager							& shipState
 	, ::gpk::apod<::gpk::n3f32>			& lightPoints
-	, ::gpk::apod<::gpk::bgra>				& lightColors
+	, ::gpk::a8bgra				& lightColors
 	) {
 	constexpr ::gpk::bgra								colorLightPlayer		= ::gpk::bgra{0xFF, 0x88, 0xFF};
 	constexpr ::gpk::bgra								colorLightEnemy			= ::gpk::bgra{0xFF, 0x88, 0x88};
@@ -374,7 +374,7 @@ static	::gpk::error_t	drawShots			(::gpk::view2d<::gpk::bgra> targetPixels
 	( const ::ghg::SShipManager							& shipState
 	, const ::ghg::SDecoState							& decoState
 	, ::gpk::apod<::gpk::n3f32>			& lightPoints
-	, ::gpk::apod<::gpk::bgra>				& lightColors
+	, ::gpk::a8bgra				& lightColors
 	, const ::gpk::view<const ::gpk::bgra>	& debrisColors
 	) {
 	::ghg::getLightArraysFromShips(shipState, lightPoints, lightColors);
@@ -385,9 +385,9 @@ static	::gpk::error_t	drawShots			(::gpk::view2d<::gpk::bgra> targetPixels
 ::gpk::error_t			ghg::getLightArrays
 	( const ::gpk::n3f32							& modelPosition
 	, const ::gpk::apod<::gpk::n3f32>			& lightPointsWorld
-	, const ::gpk::apod<::gpk::bgra>				& lightColorsWorld
+	, const ::gpk::a8bgra				& lightColorsWorld
 	, ::gpk::apod<::gpk::n3f32>				& lightPointsModel
-	, ::gpk::apod<::gpk::bgra>					& lightColorsModel
+	, ::gpk::a8bgra					& lightColorsModel
 	) {
 	::gpk::clear(lightPointsModel, lightColorsModel);
 	for(uint32_t iLightPoint = 0; iLightPoint < lightPointsWorld.size(); ++iLightPoint) {
@@ -420,8 +420,8 @@ static	::gpk::error_t	drawShots			(::gpk::view2d<::gpk::bgra> targetPixels
 	, const ::gpk::rgbaf							& shipColor
 	, float												animationTime
 	, const ::gpk::m4f32						& matrixVP
-	, ::gpk::view2d<::gpk::bgra>				& targetPixels
-	, ::gpk::view2d<uint32_t>						depthBuffer
+	, ::gpk::g8bgra				& targetPixels
+	, ::gpk::grid<uint32_t>						depthBuffer
 	, ::ghg::SGalaxyHellDrawCache						& drawCache
 	) {
 	uint32_t												pixelsDrawn				= 0;
@@ -438,11 +438,11 @@ static	::gpk::error_t	drawShots			(::gpk::view2d<::gpk::bgra> targetPixels
 		::gpk::m4f32									matrixTransformVP			= matrixTransform * matrixVP;
 		::ghg::getLightArrays(matrixTransform.GetTranslation(), drawCache.LightPointsWorld, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightColorsModel);
 		const ::gpk::SGeometryQuads								& mesh						= shipState.Scene.Geometry[entityChild.Geometry];
-		const ::gpk::view2d<const ::gpk::bgra>					image						= shipState.Scene.Image	[entityChild.Image].View;
+		const ::gpk::grid<const ::gpk::bgra>					image						= shipState.Scene.Image	[entityChild.Image].View;
 		for(uint32_t iTriangle = 0; iTriangle < mesh.Triangles.size(); ++iTriangle) {
 			::gpk::clear(drawCache.PixelCoords, drawCache.PixelVertexWeights);
 			pixelsDrawn += ::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformVP, shipState.Scene.Global.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer
-				, [shadedColor](::gpk::view2d<::gpk::bgra> targetPixels, const ::gpk::n2i16 & pixelCoord, const ::gpk::bgra & color) {
+				, [shadedColor](::gpk::g8bgra targetPixels, const ::gpk::n2i16 & pixelCoord, const ::gpk::bgra & color) {
 					//if( color.r > 64
 					// || color.g > 128
 					//)
@@ -461,8 +461,8 @@ static	::gpk::error_t	drawShip
 	( const ::ghg::SGalaxyHell		& solarSystem
 	, int32_t						iShip
 	, const ::gpk::m4f32			& matrixVP
-	, ::gpk::view2d<::gpk::bgra>	& targetPixels
-	, ::gpk::view2d<uint32_t>		depthBuffer
+	, ::gpk::g8bgra	& targetPixels
+	, ::gpk::grid<uint32_t>		depthBuffer
 	, ::ghg::SGalaxyHellDrawCache	& drawCache
 	, const ::gpk::SRasterFont		& font
 	) {
@@ -508,11 +508,11 @@ static	::gpk::error_t	drawExplosion
 	( const ::ghg::SGalaxyHell		& solarSystem
 	, const ::ghg::SExplosion		& explosion
 	, const ::gpk::m4f32			& matrixView
-	, ::gpk::view2d<::gpk::bgra>	& targetPixels
-	, ::gpk::view2d<uint32_t>		depthBuffer
+	, ::gpk::g8bgra	& targetPixels
+	, ::gpk::grid<uint32_t>		depthBuffer
 	, ::ghg::SGalaxyHellDrawCache	& drawCache
 	) {
-	::gpk::view2d<const ::gpk::bgra>	image				= solarSystem.ShipState.Scene.Image		[explosion.IndexImage].View;
+	::gpk::grid<const ::gpk::bgra>	image				= solarSystem.ShipState.Scene.Image		[explosion.IndexImage].View;
 	const ::gpk::SGeometryQuads			& mesh				= solarSystem.ShipState.Scene.Geometry	[explosion.IndexMesh];
 	for(uint32_t iExplosionPart = 0; iExplosionPart < explosion.Particles.Position.size(); ++iExplosionPart) {
 		const ::gpk::rangeu16				& sliceMesh			= explosion.Slices[iExplosionPart];
@@ -557,8 +557,8 @@ static	::gpk::error_t	drawExplosion
 ::gpk::error_t			ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & mutexUpdate)	{
 	drawCache.RenderTarget->resize(drawCache.RenderTargetMetrics);
 	::gpk::pobj<::ghg::TRenderTarget>	renderTarget				= drawCache.RenderTarget;
-	::gpk::view2d<::gpk::bgra>			targetPixels				= renderTarget->Color			; 
-	::gpk::view2d<uint32_t>				depthBuffer					= renderTarget->DepthStencil	;
+	::gpk::g8bgra			targetPixels				= renderTarget->Color			; 
+	::gpk::grid<uint32_t>				depthBuffer					= renderTarget->DepthStencil	;
 
 	// ------------------------------------------- Transform and Draw
 	if(0 == targetPixels.size())

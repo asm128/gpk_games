@@ -144,21 +144,21 @@ namespace ghg
 	::gpk::error_t						getLightArraysFromDebris
 		( const ::ghg::SDecoState				& decoState
 		, ::gpk::apod<::gpk::n3f32>				& lightPoints
-		, ::gpk::apod<::gpk::bgra>				& lightColors
+		, ::gpk::a8bgra				& lightColors
 		, const ::gpk::view<const ::gpk::bgra>	& debrisColors
 		);
 
 	::gpk::error_t						getLightArraysFromShips
 		( const ::ghg::SShipManager	& shipState
 		, ::gpk::apod<::gpk::n3f32>	& lightPoints
-		, ::gpk::apod<::gpk::bgra>	& lightColors
+		, ::gpk::a8bgra	& lightColors
 		);
 
 	::gpk::error_t						getLightArrays
 		( const ::ghg::SShipManager				& shipState
 		, const ::ghg::SDecoState				& decoState
 		, ::gpk::apod<::gpk::n3f32>				& lightPoints
-		, ::gpk::apod<::gpk::bgra>				& lightColors
+		, ::gpk::a8bgra				& lightColors
 		, const ::gpk::view<const ::gpk::bgra>	& debrisColors
 		);
 
@@ -168,8 +168,8 @@ namespace ghg
 		, const ::gpk::rgbaf				& shipColor	
 		, float								animationTime
 		, const ::gpk::m4f32				& matrixVP
-		, ::gpk::view2d<::gpk::bgra>		& targetPixels
-		, ::gpk::view2d<uint32_t>			depthBuffer
+		, ::gpk::g8bgra		& targetPixels
+		, ::gpk::grid<uint32_t>			depthBuffer
 		, ::ghg::SGalaxyHellDrawCache		& drawCache
 		);
 }

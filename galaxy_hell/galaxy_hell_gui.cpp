@@ -56,7 +56,7 @@ static	::gpk::error_t	uiPlayerSetupHome	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 	::gpk::SDialog				& playerDialog		= uiPlayer.DialogHome;
 	gpk_necs(::dialogCreateCommon(playerDialog, input, cursorPos));
 	::gpk::SGUI					& playerGUI			= *playerDialog.GUI;
-	::gpk::pobj<::gpk::apod<::gpk::bgra>>	palette;
+	::gpk::pobj<::gpk::a8bgra>	palette;
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
@@ -110,7 +110,7 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 	::gpk::SDialog				& playerDialog		= uiPlayer.DialogPlay;
 	gpk_necs(::dialogCreateCommon(playerDialog, input, cursorPos));
 	::gpk::SGUI					& playerGUI			= *playerDialog.GUI;
-	::gpk::pobj<::gpk::apod<::gpk::bgra>>	palette;
+	::gpk::pobj<::gpk::a8bgra>	palette;
 	palette.create(*playerGUI.Colors->Palette);
 	playerGUI.Colors->Palette = palette;
 	playerGUI.ThemeDefault	= ::gpk::ASCII_COLOR_DARKGREY * 16 + 12;
@@ -528,8 +528,8 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 			matrixView				*= uiPlayer.ModuleViewports[iOrbiter]->MatrixProjection;
 
 			::ghg::TRenderTarget		& renderTarget	= viewport.RenderTargetOrbiter;
-			::gpk::view2d<::gpk::bgra>	targetPixels	= renderTarget.Color		; 
-			::gpk::view2d<uint32_t>		depthBuffer		= renderTarget.DepthStencil	;
+			::gpk::g8bgra	targetPixels	= renderTarget.Color		; 
+			::gpk::grid<uint32_t>		depthBuffer		= renderTarget.DepthStencil	;
 			//targetPixels.fill(tone);
 			::std::lock_guard			lock			(lockGame);
 			memset(targetPixels.begin(), 0, targetPixels.byte_count());
@@ -546,8 +546,8 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 
 		{ // Update weapon load bar
 			::ghg::TRenderTarget		& renderTarget	= viewport.RenderTargetWeaponLoad;
-			::gpk::view2d<::gpk::bgra>	targetPixels	= renderTarget.Color		; 
-			::gpk::view2d<uint32_t>		depthBuffer		= renderTarget.DepthStencil	;
+			::gpk::g8bgra	targetPixels	= renderTarget.Color		; 
+			::gpk::grid<uint32_t>		depthBuffer		= renderTarget.DepthStencil	;
 			::std::lock_guard			lock			(lockGame);
 			memset(targetPixels.begin(), 0, targetPixels.byte_count());
 			memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
@@ -569,8 +569,8 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 		{ // Update weapon type bar
 			::std::lock_guard			lock			(lockGame);
 			::ghg::TRenderTarget		& renderTarget	= viewport.RenderTargetWeaponType;
-			::gpk::view2d<::gpk::bgra>	targetPixels	= renderTarget.Color		; 
-			::gpk::view2d<uint32_t>		depthBuffer		= renderTarget.DepthStencil	;
+			::gpk::g8bgra	targetPixels	= renderTarget.Color		; 
+			::gpk::grid<uint32_t>		depthBuffer		= renderTarget.DepthStencil	;
 			memset(targetPixels.begin(), 0, targetPixels.byte_count());
 			memset(depthBuffer.begin(), -1, depthBuffer.byte_count());
 			if(ratioOverheat) {
@@ -773,7 +773,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 }
 
 
-::gpk::error_t			ghg::gaugeImageUpdate			(::ghg::SUIRadialGauge & gauge, ::gpk::view2d<::gpk::bgra> target, ::gpk::rgbaf colorMin, ::gpk::rgbaf colorMid, ::gpk::rgbaf colorMax, ::gpk::bgra colorEmpty, bool radialColor)  {
+::gpk::error_t			ghg::gaugeImageUpdate			(::ghg::SUIRadialGauge & gauge, ::gpk::g8bgra target, ::gpk::rgbaf colorMin, ::gpk::rgbaf colorMid, ::gpk::rgbaf colorMax, ::gpk::bgra colorEmpty, bool radialColor)  {
 	static ::gpk::imgu32		dummyDepth;
 	const ::gpk::n3f32			center3							= (gauge.Vertices[1] - gauge.Vertices[gauge.Vertices.size() / 2 + 1]) / 2 + gauge.Vertices[gauge.Vertices.size() / 2 + 1];
 	const ::gpk::n2f32			center2							= {center3.x, center3.y};

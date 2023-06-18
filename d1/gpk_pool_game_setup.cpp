@@ -48,7 +48,7 @@ static	::gpk::error_t	poolGameResetTest2Balls	(::d1p::SPoolGame & pool, ::d1p::S
 	return 0;
 }
 
-static	::gpk::error_t	textureBallNumber		(::gpk::view2d<::gpk::bgra> view, uint32_t number, const ::gpk::SRasterFont & font) { 
+static	::gpk::error_t	textureBallNumber		(::gpk::g8bgra view, uint32_t number, const ::gpk::SRasterFont & font) { 
 	char						strNumber[4]			= {};
 	sprintf_s(strNumber, "%i", number);
 	const ::gpk::rect2i16		targetRect				= 
@@ -93,7 +93,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		material.Color.Diffuse	= color;
   		material.Color.Ambient	= material.Color.Diffuse * .1f;
 		if(iBall) {
-			::gpk::view2d<::gpk::bgra>	view					= {(::gpk::bgra*)surface.Data.begin(), surface.Desc.Dimensions.u32()};
+			::gpk::g8bgra	view					= {(::gpk::bgra*)surface.Data.begin(), surface.Desc.Dimensions.u32()};
 			textureBallNumber(view, iBall, font);
 			//if(0 == iBall)
 			//	textureBallCue(view, ::gpk::RED);
@@ -312,7 +312,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 }
 
 //
-//static	::gpk::error_t	textureBallStripped		(::gpk::view2d<::gpk::bgra> view, const ::gpk::SRasterFont & font, ::gpk::bgra color, uint32_t number) { 
+//static	::gpk::error_t	textureBallStripped		(::gpk::g8bgra view, const ::gpk::SRasterFont & font, ::gpk::bgra color, uint32_t number) { 
 //	memset(view.begin(), 0xFF, view.byte_count());
 //
 //	::gpk::n2<uint32_t>					viewCenter				= view.metrics() / 2;
@@ -329,7 +329,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 //	return 0; 
 //}
 //
-//static	::gpk::error_t	textureBallSolid		(::gpk::view2d<::gpk::bgra> view, const ::gpk::SRasterFont & font, ::gpk::bgra color, uint32_t number) { 
+//static	::gpk::error_t	textureBallSolid		(::gpk::g8bgra view, const ::gpk::SRasterFont & font, ::gpk::bgra color, uint32_t number) { 
 //	::gpk::n2<uint32_t>					viewCenter				= view.metrics() / 2;
 //
 //	for(uint32_t y = 0; y < view.metrics().y; ++y)
@@ -344,7 +344,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 //	return 0; 
 //}
 //
-//static	::gpk::error_t	textureBallCue			(::gpk::view2d<::gpk::bgra> view, ::gpk::bgra color) {
+//static	::gpk::error_t	textureBallCue			(::gpk::g8bgra view, ::gpk::bgra color) {
 //	::gpk::n2f						viewCenter				= view.metrics().f32() / 2;
 //	::gpk::n2f						pointCenters[]			= 
 //		{ {0, viewCenter.y}
@@ -483,7 +483,7 @@ static	::gpk::error_t	geometryBuildTableCushion	(::gpk::STrianglesIndexed & outp
 	surface->Desc.Dimensions			= {32, 32};
 	surface->Data.resize(surface->Desc.Dimensions.Area() * sizeof(::gpk::bgra));
 	memset(surface->Data.begin(), 0xFF, surface->Data.size());
-	::gpk::view2d<::gpk::bgra>				view					= {(::gpk::bgra*)surface->Data.begin(), surface->Desc.Dimensions.u32()};
+	::gpk::g8bgra				view					= {(::gpk::bgra*)surface->Data.begin(), surface->Desc.Dimensions.u32()};
 	::gpk::rgba								color					= {::gpk::ASCII_PALETTE[rand() % 16]};
 	for(uint32_t y = surface->Desc.Dimensions.y / 3; y < surface->Desc.Dimensions.y / 3U * 2U; ++y)
 	for(uint32_t x = 0; x < surface->Desc.Dimensions.x; ++x)

@@ -210,8 +210,8 @@
 
 	target->resize(renderTargetSize.u32(), {0, 0, 0, 1}, 0xFFFFFFFFU);
 
-	::gpk::view2d<::gpk::bgra>							targetPixels			= target->Color.View;
-	::gpk::view2d<uint32_t>									depthBuffer				= target->DepthStencil.View;
+	::gpk::g8bgra							targetPixels			= target->Color.View;
+	::gpk::grid<uint32_t>									depthBuffer				= target->DepthStencil.View;
 	switch(app.ActiveState) {
 	default					: 
 	case APP_STATE_Play		: 
@@ -221,7 +221,7 @@
 		if(!sourceRT)
 			break;
 
-		::gpk::view2d<::gpk::bgra>			cameraView			= sourceRT->Color.View;
+		::gpk::g8bgra			cameraView			= sourceRT->Color.View;
 		::gpk::n2i16						cameraViewMetrics	= cameraView.metrics().i16();
 		::gpk::grid_copy(targetPixels, cameraView, ::gpk::n2<uint32_t>
 				{ (targetPixels.metrics().x >> 1) - (cameraView.metrics().x >> 1)

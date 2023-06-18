@@ -1,5 +1,5 @@
 #include "gpk_image.h"
-#include "gpk_ptr.h"
+#include "gpk_array_ptr.h"
 
 #ifndef GPK_MINE_HELL_H_66546478
 #define GPK_MINE_HELL_H_66546478
@@ -46,7 +46,7 @@ namespace gpkg
 		::gpk::error_t						GetFlags				(::gpk::view_bit<uint64_t> & out_Cells)	const;	// These functions return the amount of flags in the board.
 		::gpk::error_t						GetHolds				(::gpk::view_bit<uint64_t> & out_Cells)	const;	// These functions return the amount of holds in the board.
 		::gpk::error_t						GetShows				(::gpk::view_bit<uint64_t> & out_Cells)	const;	// These functions return the amount of hides in the board.
-		::gpk::error_t						GetHints				(::gpk::view2d<uint8_t> & out_Cells)	const;	// These functions return the amount of hints in the board.
+		::gpk::error_t						GetHints				(::gpk::grid<uint8_t> & out_Cells)	const;	// These functions return the amount of hints in the board.
 		::gpk::error_t						GetBlast				(::gpk::n2u32 & out_coord)	const;	// Returns 1 if blast was found, 0 if not.
 
 		::gpk::error_t						Flag					(const ::gpk::n2u32 cell);	// Set/Clear a flag on a given tile

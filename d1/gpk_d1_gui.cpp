@@ -124,7 +124,7 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Align			= ::gpk::ALIGN_CENTER_RIGHT;
 	gui.Controls.Placement[appUI.ForceSlider->IdButton].Area.Size.y			= 8;
 	//gui.Controls.Modes[app.ForceSlider->IdGUIControl].NoBackgroundRect	= true;
-	gui.Controls.States[appUI.ForceSlider->IdGUIControl].Mask				&= ~::gpk::GUI_CONTROL_FLAG_Hovered;
+	//gui.Controls.States[appUI.ForceSlider->IdGUIControl].Mask				&= ~::gpk::GUI_CONTROL_FLAG_Hovered;
 	appUI.ForceSliderRenderTarget.resize(gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Size.u32()); 
 
 	cnstxpr ::gpk::rgbaf		min							= ::gpk::GREEN;

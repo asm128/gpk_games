@@ -73,9 +73,9 @@ namespace ghg
 	::gpk::error_t			getLightArrays
 		( const ::gpk::n3f32				& modelPosition
 		, const ::gpk::apod<::gpk::n3f32>	& lightPointsWorld
-		, const ::gpk::apod<::gpk::bgra>	& lightColorsWorld
+		, const ::gpk::a8bgra	& lightColorsWorld
 		, ::gpk::apod<::gpk::n3f32>			& lightPointsModel
-		, ::gpk::apod<::gpk::bgra>			& lightColorsModel
+		, ::gpk::a8bgra			& lightColorsModel
 		);
 
 	GDEFINE_ENUM_TYPE (SHIP_GEOMETRY, uint8_t);
