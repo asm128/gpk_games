@@ -7,7 +7,7 @@ static	::gpk::error_t	shootCueBall			(::d1p::SPoolGame & pool, const ::d1p::SSti
 	activeTurn.StickControl		= activeStick;
 	::gpk::quatf32					stickOrientation		= {0, 0, 0, 1}; 
 	pool.GetStickOrientation(stickOrientation);
-	::gpk::n3f						velocity				= {activeStick.Velocity, 0, 0}; 
+	::gpk::n3f32						velocity				= {activeStick.Velocity, 0, 0}; 
 	velocity					= stickOrientation.RotateVector(velocity);
 	engine.SetVelocity(pool.Entities.Balls[0], velocity);
 	if(velocity.y)
@@ -109,7 +109,7 @@ static	::gpk::error_t	processEventTurn		(::d1p::SPoolGame & pool, const ::d1p::S
 		const int32_t					activeStickEntity		= pool.ActiveStickEntity();
 		const uint32_t					stickRigidBodyId		= pool.Engine.Entities[activeStickEntity].RigidBody;
 		::gpk::SBodyCenter				& stickRigidBody		= pool.Engine.Integrator.Centers[stickRigidBodyId];
-		(stickRigidBody.Orientation *= ::gpk::quatf{}.CreateFromAxisAngle({0, 0, 1}, -angleY).Normalize()).Normalize();
+		(stickRigidBody.Orientation *= ::gpk::quatf32{}.CreateFromAxisAngle({0, 0, 1}, -angleY).Normalize()).Normalize();
 		pool.Engine.Integrator.Flags[stickRigidBodyId].UpdatedTransform = false;
 	}
 		break;

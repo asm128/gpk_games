@@ -3,27 +3,28 @@
 
 #include "gpk_timer.h"
 
-::gpk::error_t								transformFragments				()	{ return 0; }
+::gpk::error_t			transformFragments	()	{ return 0; }
 
-::gpk::error_t								d1p::poolGameDraw				
-	( ::d1p::SPoolGame							& pool
-	, ::gpk::rt<::gpk::bgra, uint32_t>			& backBuffer
-	, const ::gpk::n3f							& cameraPosition
-	, const ::gpk::n3f							& cameraTarget
-	, const ::gpk::n3f							& cameraUp
-	, double									totalSeconds
+::gpk::error_t			d1p::poolGameDraw				
+	( ::d1p::SPoolGame		& pool
+	, ::gpk::rtbgra8d32		& backBuffer
+	, const ::gpk::n3f32	& cameraPosition
+	, const ::gpk::n3f32	& cameraTarget
+	, const ::gpk::n3f32	& cameraUp
+	, double				totalSeconds
 	) {
 
-	const ::gpk::n2u16								offscreenMetrics				= backBuffer.Color.View.metrics16();
+	const ::gpk::n2u16			offscreenMetrics	= backBuffer.Color.View.metrics16();
 
-	::gpk::n3f										cameraFront						= (cameraTarget - cameraPosition).Normalized();
+	::gpk::n3f32				cameraFront			= (cameraTarget - cameraPosition).Normalized();
 
-	::gpk::SEngineSceneConstants					constants						= {};
-	constants.CameraPosition					= cameraPosition;
-	constants.CameraFront						= cameraFront;
-	constants.LightPosition						= {0, 10, 0};
-	constants.LightDirection					= {0, -1, 0};
-	::gpk::minmax									nearFar 						= {.0001f, 10.0f}; 
+	::gpk::SEngineSceneConstants	constants		= {};
+	constants.CameraPosition	= cameraPosition;
+	constants.CameraFront		= cameraFront;
+	constants.LightPosition		= {0, 10, 0};
+	constants.LightDirection	= {0, -1, 0};
+
+	::gpk::minmax				nearFar 			= {.0001f, 10.0f}; 
 
 	constants.View.LookAt(cameraPosition, cameraTarget, cameraUp);
 	constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Min, nearFar.Max);
@@ -34,7 +35,7 @@
 	::gpk::STimer									timer;
 	::gpk::SEngine									& engine						= pool.Engine;
 
-	::gpk::apod<::gpk::n3f>							& wireframePixelCoords			= engine.Scene->RenderCache.VertexShaderCache.WireframePixelCoords;
+	::gpk::apod<::gpk::n3f32>							& wireframePixelCoords			= engine.Scene->RenderCache.VertexShaderCache.WireframePixelCoords;
 	for(uint32_t iBall = 0; iBall < pool.MatchState.CountBalls; ++iBall) {
 		for(uint32_t iDelta = ::gpk::max(0, (int32_t)pool.PositionDeltas[iBall].size() - 20); iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {
 			::gpk::line3<float>							screenDelta				= pool.PositionDeltas[iBall][iDelta];
@@ -51,17 +52,17 @@
 	const gpk::n2f32							halfDimensions					= pool.MatchState.Board.Table.Slate * .5;
 
 	wireframePixelCoords.clear();
-	const	::gpk::n3f								limitsBottom	[4]				=
+	const	::gpk::n3f32								limitsBottom	[4]				=
 		{ { halfDimensions.x, .0f,  halfDimensions.y}
 		, {-halfDimensions.x, .0f,  halfDimensions.y}
 		, { halfDimensions.x, .0f, -halfDimensions.y}
 		, {-halfDimensions.x, .0f, -halfDimensions.y}
 		};
-	const	::gpk::n3f								limitsTop		[4]				= 
-		{ limitsBottom[0] + ::gpk::n3f{0, pool.MatchState.Board.Table.Height, 0}
-		, limitsBottom[1] + ::gpk::n3f{0, pool.MatchState.Board.Table.Height, 0}
-		, limitsBottom[2] + ::gpk::n3f{0, pool.MatchState.Board.Table.Height, 0}
-		, limitsBottom[3] + ::gpk::n3f{0, pool.MatchState.Board.Table.Height, 0}
+	const	::gpk::n3f32								limitsTop		[4]				= 
+		{ limitsBottom[0] + ::gpk::n3f32{0, pool.MatchState.Board.Table.Height, 0}
+		, limitsBottom[1] + ::gpk::n3f32{0, pool.MatchState.Board.Table.Height, 0}
+		, limitsBottom[2] + ::gpk::n3f32{0, pool.MatchState.Board.Table.Height, 0}
+		, limitsBottom[3] + ::gpk::n3f32{0, pool.MatchState.Board.Table.Height, 0}
 		};
 
 	::gpk::drawLine(offscreenMetrics, ::gpk::line3<float>{limitsBottom[3], limitsBottom[2]}, constants.VPS, wireframePixelCoords, backBuffer.DepthStencil);

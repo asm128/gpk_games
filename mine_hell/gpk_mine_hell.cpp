@@ -174,8 +174,8 @@ static	::gpk::error_t	uncoverCell						(::gpk::grid<::gpkg::SMineHellCell> & blo
 			}
 		}
 		if(false == cellData->Boom) {	// Check if we won after uncovering the cell(s)
-			::gpk::SImageMonochrome<uint64_t>		cellsMines;
-			::gpk::SImageMonochrome<uint64_t>		cellsShows;
+			::gpk::imgmono<uint64_t>		cellsMines;
+			::gpk::imgmono<uint64_t>		cellsShows;
 			gpk_necall(cellsMines.resize(boardMetrics), "%s", "Out of memory?");
 			gpk_necall(cellsShows.resize(boardMetrics), "%s", "Out of memory?");
 			const int32_t							totalShows						= GetShows(cellsShows.View);

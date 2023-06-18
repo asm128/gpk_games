@@ -42,7 +42,7 @@ static	::gpk::error_t	poolGameResetTest2Balls	(::d1p::SPoolGame & pool, ::d1p::S
 		engine.SetCollides		(iEntity, true);
 		engine.SetHidden		(iEntity, false);
 	}
-	//::gpk::n3f				velocity					= {0, 0, -1.f - rand() % 30};
+	//::gpk::n3f32				velocity					= {0, 0, -1.f - rand() % 30};
 	//velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 20 * ((rand() % 2) ? -1 : 1));
 	//engine.SetVelocity(pool.StartState.Balls[1].Entity, velocity);
 	return 0;
@@ -139,12 +139,12 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 
 	uint8_t						rowLen					= 5;
 	float						ballDiameter			= board.BallRadius * 2;
-	::gpk::n3f					diagonal				= {1, 0, 1};
+	::gpk::n3f32					diagonal				= {1, 0, 1};
 	diagonal				= diagonal.Normalize() * 1.25f * ballDiameter; 
 	for(uint32_t iRow = 0, iBall = 1; iRow < 5; ++iRow, --rowLen) {
 		float						offsetZ					= -(rowLen / 2.0f) * ballDiameter + board.BallRadius;
 		for(uint32_t iColumn = 0; iColumn < rowLen; ++iColumn) {
-			::gpk::n3f					position				= ::gpk::n3f{(distanceFromCenter + diagonal.x * 5) - iRow * diagonal.x, board.BallRadius, offsetZ + (float)iColumn * ballDiameter};
+			::gpk::n3f32					position				= ::gpk::n3f32{(distanceFromCenter + diagonal.x * 5) - iRow * diagonal.x, board.BallRadius, offsetZ + (float)iColumn * ballDiameter};
 			uint32_t					iEntity					= pool.Entities.Balls[ballOrder[iBall++]];
 			gpk_necs(engine.SetPosition(iEntity, position));
 		}
@@ -159,7 +159,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		const uint32_t				column					= iPocket % 3;
 		const ::gpk::n3f32			pocketPosition			= {tableCenter.x * column - tableCenter.x, -board.Table.PocketRadius, board.Table.Slate.y * row - tableCenter.y};
 		const double				orientationAngle		= (iPocket < 3) ? piPerPocket - piPerPocket * iPocket : (::gpk::math_pi - piPerPocket) + piPerPocket * (iPocket % 3);
-		const ::gpk::quatf			pocketOrientation		= ::gpk::quatf{}.CreateFromAxisAngle({0, 1, 0}, orientationAngle).Normalize();
+		const ::gpk::quatf32		pocketOrientation		= ::gpk::quatf32{}.CreateFromAxisAngle({0, 1, 0}, orientationAngle).Normalize();
 		{ // Set up rigid body
 			const uint32_t				iRigidBody				= engine.GetRigidBody(iEntity);
 			engine.Integrator.Flags				[iRigidBody]				= {::gpk::BOUNDING_TYPE_Cylinder, true};
@@ -219,8 +219,8 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		engine.Integrator.BoundingVolumes	[engine.Entities[iEntity].RigidBody].HalfSizes	= {board.BallRadius, board.BallRadius, board.BallRadius};
 	}
 
-	gpk_necs(engine.SetMeshScale	(pool.Entities.Table, {board.Table.Slate.x, board.Table.Slate.y * .25f, board.Table.Slate.y}));
-	gpk_necs(engine.SetPosition		(pool.Entities.Table, {0, -board.Table.Slate.y * .125f}));
+	gpk_necs(engine.SetMeshScale(pool.Entities.Table, {board.Table.Slate.x, board.Table.Slate.y * .25f, board.Table.Slate.y}));
+	gpk_necs(engine.SetPosition (pool.Entities.Table, {}));
 	//constexpr double		piPerPocket					= (::gpk::math_pi / 3);
 	for(uint32_t iPocket = 0; iPocket < pool.Entities.Pockets.size(); ++iPocket) {
 		const uint32_t			iEntity						= pool.Entities.Pockets[iPocket];
@@ -239,7 +239,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	}
 
 	::gpk::m4f32			mRotation;
-	mRotation.SetOrientation(::gpk::quatf{0, 0, 1, 1}.Normalize());
+	mRotation.SetOrientation(::gpk::quatf32{0, 0, 1, 1}.Normalize());
 	for(uint8_t iStick = 0; iStick < pool.Entities.Sticks.size(); ++iStick) {
 		const uint16_t			stickEntity			= pool.Entities.Sticks[iStick];
 		gpk_necs(engine.SetMeshScale	(stickEntity, {.01f, board.Table.Slate.y, .01f}));
@@ -279,12 +279,17 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		gpk_necs(pool.Entities.Balls[iBall] = (uint16_t)engine.Clone(pool.Entities.Balls[0], true, true, true));
 
 	// table
-	gpk_necs(pool.Entities.Table = (uint16_t)engine.CreateBox());
-	for(uint32_t iFace = 0; iFace < 6; ++iFace)
-		gpk_necs(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[iFace], ::d1p::psTableCloth, "psHidden"));
+	::gpk::SParamsGrid		argsGrid					= {};
+	argsGrid.CellCount	= {10, 4};
+	argsGrid.Size		= {1, 1};
+	argsGrid.Center		= {.5, .5};
+	gpk_necs(pool.Entities.Table = (uint16_t)engine.CreateGrid(argsGrid));
+	gpk_necs(engine.SetShader(pool.Entities.Table, ::d1p::psTableCloth, "psTableCloth"));
+	//for(uint32_t iFace = 0; iFace < 6; ++iFace)
+	//	gpk_necs(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[iFace], ::d1p::psTableCloth, "psHidden"));
 
-	gpk_necs(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[::gpk::VOXEL_FACE_Top], ::d1p::psTableCloth, "psTableCloth"));
-	gpk_necs(engine.SetColorDiffuse((*engine.Entities.Children[pool.Entities.Table])[::gpk::VOXEL_FACE_Top], ::gpk::RED * .5f));
+	//gpk_necs(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[::gpk::VOXEL_FACE_Top], ::d1p::psTableCloth, "psTableCloth"));
+	//gpk_necs(engine.SetColorDiffuse((*engine.Entities.Children[pool.Entities.Table])[::gpk::VOXEL_FACE_Top], ::gpk::RED * .5f));
 
 	// pockets
 	uint16_t				iPocketEntity				= (uint16_t)engine.CreateCylinder(16, true, 0.5f);
@@ -377,17 +382,17 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 //}
 
 static	::gpk::error_t	geometryBuildTableCushion	(::gpk::STrianglesIndexed & output) {
-	stacxpr	::gpk::n3f32			TABLE_CUSHION_POSITIONS	[8]		= 
+	stacxpr	::gpk::n3f32		TABLE_CUSHION_POSITIONS	[8]		= 
 		{ {0, 1, 0}, {1, 1, 0}, {0, 1, 1}, {1, 1, 1}	// top face
 		, {0, 0, 0}, {1, 0, 0}, {0, 1, 1}, {1, 1, 1}	// diagonal face
 		};
 
-	stacxpr	::gpk::n2f32			TABLE_CUSHION_UV		[8]		= 
+	stacxpr	::gpk::n2f32		TABLE_CUSHION_UV		[8]		= 
 		{ {0, 0}, {1, 0}, {0, 1}, {1, 1}
 		, {0, 0}, {1, 0}, {0, 1}, {1, 1}
 		};
 
-	stacxpr	::gpk::n3f32			TABLE_CUSHION_NORMALS	[8]		= 
+	stacxpr	::gpk::n3f32		TABLE_CUSHION_NORMALS	[8]		= 
 		{ {0, 1, 0}, {0, 1, 0}, {0, 1, 0}, {0, 1, 0}
 		, {0, -1, -1}, {0, -1, -1}, {0, -1, -1}, {0, -1, -1}
 		};

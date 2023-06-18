@@ -1,16 +1,16 @@
 #include "gpk_pool_game_update.h"
 
 static	::gpk::error_t	resolveCollision							
-	( const ::gpk::n3d	& initialVelocityA
-	, const ::gpk::n3d	& initialRotationA
-	, const ::gpk::n3d	& distanceDirection
+	( const ::gpk::n3f64	& initialVelocityA
+	, const ::gpk::n3f64	& initialRotationA
+	, const ::gpk::n3f64	& distanceDirection
 	, double			& out_forceTransferRatioB	
-	, ::gpk::n3f		& out_finalRotationA
-	, ::gpk::n3f		& out_finalRotationB
-	, ::gpk::n3f		& out_finalVelocityA
-	, ::gpk::n3f		& out_finalVelocityB
+	, ::gpk::n3f32		& out_finalRotationA
+	, ::gpk::n3f32		& out_finalRotationB
+	, ::gpk::n3f32		& out_finalVelocityA
+	, ::gpk::n3f32		& out_finalVelocityB
 	) {
-	::gpk::n3d						directionA			= initialVelocityA.f64();
+	::gpk::n3f64						directionA			= initialVelocityA.f64();
 	directionA.Normalize();
 	out_forceTransferRatioB		= ::gpk::max(0.0f, (float)distanceDirection.Dot(directionA));
 	if(0 >= out_forceTransferRatioB) {
@@ -27,9 +27,9 @@ static	::gpk::error_t	resolveCollision
 	const double					speedA				= initialVelocityA.Length();
 	if(speedA) {
 		bool							revert				= distanceDirection.Dot(directionA.RotateY(::gpk::math_pi_2)) >= 0;
-		const ::gpk::n3d				vUp					= {0, revert ? -1 : 1.0f, 0};
-		::gpk::n3d						finalVelocityB		= distanceDirection * speedA * out_forceTransferRatioB;
-		::gpk::n3d						finalVelocityA		= ::gpk::n3d{finalVelocityB}.Normalize().Cross(vUp).Normalize() * speedA * (1.0f - out_forceTransferRatioB);
+		const ::gpk::n3f64				vUp					= {0, revert ? -1 : 1.0f, 0};
+		::gpk::n3f64						finalVelocityB		= distanceDirection * speedA * out_forceTransferRatioB;
+		::gpk::n3f64						finalVelocityA		= ::gpk::n3f64{finalVelocityB}.Normalize().Cross(vUp).Normalize() * speedA * (1.0f - out_forceTransferRatioB);
 		out_finalVelocityA			+= finalVelocityA.f32();
 		out_finalVelocityB			+= finalVelocityB.f32();
 	//	const double					totalFinalSpeed		= finalVelocityA.Length() + finalVelocityB.Length();
@@ -41,9 +41,9 @@ static	::gpk::error_t	resolveCollision
 
 	const double					rotA				= initialRotationA.Length();
 	if(rotA) {
-		const ::gpk::n3d				initialRotationANormalized	= initialRotationA * (1.0 / rotA);
-		const ::gpk::n3d				finalRotationB		= initialRotationANormalized * rotA * out_forceTransferRatioB;
-		const ::gpk::n3d				finalRotationA		= initialRotationANormalized * rotA * (1.0 - out_forceTransferRatioB);
+		const ::gpk::n3f64				initialRotationANormalized	= initialRotationA * (1.0 / rotA);
+		const ::gpk::n3f64				finalRotationB		= initialRotationANormalized * rotA * out_forceTransferRatioB;
+		const ::gpk::n3f64				finalRotationA		= initialRotationANormalized * rotA * (1.0 - out_forceTransferRatioB);
 		out_finalRotationA			+= finalRotationA.f32();
 		out_finalRotationB			+= finalRotationB.f32();
 		//const double					finalRotA			= finalRotationB.Length();
@@ -64,17 +64,17 @@ static	::gpk::error_t	handleBallContact	(::d1p::SPoolGame & pool, const ::gpk::S
 	contactResult.DistanceDirection.Normalize();
 
 	// Separate balls
-	::gpk::n3f						& positionA			= engine.Integrator.Centers[entityA.RigidBody].Position;
-	::gpk::n3f						& positionB			= engine.Integrator.Centers[entityB.RigidBody].Position;
+	::gpk::n3f32						& positionA			= engine.Integrator.Centers[entityA.RigidBody].Position;
+	::gpk::n3f32						& positionB			= engine.Integrator.Centers[entityB.RigidBody].Position;
 	positionA					+= contactResult.DistanceDirection * ::gpk::max(pool.MatchState.Board.BallRadius * 2 - distanceLength, 0.0) * -.51f;
 	positionB					+= contactResult.DistanceDirection * ::gpk::max(pool.MatchState.Board.BallRadius * 2 - distanceLength, 0.0) * .51f;
 
 
 	// Calculate force transfer
-	::gpk::n3f						& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
-	::gpk::n3f						& velocityB			= engine.Integrator.Forces[entityB.RigidBody].Velocity;
-	::gpk::n3f						& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
-	::gpk::n3f						& rotationB			= engine.Integrator.Forces[entityB.RigidBody].Rotation;
+	::gpk::n3f32						& velocityA			= engine.Integrator.Forces[entityA.RigidBody].Velocity;
+	::gpk::n3f32						& velocityB			= engine.Integrator.Forces[entityB.RigidBody].Velocity;
+	::gpk::n3f32						& rotationA			= engine.Integrator.Forces[entityA.RigidBody].Rotation;
+	::gpk::n3f32						& rotationB			= engine.Integrator.Forces[entityB.RigidBody].Rotation;
 
 	contactResult.InitialVelocityA	= velocityA;
 	contactResult.InitialVelocityB	= velocityB;
@@ -86,8 +86,8 @@ static	::gpk::error_t	handleBallContact	(::d1p::SPoolGame & pool, const ::gpk::S
 	rotationA					= {};
 	if(contactResult.InitialVelocityA.LengthSquared() || contactResult.InitialRotationA.LengthSquared()) {
 		engine.Integrator.SetActive(entityB.RigidBody, true);
-		::gpk::n3f						lvelocityB					= {};
-		::gpk::n3f						lvelocityA					= {};
+		::gpk::n3f32						lvelocityB					= {};
+		::gpk::n3f32						lvelocityA					= {};
 		::resolveCollision(contactResult.InitialVelocityA.f64(), contactResult.InitialRotationA.f64(), contactResult.DistanceDirection.f64(), contactResult.ForceTransferRatioB, rotationA, rotationB, lvelocityA, lvelocityB);
 		velocityB					+= lvelocityB;
 		velocityA					+= lvelocityA;
@@ -95,8 +95,8 @@ static	::gpk::error_t	handleBallContact	(::d1p::SPoolGame & pool, const ::gpk::S
 
 	if(contactResult.InitialVelocityB.LengthSquared() || contactResult.InitialRotationB.LengthSquared()) {
 		engine.Integrator.SetActive(entityA.RigidBody, true);
-		::gpk::n3f						lvelocityB					= {};
-		::gpk::n3f						lvelocityA					= {};
+		::gpk::n3f32						lvelocityB					= {};
+		::gpk::n3f32						lvelocityA					= {};
 		::resolveCollision(contactResult.InitialVelocityB.f64(), contactResult.InitialRotationB.f64(), contactResult.DistanceDirection.f64() * -1, contactResult.ForceTransferRatioA, rotationB, rotationA, lvelocityB, lvelocityA);
 		velocityB					+= lvelocityB;
 		velocityA					+= lvelocityA;
@@ -128,7 +128,7 @@ static	::gpk::error_t	handlePockets
 	, uint8_t							iBall
 	, ::gpk::SBodyFlags					& flags	
 	, ::gpk::SBodyForces				& forces
-	, const ::gpk::n3f					& positionA
+	, const ::gpk::n3f32					& positionA
 	, ::gpk::apobj<::d1p::SEventPool>	& outputEvents
 	//, double					secondsElapsed
 	) {
@@ -139,14 +139,14 @@ static	::gpk::error_t	handlePockets
 	const float						pocketRadius			= board.Table.PocketRadius;
 	const float						maxDistance				= pocketRadius + ballRadius;
 	const float						maxDistanceSquared		= maxDistance * maxDistance;
-	::gpk::n3f						positionBall			= positionA;
+	::gpk::n3f32						positionBall			= positionA;
 	positionBall.y				= 0;
 	for(uint8_t iPocket = 0; iPocket < 6; ++iPocket) {
 		const ::gpk::SVirtualEntity		& entityPocket			= engine.Entities[pool.Entities.Pockets[iPocket]];
-		::gpk::n3f						pocketPosition			= engine.Scene->RenderNodes.Transforms[entityPocket.RenderNode].World.GetTranslation();
+		::gpk::n3f32						pocketPosition			= engine.Scene->RenderNodes.Transforms[entityPocket.RenderNode].World.GetTranslation();
 		pocketPosition.y			= 0;
 
-		::gpk::n3f						distanceFromPocket		= positionA - pocketPosition;
+		::gpk::n3f32						distanceFromPocket		= positionA - pocketPosition;
 		if(distanceFromPocket.LengthSquared() > maxDistanceSquared)
 			continue;
 
@@ -219,7 +219,7 @@ static	::gpk::error_t	handleBoundaries				(::d1p::SPoolGame & pool, float ballRa
 	return 0;
 }
 
-static	::gpk::error_t	handleFalling					(::d1p::SPoolGame & pool, uint32_t iRigidBody, ::gpk::n3f & positionA, ::gpk::SBodyFlags & flagsA, ::gpk::SBodyForces & forcesA, ::gpk::SBodyMass & massA) {
+static	::gpk::error_t	handleFalling					(::d1p::SPoolGame & pool, uint32_t iRigidBody, ::gpk::n3f32 & positionA, ::gpk::SBodyFlags & flagsA, ::gpk::SBodyForces & forcesA, ::gpk::SBodyMass & massA) {
 	if(positionA.y < pool.MatchState.Board.BallRadius) { // if the ball is falling through the top of the table we make it bounce up
 		positionA.y				= (positionA.y - pool.MatchState.Board.BallRadius) * -.95f + pool.MatchState.Board.BallRadius;
 
@@ -243,7 +243,7 @@ static	::gpk::error_t	handlePocketsAndBoundaries		(::d1p::SPoolGame & pool, uint
 	::gpk::SEngine				& engine						= pool.Engine;
 	const float					ballRadius						= pool.MatchState.Board.BallRadius;
 	const ::gpk::SVirtualEntity	& entityA						= engine.Entities[pool.Entities.Balls[iBall]]; 
-	::gpk::n3f					& positionA						= engine.Integrator.Centers		[entityA.RigidBody].Position;
+	::gpk::n3f32					& positionA						= engine.Integrator.Centers		[entityA.RigidBody].Position;
 	::gpk::SBodyForces			& forcesA						= engine.Integrator.Forces		[entityA.RigidBody];
 	::gpk::SBodyFlags			& flagsA						= engine.Integrator.Flags	[entityA.RigidBody];
 	::gpk::SBodyMass			& massA							= engine.Integrator.Masses		[entityA.RigidBody];
@@ -308,8 +308,8 @@ static	::gpk::error_t	handlePocketsAndBoundaries		(::d1p::SPoolGame & pool, uint
 		//for(uint32_t iBallA = 0; iBallA < pool.StateStart.CountBalls; ++iBallA) {
 		//	::gpk::SBodyForces				& forces						= engine.Integrator.Forces		[engine.Entities[pool.StateStart.Ball[iBallA].Entity].RigidBody];
 		//	::gpk::SBodyFrame			& bodyAccum						= engine.Integrator.Frames	[engine.Entities[pool.StateStart.Ball[iBallA].Entity].RigidBody];
-		//	if(::gpk::n3f{forces.Velocity}.Normalize().Dot(::gpk::n3f{forces.Rotation.z, 0, -forces.Rotation.x}.Normalize()) < 0) {
-		//		bodyAccum.AccumulatedForce += ::gpk::n3f{forces.Rotation.z, 0, -forces.Rotation.x} * secondsElapsed;
+		//	if(::gpk::n3f32{forces.Velocity}.Normalize().Dot(::gpk::n3f32{forces.Rotation.z, 0, -forces.Rotation.x}.Normalize()) < 0) {
+		//		bodyAccum.AccumulatedForce += ::gpk::n3f32{forces.Rotation.z, 0, -forces.Rotation.x} * secondsElapsed;
 		//	}
 		//	if(forces.Rotation.y)
 		//		forces.Velocity.RotateY(forces.Rotation.y * secondsElapsed * .05);

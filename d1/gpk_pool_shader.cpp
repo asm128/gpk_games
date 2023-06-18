@@ -11,7 +11,7 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	, const ::gpk::SPSIn					& inPS
 	, ::gpk::bgra							& outputPixel
 	) { 
-	const ::gpk::n3f							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
+	const ::gpk::n3f32							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
 	const ::gpk::rgbaf							diffuse						= ::gpk::lightCalcDiffuse(::gpk::DARKGREEN, inPS.WeightedNormal, lightVecW);
 	outputPixel								= ::gpk::rgbaf(diffuse).Clamp();
 	return 0; 
@@ -22,7 +22,7 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	, const ::gpk::SPSIn					& inPS
 	, ::gpk::bgra							& outputPixel
 	) { 
-	const ::gpk::n3f							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
+	const ::gpk::n3f32							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
 	const ::gpk::rgbaf							diffuse						= ::gpk::lightCalcDiffuse(::gpk::DARKGREEN, inPS.WeightedNormal, lightVecW);
 	outputPixel								= ::gpk::rgbaf(diffuse).Clamp();
 	return 0; 
@@ -33,7 +33,7 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	, const ::gpk::SPSIn					& inPS
 	, ::gpk::bgra							& outputPixel
 	) { 
-	const ::gpk::n3f							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
+	const ::gpk::n3f32							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
 	const ::gpk::rgbaf							diffuse						= ::gpk::lightCalcDiffuse(::gpk::DARKGRAY, inPS.WeightedNormal, lightVecW);
 	outputPixel								= ::gpk::rgbaf(diffuse).Clamp();
 	return 0; 
@@ -45,7 +45,7 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	, ::gpk::bgra							& outputPixel
 	) { 
 	::gpk::rgbaf								materialcolor				= ::gpk::BROWN + (::gpk::ORANGE * .5f);
-	const ::gpk::n3f							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
+	const ::gpk::n3f32							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
 	const ::gpk::rgbaf							diffuse						= ::gpk::lightCalcDiffuse(materialcolor, inPS.WeightedNormal, lightVecW);
 	const ::gpk::rgbaf							ambient						= materialcolor * ::LIGHT_FACTOR_AMBIENT;
 
@@ -72,7 +72,7 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 		: ((-0.5f - relativeToCenter.y) > -.05f) ? ::gpk::RED 
 		: ::gpk::WHITE;
 	::gpk::rgbaf								materialcolor				= surfacecolor;		
-	const ::gpk::n3f							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
+	const ::gpk::n3f32							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
 	const ::gpk::rgbaf							specular					= ::gpk::lightCalcSpecular(constants.CameraPosition, ::LIGHT_FACTOR_SPECULAR_POWER, gpk::WHITE, ::gpk::WHITE, inPS.WeightedPosition, inPS.WeightedNormal, lightVecW);
 	const ::gpk::rgbaf							diffuse						= ::gpk::lightCalcDiffuse(materialcolor, inPS.WeightedNormal, lightVecW);
 	const ::gpk::rgbaf							ambient						= materialcolor * ::LIGHT_FACTOR_AMBIENT;
@@ -118,7 +118,7 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	}
 
 	if(shade) {
-		const ::gpk::n3f							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
+		const ::gpk::n3f32							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
 		double										diffuseFactor				= inPS.WeightedNormal.Dot(lightVecW);
 		if(diffuseFactor < 0) {
 			ambientFactor							+= (rand() % 256) / 255.0f * float(diffuseFactor) * -.25f;
@@ -176,7 +176,7 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 		} 
 	}
 	if(shade) {
-		const ::gpk::n3f							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
+		const ::gpk::n3f32							lightVecW					= (constants.LightPosition - inPS.WeightedPosition).Normalize();
 		double										diffuseFactor				= inPS.WeightedNormal.Dot(lightVecW);
 		if(diffuseFactor < 0) {
 			ambientFactor							+= (rand() % 256) * (1.0f / 255) * float(diffuseFactor) * -.25f;

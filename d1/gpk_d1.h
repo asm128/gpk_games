@@ -34,8 +34,8 @@ namespace d1
 
 #pragma pack(push, 1)
 	struct SCamera {
-		::gpk::n3f					Position			= {-1, 0, 0};
-		::gpk::n3f					Target				= {0, 0, 0};
+		::gpk::n3f32					Position			= {-1, 0, 0};
+		::gpk::n3f32					Target				= {0, 0, 0};
 		float						Zoom				= 2.0f;
 		uint8_t						BallLockAtPosition	= (uint8_t)-1;
 		uint8_t						BallLockAtTarget	= (uint8_t)-1;
@@ -144,7 +144,7 @@ namespace d1
 		::gpk::aobj<::d1::CAMERA_INPUT>		QueueCamera			= {};
 		::gpk::astatic<::d1::SD1Player
 			, ::d1p::MAX_PLAYERS>			Players				= {};
-		::gpk::n3f							LightPos			= {5, 2, 0};
+		::gpk::n3f32							LightPos			= {5, 2, 0};
 
 
 		::gpk::error_t						Save				(::gpk::apod<uint8_t> & output) const {
@@ -326,27 +326,13 @@ namespace d1
 				const ::d1::SD1Player		& player					= MainGame.Players[iPlayer];
 				gpk_necall(player.Save(serialized), "iPlayer: %i", iPlayer);
 			}
-
-			::gpk::au8					deflated;
-			gpk_necs(::gpk::arrayDeflate(serialized, deflated));
-
-			info_printf("Savegame size in bytes: %u.", serialized.size());
-			info_printf("Savegame file size: %u.", deflated.size());
-
-			return ::gpk::fileFromMemory(fileName, deflated);
+			return ::gpk::deflateFromMemory(fileName, serialized);
 		}
 
 		::gpk::error_t			Load						(::gpk::vcc filename)				{
 			::gpk::au8					serialized;
-			gpk_necs(::gpk::fileToMemory(filename, serialized));
-
-			::gpk::au8					inflated;
-			::gpk::arrayInflate(serialized, inflated);
-
-			info_printf("Savegame file size: %u.", inflated.size());
-			info_printf("Savegame size in bytes: %u.", serialized.size());
-
-			::gpk::vcu8					viewSerialized				= inflated;
+			gpk_necs(::gpk::inflateToMemory(filename, serialized));
+			::gpk::vcu8					viewSerialized				= serialized;
 			if errored(MainGame.Load(viewSerialized)) {
 				es_if(errored(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
 				return -1;

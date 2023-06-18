@@ -55,7 +55,7 @@ static	::gpk::error_t	poolGameUpdateShot		(::d1p::SPoolGame & pool, ::gpk::apobj
 			::gpk::line3f32			& delta					= pool.PositionDeltas[iBall][lastDelta];
 			pool.GetBallPosition(iBall, delta.B);
 			::gpk::SBodyForces		& forces				= engine.Integrator.Forces[engine.GetRigidBody(pool.BallToEntity(iBall))];
-			const ::gpk::n3f		rotationResult			= (delta.B - delta.A) / diameter * ::gpk::math_2pi;
+			const ::gpk::n3f32		rotationResult			= (delta.B - delta.A) / diameter * ::gpk::math_2pi;
 			forces.Rotation		+= {rotationResult.z, 0, -rotationResult.x};
 		}
 		if(pool.PositionDeltas[iBall].size() > 10) {
@@ -79,7 +79,7 @@ static	::gpk::error_t	poolGameUpdateShot		(::d1p::SPoolGame & pool, ::gpk::apobj
 		pool.ActiveTurn().Time.SecondsActive	+= secondsElapsed;
 	}
 	else { // Set the stick origin to the position of the cue ball
-		::gpk::n3f				ballPosition			= {};
+		::gpk::n3f32				ballPosition			= {};
 		pool.GetBallPosition(0, ballPosition);
 		engine.SetPosition(pool.ActiveStickEntity(), ballPosition);
 		gpk_necs(engine.Update(secondsElapsed));

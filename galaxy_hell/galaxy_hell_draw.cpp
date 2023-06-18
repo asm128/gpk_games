@@ -438,7 +438,7 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 		::gpk::m4f32									matrixTransformVP			= matrixTransform * matrixVP;
 		::ghg::getLightArrays(matrixTransform.GetTranslation(), drawCache.LightPointsWorld, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightColorsModel);
 		const ::gpk::SGeometryQuads								& mesh						= shipState.Scene.Geometry[entityChild.Geometry];
-		const ::gpk::grid<const ::gpk::bgra>					image						= shipState.Scene.Image	[entityChild.Image].View;
+		const ::gpk::gc8bgra					image						= shipState.Scene.Image	[entityChild.Image].View;
 		for(uint32_t iTriangle = 0; iTriangle < mesh.Triangles.size(); ++iTriangle) {
 			::gpk::clear(drawCache.PixelCoords, drawCache.PixelVertexWeights);
 			pixelsDrawn += ::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformVP, shipState.Scene.Global.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer
@@ -512,7 +512,7 @@ static	::gpk::error_t	drawExplosion
 	, ::gpk::grid<uint32_t>		depthBuffer
 	, ::ghg::SGalaxyHellDrawCache	& drawCache
 	) {
-	::gpk::grid<const ::gpk::bgra>	image				= solarSystem.ShipState.Scene.Image		[explosion.IndexImage].View;
+	::gpk::gc8bgra	image				= solarSystem.ShipState.Scene.Image		[explosion.IndexImage].View;
 	const ::gpk::SGeometryQuads			& mesh				= solarSystem.ShipState.Scene.Geometry	[explosion.IndexMesh];
 	for(uint32_t iExplosionPart = 0; iExplosionPart < explosion.Particles.Position.size(); ++iExplosionPart) {
 		const ::gpk::rangeu16				& sliceMesh			= explosion.Slices[iExplosionPart];

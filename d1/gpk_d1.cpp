@@ -284,8 +284,8 @@ static	::gpk::error_t	resetCameraBallCue			(::d1p::SPoolGame & poolGame, ::d1::S
 static	::gpk::error_t	resetCameraBallRack			(::d1p::SPoolGame & poolGame, uint8_t iBall, ::d1::SCamera & cameraBall) {
 	poolGame.GetBallPosition(0, cameraBall.Position);
 	poolGame.GetBallPosition(iBall, cameraBall.Target);
-	::gpk::n3f						distance				= cameraBall.Target - cameraBall.Position;
-	::gpk::n3f						direction				= ::gpk::n3f32{distance}.Normalize();
+	::gpk::n3f32						distance				= cameraBall.Target - cameraBall.Position;
+	::gpk::n3f32						direction				= ::gpk::n3f32{distance}.Normalize();
 	cameraBall.Position			+= direction * -2.0f;
 	cameraBall.Position.y		= 1.75f * .35f;
 	return 0;
@@ -480,8 +480,8 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 		::gpk::aobj<::gpk::apod<char>>	fileNames				= {};
 		::gpk::pathList(app.FileStrings.SavegameFolder, fileNames, app.FileStrings.ExtensionSaveAuto);
 		if(fileNames.size()) {
-			if errored(app.Load(fileNames[0])) 
-				gpk_necs(::d1p::poolGameSetup(poolGame));
+			//if errored(app.Load(fileNames[0])) 
+			//	gpk_necs(::d1p::poolGameSetup(poolGame));
 		}
 		app.StateSwitch(::d1::APP_STATE_Welcome);
 		app.AppUI.RefreshTeamStrings(poolGame.MatchState.Flags.TeamStripped);

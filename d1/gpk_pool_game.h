@@ -117,11 +117,11 @@ namespace d1p
 		inline	::gpk::error_t				BallToRenderNode			(uint8_t iBall)										const	{ return Engine.Entities[Entities.Balls[iBall]].RenderNode; }
 		inline	::gpk::error_t				BallToBody					(uint8_t iBall)										const	{ return Engine.Entities[Entities.Balls[iBall]].RigidBody; }
 
-		inline	::gpk::error_t				GetPocketPosition			(uint8_t iPocket, ::gpk::n3f & out_position)		const	{ return Engine.GetPosition(Entities.Pockets[iPocket], out_position); }
-		inline	::gpk::error_t				GetBallPosition				(uint8_t iBall  , ::gpk::n3f & out_position)		const	{ return Engine.GetPosition(Entities.Balls[iBall], out_position); }
+		inline	::gpk::error_t				GetPocketPosition			(uint8_t iPocket, ::gpk::n3f32 & out_position)		const	{ return Engine.GetPosition(Entities.Pockets[iPocket], out_position); }
+		inline	::gpk::error_t				GetBallPosition				(uint8_t iBall  , ::gpk::n3f32 & out_position)		const	{ return Engine.GetPosition(Entities.Balls[iBall], out_position); }
 		inline	::gpk::error_t				GetStickOrientation			(uint8_t iStick , ::gpk::quatf32 & out_orientation)	const	{ return Engine.GetOrientation(Entities.Sticks[iStick], out_orientation); }
 		inline	::gpk::error_t				GetStickOrientation			(::gpk::quatf32 & out_orientation)					const	{ return Engine.GetOrientation(Entities.Sticks[ActivePlayer()], out_orientation); }
-		inline	::gpk::error_t				SetBallPosition				(uint8_t iBall, const ::gpk::n3f & in_position)				{ return Engine.SetPosition(Entities.Balls[iBall], in_position); }
+		inline	::gpk::error_t				SetBallPosition				(uint8_t iBall, const ::gpk::n3f32 & in_position)			{ return Engine.SetPosition(Entities.Balls[iBall], in_position); }
 		inline	::gpk::error_t				SetStickVelocity			(float velocity)											{ return ::gpk::error_t((ActiveStick().Velocity = ::gpk::clamp(velocity, 0.0f, ::d1p::MAX_SHOOT_VELOCITY)) * 1000); }
 		inline	::gpk::error_t				AddStickVelocity			(float velocity)											{ 
 			::d1p::SStickControl					& activeStick				= ActiveStick(); 
@@ -144,9 +144,9 @@ namespace d1p
 	::gpk::error_t						poolGameUpdate				(::d1p::SPoolGame & pool, ::gpk::view<const ::d1p::SEventPlayer> inputEvents, ::gpk::apobj<::d1p::SEventPool> & outputEvents, double secondsElapsed);
 	::gpk::error_t						poolGameDraw				(::d1p::SPoolGame & pool
 		, ::gpk::rt<::gpk::bgra, uint32_t>	& backBuffer
-		, const ::gpk::n3f					& cameraPosition
-		, const ::gpk::n3f					& cameraTarget
-		, const ::gpk::n3f					& cameraUp
+		, const ::gpk::n3f32					& cameraPosition
+		, const ::gpk::n3f32					& cameraTarget
+		, const ::gpk::n3f32					& cameraUp
 		, double							totalSeconds
 		);
 } // namespace

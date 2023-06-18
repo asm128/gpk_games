@@ -32,9 +32,9 @@ namespace ghg
 			return Particles.Create(position, direction, speed);
 		}
 
-		int							SpawnForcedDirected	(double stabilityFactor, const ::gpk::n3f & position, const ::gpk::n3f & direction, float speedDebris, float brightness, float lifetime)	{
+		int							SpawnForcedDirected	(double stabilityFactor, const ::gpk::n3f32 & position, const ::gpk::n3f32 & direction, float speedDebris, float brightness, float lifetime)	{
 			stacxpr	double					randUnit			= ::gpk::math_2pi / RAND_MAX;
-			::gpk::n3f						finalDirection		= {0, 1, 0};
+			::gpk::n3f32						finalDirection		= {0, 1, 0};
 			finalDirection.RotateX(rand() * randUnit);
 			finalDirection.RotateY(rand() * randUnit);
 			finalDirection.Normalize();
@@ -44,7 +44,7 @@ namespace ghg
 		::gpk::error_t				Update				(float secondsLastFrame)	{
 			stacxpr	uint32_t				maxRange			= 200;
 			stacxpr	uint32_t				maxRangeSquared		= maxRange * maxRange;
-			memcpy(PositionPrev.begin(), Particles.Position.begin(), Particles.Position.size() * sizeof(::gpk::n3f));
+			memcpy(PositionPrev.begin(), Particles.Position.begin(), Particles.Position.size() * sizeof(::gpk::n3f32));
 			Particles.IntegrateSpeed(secondsLastFrame);
 			for(uint32_t iShot = 0; iShot < Particles.Position.size(); ++iShot) {
 				Lifetime[iShot] -= secondsLastFrame;
