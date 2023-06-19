@@ -1,12 +1,12 @@
 // Tic Tac Toe implementation which stores its whole state in just 4 bytes (27 bits).
-// These sources are best viewed in Visual Studio 2017 with a screen of at least 1920x1080 screen and the zoom set to 81 %.
+// These sources are best viewed in Visual Studio 2017 and over with a screen of at least 1920x1080 screen and the zoom set to 81 %.
 //
 // Pablo Ariel Zorrilla Cepeda (asm128) (c) 2017 - Distributed under the MIT License.
 #include <cstdint>
 #include <random>
 
-#ifndef GPK_TICTACTOE_H_9283740923874
-#define GPK_TICTACTOE_H_9283740923874
+#ifndef GPK_TICTACTOE_H_9283740923618
+#define GPK_TICTACTOE_H_9283740923618
 
 namespace gpkg
 {
@@ -84,14 +84,14 @@ namespace gpkg
 	struct TicTacToeBoard32 {
 		// ----------------------------------------------------  Variables	-------------------------------------------------------------------------
 		uint32_t							Cells					: 18;
-		uint32_t							MovesLeft				: 4;
+		uint32_t							MovesConsumed			: 4;
 		uint32_t							PlayerIndex				: 1;
 		uint32_t							Winner					: 2;
 		uint32_t							PlayerControls			: 2;
 		uint32_t							Padding					: 5;
 
 		// ----------------------------------------------------	  Methods	-------------------------------------------------------------------------
-		inline constexpr					TicTacToeBoard32		()															noexcept	: Cells(0), MovesLeft(9), PlayerIndex(0), Winner(CELL_VALUE_EMPTY), PlayerControls(0x1), Padding(0)	{}
+		inline constexpr					TicTacToeBoard32		()															noexcept	: Cells(0), MovesConsumed(0), PlayerIndex(0), Winner(CELL_VALUE_EMPTY), PlayerControls(0x1), Padding(0)	{}
 		//
 		inline constexpr	CELL_VALUE		GetWinner				()													const	noexcept	{ return (CELL_VALUE)Winner; }
 		inline constexpr	PLAYER_CONTROL	GetPlayerControl		(const int playerIndex)								const	noexcept	{ return PLAYER_CONTROL((PlayerControls & (1 << playerIndex)) >> playerIndex); }
@@ -103,7 +103,7 @@ namespace gpkg
 		inline	void						SetCellValue			(const int index, const CELL_VALUE value)					noexcept	{ Cells |= uint32_t(value & CELL_VALUE_MASK) << (index * 2); }
 
 		TicTacToeBoard16					GetCells				(const CELL_VALUE value)							const	noexcept	{
-			TicTacToeBoard16						result;
+			TicTacToeBoard16						result					= {};
 			for(int y = 0; y < 3; ++y)
 			for(int x = 0; x < 3; ++x) {
 				const int32_t							indexLinear				= y * 3 + x;
@@ -118,12 +118,12 @@ namespace gpkg
 	};	// struct
 
 	//
-	template <size_t _sizeWidth, size_t _sizeHeight>
+	template <size_t _nWidth, size_t _nHeight>
 	struct ScreenASCII {
 		// ----------------------------------------------------  Constants	-------------------------------------------------------------------------
-		static constexpr	int			Width			= (int)_sizeWidth;
-		static constexpr	int			Height			= (int)_sizeHeight;
-		char							Cells[_sizeHeight][_sizeWidth]	= {};
+		static constexpr	int			Width			= (int)_nWidth;
+		static constexpr	int			Height			= (int)_nHeight;
+		char							Cells[_nHeight][_nWidth]	= {};
 		// ------------------------------------------------	  Methods	-------------------------------------------------------------------------
 		inline constexpr				ScreenASCII		()	noexcept	= default;
 	};
@@ -154,7 +154,7 @@ namespace gpkg
 					result_value				= Board.PlayerIndex ? CELL_VALUE_O : CELL_VALUE_X;
 				break;
 			default:					// --- Otherwise just play any empty cell
-				do cellIndex														= ::rand()%9;
+				do cellIndex														= ::rand() % 9;
 				while(Board.GetCellValue(cellIndex));
 				result_value					= Board.PlayerIndex ? CELL_VALUE_O : CELL_VALUE_X;
 				break;
@@ -163,12 +163,12 @@ namespace gpkg
 			if(CELL_VALUE_EMPTY != result_value) {	// If a valid cell has been played, mark it in the board.
 				Board.SetCellValue(cellIndex, result_value);
 				TurnChange();
-				--Board.MovesLeft;
+				++Board.MovesConsumed;
 			}
 			return {result_value, cellIndex, playerIndex};
 		}
 		// --- Returns true if a full line was found
-		inline	CELL_VALUE				EvaluateBoard	()	const	noexcept	{
+		inline	CELL_VALUE				EvaluateBoard	()					const	noexcept	{
 			const TicTacToeBoard16				boardX			= Board.GetCells(CELL_VALUE_X);
 			const TicTacToeBoard16				boardO			= Board.GetCells(CELL_VALUE_O);
 			if(boardX.EvaluateLines()) return CELL_VALUE_X;
@@ -198,37 +198,37 @@ namespace gpkg
 			return Board.GetWinner();
 		}
 		// --- Display match results text
-		template <size_t _sizeWidth, size_t _sizeHeight>
-		inline	void					DrawResults		(const CELL_VALUE winner, const Coord2Du32& textCenter, char (&screen)[_sizeHeight][_sizeWidth])	const	noexcept	{
+		template <size_t _nWidth, size_t _nHeight>
+		inline	void					DrawResults		(const CELL_VALUE winner, const Coord2Du32 & textCenter, char (&screen)[_nHeight][_nWidth])	const	noexcept	{
 			char								text[25]		= {};
 			const int32_t						len				= (int32_t)(winner ? ::sprintf_s(text, "Player %u won the match!", (uint32_t)winner) : ::sprintf_s(text, "Tie!"));
 			memcpy(&screen[textCenter.y][textCenter.x - (len >> 1)], text, len);
 		}
 		// --- Display the board
-		template <size_t _sizeWidth, size_t _sizeHeight>
-		void							DrawBoard		(const Coord2Du32& offset, char (&screen)[_sizeHeight][_sizeWidth])									const	noexcept	{
-			for(uint8_t y = 0, yMax = (_sizeHeight < 3) ? _sizeHeight : 3; y < yMax; ++y) {
-				for(uint8_t x = 0, xMax = (_sizeWidth < 3) ? _sizeWidth : 3; x < xMax; ++x)
+		template <size_t _nWidth, size_t _nHeight>
+		void							DrawBoard		(const Coord2Du32& offset, char (&screen)[_nHeight][_nWidth])									const	noexcept	{
+			for(uint8_t y = 0, yMax = (_nHeight < 3) ? _nHeight : 3; y < yMax; ++y) {
+				for(uint8_t x = 0, xMax = (_nWidth < 3) ? _nWidth : 3; x < xMax; ++x)
 					screen[offset.y + y][offset.x + x]		= Symbols[Board.GetCellValue(x, y)];
-				screen[offset.y + y][_sizeWidth - 1]	= '\n';
+				screen[offset.y + y][_nWidth - 1]	= '\n';
 			}
-			screen[_sizeHeight - 1][_sizeWidth - 1]	= 0;
+			screen[_nHeight - 1][_nWidth - 1]	= 0;
 		}
 		// --- Display the board for a given team
-		template <size_t _sizeWidth, size_t _sizeHeight>
-		void							DrawBoard		(const CELL_VALUE cellValue, const Coord2Du32& offset, char (&screen)[_sizeHeight][_sizeWidth])		const	noexcept	{
+		template <size_t _nWidth, size_t _nHeight>
+		void							DrawBoard		(const CELL_VALUE cellValue, const Coord2Du32 & offset, char (&screen)[_nHeight][_nWidth])		const	noexcept	{
 			const TicTacToeBoard16				board			= Board.GetCells(cellValue);
-			for(uint8_t y = 0, yMax = (_sizeHeight < 3) ? _sizeHeight : 3; y < yMax; ++y) {
-				for(uint8_t x = 0, xMax = (_sizeWidth < 3) ? _sizeWidth : 3; x < xMax; ++x)
+			for(uint8_t y = 0, yMax = (_nHeight < 3) ? _nHeight : 3; y < yMax; ++y) {
+				for(uint8_t x = 0, xMax = (_nWidth < 3) ? _nWidth : 3; x < xMax; ++x)
 					screen[offset.y + y][offset.x + x]		= Symbols[board.GetCell({x, y}) ? cellValue : 0];
-				screen[offset.y + y][_sizeWidth - 1]	= '\n';
+				screen[offset.y + y][_nWidth - 1]	= '\n';
 			}
-			if((offset.y + 2) < _sizeHeight && (offset.x + 4) < _sizeWidth)		// print number of cells used if the screen is large enough
+			if((offset.y + 2) < _nHeight && (offset.x + 4) < _nWidth)		// print number of cells used if the screen is large enough
 				screen[offset.y + 2][offset.x + 4]			= (char)('0' + board.Used);
-			screen[_sizeHeight - 1][_sizeWidth - 1]		= 0;
+			screen[_nHeight - 1][_nWidth - 1]		= 0;
 		}
 	};	// struct
 #pragma pack( pop )
 } // namespace
 
-#endif // GPK_TICTACTOE_H_9283740923874
+#endif // GPK_TICTACTOE_H_9283740923618

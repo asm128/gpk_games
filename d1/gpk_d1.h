@@ -34,8 +34,8 @@ namespace d1
 
 #pragma pack(push, 1)
 	struct SCamera {
-		::gpk::n3f32					Position			= {-1, 0, 0};
-		::gpk::n3f32					Target				= {0, 0, 0};
+		::gpk::n3f32				Position			= {-1, 0, 0};
+		::gpk::n3f32				Target				= {0, 0, 0};
 		float						Zoom				= 2.0f;
 		uint8_t						BallLockAtPosition	= (uint8_t)-1;
 		uint8_t						BallLockAtTarget	= (uint8_t)-1;
@@ -52,17 +52,17 @@ namespace d1
 		const ::d1::SCamera&		GetCamera			(uint32_t cameraId)	const	{
 			return	(cameraId == 0				) ? Free 
 				:	(cameraId > d1p::MAX_BALLS	) ? Stick
-				:	Balls[cameraId - 1] 
+				:	Balls[cameraId - 1]
 				;
 		}
 		::d1::SCamera&				GetCamera			(uint32_t cameraId)	{
 			return	(cameraId == 0				) ? Free 
 				:	(cameraId > d1p::MAX_BALLS	) ? Stick
-				:	Balls[cameraId - 1] 
+				:	Balls[cameraId - 1]
 				;
 		}
-		inline	SCamera&			GetSelected		()			{ return GetCamera(Selected); }
-		inline	const SCamera&		GetSelected		()	const	{ return GetCamera(Selected); }
+		inline	SCamera&			GetSelected			()			{ return GetCamera(Selected); }
+		inline	const SCamera&		GetSelected			()	const	{ return GetCamera(Selected); }
 	};
 
 	GDEFINE_ENUM_TYPE (PLAYER_TYPE, uint8_t);
@@ -71,12 +71,12 @@ namespace d1
 	GDEFINE_ENUM_VALUE(PLAYER_TYPE, Network	, 2);
 
 	struct SD1Player {
-		::gpk::vcc					Name;
-		::d1::SPlayerCameras		Cameras						= {};
-		::gpk::bgra					Color;
-		PLAYER_TYPE					Type;
+		::gpk::vcc					Name				= {};
+		::d1::SPlayerCameras		Cameras				= {};
+		::gpk::bgra					Color				= {};
+		PLAYER_TYPE					Type				= {};
 
-		::gpk::error_t				Save			(::gpk::apod<uint8_t> & output) const {
+		::gpk::error_t				Save				(::gpk::apod<uint8_t> & output) const {
 			gpk_necs(::gpk::savePOD		(output, Cameras));
 			gpk_necs(::gpk::savePOD		(output, Color));
 			gpk_necs(::gpk::savePOD		(output, Type));
@@ -84,7 +84,7 @@ namespace d1
 			return 0;
 		}
 
-		::gpk::error_t				Load			(::gpk::vcu8 & input) {
+		::gpk::error_t				Load				(::gpk::vcu8 & input) {
 			gpk_necs(::gpk::loadPOD		(input, Cameras	));
 			gpk_necs(::gpk::loadPOD		(input, Color	));
 			gpk_necs(::gpk::loadPOD		(input, Type	));
@@ -93,7 +93,7 @@ namespace d1
 		}
 	};
 
-	stacxpr ::gpk::vcc		TEAM_TEXT[]		= {{6, "Team 1"}, {6, "Team 2"}};
+	stacxpr ::gpk::vcc			TEAM_TEXT[]			= {{6, "Team 1"}, {6, "Team 2"}};
 
 	GDEFINE_ENUM_TYPE (UI_TEAM, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_TEAM, Name		, 0);
@@ -224,12 +224,12 @@ namespace d1
 		::gpk::astatic<::d1::STeamUI, 2>	TeamUI					= {};
 		::gpk::SUIInputBox					NameEditBox;
 		
-		::gpk::astatic<char, 32>			turnsbuffer;
-		::gpk::astatic<char, 32>			secdsbuffer;
-		::gpk::astatic<char, 32>			playrbuffer[6]			=  {{"Player 1"}, {"Player 2"}, {"Player 3"}, {"Player 4"}, {"Player 5"}, {"Player 6"}};
-		::gpk::astatic<char, 32>			teamsbuffer[2]			=  {{"Team 1"}, {"Team 2"}};
-		::gpk::astatic<char, 32>			scorebuffer[2]			=  {{"Score: 0"}, {"Score: 0"}};
-		::gpk::astatic<char, 32>			foulsbuffer[2]			=  {{"Fouls: 0"}, {"Fouls: 0"}};
+		::gpk::astatic<char, 64>			turnsbuffer;
+		::gpk::astatic<char, 64>			secdsbuffer;
+		::gpk::astatic<char, 64>			playrbuffer[6]			=  {{"Player 1"}, {"Player 2"}, {"Player 3"}, {"Player 4"}, {"Player 5"}, {"Player 6"}};
+		::gpk::astatic<char, 64>			teamsbuffer[2]			=  {{"Team 1"}, {"Team 2"}};
+		::gpk::astatic<char, 64>			scorebuffer[2]			=  {{"Score: 0"}, {"Score: 0"}};
+		::gpk::astatic<char, 64>			foulsbuffer[2]			=  {{"Fouls: 0"}, {"Fouls: 0"}};
 
 		//::gpk::pnco<::gpk::SDialogTuner<uint8_t>>	TunerTeamCount;
 		//::gpk::pnco<::gpk::SDialogTuner<uint8_t>>	TunerPlayerCount;
