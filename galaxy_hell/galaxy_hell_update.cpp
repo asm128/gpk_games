@@ -488,14 +488,6 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 	::gpk::n2u16				targetMetrics				= {}; 
 	targetMetrics			= solarSystem.DrawCache.RenderTargetMetrics;
 
-	for(uint32_t iSysEvent = 0; iSysEvent < frameEvents.size(); ++iSysEvent) {
-		const ::gpk::SSysEvent		& eventToProcess			= frameEvents[iSysEvent];
-		switch(eventToProcess.Type) {
-		case ::gpk::SYSEVENT_WINDOW_RESIZE:
-			break;
-		}
-	}
-
 	double						secondsToProcess			= ::gpk::min(actualSecondsLastFrame, 0.15);
 	for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
 		::gpk::au16					& shipParts				= solarSystem.ShipState.ShipParts[iShip];

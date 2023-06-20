@@ -131,8 +131,8 @@ namespace d1p
 #pragma pack(pop)
 
 	template<typename _tChildEvent>
-	stainli	::gpk::error_t		extractAndHandle		(const ::gpk::SEvent<::d1p::POOL_EVENT> & parentEvent, const ::std::function<::gpk::error_t (const ::gpk::SEventView<_tChildEvent> &)> & funcHandleChild) {
-		return ::gpk::extractAndHandle<::d1p::POOL_EVENT, _tChildEvent>(parentEvent, funcHandleChild);
+	stainli	::gpk::error_t		eventExtractAndHandle		(const ::gpk::SEvent<::d1p::POOL_EVENT> & parentEvent, const ::std::function<::gpk::error_t (const ::gpk::SEventView<_tChildEvent> &)> & funcHandleChild) {
+		return ::gpk::eventExtractAndHandle<_tChildEvent>(parentEvent, funcHandleChild);
 	}
 
 } // namespace

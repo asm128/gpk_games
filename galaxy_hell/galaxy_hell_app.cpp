@@ -5,36 +5,62 @@
 #include "gpk_deflate.h"
 #include "gpk_path.h"
 
-::gpk::error_t					ghg::galaxyHellUpdate			(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view<::gpk::SSysEvent> & systemEvents) {
+static	::gpk::error_t	processScreenEvent		(::ghg::SGalaxyHellApp & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
+	switch(screenEvent.Type) {
+	default: break;
+	case ::gpk::EVENT_SCREEN_Close:
+	case ::gpk::EVENT_SCREEN_Deactivate: 
+		if(app.ActiveState != ::ghg::APP_STATE_Welcome) {
+			app.Save(::ghg::SAVE_MODE_AUTO);
+			app.ActiveState						= ::ghg::APP_STATE_Home;
+		}
+		break;
+	case ::gpk::EVENT_SCREEN_Create:
+	case ::gpk::EVENT_SCREEN_Resize: {
+		::gpk::n2<uint16_t>			newMetrics				= *(const ::gpk::n2<uint16_t>*)screenEvent.Data.begin();
+		::gpk::guiUpdateMetrics(*app.DialogDesktop.GUI, newMetrics, true);
+		for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) {
+			if(app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI) ::gpk::guiUpdateMetrics(*app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI, newMetrics, true);
+			if(app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI) ::gpk::guiUpdateMetrics(*app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI, newMetrics, true);
+		}
+
+		app.RenderTargetPool.resize(16);
+		for(uint32_t iRT = 0; iRT < 16; ++iRT) {
+			app.RenderTargetPool[iRT]->resize(newMetrics);
+		}
+
+		app.Game.DrawCache.RenderTargetMetrics = newMetrics;
+		double						currentRatio			= app.Game.DrawCache.RenderTargetMetrics.y / (double)app.Game.DrawCache.RenderTargetMetrics.x;
+		double						targetRatioY			=  9 / 16.0;
+		if(currentRatio >= targetRatioY)
+			app.Game.DrawCache.RenderTargetMetrics.y = (uint16_t)(app.Game.DrawCache.RenderTargetMetrics.x * targetRatioY + .1f);
+		else 
+			app.Game.DrawCache.RenderTargetMetrics.x = (uint16_t)(app.Game.DrawCache.RenderTargetMetrics.y / targetRatioY + .1f);
+		}
+		break;
+	}
+	return 0;
+}
+
+static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::gpk::SSystemEvent & sysEvent) { 
+	switch(sysEvent.Type) {
+	default: break;
+	case ::gpk::SYSTEM_EVENT_Screen:
+		es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { return processScreenEvent(app, screenEvent); })));
+		break;
+	}
+	return 0;
+}
+
+::gpk::error_t			ghg::galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::vpobj<::gpk::SSystemEvent> & systemEventsNew, const ::gpk::view<::gpk::SSysEvent> & systemEventsOld) {
 	if(app.ActiveState == ::ghg::APP_STATE_Quit)
 		return 1;
 
-	for(uint32_t iEvent = 0; iEvent < systemEvents.size(); ++iEvent) {
-		const ::gpk::SSysEvent				& eventToProcess				= systemEvents[iEvent];
+	gpk_necs(systemEventsNew.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
+
+	for(uint32_t iEvent = 0; iEvent < systemEventsOld.size(); ++iEvent) {
+		const ::gpk::SSysEvent				& eventToProcess				= systemEventsOld[iEvent];
 		switch(eventToProcess.Type) {
-		case gpk::SYSEVENT_WINDOW_RESIZE: {
-			::gpk::n2<uint16_t>			newMetrics						= *(const ::gpk::n2<uint16_t>*)eventToProcess.Data.begin();
-			::gpk::guiUpdateMetrics(*app.DialogDesktop.GUI, newMetrics, true);
-			for(uint32_t iPlayer = 0; iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) {
-				if(app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI) ::gpk::guiUpdateMetrics(*app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI, newMetrics, true);
-				if(app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI) ::gpk::guiUpdateMetrics(*app.UIPlay.PlayerUI[iPlayer].DialogPlay.GUI, newMetrics, true);
-			}
-
-			app.RenderTargetPool.resize(16);
-			for(uint32_t iRT = 0; iRT < 16; ++iRT) {
-				app.RenderTargetPool[iRT]->resize(newMetrics);
-			}
-
-			app.Game.DrawCache.RenderTargetMetrics = newMetrics;
-			double								currentRatio					= app.Game.DrawCache.RenderTargetMetrics.y / (double)app.Game.DrawCache.RenderTargetMetrics.x;
-			double								targetRatioY					=  9 / 16.0;
-			if(currentRatio >= targetRatioY)
-				app.Game.DrawCache.RenderTargetMetrics.y = (uint16_t)(app.Game.DrawCache.RenderTargetMetrics.x * targetRatioY + .1f);
-			else 
-				app.Game.DrawCache.RenderTargetMetrics.x = (uint16_t)(app.Game.DrawCache.RenderTargetMetrics.y / targetRatioY + .1f);
-			break;
-		}
-		//case ::gpk::SYSEVENT_MOUSE_POSITION:
 		case ::gpk::SYSEVENT_CHAR:
 			if(eventToProcess.Data[0] >= 0x20 && eventToProcess.Data[0] <= 0x7F) {
 				if(app.ActiveState == ::ghg::APP_STATE_Welcome)
@@ -52,6 +78,7 @@
 					for(uint32_t iPlayer = 0; iPlayer < app.TunerPlayerCount->ValueCurrent; ++iPlayer) {
 						if(app.UIPlay.PlayerUI[iPlayer].InputBox.Editing) {
 							editing = true;
+							break;
 						}
 					}
 					if(!editing) {
@@ -61,12 +88,6 @@
 				}
 			}
 			break;
-		case ::gpk::SYSEVENT_WINDOW_CLOSE:
-		case ::gpk::SYSEVENT_WINDOW_DEACTIVATE: 
-			if(app.ActiveState != ::ghg::APP_STATE_Welcome) {
-				app.Save(::ghg::SAVE_MODE_AUTO);
-				app.ActiveState						= ::ghg::APP_STATE_Home;
-			}
 		}
 	}
 	switch(app.ActiveState) {
@@ -77,7 +98,7 @@
 		::gpk::aobj<::gpk::apod<char>>					fileNames					= {};
 		::gpk::pathList(app.SavegameFolder, fileNames, app.ExtensionSaveAuto);
 		if(fileNames.size()) {
-			if errored(::ghg::solarSystemLoad(app.Game, fileNames[0])) {
+			if(errored(::ghg::solarSystemLoad(app.Game, fileNames[0]))) {
 				app.Game.PilotsReset();
 			}
 		}
@@ -173,7 +194,7 @@
 		//}
 	}
 
-	::ghg::solarSystemUpdate(app.Game, (false == inGame) ? 0 : lastTimeSeconds, *inputState, systemEvents);
+	::ghg::solarSystemUpdate(app.Game, (false == inGame) ? 0 : lastTimeSeconds, *inputState, systemEventsOld);
 	for(uint32_t iShip = 0; iShip < app.Game.ShipState.ShipOrbiterActionQueue.size(); ++iShip)
 		if(iShip < app.Game.PlayState.CountPlayers) {
 			for(uint32_t iEvent = 0; iEvent < app.Game.ShipState.ShipOrbiterActionQueue[iShip].size(); ++iEvent)
@@ -184,11 +205,11 @@
 		}
 	//::ghg::overlayUpdate(app.Overlay, app.World.PlayState.Stage, app.World.ShipState.ShipCores.size() ? app.World.ShipState.ShipCores[0].Score : 0, app.World.PlayState.TimeWorld);
 
-	app.ActiveState					= (::ghg::APP_STATE)::ghg::guiUpdate(app, systemEvents);
+	app.ActiveState					= (::ghg::APP_STATE)::ghg::guiUpdate(app, systemEventsOld);
 	return 0;
 }
 
-::gpk::error_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::n2<uint16_t> renderTargetSize) {
+::gpk::error_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::n2u16 renderTargetSize) {
 	if(app.ActiveState < 2)
 		return 0;
 

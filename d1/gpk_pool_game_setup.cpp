@@ -22,7 +22,7 @@
 	gpk_necs(::gpk::inflateToMemory(filename, inflated));
 
 	::gpk::vcu8					viewSerialized			= {(const uint8_t*)inflated.begin(), inflated.size()};
-	if errored(world.Load(viewSerialized)) {
+	if (errored(world.Load(viewSerialized))) {
 		es_if(errored(::d1p::poolGameReset(world)));
 		return -1;
 	}

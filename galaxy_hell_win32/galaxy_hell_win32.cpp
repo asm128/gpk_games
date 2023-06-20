@@ -36,9 +36,9 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Galaxy Hell v0.4");
 
 ::gpk::error_t			cleanup				(::SApplication & app)						{ 
 	::gpk::SFramework			& framework			= app.Framework;
-	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, framework.RootWindow.EventQueueOld);
+	::gpk::SWindow				& mainWindow		= framework.RootWindow;
+	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, mainWindow.EventQueueNew, mainWindow.EventQueueOld);
 	app.AudioState.CleanupAudio(); 
-
 
 	// --- when the rendering context is no longer needed ...   
  	// make the rendering context not current  
@@ -186,10 +186,6 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 
 	for(uint32_t iEvent = 0; iEvent < framework.RootWindow.EventQueueOld.size(); ++iEvent) {
 		switch(framework.RootWindow.EventQueueOld[iEvent].Type) {
-		case ::gpk::SYSEVENT_WINDOW_ACTIVATE:
-			break;
-		case ::gpk::SYSEVENT_WINDOW_DEACTIVATE:
-			break;
 		case ::gpk::SYSEVENT_SYSKEY_DOWN:
 		case ::gpk::SYSEVENT_KEY_DOWN:
 			switch(framework.RootWindow.EventQueueOld[iEvent].Data[0]) {
@@ -201,7 +197,8 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 		}
 	}
 
-	if(1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, framework.RootWindow.EventQueueOld))
+	::gpk::SWindow				& mainWindow		= framework.RootWindow;
+	if(1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueueNew, mainWindow.EventQueueOld))
 		return ::gpk::APPLICATION_STATE_EXIT;
 
 	{

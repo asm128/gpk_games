@@ -333,13 +333,13 @@ namespace d1
 			::gpk::au8					serialized;
 			gpk_necs(::gpk::inflateToMemory(filename, serialized));
 			::gpk::vcu8					viewSerialized				= serialized;
-			if errored(MainGame.Load(viewSerialized)) {
+			if(errored(MainGame.Load(viewSerialized))) {
 				es_if(errored(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
 				return -1;
 			}
 			for(uint32_t iPlayer = 0; iPlayer < MainGame.Players.size(); ++iPlayer) {
 				::d1::SD1Player				& player					= MainGame.Players[iPlayer];
-				if errored(player.Load(viewSerialized)) {
+				if(errored(player.Load(viewSerialized))) {
 					error_printf("Failed to load player %i.", iPlayer);
 					es_if(errored(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
 					return -1;
@@ -356,7 +356,7 @@ namespace d1
 
 	};
 
-	::gpk::error_t			d1Update				(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::view<::gpk::SSysEvent> & systemEvents);
+	::gpk::error_t			d1Update				(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::vpobj<::gpk::SSystemEvent> & systemEventsNew, const ::gpk::view<::gpk::SSysEvent> & systemEvents);
 	::gpk::error_t			d1Draw					(::d1::SD1UI & appUI, ::d1::SD1Game & poolGame, ::gpk::rt<::gpk::bgra, uint32_t> & backBuffer, double totalSeconds, bool onlyGUI = false);
 
 	::gpk::error_t			guiSetup				(::d1::SD1UI & appUI, ::d1::SD1Game & appGame, const ::gpk::pobj<::gpk::SInput> & input);

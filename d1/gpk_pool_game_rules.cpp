@@ -239,9 +239,9 @@ static	::gpk::error_t	matchStart				(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p
 		const ::d1p::SEventPool		& eventToProcess		= *_eventToProcess;
 		info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));
 		switch(eventToProcess.Type) {
-		case ::d1p::POOL_EVENT_FOUL       : return ::d1p::extractAndHandle<::d1p::FOUL       >(eventToProcess, [&pool, &outputEvents](auto ev){ gpk_necs(::handleFOUL       (pool, ev, outputEvents)); return 0; } ); 
-		case ::d1p::POOL_EVENT_BALL_EVENT : return ::d1p::extractAndHandle<::d1p::BALL_EVENT >(eventToProcess, [&pool, &outputEvents](auto ev){ gpk_necs(::handleBALL_EVENT (pool, ev, outputEvents)); return 0; } ); 
-		case ::d1p::POOL_EVENT_MATCH_EVENT: return ::d1p::extractAndHandle<::d1p::MATCH_EVENT>(eventToProcess, [&pool, &outputEvents](auto ev){ gpk_necs(::handleMATCH_EVENT(pool, ev, outputEvents)); return 0; } ); 
+		case ::d1p::POOL_EVENT_FOUL       : return ::d1p::eventExtractAndHandle<::d1p::FOUL       >(eventToProcess, [&pool, &outputEvents](auto ev){ gpk_necs(::handleFOUL       (pool, ev, outputEvents)); return 0; } ); 
+		case ::d1p::POOL_EVENT_BALL_EVENT : return ::d1p::eventExtractAndHandle<::d1p::BALL_EVENT >(eventToProcess, [&pool, &outputEvents](auto ev){ gpk_necs(::handleBALL_EVENT (pool, ev, outputEvents)); return 0; } ); 
+		case ::d1p::POOL_EVENT_MATCH_EVENT: return ::d1p::eventExtractAndHandle<::d1p::MATCH_EVENT>(eventToProcess, [&pool, &outputEvents](auto ev){ gpk_necs(::handleMATCH_EVENT(pool, ev, outputEvents)); return 0; } ); 
 		default: 
 			gpk_warning_unhandled_event(eventToProcess); 
 			return 0;

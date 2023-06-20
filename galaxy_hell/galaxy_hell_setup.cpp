@@ -21,7 +21,7 @@
 	gpk_necs(::gpk::inflateToMemory(filename, serialized));
 
 	::gpk::vcu8					viewSerialized			= serialized;
-	if errored(world.Load(viewSerialized)) {
+	if (errored(world.Load(viewSerialized))) {
 		gpk_necs(::ghg::solarSystemReset(world));
 		return -1;
 	}
