@@ -190,8 +190,6 @@ namespace ghg
 
 		::gpk::SEngine				Engine;
 
-		::gpk::SRigidBodyIntegrator	ShipPhysics			= {};
-
 		::ghg::SEntitySystem		EntitySystem		= {};
 		::ghg::SShipScene			Scene				= {};
 
@@ -208,9 +206,9 @@ namespace ghg
 				, ShipCoreToEntityMap
 				, ShipPartToEntityMap
 			);
-			Engine						= {};
+			Engine.Integrator.Clear();
+			Engine.Entities.clear();
 
-			ShipPhysics					= {};
 			EntitySystem				= {};
 			return 0;
 		}
@@ -237,19 +235,21 @@ namespace ghg
 			return totalHealth;
 		}
 
-		::gpk::n3f32&				GetShipPosition		(const SShipCore & ship)	{ return ShipPhysics.Centers[EntitySystem.Entities[ship.Entity].Body].Position; }
+		::gpk::n3f32&				GetShipPosition		(const SShipCore & ship)			{ return Engine.Integrator.Centers[EntitySystem.Entities[ship.Entity].Body].Position; }
+		const ::gpk::n3f32&			GetShipPosition		(const SShipCore & ship)	const	{ return Engine.Integrator.Centers[EntitySystem.Entities[ship.Entity].Body].Position; }
+		inline	::gpk::n3f32&		GetShipPosition		(uint32_t indexShip)				{ return GetShipPosition(ShipCores[indexShip]); }
+		inline	const ::gpk::n3f32&	GetShipPosition		(uint32_t indexShip)		const	{ return GetShipPosition(ShipCores[indexShip]); }
 
 		::gpk::error_t				GetShipPosition		(uint32_t iShip, ::gpk::n3f32 & output) const {
-			output = ShipPhysics.Centers[EntitySystem.Entities[ShipCores[iShip].Entity].Body].Position;
+			output = Engine.Integrator.Centers[EntitySystem.Entities[ShipCores[iShip].Entity].Body].Position;
 			return 0;
 		}
 		
-		::gpk::SBodyCenter&			GetOrbiterTransform	(const SOrbiter & shipPart)	{ return ShipPhysics.Centers	[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
-		::gpk::SBodyForces&			GetShipOrbiterForces(const SOrbiter & shipPart)	{ return ShipPhysics.Forces		[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
+		::gpk::SBodyCenter&			GetOrbiterTransform	(const SOrbiter & shipPart)		{ return Engine.Integrator.Centers[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
+		::gpk::SBodyForces&			GetShipOrbiterForces(const SOrbiter & shipPart)		{ return Engine.Integrator.Forces [EntitySystem.Entities[shipPart.Entity + 1].Body]; }
 
-		inline	::gpk::n3f32&		GetShipPosition		(uint32_t indexShip)		{ return GetShipPosition(ShipCores[indexShip]); }
 
-		::gpk::error_t				Save				(::gpk::au8 & output) const { 
+		::gpk::error_t				Save				(::gpk::au8 & output)	const	{ 
 			gpk_necs(::gpk::saveView(output, ShipScores	));
 			gpk_necs(::gpk::saveView(output, ShipCores	));
 			uint32_t						totalEntityChildren	= 0;
@@ -274,7 +274,8 @@ namespace ghg
 			for(uint32_t iWeapon = 0; iWeapon < Weapons.size(); ++iWeapon) 
 				gpk_necs(Shots[iWeapon].Save(output));
 			
-			gpk_necs(ShipPhysics	.Save(output));
+			gpk_necs(Engine.Save(output));
+
 			gpk_necs(EntitySystem	.Save(output));
 			gpk_necs(Scene			.Save(output));
 			return 0; 
@@ -303,7 +304,8 @@ namespace ghg
 			for(uint32_t iWeapon = 0; iWeapon < Weapons.size(); ++iWeapon)
 				gpk_necs(Shots[iWeapon].Load(input));
 
-			gpk_necs(ShipPhysics	.Load(input));
+			gpk_necs(Engine.Load(input));
+
 			gpk_necs(EntitySystem	.Load(input));
 			gpk_necs(Scene			.Load(input));
 			return 0; 

@@ -10,7 +10,7 @@ stacxpr	bool					BACKGROUND_3D_ONLY		= true;
 stacxpr	::gpk::n2u16			MODULE_CAMERA_SIZE		= {48, 48};
 stacxpr	::gpk::n2u16			MODULE_VIEWPORT_SIZE	= {128, 64};
 stacxpr	::gpk::n2u16			WEAPON_BAR_SIZE			= {96, 16};
-stacxpr	::gpk::n2u16			PLAYER_UI_SIZE			= {256, 40};
+stacxpr	::gpk::n2u16			PLAYER_UI_SIZE			= {320, 40};
 stacxpr	::gpk::n2u16			HOME_BUTTON_SIZE		= {160, 24};
 
 static	::gpk::error_t	guiSetupCommon		(::gpk::SGUI & gui) {
@@ -120,14 +120,18 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 		//playerGUI.Controls.Controls	[iOffset + iButton].Border	= {};
 		playerGUI.Controls.Draw		[iOffset + iButton].NoBorder	= true;
 		playerGUI.Controls.Draw		[iOffset + iButton].NoClient	= true;
+		//playerGUI.Controls.Constraints[iOffset + iButton].AttachSizeToControl.x	= ::gpk::cid_t(iOffset + iButton + 1);
 	}
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Score; iButton < iStop; ++iButton) {
 		playerGUI.Controls.Placement[iOffset + iButton].Area.Offset.y	-= int16_t(16 * iButton);
 		playerGUI.Controls.Placement[iOffset + iButton].Area.Size.y		= 24; 
+		//playerGUI.Controls.Placement[iOffset + iButton].Area.Size.x		= 24; 
+		//playerGUI.Controls.Constraints[iOffset + iButton].AttachSizeToText.x	= true;
 	}
 
 	gpk_necs(::gpk::controlFontSet(playerGUI, playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name, 10));
 	gpk_necs(::gpk::controlTextSet(playerGUI, playerDialog.Root + 1 + ::ghg::UI_PROFILE_Name, pilotName));
+	gpk_necs(::gpk::controlTextSet(playerGUI, playerDialog.Root + 1 + ::ghg::UI_PROFILE_Score, ""));
 
 	for(uint32_t iOrbiter = 0, countViewports = nShipParts; iOrbiter < countViewports; ++iOrbiter) {
 		int32_t						indexVP				= uiPlayer.ModuleViewports.push_back({});
@@ -460,8 +464,13 @@ static	::gpk::error_t	sprintfTime			(const char *prefix, char (&dest)[_nStorageS
 	return 0;
 }
 
-static	::gpk::error_t	uiPlayerUpdateHome	(::ghg::SUIPlayer & uiPlayer, uint16_t iPlayer, const ::gpk::vcc playerName, const ::gpk::bgra & shipColor, const ::ghg::SShipScore & shipScore) { 
-	sprintf_s(uiPlayer.TextScore.Storage, "%c %llu  %c %llu  %c %llu  %c %llu", 4, shipScore.Score, 94, shipScore.Shots, 1, (uint64_t)shipScore.KilledShips, 2, (uint64_t)shipScore.KilledOrbiters);
+template<size_t _bufSize>
+static	::gpk::error_t	sprintfScore		(char (&buffer)[_bufSize], const ::ghg::SShipScore & shipScore, const double nitro) { 
+	return sprintf_s(buffer, "%c %llu  %c %llu  %c %llu  %c %llu  %c %.2f", 4, shipScore.Score, 94, shipScore.Shots, 1, (uint64_t)shipScore.KilledShips, 2, (uint64_t)shipScore.KilledOrbiters, 24, nitro);
+}
+
+static	::gpk::error_t	uiPlayerUpdateHome	(::ghg::SUIPlayer & uiPlayer, uint16_t iPlayer, const ::gpk::vcc playerName, const ::gpk::bgra & shipColor, const ::ghg::SShipScore & shipScore, const double nitro) { 
+	sprintfScore(uiPlayer.TextScore.Storage, shipScore, nitro);
 	::gpk::SDialog				& playerDialog		= uiPlayer.DialogHome;
 	::gpk::SGUI					& playerGUI			= *playerDialog.GUI;
 	gpk_necs(::gpk::controlTextSet(playerGUI, playerDialog.Root + 1 + ::ghg::UI_PROFILE_Score, uiPlayer.TextScore.Storage));
@@ -485,8 +494,8 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 	::gpk::SDialog				& playerDialog		= uiPlayer.DialogPlay;
 	::gpk::SGUI					& playerGUI			= *playerDialog.GUI;
 
-	sprintf_s(uiPlayer.TextScore.Storage, "%c %llu  %c %llu  %c %llu  %c %llu", 4, shipScore.Score, 94, shipScore.Shots, 1, (uint64_t)shipScore.KilledShips, 2, (uint64_t)shipScore.KilledOrbiters);
 	const ::ghg::SShipCore		& shipCore			= game.ShipState.ShipCores[iPlayer];
+	sprintfScore(uiPlayer.TextScore.Storage, shipScore, shipCore.Nitro);
 	const ::gpk::rgbaf			shipColor			= (shipCore.Team ? ::gpk::RED : ::gpk::rgbaf(game.Pilots[iPlayer].Color));
 	gpk_necs(::gpk::controlTextSet(playerGUI, 1 + ::ghg::UI_PILOT_Name	, game.Pilots[iPlayer].Name));
 	gpk_necs(::gpk::controlTextSet(playerGUI, 1 + ::ghg::UI_PILOT_Score, uiPlayer.TextScore.Storage));
@@ -643,14 +652,16 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::view
 		}
 
 		::gpk::rgbaf				shipColor					= ::ghg::PLAYER_COLORS[iPlayer];
+		double						nitro						= 0;
 		if((iPlayer < app.Game.ShipState.ShipCores.size())) {
 			const ::ghg::SShipCore		& shipCore				= app.Game.ShipState.ShipCores[iPlayer];
 			shipColor				= (shipCore.Team ? ::ghg::PLAYER_COLORS[iPlayer] : app.Game.Pilots[iPlayer].Color);
+			nitro					= shipCore.Nitro;
 		}
 
 		gpk_necall(::uiPlayerUpdateHome(uiPlayer, int16_t(iPlayer), app.Players[iPlayer].Name, shipColor
 			, (app.Game.ShipState.ShipScores.size() <= iPlayer) ? ::ghg::SShipScore{} : app.Game.ShipState.ShipScores[iPlayer]
-			), "iPlayer: %i", iPlayer
+			, nitro), "iPlayer: %i", iPlayer
 		);
 
 		::gpk::acid					controlsToProcess			= {};

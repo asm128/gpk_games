@@ -42,9 +42,9 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 		::ghg::SGHEntity			entity					= {-1};
 		entity					= {-1};
 		entity.Geometry			= -1;	//1 + (iGeometry % 5);
-		entity.Transform		= scene.Transforms.push_back(shipState.ShipPhysics.MatrixIdentity4);
+		entity.Transform		= scene.Transforms.push_back(shipState.Engine.Integrator.MatrixIdentity4);
 		entity.Image			= -1;	//iImage % 5;
-		entity.Body				= shipState.ShipPhysics.Create();
+		entity.Body				= shipState.Engine.Integrator.Create();
 		ship.Entity				= shipState.EntitySystem.Create(entity, {});
 		ship.Team				= teamId;
 		//const int32_t				indexBody				= shipState.ShipPhysics.Create(); 
@@ -60,9 +60,9 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 		::ghg::SGHEntity			entityPart				= {-1};
 		entityOrbit.Parent		= ship.Entity;
 		entityOrbit.Geometry	= -1;
-		entityOrbit.Transform	= scene.Transforms.push_back(shipState.ShipPhysics.MatrixIdentity4);
+		entityOrbit.Transform	= scene.Transforms.push_back(shipState.Engine.Integrator.MatrixIdentity4);
 		entityOrbit.Image		= -1;
-		entityOrbit.Body		= ::gpk::createOrbiter(shipState.ShipPhysics
+		entityOrbit.Body		= ::gpk::createOrbiter(shipState.Engine.Integrator
 			, 1		//PLANET_MASSES				[iPlanet]
 			, 2.5	//PLANET_DISTANCE			[iPlanet]
 			, 0		//PLANET_AXIALTILT			[iPlanet]
@@ -72,12 +72,11 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 			, 0		//PLANET_ORBITALINCLINATION	[iPlanet]
 			, 1		//1.0 / PLANET_DISTANCE		[PLANET_COUNT - 1] * 2500
 			);
-		shipState.ShipPhysics.Centers[entityOrbit.Body].Orientation	= {};
-		shipState.ShipPhysics.Centers[entityOrbit.Body].Orientation.MakeFromEuler(0, (float)(::gpk::math_2pi / countParts * iPart), 0);
+		shipState.Engine.Integrator.Centers[entityOrbit.Body].Orientation.MakeFromEuler(0, (float)(::gpk::math_2pi / countParts * iPart), 0);
 
 		entityPart.Parent		= shipState.EntitySystem.Create(entityOrbit, {});
 		entityPart.Geometry		= iGeometry;
-		entityPart.Transform	= scene.Transforms.push_back(shipState.ShipPhysics.MatrixIdentity4);
+		entityPart.Transform	= scene.Transforms.push_back(shipState.Engine.Integrator.MatrixIdentity4);
 		entityPart.Image		= iImage % shipState.Scene.Image.size();
 		entityPart.Body			= entityOrbit.Body + 1;
 		int32_t						indexEntityPart			= shipState.EntitySystem.Create(entityPart, {});
@@ -230,6 +229,9 @@ static	::gpk::error_t	shipNodeCreateRoot	(::gpk::SRenderNodeManager & nodes, ::g
 	gpk::SMeshManager			& meshes			= graphics.Meshes;
 	const uint32_t				rootNode			= (uint32_t)nodes.Create();
 	nodes[rootNode].Mesh	= (uint32_t)meshes.Create();
+	meshes[nodes[rootNode].Mesh]->ConstantBuffers.clear();
+	meshes[nodes[rootNode].Mesh]->Desc.Type			= ::gpk::GEOMETRY_TYPE_Triangle;
+	meshes[nodes[rootNode].Mesh]->Desc.Mode			= ::gpk::MESH_MODE_List;
 	return rootNode;
 }
 
@@ -266,7 +268,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 	::shipNodeBuildShred		(nodes, *graphics);
 
 	//::gpk::geometryBuildCube		(scene.Geometry[::ghg::SHIP_GEOMETRY_CUBE			], {1, 1, 1});
-	//::gpk::geometryBuildSphere		(scene.Geometry[::ghg::SHIP_GEOMETRY_SPHERE			], 16U, 16U, .5f, {0, 0});
+	//::gpk::geometryBuildSphere	(scene.Geometry[::ghg::SHIP_GEOMETRY_SPHERE			], 16U, 16U, .5f, {0, 0});
 	//::gpk::geometryBuildCylinder	(scene.Geometry[::ghg::SHIP_GEOMETRY_CYLINDER		],  1U, 32U, .5, .5, {0, 0}, {1, 1, 1});
 
 	return 0;
@@ -365,7 +367,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 			for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.CountPlayers; ++iPlayer) {
 				const int32_t				indexShip						= ::shipCreate(solarSystem.ShipState, 0, 0, iPlayer);
 				::ghg::SShipCore			& playerShip					= solarSystem.ShipState.ShipCores[indexShip];
-				::gpk::SBodyCenter			& shipPivot						= solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[playerShip.Entity].Body];
+				::gpk::SBodyCenter			& shipPivot						= solarSystem.ShipState.Engine.Integrator.Centers[solarSystem.ShipState.EntitySystem.Entities[playerShip.Entity].Body];
 				shipPivot.Orientation.MakeFromEuler({0, 0, (float)(-::gpk::math_pi_2)});
 				shipPivot.Position		= {-30};
 				shipPivot.Position.z = float(solarSystem.PlayState.CountPlayers * 30) / 2 - iPlayer * 30;
@@ -376,12 +378,12 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 			int32_t						indexShip						= ::shipCreate(solarSystem.ShipState, 1, -1, solarSystem.PlayState.Stage + solarSystem.ShipState.ShipCores.size());
 			::ghg::SShipCore			& enemyShip						= solarSystem.ShipState.ShipCores[indexShip];
 			::gpk::au16					& enemyShipOrbiters				= solarSystem.ShipState.ShipParts[indexShip];
-			::gpk::SBodyCenter			& shipTransform					= solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[enemyShip.Entity].Body];
+			::gpk::SBodyCenter			& shipTransform					= solarSystem.ShipState.Engine.Integrator.Centers[solarSystem.ShipState.EntitySystem.Entities[enemyShip.Entity].Body];
 			shipTransform.Orientation.MakeFromEuler({0, 0, (float)(::gpk::math_pi_2)});
 			shipTransform.Position	= {5.0f + 5 * solarSystem.ShipState.ShipCores.size()};
 			for(uint32_t iPart = 0; iPart < enemyShipOrbiters.size(); ++iPart) {
 				const ::ghg::SOrbiter		& shipPart					= solarSystem.ShipState.Orbiters[enemyShipOrbiters[iPart]];
-				solarSystem.ShipState.ShipPhysics.Forces[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body].Rotation.y	*= float(1 + indexShip * .35);
+				solarSystem.ShipState.Engine.Integrator.Forces[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body].Rotation.y	*= float(1 + indexShip * .35);
 			}
 		}
 
@@ -447,7 +449,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 				const uint32_t				depth		= ::gpk::get_value_count<::ghg::SHIP_PART_TYPE>();
 				solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Image	= iShip * width * height * depth + shipPart.Type * width * height + newWeapon.Type * width + newWeapon.Load;
 				solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Image	%= solarSystem.ShipState.Scene.Image.size();
-				solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Body].Orientation = {0, 0, 0, 1};
+				solarSystem.ShipState.Engine.Integrator.Centers[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Body].Orientation = {0, 0, 0, 1};
 			}
 		}
 	}

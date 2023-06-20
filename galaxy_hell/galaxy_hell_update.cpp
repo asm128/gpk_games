@@ -281,7 +281,7 @@ static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int
 				}
 
 				if(solarSystem.PlayState.TimeStage > 1) {
-					solarSystem.ShipState.ShipPhysics.Forces[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Body].Rotation	= {};
+					solarSystem.ShipState.Engine.Integrator.Forces[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Body].Rotation	= {};
 					::gpk::m4f32			inverseTransform			= shipModuleMatrix.GetInverse();
 					::gpk::SBodyCenter		& shipModuleTransform		= solarSystem.ShipState.GetOrbiterTransform(shipPart);
 					::gpk::n3f32			up							= {1, 0, 0};
@@ -328,7 +328,7 @@ static	::gpk::error_t	shipsUpdate				(::ghg::SGalaxyHell & solarSystem, double s
 		if(0 >= ship.Health)
 			continue;
 		::gpk::au16					& shipParts				= solarSystem.ShipState.ShipParts[iShip];
-		::gpk::SBodyCenter			& shipTransform			= solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[ship.Entity].Body];
+		::gpk::SBodyCenter			& shipTransform			= solarSystem.ShipState.Engine.Integrator.Centers[solarSystem.ShipState.EntitySystem.Entities[ship.Entity].Body];
 		if(ship.Team) { 
 			playing					= 1;
 
@@ -397,11 +397,12 @@ static	::gpk::error_t	processInput			(::ghg::SGalaxyHell & solarSystem, double s
 	if(solarSystem.ShipState.EntitySystem.Entities.size()) {
 		for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.CountPlayers; ++iPlayer) {
 			const ::ghg::SShipController	& shipController		= controllers[iPlayer];
-			::gpk::SBodyCenter				& playerBody			= solarSystem.ShipState.ShipPhysics.Centers[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCores[iPlayer].Entity].Body];
+			::gpk::SBodyCenter				& playerBody			= solarSystem.ShipState.Engine.Integrator.Centers[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCores[iPlayer].Entity].Body];
 			::ghg::SShipCore				& ship					= solarSystem.ShipState.ShipCores[iPlayer];
 			bool							turbo					= shipController.Turbo;
 			double							speedMultiplier			= 1;
-			ship.Nitro					+= (float)(secondsLastFrame * .1);
+			if(ship.Nitro < ship.MaxNitro)
+				ship.Nitro					+= (float)(secondsLastFrame * .1);
 			if(ship.Nitro > 0 && turbo) {
 				ship.Nitro					-= (float)secondsLastFrame;
 				speedMultiplier				*= 2;
@@ -499,14 +500,14 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 	for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
 		::gpk::au16					& shipParts				= solarSystem.ShipState.ShipParts[iShip];
 		const uint32_t				iBody					= solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCores[iShip].Entity].Body;
-		solarSystem.ShipState.ShipPhysics.SetActive (iBody, true);
-		solarSystem.ShipState.ShipPhysics.Flags		[iBody].UpdatedTransform	= false;
+		solarSystem.ShipState.Engine.Integrator.SetActive (iBody, true);
+		solarSystem.ShipState.Engine.Integrator.Flags		[iBody].UpdatedTransform	= false;
 		for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
 			::ghg::SOrbiter				& shipPart				= solarSystem.ShipState.Orbiters[shipParts[iPart]];
 			::std::lock_guard			lockUpdate				(solarSystem.LockUpdate);
 			memcpy(solarSystem.ShipState.Shots[shipPart.Weapon].PositionDraw.begin(), solarSystem.ShipState.Shots[shipPart.Weapon].Particles.Position.begin(), solarSystem.ShipState.Shots[shipPart.Weapon].Particles.Position.size() * sizeof(::gpk::n3f32));
-			solarSystem.ShipState.ShipPhysics.SetActive(solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body, true);
-			solarSystem.ShipState.ShipPhysics.Flags[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body].UpdatedTransform	= false;
+			solarSystem.ShipState.Engine.Integrator.SetActive(solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body, true);
+			solarSystem.ShipState.Engine.Integrator.Flags[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body].UpdatedTransform	= false;
 		}
 	}
 
@@ -546,7 +547,7 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 		solarSystem.PlayState.TimeStage	+= secondsLastFrame;
 		solarSystem.PlayState.TimeWorld	+= secondsLastFrame;
 
-		solarSystem.ShipState.ShipPhysics.Integrate(secondsLastFrame);
+		solarSystem.ShipState.Engine.Integrator.Integrate(secondsLastFrame);
 
 		bool						playing				= shipsUpdate(solarSystem, secondsLastFrame);
 		if(false == playing) {
@@ -567,7 +568,7 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 		for(uint32_t iEntity = 0; iEntity < solarSystem.ShipState.EntitySystem.Entities.size(); ++iEntity) {
 			const ::ghg::SGHEntity		& entity			= solarSystem.ShipState.EntitySystem.Entities[iEntity];
 			if(-1 == entity.Parent)	// process root entities
-				updateEntityTransforms(iEntity, solarSystem.ShipState.EntitySystem.Entities, solarSystem.ShipState.EntitySystem.EntityChildren, solarSystem.ShipState.Scene, solarSystem.ShipState.ShipPhysics);
+				::updateEntityTransforms(iEntity, solarSystem.ShipState.EntitySystem.Entities, solarSystem.ShipState.EntitySystem.EntityChildren, solarSystem.ShipState.Scene, solarSystem.ShipState.Engine.Integrator);
 		}
 		secondsToProcess		-= secondsLastFrame;
 	}

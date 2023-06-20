@@ -351,7 +351,7 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 	constexpr ::gpk::bgra								colorLightEnemy			= ::gpk::bgra{0xFF, 0x88, 0x88};
 	for(uint32_t iShip = 0; iShip < shipState.ShipCores.size(); ++iShip) {
 		const ::ghg::SShipCore									& ship					= shipState.ShipCores[iShip];
-		lightPoints.push_back(shipState.ShipPhysics.Centers[shipState.EntitySystem.Entities[ship.Entity].Body].Position);
+		lightPoints.push_back(shipState.GetShipPosition(ship));
 		lightColors.push_back((0 == shipState.ShipCores[iShip].Team) ? colorLightPlayer : colorLightEnemy);
 		for(uint32_t iPart = 0; iPart < shipState.ShipParts[iShip].size(); ++iPart) {
 			const ::ghg::SOrbiter									& shipPart				= shipState.Orbiters[shipState.ShipParts[iShip][iPart]];
