@@ -19,13 +19,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "D1");
 ::gpk::error_t			cleanup					(::SApplication & app)											{
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::SWindow				& mainWindow			= framework.RootWindow;
-	::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueueNew, mainWindow.EventQueueOld);
+	::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue);
 #if !defined(DISABLE_D3D11)
 	app.D3DApp.Shutdown();
 #endif
 
 	::gpk::mainWindowDestroy(mainWindow);
-	::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueueNew, mainWindow.EventQueueOld);
+	::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue);
 	return 0;
 }
 
@@ -75,9 +75,9 @@ static	::gpk::error_t	processSystemEventNew	(::SApplication & app, const ::gpk::
 	mainWindow.Size			= {1280, 720};
 	gpk_necs(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input));
 
-	gpk_necs(mainWindow.EventQueueNew.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEventNew(app, *sysEvent); }));
+	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEventNew(app, *sysEvent); }));
 
-	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueueNew, mainWindow.EventQueueOld));
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue));
 
 	return 0;
 }
@@ -90,12 +90,12 @@ static	::gpk::error_t	processSystemEventNew	(::SApplication & app, const ::gpk::
 
 	::gpk::SWindow				& mainWindow			= app.Framework.RootWindow;
 
-	gpk_necs(mainWindow.EventQueueNew.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEventNew(app, *sysEvent); }));
+	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEventNew(app, *sysEvent); }));
 
 	::gpk::SFrameInfo			& frameInfo				= framework.FrameInfo;
 	{
 		::gpk::STimer				timer					= {};
-		rvis_if(::gpk::APPLICATION_STATE_EXIT, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueueNew, mainWindow.EventQueueOld))
+		rvis_if(::gpk::APPLICATION_STATE_EXIT, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue))
 
 		timer.Frame();
 		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);

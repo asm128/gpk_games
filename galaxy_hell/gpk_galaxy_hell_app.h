@@ -368,9 +368,9 @@ namespace ghg
 	};
 
 	::gpk::error_t	guiSetup			(::ghg::SGalaxyHellApp & gameui, const ::gpk::pobj<::gpk::SInput> & inputState);
-	::gpk::error_t	guiUpdate			(::ghg::SGalaxyHellApp & gameui, const ::gpk::view<::gpk::SSysEvent> & sysEvents);
+	::gpk::error_t	guiUpdate			(::ghg::SGalaxyHellApp & gameui, ::gpk::vpobj<::gpk::SSystemEvent> sysEvents);
 	
-	::gpk::error_t	galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::vpobj<::gpk::SSystemEvent> & systemEventsNew, const ::gpk::view<::gpk::SSysEvent> & systemEvents);
+	::gpk::error_t	galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEventsNew);
 	::gpk::error_t	galaxyHellDraw		(::ghg::SGalaxyHellApp & app, ::gpk::n2u16 renderTargetSize);
 
 	::gpk::error_t	listFilesSavegame	(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames);

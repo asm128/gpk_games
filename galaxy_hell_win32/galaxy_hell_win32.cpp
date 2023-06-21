@@ -34,10 +34,50 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Galaxy Hell v0.4");
 
+static	::gpk::error_t	processScreenEvent		(::SApplication & /*app*/, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
+	switch(screenEvent.Type) {
+	default: break;
+	case ::gpk::EVENT_SCREEN_Create:
+//#if !defined(DISABLE_D3D11)
+//		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.D1.MainGame.Pool.Engine.Scene->Graphics));
+//#endif
+	case ::gpk::EVENT_SCREEN_Resize: 
+		//gpk_necs(::updateSizeDependentResources(app));
+		break;
+	}
+	return 0;
+}
+
+static	::gpk::error_t	processKeyboardEvent	(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
+	switch(screenEvent.Type) {
+	default: break;
+	case ::gpk::EVENT_KEYBOARD_Down:
+	case ::gpk::EVENT_KEYBOARD_SysDown:
+		switch(screenEvent.Data[0]) {
+		case VK_RETURN:
+			if(GetAsyncKeyState(VK_MENU) & 0xFFF0)
+				gpk_necs(::gpk::fullScreenToggle(app.Framework.RootWindow));
+			break;
+		}
+		break;
+	}
+	return 0;
+}
+
+static	::gpk::error_t	processSystemEventNew	(::SApplication & app, const ::gpk::SSystemEvent & sysEvent) { 
+	switch(sysEvent.Type) {
+	default: break;
+	case ::gpk::SYSTEM_EVENT_Screen:
+		es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { return processScreenEvent(app, screenEvent); })));
+		break;
+	}
+	return 0;
+}
+
 ::gpk::error_t			cleanup				(::SApplication & app)						{ 
 	::gpk::SFramework			& framework			= app.Framework;
 	::gpk::SWindow				& mainWindow		= framework.RootWindow;
-	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, mainWindow.EventQueueNew, mainWindow.EventQueueOld);
+	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, mainWindow.EventQueue);
 	app.AudioState.CleanupAudio(); 
 
 	// --- when the rendering context is no longer needed ...   
@@ -139,6 +179,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	mainWindow.Size			= {1280, 720};
 
 	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
+	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEventNew(app, *sysEvent); }));
 
 	srand((uint32_t)time(0));
 
@@ -180,26 +221,15 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 }
 
 ::gpk::error_t			update				(SApplication & app, bool exitSignal)	{
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, exitSignal);
+
 	::gpk::SFramework			& framework			= app.Framework;
-	//::gpk::STimer				timer;
-	retval_ginfo_if(::gpk::APPLICATION_STATE_EXIT, exitSignal, "%s", "Exit requested by runtime.");
-
-	for(uint32_t iEvent = 0; iEvent < framework.RootWindow.EventQueueOld.size(); ++iEvent) {
-		switch(framework.RootWindow.EventQueueOld[iEvent].Type) {
-		case ::gpk::SYSEVENT_SYSKEY_DOWN:
-		case ::gpk::SYSEVENT_KEY_DOWN:
-			switch(framework.RootWindow.EventQueueOld[iEvent].Data[0]) {
-			case VK_RETURN:
-				if(GetAsyncKeyState(VK_MENU) & 0xFFF0)
-					gpk_necs(::gpk::fullScreenToggle(app.Framework.RootWindow));
-				break;
-			}
-		}
-	}
-
 	::gpk::SWindow				& mainWindow		= framework.RootWindow;
-	if(1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueueNew, mainWindow.EventQueueOld))
-		return ::gpk::APPLICATION_STATE_EXIT;
+	//::gpk::STimer				timer;
+
+	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEventNew(app, *sysEvent); }));
+
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, 1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue));
 
 	{
 		::std::lock_guard			lockRTQueue	(app.GalaxyHellApp.RenderTargetLockQueue);

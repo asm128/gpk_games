@@ -227,7 +227,7 @@ static	::gpk::error_t	guiHandleHome				(::d1::SD1 & app, ::gpk::SGUI & gui, uint
 	return appState;
 }
 
-::d1::APP_STATE			d1::guiUpdate				(::d1::SD1 & app, ::gpk::view<::gpk::SSysEvent> sysEvents) {
+::d1::APP_STATE			d1::guiUpdate				(::d1::SD1 & app, ::gpk::vpobj<::gpk::SSystemEvent> sysEvents) {
 	::gpk::SDialog				& dialog					= app.AppUI.Dialog;
 	::gpk::guiProcessInput(*dialog.GUI, *dialog.Input, sysEvents); 
 	

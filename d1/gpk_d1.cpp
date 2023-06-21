@@ -1,6 +1,8 @@
 #include "gpk_d1.h"
 #include "gpk_pool_game_update.h"
 #include "gpk_path.h"
+#include "gpk_event_screen.h"
+
 
 static	::gpk::error_t	d1Setup				(::d1::SD1UI & appUI, ::d1::SD1Game & game, const ::gpk::pobj<::gpk::SInput> & inputState) { 
 	gpk_necs(::d1p::poolGameSetup(game.Pool));
@@ -260,28 +262,27 @@ static	::gpk::error_t	processScreenEvent		(::d1::SD1 & app, const ::gpk::SEventV
 
 }
 
-static	::gpk::error_t	processSystemEvent		(::d1::SD1 & app, const ::gpk::SSystemEvent & sysEvent) { 
-	switch(sysEvent.Type) {
+static	::gpk::error_t	processTextEvent		(::d1::SD1 & app, const ::gpk::SEventView<::gpk::EVENT_TEXT> & screenEvent) { 
+	switch(screenEvent.Type) {
 	default: break;
-	case ::gpk::SYSTEM_EVENT_Screen:
-		es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { return processScreenEvent(app, screenEvent); })));
+	case ::gpk::EVENT_TEXT_Char:
+		if(screenEvent.Data[0] >= 0x20 && screenEvent.Data[0] <= 0x7F) {
+			if(app.ActiveState == ::d1::APP_STATE_Welcome)
+				app.AppUI.NameEditBox.Text.push_back(screenEvent.Data[0]);
+		}
 		break;
 	}
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent		(::d1::SD1 & app, const ::gpk::SSysEvent & eventToProcess) { 
-	switch(eventToProcess.Type) {
-	case ::gpk::SYSEVENT_CHAR:
-		if(eventToProcess.Data[0] >= 0x20 && eventToProcess.Data[0] <= 0x7F) {
-			if(app.ActiveState == ::d1::APP_STATE_Home)
-				app.AppUI.NameEditBox.Text.push_back(eventToProcess.Data[0]);
-		}
-		break;
-	case ::gpk::SYSEVENT_KEY_DOWN:
-		if(eventToProcess.Data[0] == VK_ESCAPE) {
-			if(app.ActiveState != ::d1::APP_STATE_Home)
+static	::gpk::error_t	processKeyboardEvent	(::d1::SD1 & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
+	switch(screenEvent.Type) {
+	default: break;
+	case ::gpk::EVENT_KEYBOARD_Down:
+		if(screenEvent.Data[0] == VK_ESCAPE) {
+			if(app.ActiveState != ::d1::APP_STATE_Home) {
 				app.StateSwitch(::d1::APP_STATE_Home);
+			}
 			else { 
 				if(!app.AppUI.NameEditBox.Editing) {
 					app.StateSwitch(::d1::APP_STATE_Play);
@@ -291,7 +292,16 @@ static	::gpk::error_t	processSystemEvent		(::d1::SD1 & app, const ::gpk::SSysEve
 		break;
 	}
 	return 0;
-};
+}
+static	::gpk::error_t	processSystemEvent		(::d1::SD1 & app, const ::gpk::SSystemEvent & sysEvent) { 
+	switch(sysEvent.Type) {
+	default: break;
+	case ::gpk::SYSTEM_EVENT_Screen		: es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN	>(sysEvent, [&app](auto ev) { return processScreenEvent		(app, ev); }))); break;
+	case ::gpk::SYSTEM_EVENT_Text		: es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_TEXT		>(sysEvent, [&app](auto ev) { return processTextEvent		(app, ev); }))); break;
+	case ::gpk::SYSTEM_EVENT_Keyboard	: es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_KEYBOARD	>(sysEvent, [&app](auto ev) { return processKeyboardEvent	(app, ev); }))); break;
+	}
+	return 0;
+}
 
 static	::gpk::error_t	resetCameraBallCue			(::d1p::SPoolGame & poolGame, ::d1::SCamera & cameraBall) {
 	poolGame.GetBallPosition(0, cameraBall.Target);
@@ -478,14 +488,9 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 }
 
 
-::gpk::error_t				d1::d1Update		(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::vpobj<::gpk::SSystemEvent> & systemEventsNew, const ::gpk::view<::gpk::SSysEvent> & systemEventsOld) { 
+::gpk::error_t				d1::d1Update		(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEventsNew) { 
 	::d1::SD1Game					& clientGame		= app.MainGame;
 
-	const ::gpk::FSysEventConst		funcEvent				= [&app](const ::gpk::SSysEvent & sysEvent) { 
-		e_if(errored(::processSystemEvent(app, sysEvent)), "Error while processing event '%s' (0x%X):", ::gpk::get_value_namep(sysEvent.Type), sysEvent.Type); 
-		return 0; 
-	};
-	gpk_necs(systemEventsOld.for_each(funcEvent));
 	gpk_necs(systemEventsNew.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
 
 	::d1p::SPoolGame				& poolGame			= clientGame.Pool;
@@ -543,7 +548,7 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 	} // APP_STATE_Play
 	} // switch
 
-	const ::d1::APP_STATE			newState			= ::d1::guiUpdate(app, systemEventsOld);
+	const ::d1::APP_STATE			newState			= ::d1::guiUpdate(app, systemEventsNew);
 	return app.StateSwitch(newState); 
 }
 

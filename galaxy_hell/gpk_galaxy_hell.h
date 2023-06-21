@@ -6,8 +6,9 @@
 
 
 #include "gpk_input.h"
-#include "gpk_sysevent.h"
 #include "gpk_label.h"
+
+#include "gpk_system_event.h"
 
 #include <mutex>
 
@@ -137,7 +138,7 @@ namespace ghg
 	::gpk::error_t						solarSystemSetup		(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2<uint16_t> & windowSize);
 	::gpk::error_t						solarSystemReset		(::ghg::SGalaxyHell & solarSystem); 
 	::gpk::error_t						solarSystemDraw			(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
-	::gpk::error_t						solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, const ::gpk::view<::gpk::SSysEvent> & frameEvents);
+	::gpk::error_t						solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SSystemEvent> frameEvents);
 	::gpk::error_t						solarSystemLoad			(::ghg::SGalaxyHell & world,::gpk::vcc filename);
 	::gpk::error_t						solarSystemSave			(const ::ghg::SGalaxyHell & world,::gpk::vcc filename);
 	
