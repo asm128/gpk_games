@@ -1,4 +1,5 @@
 #include "gpk_galaxy_hell.h"
+#include "gpk_geometry.h"
 
 #include "gpk_raster_lh.h"
 #include "gpk_gui_text.h"
@@ -151,10 +152,10 @@ static	::gpk::error_t	drawCannonball
 	, const ::gpk::n3f32			& prevPosition
 	, const ::gpk::n3f32			& _direction
 	, const ::gpk::rgbaf			& bulletColor
-	, float							animationTime
+	, const float					animationTime
 	, const ::gpk::m4f32			& matrixVP
-	, ::gpk::g8bgra	& targetPixels
-	, ::gpk::grid<uint32_t>		depthBuffer
+	, ::gpk::g8bgra					& targetPixels
+	, ::gpk::gu32					depthBuffer
 	, ::ghg::SGalaxyHellDrawCache	& drawCache
 	) {
 	uint32_t					pixelsDrawn				= 0;
@@ -329,9 +330,9 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 
 ::gpk::error_t			ghg::getLightArraysFromDebris
 	( const ::ghg::SDecoState								& decoState
-	, ::gpk::apod<::gpk::n3f32>				& lightPoints
-	, ::gpk::a8bgra					& lightColors
-	, const ::gpk::view<const ::gpk::bgra>		& debrisColors
+	, ::gpk::an3f32			& lightPoints
+	, ::gpk::a8bgra			& lightColors
+	, const ::gpk::vc8bgra	& debrisColors
 	)						{
 	for(uint32_t iParticle = 0; iParticle < decoState.Debris.Particles.Position.size(); ++iParticle) {
 		lightPoints.push_back(decoState.Debris.Particles.Position[iParticle]);
@@ -343,8 +344,8 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 
 
 ::gpk::error_t			ghg::getLightArraysFromShips
-	( const ::ghg::SShipManager							& shipState
-	, ::gpk::apod<::gpk::n3f32>			& lightPoints
+	( const ::ghg::SShipManager	& shipState
+	, ::gpk::an3f32				& lightPoints
 	, ::gpk::a8bgra				& lightColors
 	) {
 	constexpr ::gpk::bgra								colorLightPlayer		= ::gpk::bgra{0xFF, 0x88, 0xFF};
@@ -371,11 +372,11 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 }
 
 ::gpk::error_t			ghg::getLightArrays
-	( const ::ghg::SShipManager							& shipState
-	, const ::ghg::SDecoState							& decoState
-	, ::gpk::apod<::gpk::n3f32>			& lightPoints
+	( const ::ghg::SShipManager	& shipState
+	, const ::ghg::SDecoState	& decoState
+	, ::gpk::an3f32				& lightPoints
 	, ::gpk::a8bgra				& lightColors
-	, const ::gpk::view<const ::gpk::bgra>	& debrisColors
+	, const ::gpk::vc8bgra		& debrisColors
 	) {
 	::ghg::getLightArraysFromShips(shipState, lightPoints, lightColors);
 	::ghg::getLightArraysFromDebris(decoState, lightPoints, lightColors, debrisColors);
@@ -383,11 +384,11 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 }
 
 ::gpk::error_t			ghg::getLightArrays
-	( const ::gpk::n3f32							& modelPosition
-	, const ::gpk::apod<::gpk::n3f32>			& lightPointsWorld
-	, const ::gpk::a8bgra				& lightColorsWorld
-	, ::gpk::apod<::gpk::n3f32>				& lightPointsModel
-	, ::gpk::a8bgra					& lightColorsModel
+	( const ::gpk::n3f32		& modelPosition
+	, const ::gpk::vn3f32		& lightPointsWorld
+	, const ::gpk::a8bgra		& lightColorsWorld
+	, ::gpk::an3f32				& lightPointsModel
+	, ::gpk::a8bgra				& lightColorsModel
 	) {
 	::gpk::clear(lightPointsModel, lightColorsModel);
 	for(uint32_t iLightPoint = 0; iLightPoint < lightPointsWorld.size(); ++iLightPoint) {
@@ -461,8 +462,8 @@ static	::gpk::error_t	drawShip
 	( const ::ghg::SGalaxyHell		& solarSystem
 	, int32_t						iShip
 	, const ::gpk::m4f32			& matrixVP
-	, ::gpk::g8bgra	& targetPixels
-	, ::gpk::grid<uint32_t>		depthBuffer
+	, ::gpk::g8bgra					& targetPixels
+	, ::gpk::gu32					depthBuffer
 	, ::ghg::SGalaxyHellDrawCache	& drawCache
 	, const ::gpk::SRasterFont		& font
 	) {
@@ -490,10 +491,10 @@ static	::gpk::error_t	drawShip
 	const ::gpk::n2<int32_t>			pixelCoord			= {(int32_t)starPos.x, (int32_t)starPos.y};
 
 	const ::gpk::vcs					finalText			= solarSystem.Pilots[iShip].Name;
-	::gpk::rect2<int16_t>				rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
-	rectText.Offset = (pixelCoord - ::gpk::n2<int32_t>{(rectText.Size.x >> 1), (rectText.Size.y >> 1)}).i16();
+	::gpk::rect2i16						rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
+	rectText.Offset = (pixelCoord - ::gpk::n2i32{(rectText.Size.x >> 1), (rectText.Size.y >> 1)}).i16();
 
-	::gpk::apod<::gpk::n2u16>			dstCoords;
+	::gpk::an2u16						dstCoords;
 	gpk_necs(::gpk::textLineRaster(targetPixels.metrics(), font.CharSize, rectText, font.Texture, finalText, dstCoords));
 	for(uint32_t iCoord = 0; iCoord < dstCoords.size(); ++iCoord) {
 		const ::gpk::n2u16					dstCoord			= dstCoords[iCoord];
@@ -508,11 +509,11 @@ static	::gpk::error_t	drawExplosion
 	( const ::ghg::SGalaxyHell		& solarSystem
 	, const ::ghg::SExplosion		& explosion
 	, const ::gpk::m4f32			& matrixView
-	, ::gpk::g8bgra	& targetPixels
-	, ::gpk::grid<uint32_t>		depthBuffer
+	, ::gpk::g8bgra					& targetPixels
+	, ::gpk::gu32					depthBuffer
 	, ::ghg::SGalaxyHellDrawCache	& drawCache
 	) {
-	::gpk::gc8bgra	image				= solarSystem.ShipState.Scene.Image		[explosion.IndexImage].View;
+	::gpk::gc8bgra						image				= solarSystem.ShipState.Scene.Image		[explosion.IndexImage].View;
 	const ::gpk::SGeometryQuads			& mesh				= solarSystem.ShipState.Scene.Geometry	[explosion.IndexMesh];
 	for(uint32_t iExplosionPart = 0; iExplosionPart < explosion.Particles.Position.size(); ++iExplosionPart) {
 		const ::gpk::rangeu16				& sliceMesh			= explosion.Slices[iExplosionPart];

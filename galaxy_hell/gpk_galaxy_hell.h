@@ -134,44 +134,44 @@ namespace ghg
 		}
 	};
 
-	::gpk::error_t						stageSetup				(::ghg::SGalaxyHell & solarSystem);
-	::gpk::error_t						solarSystemSetup		(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2<uint16_t> & windowSize);
-	::gpk::error_t						solarSystemReset		(::ghg::SGalaxyHell & solarSystem); 
-	::gpk::error_t						solarSystemDraw			(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
-	::gpk::error_t						solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SSystemEvent> frameEvents);
-	::gpk::error_t						solarSystemLoad			(::ghg::SGalaxyHell & world,::gpk::vcc filename);
-	::gpk::error_t						solarSystemSave			(const ::ghg::SGalaxyHell & world,::gpk::vcc filename);
+	::gpk::error_t		stageSetup				(::ghg::SGalaxyHell & solarSystem);
+	::gpk::error_t		solarSystemSetup		(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2u16 & windowSize);
+	::gpk::error_t		solarSystemReset		(::ghg::SGalaxyHell & solarSystem); 
+	::gpk::error_t		solarSystemDraw			(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
+	::gpk::error_t		solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SSystemEvent> frameEvents);
+	::gpk::error_t		solarSystemLoad			(::ghg::SGalaxyHell & world,::gpk::vcc filename);
+	::gpk::error_t		solarSystemSave			(const ::ghg::SGalaxyHell & world,::gpk::vcc filename);
 	
-	::gpk::error_t						getLightArraysFromDebris
-		( const ::ghg::SDecoState				& decoState
-		, ::gpk::apod<::gpk::n3f32>				& lightPoints
+	::gpk::error_t		getLightArraysFromDebris
+		( const ::ghg::SDecoState	& decoState
+		, ::gpk::an3f32				& lightPoints
 		, ::gpk::a8bgra				& lightColors
-		, const ::gpk::view<const ::gpk::bgra>	& debrisColors
+		, const ::gpk::vc8bgra		& debrisColors
 		);
 
-	::gpk::error_t						getLightArraysFromShips
+	::gpk::error_t		getLightArraysFromShips
 		( const ::ghg::SShipManager	& shipState
-		, ::gpk::apod<::gpk::n3f32>	& lightPoints
-		, ::gpk::a8bgra	& lightColors
-		);
-
-	::gpk::error_t						getLightArrays
-		( const ::ghg::SShipManager				& shipState
-		, const ::ghg::SDecoState				& decoState
-		, ::gpk::apod<::gpk::n3f32>				& lightPoints
+		, ::gpk::an3f32				& lightPoints
 		, ::gpk::a8bgra				& lightColors
-		, const ::gpk::view<const ::gpk::bgra>	& debrisColors
 		);
 
-	::gpk::error_t						drawOrbiter
-		( const ::ghg::SShipManager			& shipState
-		, const ::ghg::SOrbiter				& shipPart
-		, const ::gpk::rgbaf				& shipColor	
-		, float								animationTime
-		, const ::gpk::m4f32				& matrixVP
-		, ::gpk::g8bgra		& targetPixels
-		, ::gpk::grid<uint32_t>			depthBuffer
-		, ::ghg::SGalaxyHellDrawCache		& drawCache
+	::gpk::error_t		getLightArrays
+		( const ::ghg::SShipManager	& shipState
+		, const ::ghg::SDecoState	& decoState
+		, ::gpk::an3f32				& lightPoints
+		, ::gpk::a8bgra				& lightColors
+		, const ::gpk::vc8bgra		& debrisColors
+		);
+
+	::gpk::error_t		drawOrbiter
+		( const ::ghg::SShipManager		& shipState
+		, const ::ghg::SOrbiter			& shipPart
+		, const ::gpk::rgbaf			& shipColor	
+		, const float					animationTime
+		, const ::gpk::m4f32			& matrixVP
+		, ::gpk::g8bgra					& targetPixels
+		, ::gpk::gu32					depthBuffer
+		, ::ghg::SGalaxyHellDrawCache	& drawCache
 		);
 }
 

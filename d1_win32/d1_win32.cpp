@@ -19,13 +19,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "D1");
 ::gpk::error_t			cleanup					(::SApplication & app)											{
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::SWindow				& mainWindow			= framework.RootWindow;
-	::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue);
+	gpk_necs(::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue));
 #if !defined(DISABLE_D3D11)
 	app.D3DApp.Shutdown();
 #endif
 
-	::gpk::mainWindowDestroy(mainWindow);
-	::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue);
+	gpk_necs(::gpk::mainWindowDestroy(mainWindow));
+	gpk_necs(::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue));
 	return 0;
 }
 
@@ -34,7 +34,7 @@ static	::gpk::error_t	updateSizeDependentResources(::SApplication & app)								
 	const ::gpk::n2u16			newSize					= mainWindow.Size;
 #if !defined(DISABLE_D3D11)
 	mainWindow.BackBuffer	= {};
-	app.D3DApp.SetWindowSize(newSize);
+	gpk_necs(app.D3DApp.SetWindowSize(newSize));
 #else
 	gpk_necs(mainWindow.BackBuffer->resize(newSize, ::gpk::bgra{0, 0, 0, 0}, 0xFFFFFFFF));
 #endif

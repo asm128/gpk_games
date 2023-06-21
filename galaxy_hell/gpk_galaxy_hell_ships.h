@@ -7,6 +7,7 @@
 #include "gpk_engine.h"
 #include "gpk_camera.h"
 #include "gpk_image_color.h"
+#include "gpk_view_n3.h"
 
 #ifndef GPK_GALAXY_HELL_SHIPS_H
 #define GPK_GALAXY_HELL_SHIPS_H
@@ -71,10 +72,10 @@ namespace ghg
 	};
 
 	::gpk::error_t			getLightArrays
-		( const ::gpk::n3f32				& modelPosition
-		, const ::gpk::apod<::gpk::n3f32>	& lightPointsWorld
+		( const ::gpk::n3f32	& modelPosition
+		, const ::gpk::vn3f32	& lightPointsWorld
 		, const ::gpk::a8bgra	& lightColorsWorld
-		, ::gpk::apod<::gpk::n3f32>			& lightPointsModel
+		, ::gpk::an3f32			& lightPointsModel
 		, ::gpk::a8bgra			& lightColorsModel
 		);
 
@@ -235,15 +236,17 @@ namespace ghg
 			return totalHealth;
 		}
 
-		::gpk::n3f32&				GetShipPosition		(const SShipCore & ship)			{ return Engine.Integrator.Centers[EntitySystem.Entities[ship.Entity].Body].Position; }
-		const ::gpk::n3f32&			GetShipPosition		(const SShipCore & ship)	const	{ return Engine.Integrator.Centers[EntitySystem.Entities[ship.Entity].Body].Position; }
-		inline	::gpk::n3f32&		GetShipPosition		(uint32_t indexShip)				{ return GetShipPosition(ShipCores[indexShip]); }
-		inline	const ::gpk::n3f32&	GetShipPosition		(uint32_t indexShip)		const	{ return GetShipPosition(ShipCores[indexShip]); }
+		::gpk::SBodyCenter&					GetShipPivot		(const SShipCore & ship)			{ return Engine.Integrator.Centers[EntitySystem.Entities[ship.Entity].Body]; }
+		const ::gpk::SBodyCenter&			GetShipPivot		(const SShipCore & ship)	const	{ return Engine.Integrator.Centers[EntitySystem.Entities[ship.Entity].Body]; }
+		inline	::gpk::SBodyCenter&			GetShipPivot		(uint32_t indexShip)				{ return GetShipPivot(ShipCores[indexShip]); }
+		inline	const ::gpk::SBodyCenter&	GetShipPivot		(uint32_t indexShip)		const	{ return GetShipPivot(ShipCores[indexShip]); }
 
-		::gpk::error_t				GetShipPosition		(uint32_t iShip, ::gpk::n3f32 & output) const {
-			output = Engine.Integrator.Centers[EntitySystem.Entities[ShipCores[iShip].Entity].Body].Position;
-			return 0;
-		}
+		::gpk::n3f32&						GetShipPosition		(const SShipCore & ship)			{ return GetShipPivot(ship).Position; }
+		const ::gpk::n3f32&					GetShipPosition		(const SShipCore & ship)	const	{ return GetShipPivot(ship).Position; }
+		inline	::gpk::n3f32&				GetShipPosition		(uint32_t indexShip)				{ return GetShipPosition(ShipCores[indexShip]); }
+		inline	const ::gpk::n3f32&			GetShipPosition		(uint32_t indexShip)		const	{ return GetShipPosition(ShipCores[indexShip]); }
+
+		::gpk::error_t						GetShipPosition		(uint32_t iShip, ::gpk::n3f32 & output) const { output = GetShipPosition(iShip); return 0; }
 		
 		::gpk::SBodyCenter&			GetOrbiterTransform	(const SOrbiter & shipPart)		{ return Engine.Integrator.Centers[EntitySystem.Entities[shipPart.Entity + 1].Body]; }
 		::gpk::SBodyForces&			GetShipOrbiterForces(const SOrbiter & shipPart)		{ return Engine.Integrator.Forces [EntitySystem.Entities[shipPart.Entity + 1].Body]; }

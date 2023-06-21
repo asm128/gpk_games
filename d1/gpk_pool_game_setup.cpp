@@ -270,19 +270,27 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	return 0;
 }
 
-::gpk::error_t		d1p::poolGameSetup			(::d1p::SPoolGame & pool) {
-	::d1p::SPoolEngine		& engine					= pool.Engine;
+::gpk::error_t			d1p::poolGameSetup			(::d1p::SPoolGame & pool) {
+	::d1p::SPoolEngine			& engine					= pool.Engine;
 	gpk_necs(::gpk::rasterFontDefaults(engine.Scene->Graphics->Fonts));
 
 	// balls
-	gpk_necs(pool.Entities.Balls[0]	= (uint16_t)engine.CreateSphere());
-	gpk_necs(engine.SetShader(pool.Entities.Balls[0], ::d1p::psBallSolid, "psBallSolid"));
-	for(uint32_t iBall = 1; iBall < ::d1p::MAX_BALLS; ++iBall) 
-		gpk_necs(pool.Entities.Balls[iBall] = (uint16_t)engine.Clone(pool.Entities.Balls[0], true, true, true));
+	{
+		::gpk::SParamsSphere		params			= {};
+		params.CellCount	= {24, 24};
+		params.Radius		= .5f;
+		params.Origin		= {};
+		params.Reverse		= false;
+		params.DiameterRatio	= 1.f;
+		gpk_necs(pool.Entities.Balls[0]	= (uint16_t)engine.CreateSphere(params));
+		gpk_necs(engine.SetShader(pool.Entities.Balls[0], ::d1p::psBallSolid, "psBallSolid"));
+		for(uint32_t iBall = 1; iBall < ::d1p::MAX_BALLS; ++iBall) 
+			gpk_necs(pool.Entities.Balls[iBall] = (uint16_t)engine.Clone(pool.Entities.Balls[0], true, true, true));
+	}
 
 	// table
-	::gpk::SParamsGrid		argsGrid					= {};
-	argsGrid.CellCount	= {9, 4};
+	::gpk::SParamsGrid			argsGrid					= {};
+	argsGrid.CellCount		= {9, 4};
 	gpk_necs(pool.Entities.Table = (uint16_t)engine.CreateGrid(argsGrid));
 	gpk_necs(engine.SetShader(pool.Entities.Table, ::d1p::psTableCloth, "psTableCloth"));
 	gpk_necs(engine.SetColorDiffuse(pool.Entities.Table, ::gpk::RED * .5f));
@@ -293,7 +301,13 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	//gpk_necs(engine.SetColorDiffuse((*engine.Entities.Children[pool.Entities.Table])[::gpk::VOXEL_FACE_Top], ::gpk::RED * .5f));
 
 	// pockets
-	uint16_t				iPocketEntity				= (uint16_t)engine.CreateCylinder(16, true, 0.5f);
+	::gpk::SParamsCylinder		params;
+	params.DiameterRatio	= .65f;
+	params.CellCount		= {16, 16};
+	params.Reverse			= true;
+	params.Length			= 1;
+	params.Radius			= {.1f, .5f};
+	uint16_t					iPocketEntity			= (uint16_t)engine.CreateCylinder(params);
 	gpk_necs(pool.Entities.Pockets[0] = iPocketEntity);
 	gpk_necs(engine.SetColorDiffuse(iPocketEntity, ::gpk::DARKGRAY * .5f));
 	gpk_necs(engine.SetShader(iPocketEntity, ::d1p::psPocket, "psPocket"));

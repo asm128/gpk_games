@@ -6,30 +6,13 @@
 
 namespace ghg 
 {
-	GDEFINE_ENUM_TYPE(SHAPE_TYPE, uint8_t);
-	GDEFINE_ENUM_VALUE(SHAPE_TYPE, Custom		, 0);
-	GDEFINE_ENUM_VALUE(SHAPE_TYPE, Rectangle	, 1);
-	GDEFINE_ENUM_VALUE(SHAPE_TYPE, Circle		, 2);
-	GDEFINE_ENUM_VALUE(SHAPE_TYPE, Ring			, 3);
-	GDEFINE_ENUM_VALUE(SHAPE_TYPE, Cube			, 4);
-	GDEFINE_ENUM_VALUE(SHAPE_TYPE, Sphere		, 5);
-	GDEFINE_ENUM_VALUE(SHAPE_TYPE, Cylinder		, 6);
-	GDEFINE_ENUM_VALUE(SHAPE_TYPE, Torus		, 7);
-
 #pragma pack(push, 1)
-	struct SEntityFlags {
-		SHAPE_TYPE					ShapeType				;
-		uint8_t						Padding0				;
-		uint16_t					Padding1				;
-	};
-
 	struct SGHEntity {
 		int32_t						Parent					= -1;
 		int32_t						Geometry				= -1;
 		int32_t						Transform				= -1;
 		int32_t						Image					= -1;
 		int32_t						Body					= -1;
-		SEntityFlags				Flags					= {SHAPE_TYPE_Sphere};
 	};
 #pragma pack(pop)
 
