@@ -274,8 +274,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	::d1p::SPoolEngine			& engine					= pool.Engine;
 	gpk_necs(::gpk::rasterFontDefaults(engine.Scene->Graphics->Fonts));
 
-	// balls
-	{
+	{	// balls
 		::gpk::SParamsSphere		params			= {};
 		params.CellCount	= {24, 24};
 		params.Radius		= .5f;
@@ -288,31 +287,33 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 			gpk_necs(pool.Entities.Balls[iBall] = (uint16_t)engine.Clone(pool.Entities.Balls[0], true, true, true));
 	}
 
-	// table
-	::gpk::SParamsGrid			argsGrid					= {};
-	argsGrid.CellCount		= {9, 4};
-	gpk_necs(pool.Entities.Table = (uint16_t)engine.CreateGrid(argsGrid));
-	gpk_necs(engine.SetShader(pool.Entities.Table, ::d1p::psTableCloth, "psTableCloth"));
-	gpk_necs(engine.SetColorDiffuse(pool.Entities.Table, ::gpk::RED * .5f));
-	//for(uint32_t iFace = 0; iFace < 6; ++iFace)
-	//	gpk_necs(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[iFace], ::d1p::psTableCloth, "psHidden"));
+	{	// table 
+		::gpk::SParamsGrid			argsGrid					= {};
+		argsGrid.CellCount		= {9, 4};
+		gpk_necs(pool.Entities.Table = (uint16_t)engine.CreateGrid(argsGrid));
+		gpk_necs(engine.SetShader(pool.Entities.Table, ::d1p::psTableCloth, "psTableCloth"));
+		gpk_necs(engine.SetColorDiffuse(pool.Entities.Table, ::gpk::RED * .5f));
+		//for(uint32_t iFace = 0; iFace < 6; ++iFace)
+		//	gpk_necs(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[iFace], ::d1p::psTableCloth, "psHidden"));
+	}
 
 	//gpk_necs(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[::gpk::VOXEL_FACE_Top], ::d1p::psTableCloth, "psTableCloth"));
 	//gpk_necs(engine.SetColorDiffuse((*engine.Entities.Children[pool.Entities.Table])[::gpk::VOXEL_FACE_Top], ::gpk::RED * .5f));
+	{	// pockets
+		::gpk::SParamsCylinder		params;
+		params.DiameterRatio	= .65f;
+		params.CellCount		= {16, 16};
+		params.Reverse			= true;
+		params.Length			= 1;
+		params.Radius			= {.1f, .5f};
 
-	// pockets
-	::gpk::SParamsCylinder		params;
-	params.DiameterRatio	= .65f;
-	params.CellCount		= {16, 16};
-	params.Reverse			= true;
-	params.Length			= 1;
-	params.Radius			= {.1f, .5f};
-	uint16_t					iPocketEntity			= (uint16_t)engine.CreateCylinder(params);
-	gpk_necs(pool.Entities.Pockets[0] = iPocketEntity);
-	gpk_necs(engine.SetColorDiffuse(iPocketEntity, ::gpk::DARKGRAY * .5f));
-	gpk_necs(engine.SetShader(iPocketEntity, ::d1p::psPocket, "psPocket"));
-	for(uint32_t iPocket = 1; iPocket < ::d1p::MAX_POCKETS; ++iPocket) 
-		gpk_necs(pool.Entities.Pockets[iPocket] = (uint16_t)engine.Clone(pool.Entities.Pockets[0], false, false, false));
+		uint16_t					iPocketEntity			= (uint16_t)engine.CreateCylinder(params);
+		gpk_necs(pool.Entities.Pockets[0] = iPocketEntity);
+		gpk_necs(engine.SetColorDiffuse(iPocketEntity, ::gpk::DARKGRAY * .5f));
+		gpk_necs(engine.SetShader(iPocketEntity, ::d1p::psPocket, "psPocket"));
+		for(uint32_t iPocket = 1; iPocket < ::d1p::MAX_POCKETS; ++iPocket) 
+			gpk_necs(pool.Entities.Pockets[iPocket] = (uint16_t)engine.Clone(pool.Entities.Pockets[0], false, false, false));
+	}
 
 	// sticks
 	gpk_necs(pool.Entities.Sticks[0] = (uint16_t)engine.CreateCylinder(8, false, 1.0f));
@@ -331,72 +332,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	return 0;
 }
 
-//
-//static	::gpk::error_t	textureBallStripped		(::gpk::g8bgra view, const ::gpk::SRasterFont & font, ::gpk::bgra color, uint32_t number) { 
-//	memset(view.begin(), 0xFF, view.byte_count());
-//
-//	::gpk::n2<uint32_t>					viewCenter				= view.metrics() / 2;
-//	::gpk::SSlice<uint16_t>						colorBand				= {uint16_t(view.metrics().y / 3), uint16_t(view.metrics().y / 3 * 2)};
-//	for(uint32_t y = colorBand.Begin; y < colorBand.End; ++y)
-//	for(uint32_t x = 0; x < view.metrics().x; ++x) {
-//		if((viewCenter - ::gpk::n2<uint32_t>{x, y}).Length() < view.metrics().y / 7)
-//			view[y][x]								= ::gpk::WHITE;
-//		else
-//			view[y][x]								= color;
-//	}
-//
-//	::textureBallNumber(view, number, font);
-//	return 0; 
-//}
-//
-//static	::gpk::error_t	textureBallSolid		(::gpk::g8bgra view, const ::gpk::SRasterFont & font, ::gpk::bgra color, uint32_t number) { 
-//	::gpk::n2<uint32_t>					viewCenter				= view.metrics() / 2;
-//
-//	for(uint32_t y = 0; y < view.metrics().y; ++y)
-//	for(uint32_t x = 0; x < view.metrics().x; ++x) {
-//		if((viewCenter - ::gpk::n2<uint32_t>{x, y}).Length() < view.metrics().y / 7)
-//			view[y][x]								= ::gpk::WHITE;
-//		else
-//			view[y][x]								= color;
-//	}
-//
-//	::textureBallNumber(view, number, font);
-//	return 0; 
-//}
-//
-//static	::gpk::error_t	textureBallCue			(::gpk::g8bgra view, ::gpk::bgra color) {
-//	::gpk::n2f						viewCenter				= view.metrics().f32() / 2;
-//	::gpk::n2f						pointCenters[]			= 
-//		{ {0, viewCenter.y}
-//		, {view.metrics().x / 4.0f * 1, viewCenter.y}
-//		, {view.metrics().x / 4.0f * 2, viewCenter.y}
-//		, {view.metrics().x / 4.0f * 3, viewCenter.y}
-//		, {view.metrics().x * 1.0f, viewCenter.y}
-//		};
-//	float										pointRadius				= view.metrics().y / 16.0f;
-//	if(0 == pointRadius)
-//		pointRadius = 3;
-//
-//	memset(view.begin(), 0xFF, view.byte_count());
-//	for(uint32_t y = 0; y < view.metrics().y; ++y)
-//	for(uint32_t x = 0; x < view.metrics().x; ++x) {
-//		if(y <= pointRadius)
-//			view[y][x]								= color;
-//		else if(y >= (view.metrics().y - pointRadius - 1.0f))
-//			view[y][x]								= color;
-//		else {
-//			for(uint32_t iPoint = 0; iPoint < ::gpk::size(pointCenters); ++iPoint) {
-//				::gpk::n2f					pointCenter			= pointCenters[iPoint];
-//				if((pointCenter - ::gpk::n2f{x + .0f, y + .0f}).Length() <= pointRadius + 1.0f)
-//					view[y][x]								= color;
-//			}
-//		}
-//	}
-//
-//	return 0; 
-//}
-
-static	::gpk::error_t	geometryBuildTableCushion	(::gpk::STrianglesIndexed & output) {
+static	::gpk::error_t	geometryBuildTableCushion	(::gpk::SGeometryBuffers & output) {
 	stacxpr	::gpk::n3f32		TABLE_CUSHION_POSITIONS	[8]		= 
 		{ {0, 1, 0}, {1, 1, 0}, {0, 1, 1}, {1, 1, 1}	// top face
 		, {0, 0, 0}, {1, 0, 0}, {0, 1, 1}, {1, 1, 1}	// diagonal face
@@ -429,7 +365,7 @@ static	::gpk::error_t	geometryBuildTableCushion	(::gpk::STrianglesIndexed & outp
 }
 
 ::gpk::error_t		d1p::SPoolEngine::CreateTableCushion	()	{
-	::gpk::STrianglesIndexed	geometry;
+	::gpk::SGeometryBuffers	geometry;
 	::geometryBuildTableCushion(geometry);
 
 	int32_t					iEntity								= this->Entities.Create();
@@ -520,3 +456,67 @@ static	::gpk::error_t	geometryBuildTableCushion	(::gpk::STrianglesIndexed & outp
 	Scene->Graphics->Shaders[renderNode.Shader = Scene->Graphics->Shaders.push_back({})].create(::gpk::psSolid);
 	return iEntity;
 }
+
+//static	::gpk::error_t	textureBallStripped		(::gpk::g8bgra view, const ::gpk::SRasterFont & font, ::gpk::bgra color, uint32_t number) { 
+//	memset(view.begin(), 0xFF, view.byte_count());
+//
+//	::gpk::n2<uint32_t>					viewCenter				= view.metrics() / 2;
+//	::gpk::SSlice<uint16_t>						colorBand				= {uint16_t(view.metrics().y / 3), uint16_t(view.metrics().y / 3 * 2)};
+//	for(uint32_t y = colorBand.Begin; y < colorBand.End; ++y)
+//	for(uint32_t x = 0; x < view.metrics().x; ++x) {
+//		if((viewCenter - ::gpk::n2<uint32_t>{x, y}).Length() < view.metrics().y / 7)
+//			view[y][x]								= ::gpk::WHITE;
+//		else
+//			view[y][x]								= color;
+//	}
+//
+//	::textureBallNumber(view, number, font);
+//	return 0; 
+//}
+//
+//static	::gpk::error_t	textureBallSolid		(::gpk::g8bgra view, const ::gpk::SRasterFont & font, ::gpk::bgra color, uint32_t number) { 
+//	::gpk::n2<uint32_t>					viewCenter				= view.metrics() / 2;
+//
+//	for(uint32_t y = 0; y < view.metrics().y; ++y)
+//	for(uint32_t x = 0; x < view.metrics().x; ++x) {
+//		if((viewCenter - ::gpk::n2<uint32_t>{x, y}).Length() < view.metrics().y / 7)
+//			view[y][x]								= ::gpk::WHITE;
+//		else
+//			view[y][x]								= color;
+//	}
+//
+//	::textureBallNumber(view, number, font);
+//	return 0; 
+//}
+//
+//static	::gpk::error_t	textureBallCue			(::gpk::g8bgra view, ::gpk::bgra color) {
+//	::gpk::n2f						viewCenter				= view.metrics().f32() / 2;
+//	::gpk::n2f						pointCenters[]			= 
+//		{ {0, viewCenter.y}
+//		, {view.metrics().x / 4.0f * 1, viewCenter.y}
+//		, {view.metrics().x / 4.0f * 2, viewCenter.y}
+//		, {view.metrics().x / 4.0f * 3, viewCenter.y}
+//		, {view.metrics().x * 1.0f, viewCenter.y}
+//		};
+//	float										pointRadius				= view.metrics().y / 16.0f;
+//	if(0 == pointRadius)
+//		pointRadius = 3;
+//
+//	memset(view.begin(), 0xFF, view.byte_count());
+//	for(uint32_t y = 0; y < view.metrics().y; ++y)
+//	for(uint32_t x = 0; x < view.metrics().x; ++x) {
+//		if(y <= pointRadius)
+//			view[y][x]								= color;
+//		else if(y >= (view.metrics().y - pointRadius - 1.0f))
+//			view[y][x]								= color;
+//		else {
+//			for(uint32_t iPoint = 0; iPoint < ::gpk::size(pointCenters); ++iPoint) {
+//				::gpk::n2f					pointCenter			= pointCenters[iPoint];
+//				if((pointCenter - ::gpk::n2f{x + .0f, y + .0f}).Length() <= pointRadius + 1.0f)
+//					view[y][x]								= color;
+//			}
+//		}
+//	}
+//
+//	return 0; 
+//}

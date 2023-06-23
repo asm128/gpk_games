@@ -64,12 +64,11 @@ static	::gpk::error_t	processKeyboardEvent	(::SApplication & app, const ::gpk::S
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEventNew	(::SApplication & app, const ::gpk::SSystemEvent & sysEvent) { 
+static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSystemEvent & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
-	case ::gpk::SYSTEM_EVENT_Screen:
-		es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { return processScreenEvent(app, screenEvent); })));
-		break;
+	case ::gpk::SYSTEM_EVENT_Screen		: gpk_necs(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN  >(sysEvent, [&app](const ::gpk::SScreenEventView & screenEvent) { return ::processScreenEvent  (app, screenEvent); })); break;
+	case ::gpk::SYSTEM_EVENT_Keyboard	: gpk_necs(::gpk::eventExtractAndHandle<::gpk::EVENT_KEYBOARD>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { return ::processKeyboardEvent(app, screenEvent); })); break;
 	}
 	return 0;
 }
@@ -179,7 +178,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	mainWindow.Size			= {1280, 720};
 
 	es_if(errored(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
-	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEventNew(app, *sysEvent); }));
+	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
 
 	srand((uint32_t)time(0));
 
@@ -227,7 +226,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	::gpk::SWindow				& mainWindow		= framework.RootWindow;
 	//::gpk::STimer				timer;
 
-	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEventNew(app, *sysEvent); }));
+	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
 
 	rvis_if(::gpk::APPLICATION_STATE_EXIT, 1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue));
 
@@ -310,3 +309,6 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
     //glFlush();
 	return ::ghg::galaxyHellDraw(app.GalaxyHellApp, app.Framework.RootWindow.Size.u16());
 }
+
+
+//

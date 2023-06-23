@@ -65,13 +65,13 @@ static	::gpk::error_t	stickUpdateRotation		(::d1::SD1Game & clientGame, float ac
 }
 
 static	::gpk::error_t	stickUpdateBallInHand	(::d1::SD1Game & clientGame, float actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 mouseDeltas, ::gpk::vcu8 buttonStates) {
-	const bool						slow					= keyStates[VK_SHIFT];
+	const bool					slow					= keyStates[VK_SHIFT];
 	// The following aim unit constants should be grabbed from a settings struct.
-	::gpk::n2f32						displacement			= {};
+	::gpk::n2f32				displacement			= {};
 	{
-		const double					aimUnit					= 2.5;
-		const double					aimScaled				= aimUnit * (slow ? .01 : .1);
-		const ::gpk::n2f32				displacementKeyValue	= {float(-1.0 * aimScaled), float(1.0 * aimScaled)};
+		const double				aimUnit					= 2.5;
+		const double				aimScaled				= aimUnit * (slow ? .01 : .1);
+		const ::gpk::n2f32			displacementKeyValue	= {float(-1.0 * aimScaled), float(1.0 * aimScaled)};
 		// Define a rotation value depending on 
 			 if(keyStates['D'])	displacement.x	= actualSecondsElapsed * displacementKeyValue.x;
 		else if(keyStates['A'])	displacement.x	= actualSecondsElapsed * -displacementKeyValue.x;
@@ -80,25 +80,25 @@ static	::gpk::error_t	stickUpdateBallInHand	(::d1::SD1Game & clientGame, float a
 	}
 	// Grab rotation from mouse deltas.
 	if(buttonStates[0] && (mouseDeltas.x || mouseDeltas.y) && 0 == buttonStates[1]) {
-		const double					aimUnit					= 0.05;
-		const double					aimScaled				= aimUnit * (slow ? .005 : .05);
-		const ::gpk::n2f32				displacementMouseValue	= {float(-1.0 * aimScaled), float(-1.0 * aimScaled)};
+		const double				aimUnit					= 0.05;
+		const double				aimScaled				= aimUnit * (slow ? .005 : .05);
+		const ::gpk::n2f32			displacementMouseValue	= {float(-1.0 * aimScaled), float(-1.0 * aimScaled)};
 		if(mouseDeltas.y)
-			displacement.y				+= mouseDeltas.y * displacementMouseValue.y;
+			displacement.y			+= mouseDeltas.y * displacementMouseValue.y;
 		if(mouseDeltas.x)
-			displacement.x				+= mouseDeltas.x * displacementMouseValue.x;
+			displacement.x			+= mouseDeltas.x * displacementMouseValue.x;
 	}
 
 	if(displacement.y || displacement.x) {
-		::d1p::SEventPlayer				newEvent				= {::d1p::PLAYER_INPUT_Ball};
+		::d1p::SEventPlayer			newEvent				= {::d1p::PLAYER_INPUT_Ball};
 		if(displacement.y) {
-			const ::d1p::SArgsPlayerInput	turnInfo				= {displacement.y, ::gpk::AXIS_X_POSITIVE};
-			newEvent.Data				= ::gpk::vcu8{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
+			const d1p::SArgsPlayerInput	turnInfo				= {displacement.y, ::gpk::AXIS_X_POSITIVE};
+			newEvent.Data			= ::gpk::vcu8{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
 			clientGame.QueueStick.push_back(newEvent);
 		}
 		if(displacement.x) {
-			const ::d1p::SArgsPlayerInput	turnInfo				= {displacement.x, ::gpk::AXIS_Y_POSITIVE};
-			newEvent.Data				= ::gpk::vcu8{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
+			const d1p::SArgsPlayerInput	turnInfo				= {displacement.x, ::gpk::AXIS_Y_POSITIVE};
+			newEvent.Data			= ::gpk::vcu8{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
 			clientGame.QueueStick.push_back(newEvent);
 		}
 	}

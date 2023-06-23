@@ -15,10 +15,10 @@
 #define APPLICATION_H_098273498237423
 
 struct SApplication {
-	::gpk::SFramework		Framework		;
+	::gpk::SFramework		Framework	;
 	::d1::SD1				D1			= {};
 #ifndef DISABLE_D3D11
-	::gpk::SD3DApplication	D3DApp			;
+	::gpk::SD3DApplication	D3DApp		;
 #endif
 #ifndef DISABLE_XAUDIO2
 	::gpk::AUDIO_STATE		AudioState;
