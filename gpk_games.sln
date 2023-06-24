@@ -47,6 +47,17 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gpk_engine_explorer", "..\g
 		{976FE3EA-9FD1-4066-9003-0E8513F9D900} = {976FE3EA-9FD1-4066-9003-0E8513F9D900}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7FAB74BC-E687-40B3-A355-2CA40AEBA0EA}"
+	ProjectSection(SolutionItems) = preProject
+		..\.gitignore = ..\.gitignore
+		..\.gitmodules = ..\.gitmodules
+		..\clean.bat = ..\clean.bat
+		..\LICENSE = ..\LICENSE
+		..\repo_init.bat = ..\repo_init.bat
+		..\repo_update.bat = ..\repo_update.bat
+		..\repo_update_heads.bat = ..\repo_update_heads.bat
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
