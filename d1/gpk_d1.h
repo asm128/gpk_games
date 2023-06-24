@@ -222,7 +222,7 @@ namespace d1
 		::gpk::astatic<::gpk::acid, APP_STATE_COUNT>	
 											DialogControls			= {}; 	
 		::gpk::astatic<::d1::STeamUI, 2>	TeamUI					= {};
-		::gpk::SUIInputBox					NameEditBox;
+		::gpk::SInputBox					NameEditBox;
 		
 		::gpk::astatic<char, 64>			turnsbuffer;
 		::gpk::astatic<char, 64>			secdsbuffer;

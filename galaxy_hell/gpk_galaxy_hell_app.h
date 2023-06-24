@@ -137,7 +137,7 @@ namespace ghg
 		::gpk::acid				ControlsDialogPlay		= {};
 		::gpk::acid				ControlsDialogHome		= {};
 
-		::gpk::SUIInputBox		InputBox				= {};
+		::gpk::SInputBox		InputBox				= {};
 	
 		::gpk::astc<128>		TextScore				= {};
 		::gpk::astc<128>		TextHits				= {};
