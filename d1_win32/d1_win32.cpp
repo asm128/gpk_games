@@ -89,7 +89,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 	mainWindow.Size			= {1280, 720};
 	gpk_necs(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input));
 
-	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEventNew(app, *sysEvent); }));
+	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
 
 	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue));
 
@@ -104,7 +104,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 
 	::gpk::SWindow				& mainWindow			= app.Framework.RootWindow;
 
-	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEventNew(app, *sysEvent); }));
+	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
 
 	::gpk::SFrameInfo			& frameInfo				= framework.FrameInfo;
 	{
