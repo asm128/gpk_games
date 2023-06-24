@@ -19,10 +19,9 @@ namespace gpkg
 	struct SMineHellState {
 		::gpk::rangeu64	Time			= {};
 		::gpk::n2u32	BlastCoord		= {(uint32_t)-1, (uint32_t)-1};
-		::gpk::n2u32	BoardSize		= {32, 32};	// Note that it's quite easy to hit stack overflow with more than 20 x 20 cells per block
-		::gpk::n2u32	BlockSize		= {16, 16};	// Note that it's quite easy to hit stack overflow with more than 20 x 20 cells per block
+		::gpk::n2u32	BoardSize		= {32, 32};	
+		::gpk::n2u8		BlockSize		= {16, 16};	// Note that it's quite easy to hit stack overflow with more than 20 x 20 cells per block
 		uint32_t		MineCount		= 10;
-		//char			PlayerId[127]	= {};
 		bool			Blast			: 1;
 		bool			BlockBased		: 1;
 
@@ -39,19 +38,22 @@ namespace gpkg
 		::gpk::apobj<::gpk::img<::gpkg::SMineHellCell>>
 											BoardBlocks				;	// New implementation with support for large boards.
 
-		::gpk::error_t						GetCell					(const ::gpk::n2u32 & cellCoord, ::gpkg::SMineHellCell ** out_cell);					// These functions return the cell
-		::gpk::error_t						GetCell					(const ::gpk::n2u32 & cellCoord, const ::gpkg::SMineHellCell ** out_cell)	const;	// These functions return the cell
+		::gpk::error_t						GetCell					(const ::gpk::n2u32 & cellCoord, ::gpkg::SMineHellCell			** out_cell);			
+		::gpk::error_t						GetCell					(const ::gpk::n2u32 & cellCoord, const ::gpkg::SMineHellCell	** out_cell)	const;	
 
-		::gpk::error_t						GetMines				(::gpk::view_bit<uint64_t> & out_Cells)	const;	// These functions return the amount of mines in the board.
-		::gpk::error_t						GetFlags				(::gpk::view_bit<uint64_t> & out_Cells)	const;	// These functions return the amount of flags in the board.
-		::gpk::error_t						GetHolds				(::gpk::view_bit<uint64_t> & out_Cells)	const;	// These functions return the amount of holds in the board.
-		::gpk::error_t						GetShows				(::gpk::view_bit<uint64_t> & out_Cells)	const;	// These functions return the amount of hides in the board.
-		::gpk::error_t						GetHints				(::gpk::grid<uint8_t> & out_Cells)	const;	// These functions return the amount of hints in the board.
-		::gpk::error_t						GetBlast				(::gpk::n2u32 & out_coord)	const;	// Returns 1 if blast was found, 0 if not.
+		::gpk::error_t						GetMines				(::gpk::vbitu64 & out_Cells)	const;	// Returns the amount of mines in the board.
+		::gpk::error_t						GetFlags				(::gpk::vbitu64 & out_Cells)	const;	// Returns the amount of flags in the board.
+		::gpk::error_t						GetHolds				(::gpk::vbitu64 & out_Cells)	const;	// Returns the amount of holds in the board.
+		::gpk::error_t						GetShows				(::gpk::vbitu64 & out_Cells)	const;	// Returns the amount of hides in the board.
+
+		::gpk::error_t						GetHints				(::gpk::gu8		& out_Cells)	const;	// Returns the amount of hints in the board.
+
+		::gpk::error_t						GetBlast				(::gpk::n2u32	& out_coord)	const;	// Returns 1 if blast was found, 0 if not.
 
 		::gpk::error_t						Flag					(const ::gpk::n2u32 cell);	// Set/Clear a flag on a given tile
 		::gpk::error_t						Hold					(const ::gpk::n2u32 cell);	// Set/Clear a question mark on a given tile
 		::gpk::error_t						Step					(const ::gpk::n2u32 cell);	// Step on a given tile
+
 		::gpk::error_t						Start					(const ::gpk::n2u32 boardMetrics, const uint32_t mineCount);	// Start a new game with a board of boardMetrics size and mineCount mine count.
 
 		::gpk::error_t						Save					(::gpk::au8 & bytes);	// Write game state to array

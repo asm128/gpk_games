@@ -2,54 +2,60 @@
 
 #define superp(format, ...) printf(format "\n", __VA_ARGS__)
 
-int						fileSize		(FILE* fp) {
-	uint32_t				position		= (uint32_t)ftell(fp);
+static	::gpk::error_t	fileSize		(FILE* fp) {
+	uint32_t					position		= (uint32_t)ftell(fp);
 	fseek(fp, 0, SEEK_END);
-	uint32_t				lastPosition	= (uint32_t)ftell(fp);
+	uint32_t					lastPosition	= (uint32_t)ftell(fp);
 	fseek(fp, position, SEEK_SET);
 	return (int)lastPosition;
 }
 
-int						splitLines		(const ::std::string & pageBytes, ::gpk::aobj<std::string> & pageLines) {
+static	::gpk::error_t	splitLines		(const ::gpk::achar & pageBytes, ::gpk::aobj<gpk::achar> & pageLines) {
 	pageLines.clear();
-	uint32_t				lastOffset		= 0;
+	uint32_t					lastOffset		= 0;
 	for(uint32_t iOffset = 0; iOffset < pageBytes.size(); ++iOffset) {
 		if(pageBytes[iOffset] == '\n') {
-			const ::std::string	lineToPush		= pageBytes.substr(lastOffset, iOffset - lastOffset + 1);
+			::gpk::vcc					lineToPush		= {};
+			pageBytes.slice(lineToPush, lastOffset, iOffset - lastOffset + 1);
 			pageLines.push_back(lineToPush);
-			lastOffset		= ++iOffset;
+			lastOffset				= ++iOffset;
 		}
 	}
 	if(pageBytes.size() > lastOffset) {
-		pageLines.push_back(pageBytes.substr(lastOffset) + "\n");
+		::gpk::vcc					vline			= {};
+		pageBytes.slice(vline, lastOffset, lastOffset + 1);
+
+		::gpk::achar				lineToPush		= vline;
+		lineToPush.append_string("\n");
+		pageLines.push_back(lineToPush);
 	}
 	return 0;
 }
 
 template <typename _tCell>
-int32_t					reverse			(_tCell* elements, uint32_t elementCount)	 {
+static	::gpk::error_t	reverse			(_tCell* elements, uint32_t elementCount)	 {
 	for(uint32_t i = 0, swapCount = elementCount / 2; i < swapCount; ++i) {
-		_tCell								old			= elements[i];
-		elements[i]						= elements[elementCount - 1 - i];
+		_tCell						old				= elements[i];
+		elements[i]				= elements[elementCount - 1 - i];
 		elements[elementCount - 1 - i]	= old;
 	}
 	return 0;
 }
 
-int						loadLines		(::gpkg::SPage & page, const ::gpk::aobj<std::string> & pageLines) {
+static	::gpk::error_t	loadLines		(::gpkg::SPage & page, const ::gpk::aachar & pageLines) {
 	page.TextLines			= pageLines;
 	page.PageJumps			= {};
 	for(int32_t iLine = (int32_t)page.TextLines.size() - 1; iLine >= 0; --iLine) {
-		std::string					& currentLine		= page.TextLines[iLine];
-		::gpk::vcc		trimmed;
-		::gpk::trim(trimmed, ::gpk::vcc{currentLine.data(), (uint32_t)currentLine.size()});
-		currentLine = {trimmed.begin(), trimmed.size()};
+		::gpk::achar				& currentLine	= page.TextLines[iLine];
+		::gpk::vcc					trimmed;
+		::gpk::trim(trimmed, currentLine);
+		currentLine				= trimmed;
 		if(currentLine.size() <= 2 && 0 == page.PageJumps.size()) {
 			page.TextLines.pop_back();
 			continue;
 		}
 
-		uint32_t			jumpIndex			= atoi(currentLine.data());
+		uint32_t					jumpIndex		= atoi(currentLine.begin());
 		if(0 == jumpIndex && currentLine[0] != '0') {
 			break;
 		}
@@ -62,21 +68,21 @@ int						loadLines		(::gpkg::SPage & page, const ::gpk::aobj<std::string> & page
 	return 0;
 }
 
-int						gpkg::loadPage		(const char* folderName, gpkg::SPage & page, uint32_t pageIndex) {
-	char					fileName[4096]	= {};
+::gpk::error_t			gpkg::loadPage	(const char* folderName, gpkg::SPage & page, uint32_t pageIndex) {
+	char						fileName[4096]	= {};
 	sprintf_s(fileName, "%s/%u.txt", folderName, pageIndex);
-	FILE					* fp			= 0;
+	FILE						* fp			= 0;
 	if(fopen_s(&fp, fileName, "rb")) {
 		return -1;
 	}
 
-	int						textSize		= fileSize(fp);
-	::std::string			pageBytes;
+	int							textSize		= fileSize(fp);
+	::gpk::achar				pageBytes;
 	pageBytes.resize(textSize);
 	fread(&pageBytes[0], 1, textSize, fp);
 	fclose(fp);	
 
-	::gpk::aobj<::std::string> pageLines;
+	::gpk::aachar				pageLines;
 	::splitLines(pageBytes, pageLines);
 	::loadLines(page, pageLines);
 	return 0;

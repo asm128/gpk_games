@@ -26,7 +26,7 @@ struct SApplication {
  
 	//::gpk::SUDPClient		Client;
 
-							SApplication		(::gpk::SRuntimeValues& runtimeValues)	: Framework(runtimeValues)		{}
+							SApplication		(::gpk::SRuntimeValues & runtimeValues)	: Framework(runtimeValues)		{ GalaxyHellApp.Game.ShipState.Engine.Scene->Graphics.create(); }
 };
 
 #endif // CED_DEMO_08_H_298837492837

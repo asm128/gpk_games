@@ -23,10 +23,7 @@ struct SApplication {
 #ifndef DISABLE_XAUDIO2
 	::gpk::AUDIO_STATE		AudioState;
 #endif
-							SApplication	(::gpk::SRuntimeValues & runtimeValues)	noexcept
-		: Framework(runtimeValues) { 
-		D1.MainGame.Pool.Engine.Scene->Graphics.create(); 
-	}
+							SApplication	(::gpk::SRuntimeValues & runtimeValues)	noexcept : Framework(runtimeValues) { D1.MainGame.Pool.Engine.Scene->Graphics.create(); }
 };
 
 #endif // APPLICATION_H_098273498237423
