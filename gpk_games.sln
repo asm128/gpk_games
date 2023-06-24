@@ -52,10 +52,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\.gitignore = ..\.gitignore
 		..\.gitmodules = ..\.gitmodules
 		..\clean.bat = ..\clean.bat
+		..\clean.sh = ..\clean.sh
 		..\LICENSE = ..\LICENSE
 		..\repo_init.bat = ..\repo_init.bat
+		..\repo_init.sh = ..\repo_init.sh
 		..\repo_update.bat = ..\repo_update.bat
+		..\repo_update.sh = ..\repo_update.sh
 		..\repo_update_heads.bat = ..\repo_update_heads.bat
+		..\repo_update_heads.sh = ..\repo_update_heads.sh
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{6403FA40-03F2-4F9C-9224-F85FE46A231C}"
