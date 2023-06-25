@@ -1,4 +1,4 @@
-#include "gpk_image_color.h"
+#include "gpk_img_color.h"
 #include "gpk_array_ptr.h"
 
 #ifndef GPK_GALAXY_HELL_DRAW_H_293874239874

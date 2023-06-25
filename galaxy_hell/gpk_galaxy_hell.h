@@ -3,7 +3,7 @@
 #include "gpk_galaxy_hell_deco.h"
 
 #include "gpk_galaxy_hell_draw.h"
-
+#include "gpk_view_color.h"
 
 #include "gpk_input.h"
 #include "gpk_label.h"
