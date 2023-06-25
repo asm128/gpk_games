@@ -23,9 +23,9 @@ namespace ghg
 		
 		// Used for pixel shading
 		::gpk::apod<::gpk::n3f32>			LightPointsWorld		;
-		::gpk::a8bgra			LightColorsWorld		;
+		::gpk::a8bgra						LightColorsWorld		;
 		::gpk::apod<::gpk::n3f32>			LightPointsModel		;
-		::gpk::a8bgra			LightColorsModel		;
+		::gpk::a8bgra						LightColorsModel		;
 
 		// Gameplay render target. I decided the world will have its own rendertarget to facilitate reuse of the code.
 		::gpk::n2u16						RenderTargetMetrics		= {1280, 720};
