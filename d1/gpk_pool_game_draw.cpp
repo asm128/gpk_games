@@ -3,8 +3,6 @@
 
 #include "gpk_timer.h"
 
-::gpk::error_t			transformFragments	()	{ return 0; }
-
 ::gpk::error_t			d1p::poolGameDraw				
 	( ::d1p::SPoolGame		& pool
 	, ::gpk::rtbgra8d32		& backBuffer

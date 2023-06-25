@@ -144,11 +144,11 @@ namespace d1p
 	::gpk::error_t						poolGameSetup				(::d1p::SPoolGame & pool);
 	::gpk::error_t						poolGameUpdate				(::d1p::SPoolGame & pool, ::gpk::view<const ::d1p::SEventPlayer> inputEvents, ::gpk::apobj<::d1p::SEventPool> & outputEvents, double secondsElapsed);
 	::gpk::error_t						poolGameDraw				(::d1p::SPoolGame & pool
-		, ::gpk::rt<::gpk::bgra, uint32_t>	& backBuffer
-		, const ::gpk::n3f32					& cameraPosition
-		, const ::gpk::n3f32					& cameraTarget
-		, const ::gpk::n3f32					& cameraUp
-		, double							totalSeconds
+		, ::gpk::rtbgra8d32		& backBuffer
+		, const ::gpk::n3f32	& cameraPosition
+		, const ::gpk::n3f32	& cameraTarget
+		, const ::gpk::n3f32	& cameraUp
+		, double				totalSeconds
 		);
 } // namespace
 
