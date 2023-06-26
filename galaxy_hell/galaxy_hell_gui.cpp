@@ -64,7 +64,7 @@ static	::gpk::error_t	uiPlayerSetupHome	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Name; iButton < iStop; ++iButton) {
 		playerGUI.Controls.Placement	[iOffset + iButton].Margin				= {}; 
 		//playerGUI.Controls.Controls		[iButton].Border				= {2, 2, 2, 2};
-		playerGUI.Controls.Draw			[iOffset + iButton].NoBorder		= true;
+		//playerGUI.Controls.Draw			[iOffset + iButton].NoBorder		= true;
 		playerGUI.Controls.Draw			[iOffset + iButton].NoClient		= true;
 	}
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Score; iButton < iStop; ++iButton) {
@@ -118,7 +118,7 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 	for(uint32_t iButton = 0, iStop = ::gpk::get_value_count<::ghg::UI_PROFILE>() - 1, iOffset = playerDialog.Root + 1 + ghg::UI_PROFILE_Name; iButton < iStop; ++iButton) {
 		playerGUI.Controls.Placement[iOffset + iButton].Margin		= {}; 
 		//playerGUI.Controls.Controls	[iOffset + iButton].Border	= {};
-		playerGUI.Controls.Draw		[iOffset + iButton].NoBorder	= true;
+		//playerGUI.Controls.Draw		[iOffset + iButton].NoBorder	= true;
 		playerGUI.Controls.Draw		[iOffset + iButton].NoClient	= true;
 		//playerGUI.Controls.Constraints[iOffset + iButton].AttachSizeToControl.x	= ::gpk::cid_t(iOffset + iButton + 1);
 	}
@@ -189,9 +189,9 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 		playerGUI.Controls.Draw	[viewport.Viewport + 0].NoClient	= 
 		playerGUI.Controls.Draw	[viewport.Viewport + 1].NoClient	= 
 		playerGUI.Controls.Draw	[viewport.Viewport + 2].NoClient	= true;
-		playerGUI.Controls.Draw	[viewport.Viewport + 0].NoBorder	= 
-		playerGUI.Controls.Draw	[viewport.Viewport + 1].NoBorder	= 
-		playerGUI.Controls.Draw	[viewport.Viewport + 2].NoBorder	= true;
+		playerGUI.Controls.Draw	[viewport.Viewport + 0].NoBorder	= true;
+		playerGUI.Controls.Draw	[viewport.Viewport + 1].NoBorder	= true;
+		//playerGUI.Controls.Draw	[viewport.Viewport + 2].NoBorder	= true;
 
 		::gpk::m4f32				& matrixProjection	= viewport.MatrixProjection;
 		matrixProjection.FieldOfView(::gpk::math_pi * .25, MODULE_CAMERA_SIZE.x / (double)MODULE_CAMERA_SIZE.y, 0.01, 500.0);
@@ -484,7 +484,7 @@ static	::gpk::error_t	uiPlayerUpdateHome	(::ghg::SUIPlayer & uiPlayer, uint16_t 
 		(*playerGUI.Colors->Palette)[colorCombo[::gpk::UI_CONTROL_AREA_BACKGROUND	]] = shipColor;
 		playerGUI.Controls.Draw[uiPlayer.InputBox.IdText].ColorTheme = controlDraw.ColorTheme;
 		playerGUI.Controls.Draw[uiPlayer.InputBox.IdText].NoClient = true;
-		playerGUI.Controls.Draw[uiPlayer.InputBox.IdText].NoBorder = true;
+		//playerGUI.Controls.Draw[uiPlayer.InputBox.IdText].NoBorder = true;
 
 	}
 	return 0;
