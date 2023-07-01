@@ -4,7 +4,7 @@
 
 #include "gpk_framework.h"
 
-//#include "gpk_udp_client.h"
+//#include "gpk_udp_client_app.h"
 
 #ifndef CED_DEMO_08_H_298837492837
 #define CED_DEMO_08_H_298837492837
@@ -15,8 +15,6 @@ struct SApplication {
 	::std::mutex			LockGUI;
 	::std::mutex			LockRender;
 
-	bool					DebugUIEnabled		= true;
-	::gpk::SGUI				DebugUI				= {};
 	::gpk::AUDIO_STATE		AudioState;
 
 	::ghg::SGalaxyHellApp	GalaxyHellApp;
@@ -24,7 +22,7 @@ struct SApplication {
 	HDC						DrawingContext		= {};
 	HGLRC					GLRenderContext	= {}; 
  
-	//::gpk::SUDPClient		Client;
+	//::gpk::SClient		Client;
 
 							SApplication		(::gpk::SRuntimeValues & runtimeValues)	: Framework(runtimeValues)		{ GalaxyHellApp.Game.ShipState.Engine.Scene->Graphics.create(); }
 };
