@@ -235,17 +235,17 @@ static	::gpk::error_t	shipNodeCreateRoot	(::gpk::SRenderNodeManager & nodes, ::g
 	return rootNode;
 }
 
-static	::gpk::error_t	shipNodeBuildEngine			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildWafer			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildWaferShotgun	(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildGun			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildShotgun		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildCannon			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildCannonball		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildRocket			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildMissile		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildBullet			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildShred			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildEngine			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildWafer			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildWaferShotgun	(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildGun			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildShotgun		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildCannon			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildCannonball		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildRocket			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildMissile		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildBullet			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	::gpk::error_t	shipNodeBuildShred			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
 
 static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 	gpk::pobj<gpk::SEngineScene>	scene			= engine.Scene;
@@ -297,7 +297,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		solarSystem.PlayState.TimeStart = solarSystem.PlayState.TimeLast = ::gpk::timeCurrent();
 		memset(solarSystem.ShipState.ShipScores.begin(), 0, solarSystem.ShipState.ShipScores.byte_count());
 		while(solarSystem.Pilots.size() < solarSystem.PlayState.CountPlayers) {
-			char text [64] = {};
+			char						text [64]				= {};
 			sprintf_s(text, "Player %i", solarSystem.Pilots.size() + 1);
 			solarSystem.Pilots.push_back({::gpk::label(text), PLAYER_COLORS[solarSystem.Pilots.size() % ::gpk::size(PLAYER_COLORS)]});
 		}
@@ -387,7 +387,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		}
 
 
-		constexpr int32_t			DEFAULT_NITRO					= 1;
+		cnstxpr int32_t				DEFAULT_NITRO					= 1;
 		// set up weapons
 		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
 			::ghg::SShipCore			& ship							= solarSystem.ShipState.ShipCores[iShip];
@@ -404,7 +404,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 					uint32_t				maxWeapon						= ::gpk::min(solarSystem.PlayState.Stage, ::gpk::size(weaponDefinitions) - 1);
 
 					weapon				= (int32_t)::gpk::clamp((uint32_t)minWeapon + iPart, minWeapon, maxWeapon);
-					solarSystem.ShipState.ShipOrbiterActionQueue[shipParts[0]].push_back(SHIP_ACTION_spawn);
+					solarSystem.ShipState.ShipOrbiterActionQueue[shipParts[0]].push_back(SHIP_ACTION_Spawn);
 
 				}
 				else {

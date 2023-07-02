@@ -213,7 +213,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	// make it the calling thread's current rendering context 
 	wglMakeCurrent (app.DrawingContext, app.GLRenderContext);
  
-// call OpenGL APIs as desired ... 
+	// call OpenGL APIs as desired ... 
  
 
 	return 0;
@@ -236,7 +236,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 			::std::lock_guard			lockRTPool	(app.GalaxyHellApp.RenderTargetLockPool);
 
 			app.GalaxyHellApp.RenderTargetPool.push_back(app.Framework.RootWindow.BackBuffer);
-			app.Framework.RootWindow.BackBuffer	= app.GalaxyHellApp.RenderTargetQueue[app.GalaxyHellApp.RenderTargetQueue.size() - 1];
+			app.Framework.RootWindow.BackBuffer		= app.GalaxyHellApp.RenderTargetQueue[app.GalaxyHellApp.RenderTargetQueue.size() - 1];
 			app.GalaxyHellApp.RenderTargetQueue.pop_back();
 			for(uint32_t iRT = 0; iRT < app.GalaxyHellApp.RenderTargetQueue.size(); ++iRT) {
 				app.GalaxyHellApp.RenderTargetPool.push_back(app.GalaxyHellApp.RenderTargetQueue[iRT]);

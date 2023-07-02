@@ -116,25 +116,25 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(SHIP_PART_TYPE, Tractor		, 9);
 
 	GDEFINE_ENUM_TYPE (SHIP_ACTION, uint8_t);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, spawn			, 0);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, move_left		, 1);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, move_right		, 2);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, move_up			, 3);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, move_down		, 4);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, rotate_x_up		, 5);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, rotate_x_down	, 6);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, rotate_z_front	, 7);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, rotate_z_back	, 8);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, rotate_y_left	, 9);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, rotate_y_right	, 10);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, turbo			, 11);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, bomb			, 12);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, lock			, 13);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, unlock			, 14);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, dash			, 15);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, vanish			, 16);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, explode			, 17);
-	GDEFINE_ENUM_VALUE(SHIP_ACTION, hit				, 18);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Spawn			, 0);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Move_left		, 1);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Move_right		, 2);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Move_up			, 3);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Move_down		, 4);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Rotate_x_up		, 5);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Rotate_x_down	, 6);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Rotate_z_front	, 7);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Rotate_z_back	, 8);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Rotate_y_left	, 9);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Rotate_y_right	, 10);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Turbo			, 11);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Bomb			, 12);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Lock			, 13);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Unlock			, 14);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Dash			, 15);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Vanish			, 16);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Explode			, 17);
+	GDEFINE_ENUM_VALUE(SHIP_ACTION, Hit				, 18);
 
 #pragma pack(push, 1)
 	struct SOrbiter {
@@ -160,12 +160,12 @@ namespace ghg
 	};
 
 	struct SShipCore {
-		// Const
+		// Generally constants, little or no variation during level gameplay
 		int32_t			Entity			;
 		int32_t			Team			;
 		int32_t			MaxNitro		;
 
-		// Variable
+		// Variable, may change at any time during 
 		int32_t			Health			;
 		double			Nitro			;
 		uint32_t		AvailableNitros	;

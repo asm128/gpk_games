@@ -207,7 +207,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 	for(uint32_t iShip = 0; iShip < app.Game.ShipState.ShipOrbiterActionQueue.size(); ++iShip)
 		if(iShip < app.Game.PlayState.CountPlayers) {
 			for(uint32_t iEvent = 0; iEvent < app.Game.ShipState.ShipOrbiterActionQueue[iShip].size(); ++iEvent)
-				if(app.Game.ShipState.ShipOrbiterActionQueue[iShip][iEvent] == ::ghg::SHIP_ACTION_spawn) {
+				if(app.Game.ShipState.ShipOrbiterActionQueue[iShip][iEvent] == ::ghg::SHIP_ACTION_Spawn) {
 					app.Save(::ghg::SAVE_MODE_STAGE);
 					app.Game.ShipState.ShipOrbiterActionQueue[iShip][iEvent] = (::ghg::SHIP_ACTION)-1;
 				}

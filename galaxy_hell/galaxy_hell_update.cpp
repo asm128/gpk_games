@@ -39,7 +39,7 @@ static	::gpk::error_t	collisionDetect		(::ghg::SShots & shots, const ::gpk::n3f3
 }
 
 static	::gpk::error_t	handleCollisionPoint		(::ghg::SGalaxyHell & solarSystem, int32_t weaponDamage, ::ghg::SShipScore & attackerScore, ::ghg::SShipScore & damagedScore, ::ghg::SOrbiter& damagedPart, ::ghg::SShipCore & damagedShip, int32_t iAttackedShip, const ::gpk::n3f32 & sphereCenter, const ::gpk::n3f32 & collisionPoint)	{
-	solarSystem.ShipState.ShipOrbiterActionQueue[iAttackedShip].push_back(::ghg::SHIP_ACTION_hit);
+	solarSystem.ShipState.ShipOrbiterActionQueue[iAttackedShip].push_back(::ghg::SHIP_ACTION_Hit);
 	const ::gpk::n3f32			bounceVector				= (collisionPoint - sphereCenter).Normalize();
 	solarSystem.DecoState.Debris.SpawnDirected(1 + weaponDamage / 10, 0.3, bounceVector, collisionPoint, 50, 1);
 	attackerScore.Hits		+= 1;
@@ -490,13 +490,13 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 
 	double						secondsToProcess			= ::gpk::min(actualSecondsLastFrame, 0.15);
 	for(uint32_t iShip = 0; iShip < solarSystem.ShipState.ShipCores.size(); ++iShip) {
-		::gpk::au16					& shipParts				= solarSystem.ShipState.ShipParts[iShip];
-		const uint32_t				iBody					= solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCores[iShip].Entity].Body;
+		::gpk::au16					& shipParts					= solarSystem.ShipState.ShipParts[iShip];
+		const uint32_t				iBody						= solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCores[iShip].Entity].Body;
 		solarSystem.ShipState.Engine.Integrator.SetActive (iBody, true);
 		solarSystem.ShipState.Engine.Integrator.Flags		[iBody].UpdatedTransform	= false;
 		for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
-			::ghg::SOrbiter				& shipPart				= solarSystem.ShipState.Orbiters[shipParts[iPart]];
-			::std::lock_guard			lockUpdate				(solarSystem.LockUpdate);
+			::ghg::SOrbiter				& shipPart					= solarSystem.ShipState.Orbiters[shipParts[iPart]];
+			::std::lock_guard			lockUpdate					(solarSystem.LockUpdate);
 			memcpy(solarSystem.ShipState.Shots[shipPart.Weapon].PositionDraw.begin(), solarSystem.ShipState.Shots[shipPart.Weapon].Particles.Position.begin(), solarSystem.ShipState.Shots[shipPart.Weapon].Particles.Position.size() * sizeof(::gpk::n3f32));
 			solarSystem.ShipState.Engine.Integrator.SetActive(solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body, true);
 			solarSystem.ShipState.Engine.Integrator.Flags[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body].UpdatedTransform	= false;
@@ -504,7 +504,7 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 	}
 
 	{
-		::std::lock_guard			lockUpdate				(solarSystem.LockUpdate);
+		::std::lock_guard			lockUpdate					(solarSystem.LockUpdate);
 		::ghg::decoUpdate(solarSystem.DecoState, secondsToProcess, solarSystem.PlayState.RelativeSpeedCurrent, targetMetrics);
 	}
 
@@ -519,7 +519,7 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 			solarSystem.PlayState.TimeScale	= ::gpk::min(1.0, solarSystem.PlayState.TimeScale += secondsToProcess * .45);
 	}
 	secondsToProcess		*= solarSystem.PlayState.TimeScale;
-	stacxpr	const double		relativeAcceleration	= 20;
+	stacxpr	double				relativeAcceleration	= 20;
 	if(solarSystem.PlayState.AccelerationControl > 0)
 		solarSystem.PlayState.RelativeSpeedCurrent	+= secondsToProcess * relativeAcceleration;
 	else if(solarSystem.PlayState.AccelerationControl < 0)
