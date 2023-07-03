@@ -106,8 +106,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 		return result;
 	}));
 
-	if(systemExit)
-		return 1;
+	rvi_if(::gpk::APPLICATION_STATE_EXIT, systemExit || systemRequestedExit, "%s || %s", ::gpk::bool2char(systemExit), ::gpk::bool2char(systemRequestedExit));
 
 	::gpk::SFrameInfo			& frameInfo				= framework.FrameInfo;
 	{
@@ -116,8 +115,6 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 		timer.Frame();
 		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
-
-	rvis_if(::gpk::APPLICATION_STATE_EXIT, systemRequestedExit);
 
 #if !defined(DISABLE_D3D11)
 	if(app.CampApp.ActiveState >= ::ssiege::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.CampApp.World.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
