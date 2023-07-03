@@ -49,7 +49,7 @@ namespace ghg
 		PLAY_TYPE			PlayType				= (PLAY_TYPE)0;
 		PLAY_MODE			PlayMode				= (PLAY_MODE)PLAY_MODE_VR;
 
-		uint32_t			Stage					= 10;
+		uint32_t			Stage					= 0;
 		double				TimeStage				= 0;
 		double				TimeWorld				= 0;
 		double				TimeRealStage			= 0;
