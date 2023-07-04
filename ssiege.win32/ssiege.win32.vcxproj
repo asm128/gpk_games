@@ -168,6 +168,20 @@
   <ItemGroup>
     <ClInclude Include="ssiege.win32.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\gpk\gpk_engine\gpk_engine.vcxproj">
+      <Project>{976fe3ea-9fd1-4066-9003-0e8513f9d900}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\gpk\llc\llc.vcxproj">
+      <Project>{830ab681-b788-47d4-9767-ba4e0792f682}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\zlib\contrib\vstudio\vc14\zlibvc.vcxproj">
+      <Project>{8fd826f8-3739-44e6-8cc8-997122e53b8d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ssiege\ssiege.vcxproj">
+      <Project>{2054e582-b7be-4568-93ce-de0dbc0c56eb}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
