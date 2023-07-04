@@ -6,7 +6,7 @@
 
 namespace ssiege
 {
-	struct SSSiegeServerMessage { ::ssiege::campid_t Id; ::ssiege::EventSSiege Event; };
+	struct SSSiegeServerMessage { ::ssiege::ssiegeid_t Id; ::ssiege::EventSSiege Event; };
 
 	struct SSSiegeServer : ::ssiege::SSSiegeApp {
 		::gpk::apobj<::ssiege::EventSSiege>	EventsToSend;

@@ -9,8 +9,8 @@ namespace ssiege
 {
 #pragma pack(push, 1)
 	struct SArgsEvent { // TODO: This will do for now. Maybe we can use a json format later on for more flexibility customizing for each event type.
-		campid_t				IdSource			= {}; 
-		campid_t				IdTarget			= {}; 
+		ssiegeid_t				IdSource			= {}; 
+		ssiegeid_t				IdTarget			= {}; 
 		::gpk::n3f32			CoordSource			= {}; 
 		::gpk::n3f32			CoordTarget			= {}; 
 
@@ -19,7 +19,7 @@ namespace ssiege
 			float		AsFloat; 
 		}						Value				= {};
 
-		campid_t				Id					= {};
+		ssiegeid_t				Id					= {};
 	};
 #pragma pack(pop)
 

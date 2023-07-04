@@ -20,12 +20,12 @@ namespace ssiege
 		::gpk::vcc				SavegameFolder				= {1, "."};
 		::gpk::vcc				ExtensionImages				= {4, ".png"};
 		::gpk::vcc				ExtensionProfile			= {6, ".ssiege"};
-		::gpk::vcc				ExtensionCredentials		= {6, ".campc"};
-		::gpk::vcc				ExtensionSave				= {6, ".campz"};
-		::gpk::vcc				ExtensionSaveUser			= {11, ".user.campz"};
-		::gpk::vcc				ExtensionSaveAuto			= {11, ".auto.campz"};
-		::gpk::vcc				ExtensionSaveStage			= {12, ".stage.campz"};
-		::gpk::vcc				ExtensionSaveQuick			= {12, ".quick.campz"};
+		::gpk::vcc				ExtensionCredentials		= {6, ".ssiegec"};
+		::gpk::vcc				ExtensionSave				= {6, ".ssiegez"};
+		::gpk::vcc				ExtensionSaveUser			= {11, ".user.ssiegez"};
+		::gpk::vcc				ExtensionSaveAuto			= {11, ".auto.ssiegez"};
+		::gpk::vcc				ExtensionSaveStage			= {12, ".stage.ssiegez"};
+		::gpk::vcc				ExtensionSaveQuick			= {12, ".quick.ssiegez"};
 
 		::gpk::error_t			GetSaveGameExtension		(SAVE_MODE saveMode, ::gpk::vcc & extension)	const	{
 			switch(saveMode) {
@@ -64,7 +64,7 @@ namespace ssiege
 		::gpk::apachar			InputQueue			= {};
 	};
 
-	::gpk::error_t			setupSSiegeUI			(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & campUI);
+	::gpk::error_t			setupSSiegeUI			(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & ssiegeUI);
 
 
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
@@ -84,7 +84,7 @@ namespace ssiege
 	GDEFINE_ENUM_VALUE(APP_STATE, Quit		, 13);
 
 	struct SPlayer {
-		campid_t				Id					= CAMPID_INVALID;
+		ssiegeid_t				Id					= SSIEGEID_INVALID;
 		::gpk::vcc				User				= {};
 		::gpk::vcc				Name				= {};
 	};
@@ -105,7 +105,7 @@ namespace ssiege
 
 		SCamera					Camera				= {};
 
-		campid_t				CharacterControlled	= CAMPID_INVALID;
+		ssiegeid_t				CharacterControlled	= SSIEGEID_INVALID;
 		::gpk::aobj<::ssiege::SPlayer>	Players;
 
 		gpk::pobj<gpk::SGUI>	GUI;

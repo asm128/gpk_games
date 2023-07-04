@@ -176,41 +176,41 @@ namespace ssiege
 
 	struct SMiniMe {
 		::gpk::vcc				Name;
-		uint32_t				Camp;
+		uint32_t				Hangar;
 
 		::gpk::error_t			Save				(::gpk::au8 & output)	const	{ 
 			gpk_necs(::gpk::saveView(output, Name)); 
-			gpk_necs(::gpk::savePOD (output, Camp)); 
+			gpk_necs(::gpk::savePOD (output, Hangar)); 
 			return 0;
 		}
 
 		::gpk::error_t			Load				(::gpk::vcu8 & input)	{ 
 			gpk_necs(::gpk::loadLabel(input, Name)); 
-			gpk_necs(::gpk::loadPOD  (input, Camp)); 
+			gpk_necs(::gpk::loadPOD  (input, Hangar)); 
 			return 0;
 		}
 	};
 
-	struct SCamp {
+	struct SHangar {
 		::gpk::n2u16			Size;
-		acampid					Furniture;
+		assiegeid					Furniture;
 	};
 
 	struct SWorldArea {
 		::gpk::n2u32			Offset;
-		::gpk::au32				Camps;
+		::gpk::au32				Hangars;
 		::gpk::au32				Characters;
 
 		::gpk::error_t			Save				(::gpk::au8 & output)	const	{ 
 			gpk_necs(::gpk::savePOD (output, Offset)); 
-			gpk_necs(::gpk::saveView(output, Camps)); 
+			gpk_necs(::gpk::saveView(output, Hangars)); 
 			gpk_necs(::gpk::saveView(output, Characters)); 
 			return 0;
 		}
 
 		::gpk::error_t			Load				(::gpk::vcu8 & input)	{ 
 			gpk_necs(::gpk::loadPOD (input, Offset)); 
-			gpk_necs(::gpk::loadView(input, Camps)); 
+			gpk_necs(::gpk::loadView(input, Hangars)); 
 			gpk_necs(::gpk::loadView(input, Characters)); 
 			return 0;
 		}
@@ -273,7 +273,7 @@ namespace ssiege
 	struct SWorldView {
 		SWorldState				WorldState;
 		SWorldConfig			WorldConfig;
-		::gpk::apod<SCamp>		Camps;
+		::gpk::apod<SHangar>	Hangars;
 		::gpk::aobj<SMiniMe>	Characters;
 		SWorldTiles				Tiles;
 		::gpk::SPlanetarySystem	SolarSystem;
@@ -283,7 +283,7 @@ namespace ssiege
 		::gpk::error_t			Save				(::gpk::au8 & output)	const	{ 
 			gpk_necs(::gpk::savePOD(output, WorldConfig)); 
 			gpk_necs(::gpk::savePOD(output, WorldState)); 
-			gpk_necs(::gpk::saveView(output, Camps));
+			gpk_necs(::gpk::saveView(output, Hangars));
 			gpk_necs(::gpk::savePOD(output, Characters.size())); 
 			for(uint32_t iCharacter = 0; iCharacter < Characters.size(); ++iCharacter)
 				gpk_necall(Characters[iCharacter].Save(output), "Failed to save character %i", iCharacter);
@@ -296,7 +296,7 @@ namespace ssiege
 		::gpk::error_t			Load				(::gpk::vcu8 & input)	{ 
 			gpk_necs(::gpk::loadPOD(input, WorldConfig)); 
 			gpk_necs(::gpk::loadPOD(input, WorldState)); 
-			gpk_necs(::gpk::loadView(input, Camps));
+			gpk_necs(::gpk::loadView(input, Hangars));
 			uint32_t					characterCount;
 			gpk_necs(::gpk::loadPOD(input, characterCount)); 
 			for(uint32_t iMiniMes = 0; iMiniMes < characterCount; ++iMiniMes) { 

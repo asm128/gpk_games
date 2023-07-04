@@ -5,21 +5,21 @@
 #include "gpk_event_screen.h"
 #include "gpk_path.h"
 
-static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & campUI) {
-	gpk_necs(::gpk::inputBoxCreate(campUI.UserInput, gui, campUI.Root));
-	campUI.UserInput.MaxLength	= 64;
-	gpk_necs(campUI.UserInput.Edit(gui, true));
+static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & ssiegeUI) {
+	gpk_necs(::gpk::inputBoxCreate(ssiegeUI.UserInput, gui, ssiegeUI.Root));
+	ssiegeUI.UserInput.MaxLength	= 64;
+	gpk_necs(ssiegeUI.UserInput.Edit(gui, true));
 
-	gui.Controls.Placement[campUI.UserInput.IdRoot].Align		= ::gpk::ALIGN_CENTER_BOTTOM;
-	gui.Controls.Placement[campUI.UserInput.IdRoot].Area.Size.y	= gui.Controls.Placement[campUI.UserInput.IdText].Area.Size.y;
-	gpk_necs(gui.Controls.SetHidden(campUI.UserInput.VirtualKeyboard.IdRoot, true));
+	gui.Controls.Placement[ssiegeUI.UserInput.IdRoot].Align		= ::gpk::ALIGN_CENTER_BOTTOM;
+	gui.Controls.Placement[ssiegeUI.UserInput.IdRoot].Area.Size.y	= gui.Controls.Placement[ssiegeUI.UserInput.IdText].Area.Size.y;
+	gpk_necs(gui.Controls.SetHidden(ssiegeUI.UserInput.VirtualKeyboard.IdRoot, true));
 	return 0;
 }
 
 // initialize root gui layout and console input/virtual keyboard
-::gpk::error_t			ssiege::setupSSiegeUI		(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & campUI) {
-	gpk_necs(campUI.Root = ::gpk::createScreenLayout(gui));
-	gpk_necs(::setupConsole(gui, campUI));
+::gpk::error_t			ssiege::setupSSiegeUI		(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & ssiegeUI) {
+	gpk_necs(ssiegeUI.Root = ::gpk::createScreenLayout(gui));
+	gpk_necs(::setupConsole(gui, ssiegeUI));
 	return 0; 
 }
 
