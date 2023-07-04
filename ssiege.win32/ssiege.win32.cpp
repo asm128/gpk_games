@@ -14,7 +14,7 @@
 
 #include <DirectXColors.h>
 
-GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Campp v0.1");
+GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "SSiege v0.1");
 
 // --- Cleanup application resources.
 ::gpk::error_t			cleanup					(::SApplication & app)											{
@@ -25,7 +25,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Campp v0.1");
 #endif
 
 	gpk_necs(::gpk::mainWindowDestroy(mainWindow));
-	gpk_necs(::ssiege::ssiegeUpdate(app.CampApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
+	gpk_necs(::ssiege::ssiegeUpdate(app.SSiegeApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
 	return 0;
 }
 
@@ -47,7 +47,7 @@ static	::gpk::error_t	processScreenEvent		(::SApplication & app, const ::gpk::SE
 	default: break;
 	case ::gpk::EVENT_SCREEN_Create:
 #if !defined(DISABLE_D3D11)
-		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.CampApp.World.Engine.Scene->Graphics));
+		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.SSiegeApp.World.Engine.Scene->Graphics));
 #endif
 	case ::gpk::EVENT_SCREEN_Resize: 
 		gpk_necs(::updateSizeDependentResources(app));
@@ -111,14 +111,14 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 	::gpk::SFrameInfo			& frameInfo				= framework.FrameInfo;
 	{
 		::gpk::STimer				timer					= {};
-		rvis_if(::gpk::APPLICATION_STATE_EXIT, ::ssiege::APP_STATE_Quit == ::ssiege::ssiegeUpdate(app.CampApp, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue, {}))
+		rvis_if(::gpk::APPLICATION_STATE_EXIT, ::ssiege::APP_STATE_Quit == ::ssiege::ssiegeUpdate(app.SSiegeApp, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue, {}))
 		timer.Frame();
 		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
 
 #if !defined(DISABLE_D3D11)
-	if(app.CampApp.ActiveState >= ::ssiege::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.CampApp.World.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
-		gpk_necs(app.D3DApp.CreateDeviceResources(*app.CampApp.World.Engine.Scene->Graphics));
+	if(app.SSiegeApp.ActiveState >= ::ssiege::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.World.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
+		gpk_necs(app.D3DApp.CreateDeviceResources(*app.SSiegeApp.World.Engine.Scene->Graphics));
 	}
 	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (uint32_t)frameInfo.FramesPerSecond);
 #endif
@@ -135,16 +135,16 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 
 ::gpk::error_t			draw					(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	const ::gpk::n3f32			sunlightPos				= ::gpk::calcSunPosition();
-	const double				sunlightFactor			= ::gpk::calcSunlightFactor(app.CampApp.World.WorldState.DaylightRatioExtra, app.CampApp.World.WorldState.DaylightOffsetMinutes);
+	const double				sunlightFactor			= ::gpk::calcSunlightFactor(app.SSiegeApp.World.WorldState.DaylightRatioExtra, app.SSiegeApp.World.WorldState.DaylightOffsetMinutes);
 	const ::gpk::rgbaf			clearColor				= ::gpk::interpolate_linear(::gpk::DARKBLUE * .25, ::gpk::LIGHTBLUE * 1.1, sunlightFactor);
 
 #if !defined(DISABLE_D3D11) 
 	memset(app.D3DApp.GUIStuff.RenderTarget.begin(), 0, app.D3DApp.GUIStuff.RenderTarget.byte_count());
 	
-	gpk_necs(::gpk::guiDraw(*app.CampApp.GUI, app.D3DApp.GUIStuff.RenderTarget));
+	gpk_necs(::gpk::guiDraw(*app.SSiegeApp.GUI, app.D3DApp.GUIStuff.RenderTarget));
 
-	const ::ssiege::SCamera		& cameraSelected		= app.CampApp.Camera;
-	const ::gpk::SEngineScene	& engineScene			= *app.CampApp.World.Engine.Scene;
+	const ::ssiege::SCamera		& cameraSelected		= app.SSiegeApp.Camera;
+	const ::gpk::SEngineScene	& engineScene			= *app.SSiegeApp.World.Engine.Scene;
 	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, sunlightPos, cameraSelected.Offset, cameraSelected.Target, {.01f, 10000.f}));
 #else 
 	::gpk::SFramework			& framework				= app.Framework;

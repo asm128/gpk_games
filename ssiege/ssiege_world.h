@@ -1,6 +1,6 @@
 #include "ssiege_event.h"
 #include "ssiege_id.h"
-#include "ssiege_solar_system.h"
+#include "gpk_engine_planetary_system.h"
 
 #include "gpk_img_serialize.h"
 #include "gpk_engine.h"
@@ -29,8 +29,8 @@
 // Iapetus - 84° W of crater Almeric
 // The IAU also defines meridians for some dwarf planets, asteroids, and comets.
 
-#ifndef CAMPP_WORLD_H_23701
-#define CAMPP_WORLD_H_23701
+#ifndef SSIEGE_WORLD_H_23701
+#define SSIEGE_WORLD_H_23701
 
 namespace ssiege
 {
@@ -276,7 +276,7 @@ namespace ssiege
 		::gpk::apod<SCamp>		Camps;
 		::gpk::aobj<SMiniMe>	Characters;
 		SWorldTiles				Tiles;
-		::ssiege::SSolarSystem	SolarSystem;
+		::gpk::SPlanetarySystem	SolarSystem;
 
 		::gpk::SEngine			Engine;
 
@@ -311,7 +311,7 @@ namespace ssiege
 		}
 	};
 
-	::gpk::error_t			worldViewUpdate		(::ssiege::SWorldView & world, ::gpk::vpobj<::ssiege::EventCampp> inputEvents, ::gpk::apobj<::ssiege::EventCampp> & outputEvents, double secondsElapsed);
+	::gpk::error_t			worldViewUpdate		(::ssiege::SWorldView & world, ::gpk::vpobj<::ssiege::EventSSiege> inputEvents, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents, double secondsElapsed);
 	::gpk::error_t			worldViewDraw		(::ssiege::SWorldView & pool
 		, ::gpk::rtbgra8d32			& backBuffer
 		, const ::gpk::n3f32		& cameraPosition
@@ -321,4 +321,4 @@ namespace ssiege
 		);
 } // namespace ssiege
 
-#endif // CAMPP_WORLD_H_23701
+#endif // SSIEGE_WORLD_H_23701

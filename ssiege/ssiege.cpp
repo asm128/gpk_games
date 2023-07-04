@@ -5,7 +5,7 @@
 #include "gpk_event_screen.h"
 #include "gpk_path.h"
 
-static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssiege::SCampUI & campUI) {
+static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & campUI) {
 	gpk_necs(::gpk::inputBoxCreate(campUI.UserInput, gui, campUI.Root));
 	campUI.UserInput.MaxLength	= 64;
 	gpk_necs(campUI.UserInput.Edit(gui, true));
@@ -17,21 +17,21 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssiege::SCampUI & cam
 }
 
 // initialize root gui layout and console input/virtual keyboard
-::gpk::error_t			ssiege::setupCampUI		(::gpk::SGUI & gui, ::ssiege::SCampUI & campUI) {
+::gpk::error_t			ssiege::setupSSiegeUI		(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & campUI) {
 	gpk_necs(campUI.Root = ::gpk::createScreenLayout(gui));
 	gpk_necs(::setupConsole(gui, campUI));
 	return 0; 
 }
 
-::gpk::error_t			ssiege::SCampApp::StateSwitch(APP_STATE newState) {
+::gpk::error_t			ssiege::SSSiegeApp::StateSwitch(APP_STATE newState) {
 	::gpk::SGUI					& gui				= *GUI;
 	::gpk::SControlTable		& table				= gui.Controls;
 	if(newState != ActiveState) {
 		info_printf("Switching state: (%i) -> (%i) - '%s' -> '%s'", ActiveState, newState, ::gpk::get_value_namep(ActiveState), ::gpk::get_value_namep(newState));
 
 		if(0 == ActiveState || 0 == gui.Controls.States.size() || ::gpk::CID_INVALID == UI.Root) {
-			gpk_necs(::ssiege::setupCampUI(gui, UI));
-			gpk_necs(::ssiege::solarSystemSetup(World.SolarSystem, World.Engine, "./ssiege_solar_system.json"));
+			gpk_necs(::ssiege::setupSSiegeUI(gui, UI));
+			gpk_necs(::gpk::planetarySystemSetup(World.SolarSystem, World.Engine, "./ssiege_solar_system.json"));
 		}
 		while(newState >= UI.RootPerState.size()) {	// create layouts for each state as they're required
 			::gpk::cid_t				rootId;
@@ -54,7 +54,7 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssiege::SCampUI & cam
 }
 
 
-::gpk::error_t			ssiege::ssiegeDraw		(::ssiege::SCampApp & app, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI) { 
+::gpk::error_t			ssiege::ssiegeDraw		(::ssiege::SSSiegeApp & app, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI) { 
 	if(false == onlyGUI) {
 		const ::ssiege::SCamera		& cameraSelected	= app.Camera;
 		gpk_necs(::ssiege::worldViewDraw(app.World, backBuffer, cameraSelected.Offset, cameraSelected.Target, {.1f, 10000.f}));
@@ -63,7 +63,7 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssiege::SCampUI & cam
 	return 0; 
 }
 
-static	::gpk::error_t	processScreenEvent		(::ssiege::SCampApp & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
+static	::gpk::error_t	processScreenEvent		(::ssiege::SSSiegeApp & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_SCREEN_Close:
@@ -92,7 +92,7 @@ static	::gpk::error_t	processScreenEvent		(::ssiege::SCampApp & app, const ::gpk
 	return 0;
 }
 
-static	::gpk::error_t	processTextEvent		(::ssiege::SCampApp & /*app*/, const ::gpk::SEventView<::gpk::EVENT_TEXT> & screenEvent) { 
+static	::gpk::error_t	processTextEvent		(::ssiege::SSSiegeApp & /*app*/, const ::gpk::SEventView<::gpk::EVENT_TEXT> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_TEXT_Char: break;
@@ -100,7 +100,7 @@ static	::gpk::error_t	processTextEvent		(::ssiege::SCampApp & /*app*/, const ::g
 	return 0;
 }
 
-static	::gpk::error_t	processKeyboardEvent	(::ssiege::SCampApp & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
+static	::gpk::error_t	processKeyboardEvent	(::ssiege::SSSiegeApp & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_KEYBOARD_Down:
@@ -120,7 +120,7 @@ static	::gpk::error_t	processKeyboardEvent	(::ssiege::SCampApp & app, const ::gp
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent		(::ssiege::SCampApp & app, const ::gpk::SSystemEvent & sysEvent) { 
+static	::gpk::error_t	processSystemEvent		(::ssiege::SSSiegeApp & app, const ::gpk::SSystemEvent & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen		: gpk_necs(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN		>(sysEvent, [&app](auto ev) { return processScreenEvent		(app, ev); })); break;
@@ -130,7 +130,7 @@ static	::gpk::error_t	processSystemEvent		(::ssiege::SCampApp & app, const ::gpk
 	return 0;
 }
 
-static	::gpk::error_t	updateInput				(::ssiege::SCampUI & /*ui*/, ::ssiege::SWorldView & world, double actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 /*mouseDeltas*/, ::gpk::vcu8 /*buttonStates*/) { 
+static	::gpk::error_t	updateInput				(::ssiege::SSSiegeUI & /*ui*/, ::ssiege::SWorldView & world, double actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 /*mouseDeltas*/, ::gpk::vcu8 /*buttonStates*/) { 
 	const double				secondsElapsed			= actualSecondsElapsed * world.WorldState.TimeScale;
 
 	if(keyStates[VK_CONTROL]) {
@@ -145,7 +145,7 @@ static	::gpk::error_t	updateInput				(::ssiege::SCampUI & /*ui*/, ::ssiege::SWor
 	return 0;
 }
 
-static	::gpk::error_t	parseCommands			(gpk::vpobj<gpk::achar> inputQueue, gpk::apobj<gpk::achar> & inputHistory, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) { 
+static	::gpk::error_t	parseCommands			(gpk::vpobj<gpk::achar> inputQueue, gpk::apobj<gpk::achar> & inputHistory, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	inputQueue.for_each([&outputEvents, &inputHistory](::gpk::pachar & textLine) {
 		res_if(!textLine || 0 == textLine->size());	// Shouldn't get here please
 
@@ -158,21 +158,21 @@ static	::gpk::error_t	parseCommands			(gpk::vpobj<gpk::achar> inputQueue, gpk::a
 	return 0;
 }
 
-static	::gpk::error_t	handleCamppEvent		(::ssiege::SCampApp & app, ::gpk::pobj<::ssiege::EventCampp> & _eventToProcess, ::gpk::apobj<::ssiege::EventCampp> & appOutputEvents) { 
+static	::gpk::error_t	handleSSiegeEvent		(::ssiege::SSSiegeApp & app, ::gpk::pobj<::ssiege::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssiege::EventSSiege> & appOutputEvents) { 
 	if(!_eventToProcess)
 		return false;
 
-	const ssiege::EventCampp	& eventToProcess			= *_eventToProcess;
+	const ssiege::EventSSiege	& eventToProcess			= *_eventToProcess;
 	info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));
 
 	::gpk::error_t			result			= 0; 
 	switch(eventToProcess.Type) {
-	case ::ssiege::CAMPP_EVENT_CHAR_ACTION: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CHAR_ACTION>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCHAR_ACTION(app, ev, appOutputEvents); })); break; }
-	case ::ssiege::CAMPP_EVENT_WORLD_ADMIN: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_ADMIN>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_ADMIN(app, ev, appOutputEvents); })); break; }
-	case ::ssiege::CAMPP_EVENT_WORLD_EVENT: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_EVENT>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_EVENT(app, ev, appOutputEvents); })); break; }
-	case ::ssiege::CAMPP_EVENT_CLIENT_ASKS: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CLIENT_ASKS>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCLIENT_ASKS(app, ev, appOutputEvents); })); break; }
-	case ::ssiege::CAMPP_EVENT_WORLD_SETUP: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_SETUP>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_SETUP(app, ev, appOutputEvents); })); break; }
-	case ::ssiege::CAMPP_EVENT_WORLD_VALUE: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_VALUE>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_VALUE(app, ev, appOutputEvents); })); break; }
+	case ::ssiege::SSIEGE_EVENT_CHAR_ACTION: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CHAR_ACTION>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCHAR_ACTION(app, ev, appOutputEvents); })); break; }
+	case ::ssiege::SSIEGE_EVENT_WORLD_ADMIN: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_ADMIN>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_ADMIN(app, ev, appOutputEvents); })); break; }
+	case ::ssiege::SSIEGE_EVENT_WORLD_EVENT: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_EVENT>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_EVENT(app, ev, appOutputEvents); })); break; }
+	case ::ssiege::SSIEGE_EVENT_CLIENT_ASKS: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CLIENT_ASKS>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCLIENT_ASKS(app, ev, appOutputEvents); })); break; }
+	case ::ssiege::SSIEGE_EVENT_WORLD_SETUP: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_SETUP>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_SETUP(app, ev, appOutputEvents); })); break; }
+	case ::ssiege::SSIEGE_EVENT_WORLD_VALUE: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_VALUE>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_VALUE(app, ev, appOutputEvents); })); break; }
 	default: 
 		gpk_warning_unhandled_event(eventToProcess); 
 		break;
@@ -180,8 +180,8 @@ static	::gpk::error_t	handleCamppEvent		(::ssiege::SCampApp & app, ::gpk::pobj<:
 	return bool(result == 1);
 }
 
-::gpk::error_t			ssiege::ssiegeUpdate		(::ssiege::SCampApp & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
-	, ::gpk::FBool<::gpk::pobj<::ssiege::EventCampp> &, ::gpk::apobj<::ssiege::EventCampp> &> funcHandleEvent
+::gpk::error_t			ssiege::ssiegeUpdate		(::ssiege::SSSiegeApp & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
+	, ::gpk::FBool<::gpk::pobj<::ssiege::EventSSiege> &, ::gpk::apobj<::ssiege::EventSSiege> &> funcHandleEvent
 	) {
 	gpk_necs(systemEvents.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { es_if_failed(::processSystemEvent(app, *sysEvent)); }));
 
@@ -206,10 +206,10 @@ static	::gpk::error_t	handleCamppEvent		(::ssiege::SCampApp & app, ::gpk::pobj<:
 		gpk_necs(::updateInput(app.UI, worldView, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.i16(), inputState->MouseCurrent.ButtonState));
 
 		if(0 == funcHandleEvent)
-			funcHandleEvent			= [&app](::gpk::pobj<::ssiege::EventCampp> & _eventToProcess, ::gpk::apobj<::ssiege::EventCampp> & appOutputEvents) { return handleCamppEvent(app, _eventToProcess, appOutputEvents); };
+			funcHandleEvent			= [&app](::gpk::pobj<::ssiege::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssiege::EventSSiege> & appOutputEvents) { return handleSSiegeEvent(app, _eventToProcess, appOutputEvents); };
 
 		// Process the input queue with the app handlers before sending it to the world view updates.
-		app.EventQueue.for_each([&app, &funcHandleEvent](::gpk::pobj<::ssiege::EventCampp> & _eventToProcess){ 
+		app.EventQueue.for_each([&app, &funcHandleEvent](::gpk::pobj<::ssiege::EventSSiege> & _eventToProcess){ 
 			const bool					remove				= funcHandleEvent(_eventToProcess, app.EventQueue); 
 			if(remove)
 				_eventToProcess.clear();
@@ -220,7 +220,7 @@ static	::gpk::error_t	handleCamppEvent		(::ssiege::SCampApp & app, ::gpk::pobj<:
 			gpk_necs(::ssiege::worldViewUpdate(worldView, app.EventQueue, app.EventQueue, secondsElapsed));
 
 			if(app.EventQueue.size() > offsetToEnqueue)
-				app.EventQueue			= ::gpk::vpobj<::ssiege::EventCampp>{(::gpk::pobj<::ssiege::EventCampp>*)&app.EventQueue[offsetToEnqueue], app.EventQueue.size() - offsetToEnqueue};
+				app.EventQueue			= ::gpk::vpobj<::ssiege::EventSSiege>{(::gpk::pobj<::ssiege::EventSSiege>*)&app.EventQueue[offsetToEnqueue], app.EventQueue.size() - offsetToEnqueue};
 			else 
 				app.EventQueue.clear();
 		}

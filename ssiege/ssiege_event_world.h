@@ -1,7 +1,7 @@
 #include "gpk_event.h"
 
-#ifndef CAMPP_EVENT_WORLD_H_23701
-#define CAMPP_EVENT_WORLD_H_23701
+#ifndef SSIEGE_EVENT_WORLD_H_23701
+#define SSIEGE_EVENT_WORLD_H_23701
 
 namespace ssiege
 {
@@ -56,4 +56,4 @@ namespace ssiege
 #pragma pack(pop)
 } // namespace
 
-#endif // CAMPP_EVENT_WORLD_H_23701
+#endif // SSIEGE_EVENT_WORLD_H_23701

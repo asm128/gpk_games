@@ -2,8 +2,8 @@
 
 #include "gpk_n3.h"
 
-#ifndef CAMPP_EVENT_ARGS_H_23701
-#define CAMPP_EVENT_ARGS_H_23701
+#ifndef SSIEGE_EVENT_ARGS_H_23701
+#define SSIEGE_EVENT_ARGS_H_23701
 
 namespace ssiege
 {
@@ -27,4 +27,4 @@ namespace ssiege
 	::gpk::error_t			printArgsEvent		(const ::ssiege::SArgsEvent & eventArgs, ::gpk::achar & output);
 } // namespace
 
-#endif // CAMPP_EVENT_ARGS_H_23701
+#endif // SSIEGE_EVENT_ARGS_H_23701

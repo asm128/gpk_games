@@ -1,7 +1,7 @@
 #include "ssiege_world_handle.h"
 #include "ssiege_event_args.h"
 
-::gpk::error_t	ssiege::handleCHAR_ACTION		(::ssiege::SWorldView & world, const ::ssiege::EViewMinime & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) { 
+::gpk::error_t	ssiege::handleCHAR_ACTION		(::ssiege::SWorldView & world, const ::ssiege::EViewMinime & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	const ::ssiege::SArgsEvent	& eventArgs		= *(const ::ssiege::SArgsEvent*)gameEvent.Data.begin();
 	::ssiege::printArgsEvent(eventArgs);
@@ -26,7 +26,7 @@
 	}
 	return 0; 
 }
-::gpk::error_t	ssiege::handleWORLD_ADMIN		(::ssiege::SWorldView & world, const ::ssiege::EViewAdmin & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) { 
+::gpk::error_t	ssiege::handleWORLD_ADMIN		(::ssiege::SWorldView & world, const ::ssiege::EViewAdmin & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	const ::ssiege::SArgsEvent	& eventArgs			= *(const ::ssiege::SArgsEvent*)gameEvent.Data.begin();
 	::ssiege::printArgsEvent(eventArgs);
@@ -44,7 +44,7 @@
 	} 
 	return 0; 
 }
-::gpk::error_t	ssiege::handleWORLD_EVENT		(::ssiege::SWorldView & world, const ::ssiege::EViewWorld & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) { 
+::gpk::error_t	ssiege::handleWORLD_EVENT		(::ssiege::SWorldView & world, const ::ssiege::EViewWorld & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	const ::ssiege::SArgsEvent	& eventArgs			= *(const ::ssiege::SArgsEvent*)gameEvent.Data.begin();
 	::ssiege::printArgsEvent(eventArgs);
@@ -61,7 +61,7 @@
 	} 
 	return 0; 
 }
-::gpk::error_t	ssiege::handleCLIENT_ASKS		(::ssiege::SWorldView & world, const ::ssiege::EViewClient & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) { 
+::gpk::error_t	ssiege::handleCLIENT_ASKS		(::ssiege::SWorldView & world, const ::ssiege::EViewClient & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world;
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
@@ -71,7 +71,7 @@
 	return 0; 
 }
 
-::gpk::error_t	ssiege::handleWORLD_SETUP		(::ssiege::SWorldView & world, const ::ssiege::EViewWorldSetup & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) { 
+::gpk::error_t	ssiege::handleWORLD_SETUP		(::ssiege::SWorldView & world, const ::ssiege::EViewWorldSetup & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
@@ -82,7 +82,7 @@
 	return 0;
 }
 
-::gpk::error_t	ssiege::handleWORLD_VALUE		(::ssiege::SWorldView & world, const ::ssiege::EViewWorldValue & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) { 
+::gpk::error_t	ssiege::handleWORLD_VALUE		(::ssiege::SWorldView & world, const ::ssiege::EViewWorldValue & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 

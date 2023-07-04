@@ -1,22 +1,22 @@
 #include "ssiege_client.h"
 #include "ssiege_event_args.h"
 
-::gpk::error_t		ssiege::ssiegeClientUpdate		(::ssiege::SCamppClient & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents) { 
-	gpk_necs(::ssiege::ssiegeUpdate(app, lastTimeSeconds, inputState, systemEvents, [&app](::gpk::pobj<::ssiege::EventCampp> & _eventToProcess, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) {
+::gpk::error_t		ssiege::ssiegeClientUpdate		(::ssiege::SSSiegeClient & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents) { 
+	gpk_necs(::ssiege::ssiegeUpdate(app, lastTimeSeconds, inputState, systemEvents, [&app](::gpk::pobj<::ssiege::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) {
 		if(!_eventToProcess)
 			return false;
 
-		const ::ssiege::EventCampp	& eventToProcess		= *_eventToProcess;
+		const ::ssiege::EventSSiege	& eventToProcess		= *_eventToProcess;
 		info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));
 
 		::gpk::error_t			result			= 0; 
 		switch(eventToProcess.Type) {
-		case ::ssiege::CAMPP_EVENT_CHAR_ACTION: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CHAR_ACTION>(eventToProcess, [&app, &outputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCHAR_ACTION(app, ev, outputEvents); })); break; }
-		case ::ssiege::CAMPP_EVENT_WORLD_ADMIN: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_ADMIN>(eventToProcess, [&app, &outputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_ADMIN(app, ev, outputEvents); })); break; }
-		case ::ssiege::CAMPP_EVENT_WORLD_EVENT: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_EVENT>(eventToProcess, [&app, &outputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_EVENT(app, ev, outputEvents); })); break; }
-		case ::ssiege::CAMPP_EVENT_CLIENT_ASKS: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CLIENT_ASKS>(eventToProcess, [&app, &outputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCLIENT_ASKS(app, ev, outputEvents); })); break; }
-		case ::ssiege::CAMPP_EVENT_WORLD_SETUP: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_SETUP>(eventToProcess, [&app, &outputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_SETUP(app, ev, outputEvents); })); break; }
-		case ::ssiege::CAMPP_EVENT_WORLD_VALUE: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_VALUE>(eventToProcess, [&app, &outputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_VALUE(app, ev, outputEvents); })); break; }
+		case ::ssiege::SSIEGE_EVENT_CHAR_ACTION: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CHAR_ACTION>(eventToProcess, [&app, &outputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCHAR_ACTION(app, ev, outputEvents); })); break; }
+		case ::ssiege::SSIEGE_EVENT_WORLD_ADMIN: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_ADMIN>(eventToProcess, [&app, &outputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_ADMIN(app, ev, outputEvents); })); break; }
+		case ::ssiege::SSIEGE_EVENT_WORLD_EVENT: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_EVENT>(eventToProcess, [&app, &outputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_EVENT(app, ev, outputEvents); })); break; }
+		case ::ssiege::SSIEGE_EVENT_CLIENT_ASKS: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CLIENT_ASKS>(eventToProcess, [&app, &outputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCLIENT_ASKS(app, ev, outputEvents); })); break; }
+		case ::ssiege::SSIEGE_EVENT_WORLD_SETUP: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_SETUP>(eventToProcess, [&app, &outputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_SETUP(app, ev, outputEvents); })); break; }
+		case ::ssiege::SSIEGE_EVENT_WORLD_VALUE: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_VALUE>(eventToProcess, [&app, &outputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_VALUE(app, ev, outputEvents); })); break; }
 		default: 
 			gpk_warning_unhandled_event(eventToProcess); 
 			break;
@@ -26,7 +26,7 @@
 	return 0; 
 }
 
-::gpk::error_t	ssiege::handleCHAR_ACTION		(::ssiege::SCamppClient & app, const ::ssiege::EViewMinime & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) { 
+::gpk::error_t	ssiege::handleCHAR_ACTION		(::ssiege::SSSiegeClient & app, const ::ssiege::EViewMinime & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	const ::ssiege::SArgsEvent	& eventArgs				= *(const ::ssiege::SArgsEvent*)gameEvent.Data.begin();
 	::ssiege::printArgsEvent(eventArgs);
@@ -52,7 +52,7 @@
 	return 0; 
 }
 
-::gpk::error_t	ssiege::handleWORLD_ADMIN		(::ssiege::SCamppClient & app, const ::ssiege::EViewAdmin & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) { 
+::gpk::error_t	ssiege::handleWORLD_ADMIN		(::ssiege::SSSiegeClient & app, const ::ssiege::EViewAdmin & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	const ::ssiege::SArgsEvent	& eventArgs				= *(const ::ssiege::SArgsEvent*)gameEvent.Data.begin();
 	::ssiege::printArgsEvent(eventArgs);
@@ -71,7 +71,7 @@
 	return 0; 
 }
 
-::gpk::error_t	ssiege::handleWORLD_EVENT		(::ssiege::SCamppClient & app, const ::ssiege::EViewWorld & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) { 
+::gpk::error_t	ssiege::handleWORLD_EVENT		(::ssiege::SSSiegeClient & app, const ::ssiege::EViewWorld & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	const ::ssiege::SArgsEvent	& eventArgs				= *(const ::ssiege::SArgsEvent*)gameEvent.Data.begin();
 	::ssiege::printArgsEvent(eventArgs);
@@ -89,19 +89,19 @@
 	return 0; 
 }
 
-::gpk::error_t	ssiege::handleCLIENT_ASKS		(::ssiege::SCamppClient & app, const ::ssiege::EViewClient & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) { 
+::gpk::error_t	ssiege::handleCLIENT_ASKS		(::ssiege::SSSiegeClient & app, const ::ssiege::EViewClient & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
 	case ::ssiege::CLIENT_ASKS_Join: 
 	case ::ssiege::CLIENT_ASKS_Quit: 
-		gpk_necs(::gpk::eventEnqueueChild(app.EventsToSend, ::ssiege::CAMPP_EVENT_CLIENT_ASKS, gameEvent.Type, gameEvent.Data));
+		gpk_necs(::gpk::eventEnqueueChild(app.EventsToSend, ::ssiege::SSIEGE_EVENT_CLIENT_ASKS, gameEvent.Type, gameEvent.Data));
 		return 1; 
 	} 
 	return 0; 
 }
 
-::gpk::error_t	ssiege::handleWORLD_SETUP		(::ssiege::SCamppClient & world, const ::ssiege::EViewWorldSetup & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) { 
+::gpk::error_t	ssiege::handleWORLD_SETUP		(::ssiege::SSSiegeClient & world, const ::ssiege::EViewWorldSetup & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
@@ -112,7 +112,7 @@
 	return 0;
 }
 
-::gpk::error_t	ssiege::handleWORLD_VALUE		(::ssiege::SCamppClient & world, const ::ssiege::EViewWorldValue & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents) { 
+::gpk::error_t	ssiege::handleWORLD_VALUE		(::ssiege::SSSiegeClient & world, const ::ssiege::EViewWorldValue & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 

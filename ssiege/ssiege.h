@@ -9,8 +9,8 @@
 #include "gpk_noise.h"
 #include <ctime>
 
-#ifndef CAMPP_H_23701
-#define CAMPP_H_23701
+#ifndef SSIEGE_H_23701
+#define SSIEGE_H_23701
 
 namespace ssiege
 {
@@ -56,7 +56,7 @@ namespace ssiege
 		float					Zoom				= 2.0f;
 	};
 
-	struct SCampUI {
+	struct SSSiegeUI {
 		::gpk::cid_t			Root				= ::gpk::CID_INVALID;
 		::gpk::SInputBox		UserInput			= {};
 		::gpk::acid				RootPerState		= {};
@@ -64,7 +64,7 @@ namespace ssiege
 		::gpk::apachar			InputQueue			= {};
 	};
 
-	::gpk::error_t			setupCampUI			(::gpk::SGUI & gui, ::ssiege::SCampUI & campUI);
+	::gpk::error_t			setupSSiegeUI			(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & campUI);
 
 
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
@@ -93,13 +93,13 @@ namespace ssiege
 		uint32_t				Stage				= 0;
 	};
 
-	struct SCampApp {
+	struct SSSiegeApp {
 		APP_STATE				ActiveState			= {};
 
 		SWorldView				World				= {};
 
-		SCampUI					UI					= {};
-		gpk::apobj<EventCampp>	EventQueue			= {};
+		SSSiegeUI					UI					= {};
+		gpk::apobj<EventSSiege>	EventQueue			= {};
 
 		SFileStrings			FileStrings			= {};
 
@@ -136,10 +136,10 @@ namespace ssiege
 		}
 	};
 
-	::gpk::error_t			ssiegeUpdate			(::ssiege::SCampApp & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
-		, ::gpk::FBool<::gpk::pobj<::ssiege::EventCampp> &, ::gpk::apobj<::ssiege::EventCampp> &> funcHandleEvent
+	::gpk::error_t			ssiegeUpdate			(::ssiege::SSSiegeApp & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
+		, ::gpk::FBool<::gpk::pobj<::ssiege::EventSSiege> &, ::gpk::apobj<::ssiege::EventSSiege> &> funcHandleEvent
 		);
-	::gpk::error_t			ssiegeDraw			(::ssiege::SCampApp & ssiege, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI);
+	::gpk::error_t			ssiegeDraw			(::ssiege::SSSiegeApp & ssiege, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI);
 } // namespace ssiege
 
-#endif // CAMPP_H_23701
+#endif // SSIEGE_H_23701

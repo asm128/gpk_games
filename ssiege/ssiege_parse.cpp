@@ -4,7 +4,7 @@
 #define warning_unhandled_command(command, commandArgs)	warning_printf("Unhandled command for '%s': '%s' (args:'%s').", ::gpk::get_enum_namep(command), ::gpk::get_value_namep(command), ::gpk::toString(commandArgs).begin())
 #define warning_not_implemented(command, commandArgs)	warning_printf("Implement for '%s'! '%s' (args:'%s').", ::gpk::get_enum_namep(command), ::gpk::get_value_namep(command), ::gpk::toString(commandArgs).begin())
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp> & /*queue*/, ::ssiege::WORLD_ADMIN command, ::gpk::vcc commandArgs) { 
+static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventSSiege> & /*queue*/, ::ssiege::WORLD_ADMIN command, ::gpk::vcc commandArgs) { 
 	switch(command) {
 	case ::ssiege::WORLD_ADMIN_Create	: warning_not_implemented(command, commandArgs); break;	
 	case ::ssiege::WORLD_ADMIN_Delete	: warning_not_implemented(command, commandArgs); break;	
@@ -23,7 +23,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp> & /*queue*/, ::ssiege::WORLD_EVENT command, ::gpk::vcc commandArgs) { 
+static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventSSiege> & /*queue*/, ::ssiege::WORLD_EVENT command, ::gpk::vcc commandArgs) { 
 	::ssiege::SArgsEvent interpetedArgs	= {};
 	switch(command) {
 	case ::ssiege::WORLD_EVENT_Rain			: warning_not_implemented(command, commandArgs); break;
@@ -41,7 +41,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp> & /*queue*/, ::ssiege::WORLD_VALUE command, ::gpk::vcc commandArgs) { 
+static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventSSiege> & /*queue*/, ::ssiege::WORLD_VALUE command, ::gpk::vcc commandArgs) { 
 	::ssiege::SArgsEvent interpetedArgs	= {};
 	switch(command) {
 	case ::ssiege::WORLD_VALUE_TimeCreated			: warning_not_implemented(command, commandArgs); break;
@@ -58,7 +58,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp> & /*queue*/, ::ssiege::WORLD_SETUP command, ::gpk::vcc commandArgs) { 
+static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventSSiege> & /*queue*/, ::ssiege::WORLD_SETUP command, ::gpk::vcc commandArgs) { 
 	::ssiege::SArgsEvent interpetedArgs	= {};
 	switch(command) {
 	case ::ssiege::WORLD_SETUP_BlockSize		: warning_not_implemented(command, commandArgs); break;
@@ -71,7 +71,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp> & /*queue*/, ::ssiege::CHAR_ACTION command, ::gpk::vcc commandArgs) { 
+static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventSSiege> & /*queue*/, ::ssiege::CHAR_ACTION command, ::gpk::vcc commandArgs) { 
 	switch(command) {
 	case ::ssiege::CHAR_ACTION_Walk	: warning_not_implemented(command, commandArgs); break;
 	case ::ssiege::CHAR_ACTION_Turn	: warning_not_implemented(command, commandArgs); break;
@@ -105,7 +105,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp> & /*queue*/, ::ssiege::SAIL_ACTION command, ::gpk::vcc commandArgs) { 
+static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventSSiege> & /*queue*/, ::ssiege::SAIL_ACTION command, ::gpk::vcc commandArgs) { 
 	switch(command) {
 	case ::ssiege::SAIL_ACTION_Brake		: warning_not_implemented(command, commandArgs); break;
 	case ::ssiege::SAIL_ACTION_Handbrake	: warning_not_implemented(command, commandArgs); break;
@@ -118,7 +118,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp> & /*queue*/, ::ssiege::WHEELED_ACT command, ::gpk::vcc commandArgs) { 
+static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventSSiege> & /*queue*/, ::ssiege::WHEELED_ACT command, ::gpk::vcc commandArgs) { 
 	switch(command) {
 	case ::ssiege::WHEELED_ACT_Brake		: warning_not_implemented(command, commandArgs); break;
 	case ::ssiege::WHEELED_ACT_Handbrake	: warning_not_implemented(command, commandArgs); break;
@@ -131,7 +131,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp> & /*queue*/, ::ssiege::AIRSHIP_ACT command, ::gpk::vcc commandArgs) { 
+static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventSSiege> & /*queue*/, ::ssiege::AIRSHIP_ACT command, ::gpk::vcc commandArgs) { 
 	switch(command) {
 	case ::ssiege::AIRSHIP_ACT_Brake		: warning_not_implemented(command, commandArgs); break;
 	case ::ssiege::AIRSHIP_ACT_Handbrake	: warning_not_implemented(command, commandArgs); break;
@@ -144,7 +144,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp> & /*queue*/, ::ssiege::ENGINE_ACTS command, ::gpk::vcc commandArgs) { 
+static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventSSiege> & /*queue*/, ::ssiege::ENGINE_ACTS command, ::gpk::vcc commandArgs) { 
 	switch(command) {
 	case ::ssiege::ENGINE_ACTS_Off		: warning_not_implemented(command, commandArgs); break;
 	case ::ssiege::ENGINE_ACTS_On		: warning_not_implemented(command, commandArgs); break;
@@ -158,11 +158,11 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp> & queue, ::ssiege::CLIENT_ASKS command, ::gpk::vcc commandArgs) { 
+static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventSSiege> & queue, ::ssiege::CLIENT_ASKS command, ::gpk::vcc commandArgs) { 
 	switch(command) {
 	case ::ssiege::CLIENT_ASKS_Join: 
 	case ::ssiege::CLIENT_ASKS_Quit: 
-		gpk_necs(::gpk::eventEnqueueChild<::ssiege::CAMPP_EVENT>(queue, ::ssiege::CAMPP_EVENT_CLIENT_ASKS, command, commandArgs)); 
+		gpk_necs(::gpk::eventEnqueueChild<::ssiege::SSIEGE_EVENT>(queue, ::ssiege::SSIEGE_EVENT_CLIENT_ASKS, command, commandArgs)); 
 		break;
 	default: 
 		warning_unhandled_command(command, commandArgs);
@@ -172,7 +172,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventCampp
 }
 
 template<typename _tEnum>
-static	::gpk::error_t	parseCommand		(::gpk::apobj<::ssiege::EventCampp> & queue, ::gpk::vcc commandName, ::gpk::vcc commandArgs) { 
+static	::gpk::error_t	parseCommand		(::gpk::apobj<::ssiege::EventSSiege> & queue, ::gpk::vcc commandName, ::gpk::vcc commandArgs) { 
 	const _tEnum				command				= ::gpk::get_value<_tEnum>(commandName);
 	if(::gpk::get_value_count<_tEnum>() <= command)
 		return -1;  /// having an error message here makes it too verbose
@@ -181,7 +181,7 @@ static	::gpk::error_t	parseCommand		(::gpk::apobj<::ssiege::EventCampp> & queue,
 	return command;
 }
 
-::gpk::error_t			ssiege::parseCommandLine	(::gpk::apobj<::ssiege::EventCampp> & queue, ::gpk::vcc inputLine) { 
+::gpk::error_t			ssiege::parseCommandLine	(::gpk::apobj<::ssiege::EventSSiege> & queue, ::gpk::vcc inputLine) { 
 	::gpk::vcc					commandName, commandArgs;
 	gpk_necs(inputLine.slice(inputLine, 1));
 	ginfo_if(errored(::gpk::split(::gpk::vcs{" "}, inputLine, commandName, commandArgs)), "No arguments provided for command %s.", ::gpk::toString(commandArgs).begin());

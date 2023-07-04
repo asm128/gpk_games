@@ -98,7 +98,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>deploy_data.bat</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -121,7 +122,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>deploy_data.bat</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -140,7 +142,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>deploy_data.bat</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -163,7 +166,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>deploy_data.bat</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -178,7 +182,6 @@
     <ClInclude Include="ssiege_handle.h" />
     <ClInclude Include="ssiege_parse.h" />
     <ClInclude Include="ssiege_server.h" />
-    <ClInclude Include="ssiege_solar_system.h" />
     <ClInclude Include="ssiege_world.h" />
     <ClInclude Include="ssiege_event.h" />
     <ClInclude Include="ssiege_world_handle.h" />
@@ -190,12 +193,10 @@
     <ClCompile Include="ssiege_handle.cpp" />
     <ClCompile Include="ssiege_parse.cpp" />
     <ClCompile Include="ssiege_server.cpp" />
-    <ClCompile Include="ssiege_solar_system.cpp" />
     <ClCompile Include="ssiege_world.cpp" />
     <ClCompile Include="ssiege_world_handle.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ssiege_solar_system.json" />
     <None Include="deploy_data.bat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

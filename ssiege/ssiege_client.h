@@ -1,24 +1,24 @@
 #include "ssiege.h"
 #include "ssiege_event.h"
 
-#ifndef CAMPP_CLIENT_H_23701
-#define CAMPP_CLIENT_H_23701
+#ifndef SSIEGE_CLIENT_H_23701
+#define SSIEGE_CLIENT_H_23701
 
 namespace ssiege
 {
-	struct SCamppClient : ::ssiege::SCampApp {
-		::gpk::apobj<::ssiege::EventCampp>	EventsToSend;
-		::gpk::apobj<::ssiege::EventCampp>	EventsReceived;
+	struct SSSiegeClient : ::ssiege::SSSiegeApp {
+		::gpk::apobj<::ssiege::EventSSiege>	EventsToSend;
+		::gpk::apobj<::ssiege::EventSSiege>	EventsReceived;
 	};
 
-	::gpk::error_t		handleCHAR_ACTION		(SCamppClient & app, const ::ssiege::EViewMinime & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents);
-	::gpk::error_t		handleWORLD_ADMIN		(SCamppClient & app, const ::ssiege::EViewAdmin  & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents);
-	::gpk::error_t		handleWORLD_EVENT		(SCamppClient & app, const ::ssiege::EViewWorld  & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents);
-	::gpk::error_t		handleCLIENT_ASKS		(SCamppClient & app, const ::ssiege::EViewClient & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents);
-	::gpk::error_t		handleWORLD_SETUP		(SCamppClient & app, const ::ssiege::EViewWorldSetup & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents);
-	::gpk::error_t		handleWORLD_VALUE		(SCamppClient & app, const ::ssiege::EViewWorldValue & gameEvent, ::gpk::apobj<::ssiege::EventCampp> & outputEvents);
+	::gpk::error_t		handleCHAR_ACTION		(SSSiegeClient & app, const ::ssiege::EViewMinime & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents);
+	::gpk::error_t		handleWORLD_ADMIN		(SSSiegeClient & app, const ::ssiege::EViewAdmin  & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents);
+	::gpk::error_t		handleWORLD_EVENT		(SSSiegeClient & app, const ::ssiege::EViewWorld  & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents);
+	::gpk::error_t		handleCLIENT_ASKS		(SSSiegeClient & app, const ::ssiege::EViewClient & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents);
+	::gpk::error_t		handleWORLD_SETUP		(SSSiegeClient & app, const ::ssiege::EViewWorldSetup & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents);
+	::gpk::error_t		handleWORLD_VALUE		(SSSiegeClient & app, const ::ssiege::EViewWorldValue & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents);
 
-	::gpk::error_t		ssiegeClientUpdate		(SCamppClient & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents);
+	::gpk::error_t		ssiegeClientUpdate		(SSSiegeClient & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents);
 } // namespace 
 
-#endif // CAMPP_CLIENT_H_23701
+#endif // SSIEGE_CLIENT_H_23701

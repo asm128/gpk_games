@@ -12,8 +12,8 @@
 #	include "gpk_xaudio2.h"
 #endif
 
-#ifndef CAMPP_CLIENT_WIN32_H_23701
-#define CAMPP_CLIENT_WIN32_H_23701
+#ifndef SSIEGE_CLIENT_WIN32_H_23701
+#define SSIEGE_CLIENT_WIN32_H_23701
 
 
 struct SApplication {
@@ -26,17 +26,17 @@ struct SApplication {
 #endif
 	::gpk::SClient			Client			= {};
 
-	::ssiege::SCamppClient	CampApp			= {};
+	::ssiege::SSSiegeClient	SSiegeApp			= {};
 
 							SApplication	(::gpk::SRuntimeValues & runtimeValues)	noexcept
 	: Framework(runtimeValues) { 
 		if(!Framework.GUI) 
 			Framework.GUI.create(); 
 
-		CampApp.GUI				= Framework.GUI; 
+		SSiegeApp.GUI				= Framework.GUI; 
 		
-		CampApp.World.Engine.Scene->Graphics.create(); 
+		SSiegeApp.World.Engine.Scene->Graphics.create(); 
 	}
 };
 
-#endif // CAMPP_CLIENT_WIN32_H_23701
+#endif // SSIEGE_CLIENT_WIN32_H_23701
