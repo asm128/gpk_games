@@ -1,5 +1,6 @@
 #include "gpk_frameinfo.h"
 #include "gpk_pool_game.h"
+#include "gpk_camera.h"
 
 #include "gpk_gui_control_list.h"
 #include "gpk_gui_inputbox.h"
@@ -33,9 +34,7 @@ namespace d1
 	GDEFINE_ENUM_VALUE(APP_STATE, COUNT		, 15);
 
 #pragma pack(push, 1)
-	struct SCamera {
-		::gpk::n3f32				Position			= {-1, 0, 0};
-		::gpk::n3f32				Target				= {0, 0, 0};
+	struct SCamera : ::gpk::SCameraPoints {
 		float						Zoom				= 2.0f;
 		uint8_t						BallLockAtPosition	= (uint8_t)-1;
 		uint8_t						BallLockAtTarget	= (uint8_t)-1;
