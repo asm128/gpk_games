@@ -1,15 +1,13 @@
-//#define DISABLE_D3D11
+#include "gpk_d1.h"
+#include "gpk_framework.h"
+
+#define DISABLE_D3D11
 #ifndef DISABLE_D3D11
 #	include "gpk_engine_d3d_app.h"
 #endif
 #ifndef DISABLE_XAUDIO2
 #	include "gpk_xaudio2.h"
 #endif
-
-#include "gpk_d1.h"
-
-
-#include "gpk_framework.h"
 
 #ifndef APPLICATION_H_098273498237423
 #define APPLICATION_H_098273498237423
