@@ -39,7 +39,7 @@ static	::gpk::error_t	processScreenEvent		(::SApplication & /*app*/, const ::gpk
 	default: break;
 	case ::gpk::EVENT_SCREEN_Create:
 //#if !defined(DISABLE_D3D11)
-//		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.D1.MainGame.Pool.Engine.Scene->Graphics));
+//		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.Engine.Scene->Graphics));
 //#endif
 	case ::gpk::EVENT_SCREEN_Resize: 
 		//gpk_necs(::updateSizeDependentResources(app));

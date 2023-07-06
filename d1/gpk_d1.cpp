@@ -127,7 +127,7 @@ static	::gpk::error_t	stickUpdate				(::d1::SD1UI & appUI, ::d1::SD1Game & clien
 			::gpk::sliderSetValue(*appUI.ForceSlider, int64_t(appUI.ForceSlider->ValueCurrent - forceDelta));
 		}
 		if(0 == clientGame.Pool.MatchState.Flags.NotInHand) {
-			::stickUpdateBallInHand(clientGame, actualSecondsElapsed, keyStates, mouseDeltas, buttonStates);
+			gpk_necs(::stickUpdateBallInHand(clientGame, actualSecondsElapsed, keyStates, mouseDeltas, buttonStates));
 		}
 	}
 	return 0;

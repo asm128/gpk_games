@@ -63,14 +63,14 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 		entityOrbit.Transform	= scene.Transforms.push_back(shipState.Engine.Integrator.MatrixIdentity4);
 		entityOrbit.Image		= -1;
 		entityOrbit.Body		= ::gpk::createOrbiter(shipState.Engine.Integrator
+			, 0		//PLANET_ORBITALINCLINATION	[iPlanet]
+			, 6		//PLANET_ORBITALPERIOD		[iPlanet]
 			, 1		//PLANET_MASSES				[iPlanet]
-			, 2.5	//PLANET_DISTANCE			[iPlanet]
 			, 0		//PLANET_AXIALTILT			[iPlanet]
+			, 2.5	//PLANET_DISTANCE			[iPlanet]
+			, 1		//1.0 / PLANET_DISTANCE		[PLANET_COUNT - 1] * 2500
 			, 1		//PLANET_DAY				[iPlanet]
 			, 1		//PLANET_DAY				[PLANET_EARTH]
-			, 6		//PLANET_ORBITALPERIOD		[iPlanet]
-			, 0		//PLANET_ORBITALINCLINATION	[iPlanet]
-			, 1		//1.0 / PLANET_DISTANCE		[PLANET_COUNT - 1] * 2500
 			);
 		shipState.Engine.Integrator.Centers[entityOrbit.Body].Orientation.MakeFromEuler(0, (float)(::gpk::math_2pi / countParts * iPart), 0);
 

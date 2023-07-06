@@ -312,7 +312,7 @@ namespace ssiege
 	};
 
 	::gpk::error_t			worldViewUpdate		(::ssiege::SWorldView & world, ::gpk::vpobj<::ssiege::EventSSiege> inputEvents, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents, double secondsElapsed);
-	::gpk::error_t			worldViewDraw		(::ssiege::SWorldView & pool
+	::gpk::error_t			worldViewDraw		(::ssiege::SWorldView & world
 		, ::gpk::rtbgra8d32			& backBuffer
 		, const ::gpk::n3f32		& cameraPosition
 		, const ::gpk::n3f32		& cameraTarget

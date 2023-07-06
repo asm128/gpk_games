@@ -148,9 +148,9 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, sunlightPos, cameraSelected.Offset, cameraSelected.Target, {.01f, 10000.f}));
 #else 
 	::gpk::SFramework			& framework				= app.Framework;
-	::gpk::pobj<::gpk::rtgbra8d32>	backBuffer	= framework.RootWindow.BackBuffer;
+	::gpk::prtbgra8d32			backBuffer				= framework.RootWindow.BackBuffer;
 	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), clearColor, (uint32_t)-1);
-	gpk_necs(::ssiege::d1Draw(app.D1.AppUI, app.D1.MainGame, *backBuffer, framework.FrameInfo.Seconds.Total));
+	gpk_necs(::ssiege::ssiegeDraw(app.SSiegeApp, *backBuffer, false));
 	memcpy(framework.RootWindow.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	//::gpk::grid_mirror_y(framework.RootWindow.BackBuffer->Color.View, backBuffer->Color.View);
 	//framework.RootWindow.BackBuffer		= backBuffer;

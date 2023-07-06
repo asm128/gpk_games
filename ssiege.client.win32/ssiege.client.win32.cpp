@@ -144,7 +144,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 
 #if !defined(DISABLE_D3D11)
 	if(app.SSiegeApp.ActiveState >= ::ssiege::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.World.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
-		//gpk_necs(app.D3DApp.CreateDeviceDependentEngineResources(app.D3DApp.DeviceResources->GetD3DDevice(), *app.D1.MainGame.Pool.Engine.Scene->Graphics));
+		//gpk_necs(app.D3DApp.CreateDeviceDependentEngineResources(app.D3DApp.DeviceResources->GetD3DDevice(), *app.D1.MainGame.World.Engine.Scene->Graphics));
 		gpk_necs(app.D3DApp.CreateDeviceResources(*app.SSiegeApp.World.Engine.Scene->Graphics));
 	}
 	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (uint32_t)frameInfo.FramesPerSecond);
@@ -177,7 +177,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::pobj<::gpk::rtgbra8d32>	backBuffer	= framework.RootWindow.BackBuffer;
 	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), clearColor, (uint32_t)-1);
-	gpk_necs(::ssiege::d1Draw(app.D1.AppUI, app.D1.MainGame, *backBuffer, framework.FrameInfo.Seconds.Total));
+	gpk_necs(::ssiege::ssiegeDraw(app.D1.AppUI, app.D1.MainGame, *backBuffer, false));
 	memcpy(framework.RootWindow.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	//::gpk::grid_mirror_y(framework.RootWindow.BackBuffer->Color.View, backBuffer->Color.View);
 	//framework.RootWindow.BackBuffer		= backBuffer;
