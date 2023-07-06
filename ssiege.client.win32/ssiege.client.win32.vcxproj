@@ -110,14 +110,14 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk; ../../gpk/gpk_engine; ../../gpk_games/ssiege; </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk_engine; ../../gpk_games/ssiege; ../../gpk/gpk; </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; gpk_engine.lib; gpk.lib; zlibvc.lib; ssiege.lib; ws2_32.lib; gdi32.lib; user32.lib; windowscodecs.lib; dxgi.lib; d2d1.lib; d3d11.lib; dwrite.lib; ole32.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk_engine.lib; zlibvc.lib; ssiege.lib; ws2_32.lib; gdi32.lib; user32.lib; windowscodecs.lib; dxgi.lib; d2d1.lib; d3d11.lib; dwrite.lib; ole32.lib; gpk.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -130,7 +130,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk; ../../gpk/gpk_engine; ../../gpk_games/ssiege; </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk_engine; ../../gpk_games/ssiege; ../../gpk/gpk; </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -139,7 +139,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; gpk_engine.lib; gpk.lib; zlibvc.lib; ssiege.lib; ws2_32.lib; gdi32.lib; user32.lib; windowscodecs.lib; dxgi.lib; d2d1.lib; d3d11.lib; dwrite.lib; ole32.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk_engine.lib; zlibvc.lib; ssiege.lib; ws2_32.lib; gdi32.lib; user32.lib; windowscodecs.lib; dxgi.lib; d2d1.lib; d3d11.lib; dwrite.lib; ole32.lib; gpk.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -150,14 +150,14 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk; ../../gpk/gpk_engine; ../../gpk_games/ssiege; </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk_engine; ../../gpk_games/ssiege; ../../gpk/gpk; </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; gpk_engine.lib; gpk.lib; zlibvc.lib; ssiege.lib; ws2_32.lib; gdi32.lib; user32.lib; windowscodecs.lib; dxgi.lib; d2d1.lib; d3d11.lib; dwrite.lib; ole32.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk_engine.lib; zlibvc.lib; ssiege.lib; ws2_32.lib; gdi32.lib; user32.lib; windowscodecs.lib; dxgi.lib; d2d1.lib; d3d11.lib; dwrite.lib; ole32.lib; gpk.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -170,7 +170,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk; ../../gpk/gpk_engine; ../../gpk_games/ssiege; </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk_engine; ../../gpk_games/ssiege; ../../gpk/gpk; </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -179,7 +179,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir);</AdditionalLibraryDirectories>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>llc.lib; gpk_engine.lib; gpk.lib; zlibvc.lib; ssiege.lib; ws2_32.lib; gdi32.lib; user32.lib; windowscodecs.lib; dxgi.lib; d2d1.lib; d3d11.lib; dwrite.lib; ole32.lib; </AdditionalDependencies>
+      <AdditionalDependencies>llc.lib; gpk_engine.lib; zlibvc.lib; ssiege.lib; ws2_32.lib; gdi32.lib; user32.lib; windowscodecs.lib; dxgi.lib; d2d1.lib; d3d11.lib; dwrite.lib; ole32.lib; gpk.lib; </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

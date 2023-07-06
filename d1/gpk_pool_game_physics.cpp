@@ -143,7 +143,7 @@ static	::gpk::error_t	handlePockets
 	positionBall.y				= 0;
 	for(uint8_t iPocket = 0; iPocket < 6; ++iPocket) {
 		const ::gpk::SVirtualEntity		& entityPocket			= engine.Entities[pool.Entities.Pockets[iPocket]];
-		::gpk::n3f32						pocketPosition			= engine.Scene->RenderNodes.Transforms[entityPocket.RenderNode].World.GetTranslation();
+		::gpk::n3f32					pocketPosition			= engine.Scene->RenderNodes.Transforms[entityPocket.RenderNode].Model.GetTranslation();
 		pocketPosition.y			= 0;
 
 		::gpk::n3f32						distanceFromPocket		= positionA - pocketPosition;

@@ -245,7 +245,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	for(uint8_t iStick = 0; iStick < pool.Entities.Sticks.size(); ++iStick) {
 		const uint16_t			stickEntity			= pool.Entities.Sticks[iStick];
 		gpk_necs(engine.SetMeshScale	(stickEntity, {.01f, board.Table.Slate.y, .01f}));
-		engine.Scene->RenderNodes.BaseTransforms[engine.Entities[stickEntity].RenderNode].World *= mRotation;
+		engine.Scene->RenderNodes.BaseTransforms[engine.Entities[stickEntity].RenderNode].Model *= mRotation;
 		gpk_necs(engine.SetMeshPosition	(stickEntity, {-board.BallRadius * 2, 0, 0}));
 		gpk_necs(engine.SetHidden		(stickEntity, iStick));
 	}
