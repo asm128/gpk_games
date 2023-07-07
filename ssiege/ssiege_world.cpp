@@ -54,7 +54,7 @@
 	::gpk::SEngineSceneConstants	constants		= {};
 	constants.CameraPosition	= cameraPosition;
 	constants.CameraFront		= cameraFront;
-	constants.LightPosition		= {0, 0, 0};
+	constants.LightPosition		= {0, 10, 0};
 
 	constants.View.LookAt(cameraPosition, cameraTarget, cameraUp);
 	constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Min, nearFar.Max);

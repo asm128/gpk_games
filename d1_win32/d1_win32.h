@@ -1,7 +1,7 @@
 #include "gpk_d1.h"
 #include "gpk_framework.h"
 
-#define DISABLE_D3D11
+//#define DISABLE_D3D11
 #ifndef DISABLE_D3D11
 #	include "gpk_engine_d3d_app.h"
 #endif

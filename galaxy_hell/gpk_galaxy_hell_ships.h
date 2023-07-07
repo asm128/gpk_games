@@ -180,7 +180,7 @@ namespace ghg
 
 		::gpk::apod<::ghg::SOrbiter				>	Orbiters						= {};	// One per orbiter	
 		::gpk::apod<::ghg::SWeapon				>	Weapons							= {};	// One per orbiter	
-		::gpk::aobj<::gpk::apod<::gpk::n3f32>	>	ShipOrbitersDistanceToTargets	= {};	// One per orbiter, each one mapping to a list of orbiters
+		::gpk::aobj<::gpk::an3f32				>	ShipOrbitersDistanceToTargets	= {};	// One per orbiter, each one mapping to a list of orbiters
 		::gpk::aobj<::ghg::SShots				>	Shots							= {};	// One per weapon
 		::gpk::aobj<::gpk::apod<SHIP_ACTION>	>	ShipOrbiterActionQueue			= {};
 

@@ -145,7 +145,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 
 	const ::ssiege::SCamera		& cameraSelected		= app.SSiegeApp.Camera;
 	const ::gpk::SEngineScene	& engineScene			= *app.SSiegeApp.World.Engine.Scene;
-	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, sunlightPos, cameraSelected.Offset, cameraSelected.Target, {.01f, 10000.f}));
+	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, sunlightPos, cameraSelected.Offset, cameraSelected.Target, {.001f, 500.f}));
 #else 
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::prtbgra8d32			backBuffer				= framework.RootWindow.BackBuffer;
