@@ -32,15 +32,19 @@
 	::ssiege::printArgsEvent(eventArgs);
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Create	: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Rename	: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Delete	: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Locate	: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Rotate	: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Resize	: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Reskin	: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Relocate	: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Generate	: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_ADMIN_Create		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_ADMIN_Rename		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_ADMIN_Delete		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_ADMIN_Locate		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_ADMIN_Rotate		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_ADMIN_Resize		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_ADMIN_Reskin		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_ADMIN_Relocate		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_ADMIN_Generate		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_ADMIN_Reset		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_ADMIN_Initialize	: 
+		gpk_necs(::ssiege::worldViewSetup(world));
+		break; 
 	} 
 	return 0; 
 }
@@ -55,9 +59,9 @@
 	case ::ssiege::WORLD_EVENT_Earthquake	: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssiege::WORLD_EVENT_Tornado		: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssiege::WORLD_EVENT_Wave			: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_EVENT_Lightning		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_EVENT_Lightning	: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssiege::WORLD_EVENT_Wildfire		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_EVENT_Flood			: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_EVENT_Flood		: gpk_warning_not_implemented(gameEvent); break; 
 	} 
 	return 0; 
 }
@@ -75,8 +79,8 @@
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
-	case ::ssiege::WORLD_SETUP_Seed		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_SETUP_MaxPlayers: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_SETUP_Seed			: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_SETUP_MaxPlayers	: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssiege::WORLD_SETUP_BlockSize	: gpk_warning_not_implemented(gameEvent); break; 
 	}
 	return 0;
@@ -88,11 +92,11 @@
 	default: gpk_warning_unhandled_event(gameEvent); break; 
 	case ::ssiege::WORLD_VALUE_TimeCreated			: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssiege::WORLD_VALUE_TimeOffset			: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_VALUE_DaylightOffsetMinutes	: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_VALUE_DaylightOffsetMinutes: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssiege::WORLD_VALUE_DaylightRatioExtra	: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_VALUE_TimeLastSaved			: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_VALUE_WorldSize				: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_VALUE_TimeScale				: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_VALUE_TimeLastSaved		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_VALUE_WorldSize			: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::WORLD_VALUE_TimeScale			: gpk_warning_not_implemented(gameEvent); break; 
 	}
 	return 0;
 }

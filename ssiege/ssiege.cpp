@@ -1,5 +1,7 @@
 #include "ssiege_parse.h"
 #include "ssiege_handle.h"
+#include "ssiege_event_args.h"
+
 #include "gpk_gui_control_list.h"
 
 #include "gpk_event_screen.h"
@@ -31,7 +33,7 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & s
 
 		if(0 == ActiveState || 0 == gui.Controls.States.size() || ::gpk::CID_INVALID == UI.Root) {
 			gpk_necs(::ssiege::setupSSiegeUI(gui, UI));
-			gpk_necs(::gpk::planetarySystemSetup(World.SolarSystem, World.Engine, "./gpk_solar_system.json"));
+			//gpk_necs(::ssiege::planetarySystemSetup(World.SolarSystem, World.Engine, "./gpk_solar_system.json"));
 		}
 		while(newState >= UI.RootPerState.size()) {	// create layouts for each state as they're required
 			::gpk::cid_t				rootId;
@@ -183,7 +185,8 @@ static	::gpk::error_t	handleSSiegeEvent		(::ssiege::SSSiegeApp & app, ::gpk::pob
 ::gpk::error_t			ssiege::ssiegeUpdate		(::ssiege::SSSiegeApp & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
 	, ::gpk::FBool<::gpk::pobj<::ssiege::EventSSiege> &, ::gpk::apobj<::ssiege::EventSSiege> &> funcHandleEvent
 	) {
-	gpk_necs(systemEvents.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { es_if_failed(::processSystemEvent(app, *sysEvent)); }));
+		gpk_necs(systemEvents.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { es_if_failed(::processSystemEvent(app, *sysEvent)); 
+	}));
 
 	::ssiege::SWorldView			& worldView				= app.World;
 	bool						processInput			= false;
@@ -199,6 +202,9 @@ static	::gpk::error_t	handleSSiegeEvent		(::ssiege::SSSiegeApp & app, ::gpk::pob
 			es_if_failed(::gpk::pathList(app.FileStrings.SavegameFolder, fileNames, app.FileStrings.ExtensionSaveAuto));
 			if(fileNames.size())
 				es_if_failed(app.Load(fileNames[0]));
+
+			::ssiege::SArgsEvent		dummy					= {};
+			gpk_necs(::gpk::eventEnqueueChild(app.EventQueue, ::ssiege::SSIEGE_EVENT_WORLD_ADMIN, ::ssiege::WORLD_ADMIN_Initialize, dummy));
 		}
 		gpk_necs(app.StateSwitch(::ssiege::APP_STATE_Welcome));
 		break;

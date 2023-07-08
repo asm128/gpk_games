@@ -32,8 +32,7 @@ struct SApplication {
 		if(!Framework.GUI) 
 			Framework.GUI.create(); 
 		SSiegeApp.GUI				= Framework.GUI; 
-		
-		SSiegeApp.World.Engine.Scene->Graphics.create(); 
+		es_if_failed(::gpk::rasterFontDefaults(SSiegeApp.World.Engine.Scene->Graphics->Fonts));
 	}
 };
 

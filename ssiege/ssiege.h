@@ -51,7 +51,7 @@ namespace ssiege
 	};
 
 	struct SCamera {
-		::gpk::n3f32			Offset				= {-100, 500, -1000};
+		::gpk::n3f32			Offset				= {-0.35f, .0125f, -.125f};
 		::gpk::n3f32			Target				= {0, 0, 0};
 		float					Zoom				= 2.0f;
 	};
@@ -98,7 +98,7 @@ namespace ssiege
 
 		SWorldView				World				= {};
 
-		SSSiegeUI					UI					= {};
+		SSSiegeUI				UI					= {};
 		gpk::apobj<EventSSiege>	EventQueue			= {};
 
 		SFileStrings			FileStrings			= {};

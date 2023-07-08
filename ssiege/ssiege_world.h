@@ -300,7 +300,7 @@ namespace ssiege
 			uint32_t					characterCount;
 			gpk_necs(::gpk::loadPOD(input, characterCount)); 
 			for(uint32_t iMiniMes = 0; iMiniMes < characterCount; ++iMiniMes) { 
-				SMiniMe					miniMes;
+				SMiniMe						miniMes;
 				gpk_necall(miniMes.Load(input), "Failed to load character %i", iMiniMes);
 				gpk_necs(Characters.push_back(miniMes));
 			}
@@ -311,6 +311,7 @@ namespace ssiege
 		}
 	};
 
+	::gpk::error_t			worldViewSetup		(::ssiege::SWorldView & world);
 	::gpk::error_t			worldViewUpdate		(::ssiege::SWorldView & world, ::gpk::vpobj<::ssiege::EventSSiege> inputEvents, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents, double secondsElapsed);
 	::gpk::error_t			worldViewDraw		(::ssiege::SWorldView & world
 		, ::gpk::rtbgra8d32			& backBuffer
@@ -319,6 +320,7 @@ namespace ssiege
 		, const ::gpk::n3f32		& cameraUp = {0, 1, 0}
 		, const ::gpk::minmaxf32	& nearFar = {.1f, 10000.f}
 		);
+
 } // namespace ssiege
 
 #endif // SSIEGE_WORLD_H_23701

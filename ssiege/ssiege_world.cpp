@@ -1,6 +1,37 @@
 #include "ssiege_world_handle.h"
 #include "gpk_timer.h"
 
+stacxpr	uint8_t		MAX_COLORS	= 16;
+stacxpr	::gpk::astatic<::gpk::bgra, ::MAX_COLORS>	PLANET_COLORS	=
+	{ ::gpk::YELLOW
+	, ::gpk::ORANGE
+	, ::gpk::DARKRED * .5f
+	, ::gpk::GREEN
+	, ::gpk::WHITE
+	, ::gpk::RED
+	, ::gpk::PURPLE
+	, ::gpk::BLUE
+	, ::gpk::BLACK
+	, ::gpk::ORANGE
+	, ::gpk::BLUE
+	, ::gpk::RED
+	, ::gpk::PURPLE
+	, ::gpk::DARKRED * .5f
+	, ::gpk::GREEN
+	, ::gpk::YELLOW
+	};
+
+::gpk::error_t			ssiege::worldViewSetup		(::ssiege::SWorldView & world) {
+	if(0 == world.SolarSystem.Body.size())
+		gpk_necs(::gpk::planetarySystemSetup(world.SolarSystem, "gpk_solar_system.json"));
+
+	if(0 == world.SolarSystem.EntityBody.size()) {
+		gpk_necs(::gpk::planetarySystemCreateEntities(world.SolarSystem, world.Engine));
+	} 
+	gpk_necs(::gpk::planetarySystemReset(world.SolarSystem, world.Engine, ::PLANET_COLORS));
+	return 0;
+}
+
 ::gpk::error_t			ssiege::worldViewUpdate	(::ssiege::SWorldView & world, ::gpk::vpobj<::ssiege::EventSSiege> inputEvents, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents, double secondsElapsed) {
 	::gpk::FBool<::gpk::pobj<::ssiege::EventSSiege> &, ::gpk::apobj<::ssiege::EventSSiege> &>	funcHandleEvent 
 		= [&world](::gpk::pobj<::ssiege::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssiege::EventSSiege> & worldOutputEvents) { 
@@ -30,7 +61,7 @@
 			_eventToProcess.clear();
 	});
 
-	gpk_necs(world.Engine.Update(secondsElapsed));
+	gpk_necs(world.Engine.Update(secondsElapsed * 60));
 
 
 	return 0;
@@ -54,7 +85,7 @@
 	::gpk::SEngineSceneConstants	constants		= {};
 	constants.CameraPosition	= cameraPosition;
 	constants.CameraFront		= cameraFront;
-	constants.LightPosition		= {0, 10, 0};
+	constants.LightPosition		= {0, 0, 0};
 
 	constants.View.LookAt(cameraPosition, cameraTarget, cameraUp);
 	constants.Perspective.FieldOfView(.25 * ::gpk::math_pi, offscreenMetrics.x / (double)offscreenMetrics.y, nearFar.Min, nearFar.Max);
