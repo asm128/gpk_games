@@ -51,7 +51,7 @@ namespace ssiege
 	};
 
 	struct SCamera {
-		::gpk::n3f32			Offset				= {-0.35f, .0125f, -.125f};
+		::gpk::n3f32			Offset				= {-0.35f, .025f, -.125f};
 		::gpk::n3f32			Target				= {0, 0, 0};
 		float					Zoom				= 2.0f;
 	};
@@ -131,12 +131,12 @@ namespace ssiege
 		::gpk::error_t			Load				(::gpk::vcc filename)			{
 			::gpk::au8					serialized;
 			gpk_necs(::gpk::inflateToMemory(filename, serialized));
-			::gpk::vcu8					viewSerialized			= serialized;
+			::gpk::vcu8					viewSerialized		= serialized;
 			return World.Load(viewSerialized);
 		}
 	};
 
-	::gpk::error_t			ssiegeUpdate			(::ssiege::SSSiegeApp & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
+	::gpk::error_t			ssiegeUpdate		(::ssiege::SSSiegeApp & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
 		, ::gpk::FBool<::gpk::pobj<::ssiege::EventSSiege> &, ::gpk::apobj<::ssiege::EventSSiege> &> funcHandleEvent
 		);
 	::gpk::error_t			ssiegeDraw			(::ssiege::SSSiegeApp & ssiege, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI);

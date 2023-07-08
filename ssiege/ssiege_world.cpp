@@ -1,34 +1,9 @@
 #include "ssiege_world_handle.h"
 #include "gpk_timer.h"
 
-stacxpr	uint8_t		MAX_COLORS	= 16;
-stacxpr	::gpk::astatic<::gpk::bgra, ::MAX_COLORS>	PLANET_COLORS	=
-	{ ::gpk::YELLOW
-	, ::gpk::ORANGE
-	, ::gpk::DARKRED * .5f
-	, ::gpk::GREEN
-	, ::gpk::WHITE
-	, ::gpk::RED
-	, ::gpk::PURPLE
-	, ::gpk::BLUE
-	, ::gpk::BLACK
-	, ::gpk::ORANGE
-	, ::gpk::BLUE
-	, ::gpk::RED
-	, ::gpk::PURPLE
-	, ::gpk::DARKRED * .5f
-	, ::gpk::GREEN
-	, ::gpk::YELLOW
-	};
 
 ::gpk::error_t			ssiege::worldViewSetup		(::ssiege::SWorldView & world) {
-	if(0 == world.SolarSystem.Body.size())
-		gpk_necs(::gpk::planetarySystemSetup(world.SolarSystem, "gpk_solar_system.json"));
-
-	if(0 == world.SolarSystem.EntityBody.size()) {
-		gpk_necs(::gpk::planetarySystemCreateEntities(world.SolarSystem, world.Engine));
-	} 
-	gpk_necs(::gpk::planetarySystemReset(world.SolarSystem, world.Engine, ::PLANET_COLORS));
+	gpk_necs(::gpk::planetarySystemSetup(world.SolarSystem, world.Engine, "gpk_solar_system.json"));
 	return 0;
 }
 

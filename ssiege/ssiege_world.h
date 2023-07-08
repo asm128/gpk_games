@@ -276,7 +276,7 @@ namespace ssiege
 		::gpk::apod<SHangar>	Hangars;
 		::gpk::aobj<SMiniMe>	Characters;
 		SWorldTiles				Tiles;
-		::gpk::SPlanetarySystem	SolarSystem;
+		::gpk::SEnginePlanetarySystem	SolarSystem;
 
 		::gpk::SEngine			Engine;
 

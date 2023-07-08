@@ -135,7 +135,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 
 ::gpk::error_t			draw					(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	const ::gpk::n3f32			sunlightPos				= ::gpk::calcSunPosition();
-	const double				sunlightFactor			= ::gpk::calcSunlightFactor(app.SSiegeApp.World.WorldState.DaylightRatioExtra, app.SSiegeApp.World.WorldState.DaylightOffsetMinutes);
+	const double				sunlightFactor			= .1;//:::gpk::calcSunlightFactor(app.SSiegeApp.World.WorldState.DaylightRatioExtra, app.SSiegeApp.World.WorldState.DaylightOffsetMinutes);
 	const ::gpk::rgbaf			clearColor				= ::gpk::interpolate_linear(::gpk::DARKBLUE * .25, ::gpk::LIGHTBLUE * 1.1, sunlightFactor);
 
 #if !defined(DISABLE_D3D11) 
@@ -145,6 +145,8 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 
 	const ::ssiege::SCamera		& cameraSelected		= app.SSiegeApp.Camera;
 	const ::gpk::SEngineScene	& engineScene			= *app.SSiegeApp.World.Engine.Scene;
+	app.D3DApp.Scene.ConstantBufferScene.Time	= (float)app.Framework.FrameInfo.Seconds.Total;
+
 	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, {}/*sunlightPos*/, cameraSelected.Offset, cameraSelected.Target, {.001f, 1000.f}));
 #else 
 	::gpk::SFramework			& framework				= app.Framework;
