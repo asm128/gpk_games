@@ -56,8 +56,5 @@
     <ClInclude Include="gpk_galaxy_hell_draw.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gpk_galaxy_hell_planet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

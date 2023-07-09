@@ -193,7 +193,7 @@ namespace ssiege
 
 	struct SHangar {
 		::gpk::n2u16			Size;
-		assiegeid					Furniture;
+		assiegeid				Furniture;
 	};
 
 	struct SWorldArea {

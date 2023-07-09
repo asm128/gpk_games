@@ -51,7 +51,7 @@ namespace ssiege
 	};
 
 	struct SCamera {
-		::gpk::n3f32			Offset				= {-0.35f, .025f, -.125f};
+		::gpk::n3f32			Offset				= {-0.135f, .025f, -.0625f};
 		::gpk::n3f32			Target				= {0, 0, 0};
 		float					Zoom				= 2.0f;
 	};
