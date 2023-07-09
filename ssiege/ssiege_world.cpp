@@ -36,7 +36,7 @@
 			_eventToProcess.clear();
 	});
 
-	gpk_necs(world.Engine.Update(secondsElapsed * 60));
+	gpk_necs(world.Engine.Update(secondsElapsed));
 
 
 	return 0;
