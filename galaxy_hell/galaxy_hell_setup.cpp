@@ -70,11 +70,11 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 			, 0		//PLANET_AXIALTILT			[iPlanet]
 			, 2.5	//PLANET_DISTANCE			[iPlanet]
 			, 1		//1.0 / PLANET_DISTANCE		[PLANET_COUNT - 1] * 2500
-			, 6		//PLANET_DAY				[iPlanet]
+			, 1		//PLANET_DAY				[iPlanet]
 			, 1		//PLANET_DAY				[PLANET_EARTH]
 			);
 		shipState.Engine.Integrator.Centers[entityOrbit.Body].Orientation.MakeFromEuler(0, (float)(::gpk::math_2pi / countParts * iPart), 0);
-
+		shipState.Engine.Integrator.SetActive(entityOrbit.Body, true);
 		entityPart.Parent		= shipState.EntitySystem.Create(entityOrbit, {});
 		entityPart.Geometry		= iGeometry;
 		entityPart.Transform	= scene.Transforms.push_back(shipState.Engine.Integrator.MatrixIdentity4);
@@ -83,6 +83,7 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 		int32_t						indexEntityPart			= shipState.EntitySystem.Create(entityPart, {});
 		shipState.EntitySystem.EntityChildren[entityPart.Parent].push_back(indexEntityPart);
 		//solarSystem.ShipPhysics.Transforms[entityOrbit.Body].Orientation.Normalize();
+		shipState.Engine.Integrator.SetActive(entityPart.Body, true);
 
 		::ghg::SOrbiter				shipPart				= {};
 		shipPart.Entity			= entityPart.Parent;
