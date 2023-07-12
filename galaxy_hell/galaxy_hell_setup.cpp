@@ -65,11 +65,12 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 		entityOrbit.Body		= ::gpk::createOrbiter(shipState.Engine.Integrator
 			, 0		//PLANET_ORBITALINCLINATION	[iPlanet]
 			, 6		//PLANET_ORBITALPERIOD		[iPlanet]
+			, 1		//PLANET_ORBITALUNIT		[iPlanet]
 			, 1		//PLANET_MASSES				[iPlanet]
 			, 0		//PLANET_AXIALTILT			[iPlanet]
 			, 2.5	//PLANET_DISTANCE			[iPlanet]
 			, 1		//1.0 / PLANET_DISTANCE		[PLANET_COUNT - 1] * 2500
-			, 1		//PLANET_DAY				[iPlanet]
+			, 6		//PLANET_DAY				[iPlanet]
 			, 1		//PLANET_DAY				[PLANET_EARTH]
 			);
 		shipState.Engine.Integrator.Centers[entityOrbit.Body].Orientation.MakeFromEuler(0, (float)(::gpk::math_2pi / countParts * iPart), 0);

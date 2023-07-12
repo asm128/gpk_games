@@ -57,6 +57,12 @@
     <ClInclude Include="ssiege_event_user.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ssiege_game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ssiege_event_game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ssiege.cpp">

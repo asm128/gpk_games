@@ -1,4 +1,4 @@
-#include "ssiege_world.h"
+#include "ssiege_game.h"
 
 #include "gpk_img_serialize.h"
 #include "gpk_engine.h"
@@ -7,6 +7,7 @@
 #include "gpk_deflate.h"
 #include "gpk_array_ptr.h"
 #include "gpk_noise.h"
+
 #include <ctime>
 
 #ifndef SSIEGE_H_23701
@@ -14,18 +15,19 @@
 
 namespace ssiege
 {
+
 	enum SAVE_MODE { SAVE_MODE_AUTO, SAVE_MODE_QUICK, SAVE_MODE_STAGE, SAVE_MODE_USER };
 
 	struct SFileStrings {
 		::gpk::vcc				SavegameFolder				= {1, "."};
 		::gpk::vcc				ExtensionImages				= {4, ".png"};
-		::gpk::vcc				ExtensionProfile			= {6, ".ssiege"};
-		::gpk::vcc				ExtensionCredentials		= {6, ".ssiegec"};
-		::gpk::vcc				ExtensionSave				= {6, ".ssiegez"};
-		::gpk::vcc				ExtensionSaveUser			= {11, ".user.ssiegez"};
-		::gpk::vcc				ExtensionSaveAuto			= {11, ".auto.ssiegez"};
-		::gpk::vcc				ExtensionSaveStage			= {12, ".stage.ssiegez"};
-		::gpk::vcc				ExtensionSaveQuick			= {12, ".quick.ssiegez"};
+		::gpk::vcc				ExtensionProfile			= {6, ".ssg"};
+		::gpk::vcc				ExtensionCredentials		= {6, ".ssgc"};
+		::gpk::vcc				ExtensionSave				= {6, ".ssgz"};
+		::gpk::vcc				ExtensionSaveUser			= {11, ".user.ssgz"};
+		::gpk::vcc				ExtensionSaveAuto			= {11, ".auto.ssgz"};
+		::gpk::vcc				ExtensionSaveStage			= {12, ".stage.ssgz"};
+		::gpk::vcc				ExtensionSaveQuick			= {12, ".quick.ssgz"};
 
 		::gpk::error_t			GetSaveGameExtension		(SAVE_MODE saveMode, ::gpk::vcc & extension)	const	{
 			switch(saveMode) {
@@ -95,6 +97,8 @@ namespace ssiege
 
 	struct SSSiegeApp {
 		APP_STATE				ActiveState			= {};
+
+		SSiegeGame				Game;
 
 		SWorldView				World				= {};
 

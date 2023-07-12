@@ -174,8 +174,10 @@
     <ClInclude Include="ssiege.h" />
     <ClInclude Include="ssiege_event_animal.h" />
     <ClInclude Include="ssiege_event_args.h" />
+    <ClInclude Include="ssiege_event_game.h" />
     <ClInclude Include="ssiege_event_user.h" />
     <ClInclude Include="ssiege_event_world.h" />
+    <ClInclude Include="ssiege_game.h" />
     <ClInclude Include="ssiege_id.h" />
     <ClInclude Include="ssiege_client.h" />
     <ClInclude Include="ssiege_event_vehicle.h" />

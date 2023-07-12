@@ -33,7 +33,6 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & s
 
 		if(0 == ActiveState || 0 == gui.Controls.States.size() || ::gpk::CID_INVALID == UI.Root) {
 			gpk_necs(::ssiege::setupSSiegeUI(gui, UI));
-			//gpk_necs(::ssiege::planetarySystemSetup(World.SolarSystem, World.Engine, "./gpk_solar_system.json"));
 		}
 		while(newState >= UI.RootPerState.size()) {	// create layouts for each state as they're required
 			::gpk::cid_t				rootId;
