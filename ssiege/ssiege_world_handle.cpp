@@ -19,30 +19,30 @@
 	case ::ssiege::CHAR_ACTION_Grab	: gpk_warning_not_implemented(gameEvent); break;
 	case ::ssiege::CHAR_ACTION_Wear	: gpk_warning_not_implemented(gameEvent); break;
 	case ::ssiege::CHAR_ACTION_Use	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssiege::CHAR_ACTION_Spawn	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssiege::CHAR_ACTION_Shoot	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssiege::CHAR_ACTION_Throw	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssiege::CHAR_ACTION_Sleep	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssiege::CHAR_ACTION_Spawn: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssiege::CHAR_ACTION_Shoot: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssiege::CHAR_ACTION_Throw: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssiege::CHAR_ACTION_Sleep: gpk_warning_not_implemented(gameEvent); break;
 	}
 	return 0; 
 }
-::gpk::error_t	ssiege::handleWORLD_ADMIN		(::ssiege::SWorldView & world, const ::ssiege::EViewAdmin & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
+::gpk::error_t	ssiege::handleADMIN_WORLD		(::ssiege::SWorldView & world, const ::ssiege::EViewAdminWorld & gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	const ::ssiege::SArgsEvent	& eventArgs			= *(const ::ssiege::SArgsEvent*)gameEvent.Data.begin();
 	::ssiege::printArgsEvent(eventArgs);
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Create		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Rename		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Delete		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Locate		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Rotate		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Resize		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Reskin		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Relocate		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Generate		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Reset		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssiege::WORLD_ADMIN_Initialize	: 
+	case ::ssiege::ADMIN_WORLD_Create		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::ADMIN_WORLD_Rename		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::ADMIN_WORLD_Delete		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::ADMIN_WORLD_Locate		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::ADMIN_WORLD_Rotate		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::ADMIN_WORLD_Resize		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::ADMIN_WORLD_Reskin		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::ADMIN_WORLD_Relocate		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::ADMIN_WORLD_Generate		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::ADMIN_WORLD_Reset		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssiege::ADMIN_WORLD_Initialize	: 
 		gpk_necs(::ssiege::worldViewSetup(world));
 		break; 
 	} 

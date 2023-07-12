@@ -14,7 +14,7 @@ namespace ssiege
 	};
 
 	::gpk::error_t		handleCHAR_ACTION		(SSSiegeServer & app, const ::ssiege::EViewMinime		& gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents);
-	::gpk::error_t		handleWORLD_ADMIN		(SSSiegeServer & app, const ::ssiege::EViewAdmin		& gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents);
+	::gpk::error_t		handleADMIN_WORLD		(SSSiegeServer & app, const ::ssiege::EViewAdminWorld		& gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents);
 	::gpk::error_t		handleWORLD_EVENT		(SSSiegeServer & app, const ::ssiege::EViewWorld		& gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents);
 	::gpk::error_t		handleCLIENT_ASKS		(SSSiegeServer & app, const ::ssiege::EViewClient		& gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents);
 	::gpk::error_t		handleWORLD_SETUP		(SSSiegeServer & app, const ::ssiege::EViewWorldSetup	& gameEvent, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents);

@@ -4,18 +4,18 @@
 #define warning_unhandled_command(command, commandArgs)	warning_printf("Unhandled command for '%s': '%s' (args:'%s').", ::gpk::get_enum_namep(command), ::gpk::get_value_namep(command), ::gpk::toString(commandArgs).begin())
 #define warning_not_implemented(command, commandArgs)	warning_printf("Implement for '%s'! '%s' (args:'%s').", ::gpk::get_enum_namep(command), ::gpk::get_value_namep(command), ::gpk::toString(commandArgs).begin())
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventSSiege> & /*queue*/, ::ssiege::WORLD_ADMIN command, ::gpk::vcc commandArgs) { 
+static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventSSiege> & /*queue*/, ::ssiege::ADMIN_WORLD command, ::gpk::vcc commandArgs) { 
 	switch(command) {
-	case ::ssiege::WORLD_ADMIN_Create	: warning_not_implemented(command, commandArgs); break;	
-	case ::ssiege::WORLD_ADMIN_Delete	: warning_not_implemented(command, commandArgs); break;	
-	case ::ssiege::WORLD_ADMIN_Rename	: warning_not_implemented(command, commandArgs); break;	
-	case ::ssiege::WORLD_ADMIN_Rotate	: warning_not_implemented(command, commandArgs); break;	
-	case ::ssiege::WORLD_ADMIN_Resize	: warning_not_implemented(command, commandArgs); break;	
-	case ::ssiege::WORLD_ADMIN_Reskin	: warning_not_implemented(command, commandArgs); break;	
-	case ::ssiege::WORLD_ADMIN_Deform	: warning_not_implemented(command, commandArgs); break;	
-	case ::ssiege::WORLD_ADMIN_Locate	: warning_not_implemented(command, commandArgs); break;	
-	case ::ssiege::WORLD_ADMIN_Relocate	: warning_not_implemented(command, commandArgs); break;
-	case ::ssiege::WORLD_ADMIN_Generate	: warning_not_implemented(command, commandArgs); break;
+	case ::ssiege::ADMIN_WORLD_Create	: warning_not_implemented(command, commandArgs); break;	
+	case ::ssiege::ADMIN_WORLD_Delete	: warning_not_implemented(command, commandArgs); break;	
+	case ::ssiege::ADMIN_WORLD_Rename	: warning_not_implemented(command, commandArgs); break;	
+	case ::ssiege::ADMIN_WORLD_Rotate	: warning_not_implemented(command, commandArgs); break;	
+	case ::ssiege::ADMIN_WORLD_Resize	: warning_not_implemented(command, commandArgs); break;	
+	case ::ssiege::ADMIN_WORLD_Reskin	: warning_not_implemented(command, commandArgs); break;	
+	case ::ssiege::ADMIN_WORLD_Deform	: warning_not_implemented(command, commandArgs); break;	
+	case ::ssiege::ADMIN_WORLD_Locate	: warning_not_implemented(command, commandArgs); break;	
+	case ::ssiege::ADMIN_WORLD_Relocate	: warning_not_implemented(command, commandArgs); break;
+	case ::ssiege::ADMIN_WORLD_Generate	: warning_not_implemented(command, commandArgs); break;
 	default: 
 		warning_unhandled_command(command, commandArgs);
 		return -1; 
@@ -186,7 +186,7 @@ static	::gpk::error_t	parseCommand		(::gpk::apobj<::ssiege::EventSSiege> & queue
 	gpk_necs(inputLine.slice(inputLine, 1));
 	ginfo_if(errored(::gpk::split(::gpk::vcs{" "}, inputLine, commandName, commandArgs)), "No arguments provided for command %s.", ::gpk::toString(commandArgs).begin());
 	bool						failed
-		=  -1 == ::parseCommand<::ssiege::WORLD_ADMIN>(queue, commandName, commandArgs)
+		=  -1 == ::parseCommand<::ssiege::ADMIN_WORLD>(queue, commandName, commandArgs)
 		&& -1 == ::parseCommand<::ssiege::WORLD_EVENT>(queue, commandName, commandArgs)
 		&& -1 == ::parseCommand<::ssiege::WORLD_SETUP>(queue, commandName, commandArgs)
 		&& -1 == ::parseCommand<::ssiege::WORLD_VALUE>(queue, commandName, commandArgs)

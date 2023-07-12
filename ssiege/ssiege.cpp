@@ -170,7 +170,7 @@ static	::gpk::error_t	handleSSiegeEvent		(::ssiege::SSSiegeApp & app, ::gpk::pob
 	::gpk::error_t			result			= 0; 
 	switch(eventToProcess.Type) {
 	case ::ssiege::SSIEGE_EVENT_CHAR_ACTION: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CHAR_ACTION>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCHAR_ACTION(app, ev, appOutputEvents); })); break; }
-	case ::ssiege::SSIEGE_EVENT_WORLD_ADMIN: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_ADMIN>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_ADMIN(app, ev, appOutputEvents); })); break; }
+	case ::ssiege::SSIEGE_EVENT_ADMIN_WORLD: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::ADMIN_WORLD>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleADMIN_WORLD(app, ev, appOutputEvents); })); break; }
 	case ::ssiege::SSIEGE_EVENT_WORLD_EVENT: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_EVENT>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_EVENT(app, ev, appOutputEvents); })); break; }
 	case ::ssiege::SSIEGE_EVENT_CLIENT_ASKS: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CLIENT_ASKS>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCLIENT_ASKS(app, ev, appOutputEvents); })); break; }
 	case ::ssiege::SSIEGE_EVENT_WORLD_SETUP: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_SETUP>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_SETUP(app, ev, appOutputEvents); })); break; }
@@ -204,7 +204,7 @@ static	::gpk::error_t	handleSSiegeEvent		(::ssiege::SSSiegeApp & app, ::gpk::pob
 				es_if_failed(app.Load(fileNames[0]));
 
 			::ssiege::SArgsEvent		dummy					= {};
-			gpk_necs(::gpk::eventEnqueueChild(app.EventQueue, ::ssiege::SSIEGE_EVENT_WORLD_ADMIN, ::ssiege::WORLD_ADMIN_Initialize, dummy));
+			gpk_necs(::gpk::eventEnqueueChild(app.EventQueue, ::ssiege::SSIEGE_EVENT_ADMIN_WORLD, ::ssiege::ADMIN_WORLD_Initialize, dummy));
 		}
 		gpk_necs(app.StateSwitch(::ssiege::APP_STATE_Welcome));
 		break;

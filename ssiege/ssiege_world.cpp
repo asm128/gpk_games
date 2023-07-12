@@ -19,7 +19,7 @@
 			::gpk::error_t			result			= 0; 
 			switch(eventToProcess.Type) {
 			case ::ssiege::SSIEGE_EVENT_CHAR_ACTION: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CHAR_ACTION>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCHAR_ACTION(world, ev, worldOutputEvents); })); break; }
-			case ::ssiege::SSIEGE_EVENT_WORLD_ADMIN: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_ADMIN>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_ADMIN(world, ev, worldOutputEvents); })); break; }
+			case ::ssiege::SSIEGE_EVENT_ADMIN_WORLD: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::ADMIN_WORLD>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleADMIN_WORLD(world, ev, worldOutputEvents); })); break; }
 			case ::ssiege::SSIEGE_EVENT_WORLD_EVENT: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_EVENT>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_EVENT(world, ev, worldOutputEvents); })); break; }
 			case ::ssiege::SSIEGE_EVENT_CLIENT_ASKS: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CLIENT_ASKS>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCLIENT_ASKS(world, ev, worldOutputEvents); })); break; }
 			case ::ssiege::SSIEGE_EVENT_WORLD_SETUP: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_SETUP>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_SETUP(world, ev, worldOutputEvents); })); break; }
