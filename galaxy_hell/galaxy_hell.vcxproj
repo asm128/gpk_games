@@ -124,7 +124,6 @@
     <ClInclude Include="gpk_galaxy_hell_entity.h" />
     <ClInclude Include="gpk_galaxy_hell.h" />
     <ClInclude Include="gpk_galaxy_hell_ships.h" />
-    <ClInclude Include="gpk_galaxy_hell_weapon.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

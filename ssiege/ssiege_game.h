@@ -1,6 +1,6 @@
 #include "ssiege_world.h"
 #include "gpk_engine_planetary_system.h"
-#include "gpk_engine_game.h"
+#include "gpk_game.h"
 
 #ifndef SSIEGE_GAME_H
 #define SSIEGE_GAME_H

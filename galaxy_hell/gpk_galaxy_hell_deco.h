@@ -162,9 +162,9 @@ namespace ghg
 		int								Update				(float secondsLastFrame)	{
 			Particles.IntegrateSpeed(secondsLastFrame);
 			for(uint32_t iSlice = 0; iSlice < Particles.Speed.size(); ++iSlice) {
-				float											& speed				= Particles.Speed[iSlice];
-				//speed										-= secondsLastFrame * (rand() % 16);
-				speed										-= secondsLastFrame * ((0 > speed) ? (rand() % 16) * 5 : (rand() % 16));
+				float								& speed				= Particles.Speed[iSlice];
+				//speed							-= secondsLastFrame * (rand() % 16);
+				speed							-= secondsLastFrame * ((0 > speed) ? (rand() % 16) * 5 : (rand() % 16));
 				if (speed < -30)
 					Remove(iSlice--);
 			}

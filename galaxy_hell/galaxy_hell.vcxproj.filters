@@ -44,9 +44,6 @@
     <ClInclude Include="gpk_galaxy_hell_app.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gpk_galaxy_hell_weapon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="gpk_galaxy_hell_entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
