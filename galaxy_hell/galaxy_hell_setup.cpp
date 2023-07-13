@@ -189,21 +189,21 @@ static	::gpk::error_t	shipGeometryBuildShred		(::gpk::SGeometryQuads & geometry)
 static	::gpk::error_t	modelsSetupOld			(::ghg::SShipScene & scene)			{
 	scene.Geometry.resize(::gpk::get_value_count<ghg::SHIP_GEOMETRY>() * 1024);
 
-	::shipGeometryBuildEngine		(scene.Geometry[::ghg::SHIP_GEOMETRY_ENGINE			]);
-	::shipGeometryBuildGun			(scene.Geometry[::ghg::SHIP_GEOMETRY_GUN			]);
-	::shipGeometryBuildWafer		(scene.Geometry[::ghg::SHIP_GEOMETRY_WAFER			]);
-	::shipGeometryBuildCannon		(scene.Geometry[::ghg::SHIP_GEOMETRY_CANNON			]);
-	::shipGeometryBuildShotgun		(scene.Geometry[::ghg::SHIP_GEOMETRY_SHOTGUN		]);
-	::shipGeometryBuildWaferShotgun	(scene.Geometry[::ghg::SHIP_GEOMETRY_WAFER_SHOTGUN	]);
-	::shipGeometryBuildCannonball	(scene.Geometry[::ghg::SHIP_GEOMETRY_CANNONBALL		]);
-	::shipGeometryBuildRocket		(scene.Geometry[::ghg::SHIP_GEOMETRY_ROCKET			]);
-	::shipGeometryBuildMissile		(scene.Geometry[::ghg::SHIP_GEOMETRY_MISSILE		]);
-	::shipGeometryBuildBullet		(scene.Geometry[::ghg::SHIP_GEOMETRY_BULLET			]);
-	::shipGeometryBuildShred		(scene.Geometry[::ghg::SHIP_GEOMETRY_SHRED			]);
+	::shipGeometryBuildEngine		(scene.Geometry[::ghg::SHIP_GEOMETRY_Engine			]);
+	::shipGeometryBuildGun			(scene.Geometry[::ghg::SHIP_GEOMETRY_Gun			]);
+	::shipGeometryBuildWafer		(scene.Geometry[::ghg::SHIP_GEOMETRY_Wafer			]);
+	::shipGeometryBuildCannon		(scene.Geometry[::ghg::SHIP_GEOMETRY_Cannon			]);
+	::shipGeometryBuildShotgun		(scene.Geometry[::ghg::SHIP_GEOMETRY_Shotgun		]);
+	::shipGeometryBuildWaferShotgun	(scene.Geometry[::ghg::SHIP_GEOMETRY_WaferShotgun	]);
+	::shipGeometryBuildCannonball	(scene.Geometry[::ghg::SHIP_GEOMETRY_Cannonball		]);
+	::shipGeometryBuildRocket		(scene.Geometry[::ghg::SHIP_GEOMETRY_Rocket			]);
+	::shipGeometryBuildMissile		(scene.Geometry[::ghg::SHIP_GEOMETRY_Missile		]);
+	::shipGeometryBuildBullet		(scene.Geometry[::ghg::SHIP_GEOMETRY_Bullet			]);
+	::shipGeometryBuildShred		(scene.Geometry[::ghg::SHIP_GEOMETRY_Shred			]);
 
-	::gpk::geometryBuildCube		(scene.Geometry[::ghg::SHIP_GEOMETRY_CUBE			], {1, 1, 1});
-	::gpk::geometryBuildSphere		(scene.Geometry[::ghg::SHIP_GEOMETRY_SPHERE			], 16U, 16U, .5f, {0, 0});
-	::gpk::geometryBuildCylinder	(scene.Geometry[::ghg::SHIP_GEOMETRY_CYLINDER		],  1U, 32U, .5, .5, {0, 0}, {1, 1, 1});
+	::gpk::geometryBuildCube		(scene.Geometry[::ghg::SHIP_GEOMETRY_Cube			], {1, 1, 1});
+	::gpk::geometryBuildSphere		(scene.Geometry[::ghg::SHIP_GEOMETRY_Sphere			], 16U, 16U, .5f, {0, 0});
+	::gpk::geometryBuildCylinder	(scene.Geometry[::ghg::SHIP_GEOMETRY_Cylinder		],  1U, 32U, .5, .5, {0, 0}, {1, 1, 1});
 	{
 
 		::gpk::apod<::gpk::rgbaf>	baseColors;
@@ -440,11 +440,11 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 				shipPart.Weapon			= solarSystem.ShipState.Weapons.push_back(newWeapon);
 				solarSystem.ShipState.Shots.push_back({});
 
-					 if(shipPart.Type == ::ghg::SHIP_PART_TYPE_Gun			) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = SHIP_GEOMETRY_GUN;				}
-				else if(shipPart.Type == ::ghg::SHIP_PART_TYPE_Wafer		) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = SHIP_GEOMETRY_WAFER;			}
- 				else if(shipPart.Type == ::ghg::SHIP_PART_TYPE_Shotgun		) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = SHIP_GEOMETRY_SHOTGUN;			}
- 				else if(shipPart.Type == ::ghg::SHIP_PART_TYPE_Cannon		) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = SHIP_GEOMETRY_CANNON;			}
- 				else if(shipPart.Type == ::ghg::SHIP_PART_TYPE_ShotgunWafer	) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = SHIP_GEOMETRY_WAFER_SHOTGUN;	}
+					 if(shipPart.Type == ::ghg::SHIP_PART_TYPE_Gun			) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = SHIP_GEOMETRY_Gun;			}
+				else if(shipPart.Type == ::ghg::SHIP_PART_TYPE_Wafer		) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = SHIP_GEOMETRY_Wafer;		}
+ 				else if(shipPart.Type == ::ghg::SHIP_PART_TYPE_Shotgun		) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = SHIP_GEOMETRY_Shotgun;		}
+ 				else if(shipPart.Type == ::ghg::SHIP_PART_TYPE_Cannon		) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = SHIP_GEOMETRY_Cannon;		}
+ 				else if(shipPart.Type == ::ghg::SHIP_PART_TYPE_ShotgunWafer	) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = SHIP_GEOMETRY_WaferShotgun;	}
 				ship.Health				+= shipPart.Health;
 				const uint32_t				width		= ::gpk::get_value_count<::ghg::WEAPON_LOAD>();
 				const uint32_t				height		= ::gpk::get_value_count<::ghg::WEAPON_TYPE>();

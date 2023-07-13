@@ -168,7 +168,7 @@ static	::gpk::error_t	drawCannonball
 	{
 		::gpk::m4f32				matrixTransformVP			= matrixTransform * matrixVP;
 		::ghg::getLightArrays(matrixTransform.GetTranslation(), drawCache.LightPointsWorld, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightColorsModel);
-		const ::gpk::SGeometryQuads	& mesh						= shipState.Scene.Geometry[::ghg::SHIP_GEOMETRY_SPHERE];
+		const ::gpk::SGeometryQuads	& mesh						= shipState.Scene.Geometry[::ghg::SHIP_GEOMETRY_Sphere];
 
 		for(uint32_t iTriangle = 0; iTriangle < mesh.Triangles.size(); ++iTriangle) {
 			::gpk::clear(drawCache.PixelCoords, drawCache.PixelVertexWeights);
@@ -209,7 +209,7 @@ static	::gpk::error_t	drawCannonball
 		matrixTransform.SetTranslation(position, false);
 		const ::gpk::m4f32			matrixTransformVP			= matrixTransform * matrixVP;
 		::gpk::clear(drawCache.LightPointsModel, drawCache.LightColorsModel);
-		const ::gpk::SGeometryQuads	& mesh						= shipState.Scene.Geometry[::ghg::SHIP_GEOMETRY_CYLINDER];
+		const ::gpk::SGeometryQuads	& mesh						= shipState.Scene.Geometry[::ghg::SHIP_GEOMETRY_Cylinder];
 		for(uint32_t iTriangle = 0; iTriangle < mesh.Triangles.size(); ++iTriangle) {
 			::gpk::clear(drawCache.PixelCoords, drawCache.PixelVertexWeights);
 			pixelsDrawn += ::gpk::drawQuadTriangle(targetPixels, mesh, iTriangle, matrixTransform, matrixTransformVP, shipState.Scene.Global.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel, depthBuffer
