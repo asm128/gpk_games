@@ -1,10 +1,11 @@
-#define GPK_INFO_PRINTF_ENABLED
+//#define GPK_INFO_PRINTF_ENABLED
 
 #include "gpk_galaxy_hell.h"
 #include "gpk_file.h"
 #include "gpk_json.h"
 #include "gpk_noise.h"
 #include "gpk_deflate.h"
+#include "gpk_engine_orbit.h"
 
 #include <windows.h>
 #include <mmsystem.h>
@@ -71,7 +72,7 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 			, 2.5	//PLANET_DISTANCE			[iPlanet]
 			, 1		//1.0 / PLANET_DISTANCE		[PLANET_COUNT - 1] * 2500
 			, 1		//PLANET_DAY				[iPlanet]
-			, 1		//PLANET_DAY				[PLANET_EARTH]
+			, 2		//PLANET_DAY				[PLANET_EARTH]
 			);
 		shipState.Engine.Integrator.Centers[entityOrbit.Body].Orientation.MakeFromEuler(0, (float)(::gpk::math_2pi / countParts * iPart), 0);
 		shipState.Engine.Integrator.SetActive(entityOrbit.Body, true);

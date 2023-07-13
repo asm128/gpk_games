@@ -38,7 +38,7 @@ static	::gpk::error_t	collisionDetect		(::ghg::SShots & shots, const ::gpk::n3f3
 	return 0;
 }
 
-static	::gpk::error_t	handleCollisionPoint		(::ghg::SGalaxyHell & solarSystem, int32_t weaponDamage, ::ghg::SShipScore & attackerScore, ::ghg::SShipScore & damagedScore, ::ghg::SOrbiter& damagedPart, ::ghg::SShipCore & damagedShip, int32_t iAttackedShip, const ::gpk::n3f32 & sphereCenter, const ::gpk::n3f32 & collisionPoint)	{
+static	::gpk::error_t	handleCollisionPoint		(::ghg::SGalaxyHell & solarSystem, int32_t weaponDamage, ::ghg::SShipScore & attackerScore, ::ghg::SShipScore & damagedScore, ::ghg::SOrbiter & damagedPart, ::ghg::SShipCore & damagedShip, int32_t iAttackedShip, const ::gpk::n3f32 & sphereCenter, const ::gpk::n3f32 & collisionPoint)	{
 	solarSystem.ShipState.ShipOrbiterActionQueue[iAttackedShip].push_back(::ghg::SHIP_ACTION_Hit);
 	const ::gpk::n3f32			bounceVector				= (collisionPoint - sphereCenter).Normalize();
 	solarSystem.DecoState.Debris.SpawnDirected(1 + weaponDamage / 10, 0.3, bounceVector, collisionPoint, 50, 1);

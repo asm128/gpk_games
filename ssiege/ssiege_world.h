@@ -255,8 +255,8 @@ namespace ssiege
 
 	struct SWorldConfig {
 		uint64_t				Seed					= ::gpk::noise1DBase(::gpk::timeCurrentInUs());
-		uint64_t				MaxPlayers				= {};
 		::gpk::n2u8				BlockSize				= {255, 255};
+		::gpk::n2u32			WorldSizeInBlocks		= {};	// in blocks
 	};
 
 	struct SWorldState {
@@ -265,7 +265,6 @@ namespace ssiege
 		uint32_t				DaylightOffsetMinutes	= 90;
 		float					DaylightRatioExtra		= .5;
 		uint64_t				TimeLastSaved			= {};
-		::gpk::n2u32			WorldSize				= {};
 		float			 		TimeScale				= 1;
 	};
 #pragma pack(pop)

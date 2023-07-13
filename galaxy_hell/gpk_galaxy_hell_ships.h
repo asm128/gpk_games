@@ -1,6 +1,6 @@
 #include "gpk_galaxy_hell_entity.h"
 #include "gpk_galaxy_hell_weapon.h"
-#include "gpk_rigidbody.h"
+#include "gpk_rigid_body.h"
 
 #include "gpk_geometry_lh.h"
 #include "gpk_model.h"

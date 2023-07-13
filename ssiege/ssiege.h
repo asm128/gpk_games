@@ -98,7 +98,7 @@ namespace ssiege
 	struct SSSiegeApp {
 		APP_STATE				ActiveState			= {};
 
-		SSiegeGame				Game;
+		::ssg::SSiegeGame		Game;
 
 		SWorldView				World				= {};
 
@@ -112,7 +112,7 @@ namespace ssiege
 		ssiegeid_t				CharacterControlled	= SSIEGEID_INVALID;
 		::gpk::aobj<::ssiege::SPlayer>	Players;
 
-		gpk::pobj<gpk::SGUI>	GUI;
+		::gpk::pobj<gpk::SGUI>	GUI;
 		::gpk::prtbgra8d32		RenderTargetWorld;
 		::gpk::prtbgra8d32		RenderTargetUI;
 
