@@ -354,6 +354,8 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		::std::lock_guard			lock	(solarSystem.LockUpdate);
 		// Set up player ships
 		if(solarSystem.PlayState.Stage == 0) {
+			solarSystem.ShipState.ShipCoreEntity.clear();
+			solarSystem.ShipState.ShipPartEntity.clear();
 			solarSystem.PlayState.TimeWorld		= 0;
 			solarSystem.PlayState.TimeReal		= 0;
 			solarSystem.PlayState.TimeStage		= 0;

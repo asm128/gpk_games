@@ -1,6 +1,8 @@
 #include "gpk_particle.h"
 #include "gpk_array_static.h"
 #include "gpk_font.h"
+#include "gpk_apod_range.h"
+#include "gpk_apod_n2.h"
 
 #ifndef GPK_GALAXY_HELL_DECO_H_293874239874
 #define GPK_GALAXY_HELL_DECO_H_293874239874
@@ -8,9 +10,9 @@
 namespace ghg 
 {
 	struct SStars	{
-		::gpk::apod<::gpk::n2f32>	Position			= {};
-		::gpk::af32					Speed				= {};
-		::gpk::af32					Brightness			= {};
+		::gpk::an2f32		Position			= {};
+		::gpk::af32			Speed				= {};
+		::gpk::af32			Brightness			= {};
 
 		int					Reset				(::gpk::n2u16 targetSize, uint16_t starCount = 128)	{
 			if(0 == targetSize.y || 0 == targetSize.x) 
@@ -152,7 +154,7 @@ namespace ghg
 	struct SExplosion {
 		int32_t							IndexMesh;
 		int32_t							IndexImage;
-		::gpk::apod<::gpk::rangeu16>	Slices;
+		::gpk::arangeu16				Slices;
 		::gpk::SParticles3				Particles;
 
 		int								Remove				(uint32_t iSlice)			{

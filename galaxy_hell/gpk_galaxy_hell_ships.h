@@ -84,9 +84,6 @@ namespace ghg
 	struct SShipManager  {
 		::gpk::SSpaceshipManager	SpaceshipManager;
 
-		::gpk::au32					ShipCoreToEntityMap	= {};
-		::gpk::au32					ShipPartToEntityMap	= {};
-
 		::gpk::au32					MeshMap				= {};
 
 		::gpk::SEngine				Engine;
@@ -101,8 +98,8 @@ namespace ghg
 			SpaceshipManager.Clear();
 			::gpk::clear
 				( Scene.Transforms
-				, ShipCoreToEntityMap
-				, ShipPartToEntityMap
+				, ShipCoreEntity
+				, ShipCoreEntity
 				, MeshMap
 				);
 			Engine.Integrator.Clear();
@@ -127,8 +124,8 @@ namespace ghg
 		::gpk::error_t				Save				(::gpk::au8 & output)	const	{ 
 			gpk_necs(SpaceshipManager.Save(output));
 
-			gpk_necs(::gpk::saveView(output, ShipCoreToEntityMap));
-			gpk_necs(::gpk::saveView(output, ShipPartToEntityMap));
+			gpk_necs(::gpk::saveView(output, ShipCoreEntity));
+			gpk_necs(::gpk::saveView(output, ShipPartEntity));
 		
 			gpk_necs(Engine.Save(output));
 
@@ -139,8 +136,8 @@ namespace ghg
 		::gpk::error_t				Load				(::gpk::vcu8 & input) { 
 			gpk_necs(SpaceshipManager.Load(input));
 
-			gpk_necs(::gpk::loadView(input, ShipCoreToEntityMap));
-			gpk_necs(::gpk::loadView(input, ShipPartToEntityMap));
+			gpk_necs(::gpk::loadView(input, ShipCoreEntity));
+			gpk_necs(::gpk::loadView(input, ShipPartEntity));
 
 			gpk_necs(Engine.Load(input));
 

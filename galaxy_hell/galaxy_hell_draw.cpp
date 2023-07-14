@@ -6,6 +6,7 @@
 #include "gpk_font.h"
 
 #include "gpk_label.h"
+#include "gpk_slice.h"
 
 #include <algorithm>
 
