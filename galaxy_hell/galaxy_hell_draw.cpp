@@ -475,7 +475,7 @@ static	::gpk::error_t	drawShip
 	const ::gpk::vcu16					shipParts			= solarSystem.ShipState.SpaceshipManager.ShipParts[iShip];
 	for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
 		const ::gpk::SSpaceshipOrbiter				& shipPart			= solarSystem.ShipState.SpaceshipManager.Orbiters[shipParts[iPart]];
-		if(shipPart.Health <= 0)
+		if(shipPart.Health.Value <= 0)
 			continue;
 		pixelsDrawn += ::ghg::drawOrbiter(solarSystem.ShipState, solarSystem.ShipState.ShipPartEntity[shipParts[iPart]], playerColor, (float)solarSystem.DecoState.AnimationTime, matrixVP, targetPixels, depthBuffer, drawCache);
 	}

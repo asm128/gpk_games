@@ -1,5 +1,6 @@
 #include "gpk_image.h"
 #include "gpk_array_ptr.h"
+#include "gpk_range.h"
 
 #ifndef GPK_MINE_HELL_H_66546478
 #define GPK_MINE_HELL_H_66546478

@@ -495,7 +495,7 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 	::gpk::SGUI					& playerGUI			= *playerDialog.GUI;
 
 	const ::gpk::SSpaceshipCore		& shipCore			= game.ShipState.SpaceshipManager.ShipCores[iPlayer];
-	sprintfScore(uiPlayer.TextScore.Storage, shipScore, shipCore.Nitro);
+	sprintfScore(uiPlayer.TextScore.Storage, shipScore, shipCore.Nitro.Value);
 	const ::gpk::rgbaf			shipColor			= (shipCore.Team ? ::gpk::RED : ::gpk::rgbaf(game.Pilots[iPlayer].Color));
 	gpk_necs(::gpk::controlTextSet(playerGUI, 1 + ::ghg::UI_PILOT_Name	, game.Pilots[iPlayer].Name));
 	gpk_necs(::gpk::controlTextSet(playerGUI, 1 + ::ghg::UI_PILOT_Score, uiPlayer.TextScore.Storage));
@@ -516,9 +516,9 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 		gpk_necall(::gpk::controlTextSet(playerGUI, viewport.Viewport + 1, ::gpk::get_value_label(weapon.Load)), "%s", "");
 		gpk_necall(::gpk::controlTextSet(playerGUI, viewport.Viewport + 2, ::gpk::get_value_label(weapon.Type)), "%s", "");
 
-		const float					healthRatio		= ::gpk::clamp(orbiter.Health	/ float(orbiter.MaxHealth), 0.0f, 1.0f);
-		const float					ratioOverheat	= (orbiter.Health > 0) ? ::gpk::clamp(weapon.Overheat	/ float(weapon.Cooldown), 0.0f, 1.0f) : 0;
-		const float					ratioDelay		= (orbiter.Health > 0) ? ::gpk::clamp(weapon.Delay		/ float(weapon.MaxDelay), 0.0f, 1.0f) : 0;
+		const float					healthRatio		= (float)::gpk::clamp(orbiter.Health.Weight(), 0.0, 1.0);
+		const float					ratioOverheat	= (orbiter.Health.Value > 0) ? (float)weapon.Overheat	.WeightClamp() : 0;
+		const float					ratioDelay		= (orbiter.Health.Value > 0) ? (float)weapon.Delay		.WeightClamp() : 0;
 
 		const ::gpk::rgbaf			colorLife		= ::gpk::interpolate_linear(::gpk::RED, ::gpk::GREEN, healthRatio);
 		const ::gpk::rgbaf			colorDelay		= ::gpk::interpolate_linear(::gpk::GRAY * .5, ::gpk::YELLOW, ratioDelay);;
@@ -656,7 +656,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpob
 		if((iPlayer < app.Game.ShipState.SpaceshipManager.ShipCores.size())) {
 			const ::gpk::SSpaceshipCore		& shipCore				= app.Game.ShipState.SpaceshipManager.ShipCores[iPlayer];
 			shipColor				= (shipCore.Team ? ::ghg::PLAYER_COLORS[iPlayer] : app.Game.Pilots[iPlayer].Color);
-			nitro					= shipCore.Nitro;
+			nitro					= shipCore.Nitro.Value;
 		}
 
 		gpk_necall(::uiPlayerUpdateHome(uiPlayer, int16_t(iPlayer), app.Players[iPlayer].Name, shipColor

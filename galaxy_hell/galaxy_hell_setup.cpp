@@ -398,7 +398,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 			::gpk::SSpaceshipCore		& ship							= solarSystem.ShipState.SpaceshipManager.ShipCores[iShip];
 			::gpk::au16					& shipParts						= solarSystem.ShipState.SpaceshipManager.ShipParts[iShip];
 			ship.Health				= 0;
-			ship.Nitro				= float(ship.MaxNitro = DEFAULT_NITRO);
+			ship.Nitro				= {DEFAULT_NITRO, DEFAULT_NITRO};
 
 			for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
 				::gpk::SSpaceshipOrbiter			& shipPart						= solarSystem.ShipState.SpaceshipManager.Orbiters[shipParts[iPart]];
@@ -421,25 +421,25 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 					weapon				%= ::gpk::size(weaponDefinitions) >> 1;
 				}
 
-				SShipOrbiterSetup		partCreationData	= weaponDefinitions[weapon];
-				::gpk::SWeapon			newWeapon			= {};
-				shipPart.Health			= (int32_t)(shipPart.MaxHealth = partCreationData.MaxHealth);
-				shipPart.Type			= partCreationData.Type;
-				newWeapon.MaxDelay		= (float)partCreationData.MaxDelay;
+				SShipOrbiterSetup				partCreationData	= weaponDefinitions[weapon];
+				::gpk::SWeapon					newWeapon			= {};
+				shipPart.Health.Value		= (int32_t)(shipPart.Health.Limit = partCreationData.MaxHealth);
+				shipPart.Type				= partCreationData.Type;
+				newWeapon.Delay.Limit		= (float)partCreationData.MaxDelay;
 				if(0 != ship.Team)
-					newWeapon.MaxDelay		*= 1 + (2 * iPart);
-				newWeapon.Type			= partCreationData.Weapon;
-				newWeapon.Load			= partCreationData.Munition;
-				newWeapon.Damage		= partCreationData.Damage;
-				newWeapon.Speed			= partCreationData.Speed;
-				newWeapon.Delay			= newWeapon.MaxDelay / shipParts.size() * iPart;
-				newWeapon.Stability		= (float)partCreationData.Stability;
-				newWeapon.ParticleCount	= partCreationData.ParticleCount;
-				newWeapon.Cooldown		= (float)partCreationData.Cooldown		;//= 1;
+					newWeapon.Delay.Limit		*= 1 + (2 * iPart);
+				newWeapon.Type				= partCreationData.Weapon;
+				newWeapon.Load				= partCreationData.Munition;
+				newWeapon.Damage			= partCreationData.Damage;
+				newWeapon.Speed				= partCreationData.Speed;
+				newWeapon.Delay.Value		= newWeapon.Delay.Limit / shipParts.size() * iPart;
+				newWeapon.Stability			= (float)partCreationData.Stability;
+				newWeapon.ParticleCount		= partCreationData.ParticleCount;
+				newWeapon.Overheat.Limit	= (float)partCreationData.Cooldown		;//= 1;
 				newWeapon.OverheatPerShot	= (float)partCreationData.OverheatPerShot	;//= 0;
-				newWeapon.ShotLifetime	= (float)partCreationData.ShotLifetime	;//= 0;
+				newWeapon.ShotLifetime		= (float)partCreationData.ShotLifetime	;//= 0;
 
-				shipPart.Weapon			= solarSystem.ShipState.SpaceshipManager.Weapons.push_back(newWeapon);
+				shipPart.Weapon				= solarSystem.ShipState.SpaceshipManager.Weapons.push_back(newWeapon);
 				solarSystem.ShipState.SpaceshipManager.Shots.push_back({});
 				solarSystem.ShipState.SpaceshipManager.WeaponDistanceToTargets.push_back({});
 
@@ -448,7 +448,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
  				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_Shotgun		) { solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Geometry = ::gpk::SHIP_GEOMETRY_Shotgun;		}
  				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_Cannon		) { solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Geometry = ::gpk::SHIP_GEOMETRY_Cannon;		}
  				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_ShotgunWafer	) { solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Geometry = ::gpk::SHIP_GEOMETRY_WaferShotgun;	}
-				ship.Health				+= shipPart.Health;
+				ship.Health				+= shipPart.Health.Value;
 				const uint32_t				width		= ::gpk::get_value_count<::gpk::WEAPON_LOAD>();
 				const uint32_t				height		= ::gpk::get_value_count<::gpk::WEAPON_TYPE>();
 				const uint32_t				depth		= ::gpk::get_value_count<::gpk::SHIP_PART_TYPE>();

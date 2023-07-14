@@ -47,7 +47,7 @@ static	::gpk::error_t	handleCollisionPoint		(::ghg::SGalaxyHell & solarSystem, i
 	solarSystem.DecoState.ScoreParticles.Create(collisionPoint, bounceVector, 10.0f + weaponDamage * .001f, {weaponDamage, 1});
 	attackerScore.DamageDone	+= weaponDamage;
 	damagedScore.DamageReceived	+= weaponDamage;
-	if(::applyDamage(weaponDamage, damagedPart.Health, damagedShip.Health)) {	// returns true if health reaches zero
+	if(::applyDamage(weaponDamage, damagedPart.Health.Value, damagedShip.Health)) {	// returns true if health reaches zero
 		attackerScore.Score			+= weaponDamage * 10;
 		solarSystem.DecoState.ScoreParticles.Create(collisionPoint, bounceVector, 10.0f + weaponDamage * .001f, {weaponDamage * 10, 2});
 		attackerScore.KilledOrbiters	+= 1;
@@ -126,7 +126,7 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 				for(uint32_t iPartAttacked = 0; iPartAttacked < shipAttackedParts.size(); ++iPartAttacked) {
 					int32_t attackedPart = shipAttackedParts[iPartAttacked];
 					::gpk::SSpaceshipOrbiter	& shipPartAttacked		= solarSystem.ShipState.SpaceshipManager.Orbiters[attackedPart];
-					if(shipPartAttacked.Health <= 0)
+					if(shipPartAttacked.Health.Value <= 0)
 						continue;
 					const ::gpk::SWeapon		& weaponAttacker		= solarSystem.ShipState.SpaceshipManager.Weapons[shipPartAttacker.Weapon];
 					const ::ghg::SGHEntity		& entity				= solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[attackedPart]];
@@ -226,7 +226,7 @@ static	::gpk::error_t	updateDistancesToTargets	(::ghg::SGalaxyHell & solarSystem
 
 		for(uint32_t iPart = 0; iPart < shipCoresParts[iShip].size(); ++iPart) {
 			::gpk::SSpaceshipOrbiter					& shipPartTarget		= orbiters[shipCoresParts[iShip][iPart]];
-			if(0 >= shipPartTarget.Health)
+			if(0 >= shipPartTarget.Health.Value)
 				continue;
 
 			const ::gpk::n3f32				targetPosition			= solarSystem.ShipState.Scene.Transforms[solarSystem.ShipState.ShipPartEntity[shipCoresParts[iShip][iPart]]].GetTranslation();
@@ -248,15 +248,15 @@ static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int
 	for(uint32_t iParticle = 0; iParticle < shots.Particles.Position.size(); ++iParticle)
 		shots.Particles.Position[iParticle].x				-= (float)(solarSystem.PlayState.RelativeSpeedCurrent * secondsLastFrame * .2);
 
-	weapon.Delay			+= (float)secondsLastFrame;
+	weapon.Delay.Value		+= (float)secondsLastFrame;
 
 	if(weapon.Load == ::gpk::WEAPON_LOAD_Rocket || weapon.Load == ::gpk::WEAPON_LOAD_Missile || weapon.Type == ::gpk::WEAPON_TYPE_Cannon) {
 		updateDistancesToTargets(solarSystem, team, iShipPart, shipPartDistancesToTargets, shots); 
 	}
 
-	weapon.Overheat			-= (float)secondsLastFrame;
+	weapon.Overheat.Value	-= (float)secondsLastFrame;
 	if(weapon.CoolingDown) {
-		if(0 >= weapon.Overheat)
+		if(0 >= weapon.Overheat.Value)
 			weapon.CoolingDown		= false;
 	}
 	else {
@@ -274,11 +274,11 @@ static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int
 				{
 					::std::lock_guard		lockUpdate			(solarSystem.LockUpdate);
 					if(weapon.Load == ::gpk::WEAPON_LOAD_Rocket)
-						weapon.SpawnDirected(shots, 1, positionGlobal, direction, weapon.Speed, 1, weapon.ShotLifetime);
+						weapon.ShootDirected(shots, 1, positionGlobal, direction, weapon.Speed, 1, weapon.ShotLifetime);
 					else if(weapon.Load == ::gpk::WEAPON_LOAD_Cannonball)
-						weapon.SpawnDirected(shots, 1, positionGlobal, direction, weapon.Speed, 1, weapon.ShotLifetime);
+						weapon.ShootDirected(shots, 1, positionGlobal, direction, weapon.Speed, 1, weapon.ShotLifetime);
 					else if(weapon.Load == ::gpk::WEAPON_LOAD_Missile)
-						weapon.SpawnDirected(shots, 1, positionGlobal, direction, weapon.Speed, 1, weapon.ShotLifetime);
+						weapon.ShootDirected(shots, 1, positionGlobal, direction, weapon.Speed, 1, weapon.ShotLifetime);
 				}
 
 				if(solarSystem.PlayState.TimeStage > 1) {
@@ -299,20 +299,20 @@ static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int
 			::gpk::n3f32				direction				= {team ? -1.0f : 1.0f, 0, 0};
 			::std::lock_guard			lockUpdate				(solarSystem.LockUpdate);
 			if(weapon.Load == ::gpk::WEAPON_LOAD_Ray)
-				weapon.Create(shots, positionGlobal, direction, weapon.Speed, .75f, weapon.ShotLifetime);
+				weapon.Shoot(shots, positionGlobal, direction, weapon.Speed, .75f, weapon.ShotLifetime);
 			else
-				weapon.SpawnDirected(shots, weapon.ParticleCount, positionGlobal, direction, weapon.Speed, 5.0f, weapon.ShotLifetime);
+				weapon.ShootDirected(shots, weapon.ParticleCount, positionGlobal, direction, weapon.Speed, 5.0f, weapon.ShotLifetime);
 		}
 		else if(weapon.Type == ::gpk::WEAPON_TYPE_Shotgun) {
 			::gpk::n3f32				direction				= {team ? -1.0f : 1.0f, 0, 0};
 			::std::lock_guard			lockUpdate				(solarSystem.LockUpdate);
 			if(weapon.Load == ::gpk::WEAPON_LOAD_Ray)
-				weapon.SpawnDirected(shots, weapon.ParticleCount, 1, positionGlobal, direction, weapon.Speed, .75f, weapon.ShotLifetime);
+				weapon.ShootDirected(shots, weapon.ParticleCount, 1, positionGlobal, direction, weapon.Speed, .75f, weapon.ShotLifetime);
 			else
-				weapon.SpawnDirected(shots, weapon.ParticleCount, 1, positionGlobal, direction, weapon.Speed, 5.0f, weapon.ShotLifetime);
+				weapon.ShootDirected(shots, weapon.ParticleCount, 1, positionGlobal, direction, weapon.Speed, 5.0f, weapon.ShotLifetime);
 		}
 	}
-	if(weapon.Overheat >= weapon.Cooldown) {
+	if(weapon.Overheat.Value >= weapon.Overheat.Limit) {
 		weapon.CoolingDown		= true;
 	}
 	return 0;
@@ -367,7 +367,7 @@ static	::gpk::error_t	shipsUpdate				(::ghg::SGalaxyHell & solarSystem, double s
 		}
 		for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
 			::gpk::SSpaceshipOrbiter				& shipPart				= solarSystem.ShipState.SpaceshipManager.Orbiters[shipParts[iPart]];
-			if(0 >= shipPart.Health)
+			if(0 >= shipPart.Health.Value)
 				continue;
 			::updateShipOrbiter(solarSystem, ship.Team, shipPart, iShip, shipParts[iPart], solarSystem.ShipState.SpaceshipManager.WeaponDistanceToTargets[shipParts[iPart]], secondsLastFrame);
 		}
@@ -399,13 +399,13 @@ static	::gpk::error_t	processInput			(::ghg::SGalaxyHell & solarSystem, double s
 		for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.CountPlayers; ++iPlayer) {
 			const ::ghg::SShipController	& shipController		= controllers[iPlayer];
 			::gpk::SBodyCenter				& playerBody			= solarSystem.ShipState.Engine.Integrator.Centers[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCoreEntity[iPlayer]].Body];
-			::gpk::SSpaceshipCore				& ship					= solarSystem.ShipState.SpaceshipManager.ShipCores[iPlayer];
+			::gpk::SSpaceshipCore			& ship					= solarSystem.ShipState.SpaceshipManager.ShipCores[iPlayer];
 			bool							turbo					= shipController.Turbo;
 			double							speedMultiplier			= 1;
-			if(ship.Nitro < ship.MaxNitro)
-				ship.Nitro					+= (float)(secondsLastFrame * .1);
-			if(ship.Nitro > 0 && turbo) {
-				ship.Nitro					-= (float)secondsLastFrame;
+			if(ship.Nitro.Value < ship.Nitro.Limit)
+				ship.Nitro.Value			+= (float)(secondsLastFrame * .1);
+			if(ship.Nitro.Value > 0 && turbo) {
+				ship.Nitro.Value			-= (float)secondsLastFrame;
 				speedMultiplier				*= 2;
 			}
 
