@@ -348,12 +348,12 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 	, ::gpk::an3f32				& lightPoints
 	, ::gpk::a8bgra				& lightColors
 	) {
-	constexpr ::gpk::bgra								colorLightPlayer		= ::gpk::bgra{0xFF, 0x88, 0xFF};
-	constexpr ::gpk::bgra								colorLightEnemy			= ::gpk::bgra{0xFF, 0x88, 0x88};
+	constexpr ::gpk::bgra		colorLightPlayer		= ::gpk::bgra{0xFF, 0x88, 0xFF};
+	constexpr ::gpk::bgra		colorLightEnemy			= ::gpk::bgra{0xFF, 0x88, 0x88};
 	for(uint32_t iShip = 0; iShip < shipState.SpaceshipManager.ShipCores.size(); ++iShip) {
-		const ::gpk::SSpaceshipCore									& ship					= shipState.SpaceshipManager.ShipCores[iShip];
-		lightPoints.push_back(shipState.GetShipPosition(ship));
-		lightColors.push_back((0 == shipState.SpaceshipManager.ShipCores[iShip].Team) ? colorLightPlayer : colorLightEnemy);
+		lightPoints.push_back(shipState.GetShipPosition(iShip));
+		const ::gpk::SSpaceshipCore	& ship					= shipState.SpaceshipManager.ShipCores[iShip];
+		lightColors.push_back((0 == ship.Team) ? colorLightPlayer : colorLightEnemy);
 		for(uint32_t iPart = 0; iPart < shipState.SpaceshipManager.ShipParts[iShip].size(); ++iPart) {
 			const ::gpk::SSpaceshipOrbiter									& shipPart				= shipState.SpaceshipManager.Orbiters[shipState.SpaceshipManager.ShipParts[iShip][iPart]];
 			const ::gpk::rgbaf								colorShot
@@ -416,17 +416,17 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 //}
 
 ::gpk::error_t			ghg::drawOrbiter
-	( const ::ghg::SShipManager							& shipState
-	, const ::gpk::SSpaceshipOrbiter								& shipPart
-	, const ::gpk::rgbaf							& shipColor
-	, float												animationTime
-	, const ::gpk::m4f32						& matrixVP
-	, ::gpk::g8bgra				& targetPixels
-	, ::gpk::grid<uint32_t>						depthBuffer
-	, ::ghg::SGalaxyHellDrawCache						& drawCache
+	( const ::ghg::SShipManager			& shipState
+	, const uint32_t					iPartEntity
+	, const ::gpk::rgbaf				& shipColor
+	, float								animationTime
+	, const ::gpk::m4f32				& matrixVP
+	, ::gpk::g8bgra						& targetPixels
+	, ::gpk::gu32						depthBuffer
+	, ::ghg::SGalaxyHellDrawCache		& drawCache
 	) {
 	uint32_t												pixelsDrawn				= 0;
-	const ::gpk::au32						& entityChildren		= shipState.EntitySystem.EntityChildren[shipPart.Entity];
+	const ::gpk::au32						& entityChildren		= shipState.EntitySystem.EntityChildren[iPartEntity];
 	double													absanim					= fabsf(sinf(animationTime * 3));
 	const ::gpk::rgbaf								shadedColor				= (absanim < .5) ? ::gpk::rgbaf{} : shipColor * (absanim * .5);
 	for(uint32_t iEntity = 0; iEntity < entityChildren.size(); ++iEntity) {
@@ -476,13 +476,13 @@ static	::gpk::error_t	drawShip
 		const ::gpk::SSpaceshipOrbiter				& shipPart			= solarSystem.ShipState.SpaceshipManager.Orbiters[shipParts[iPart]];
 		if(shipPart.Health <= 0)
 			continue;
-		pixelsDrawn += ::ghg::drawOrbiter(solarSystem.ShipState, shipPart, playerColor, (float)solarSystem.DecoState.AnimationTime, matrixVP, targetPixels, depthBuffer, drawCache);
+		pixelsDrawn += ::ghg::drawOrbiter(solarSystem.ShipState, solarSystem.ShipState.ShipPartEntity[shipParts[iPart]], playerColor, (float)solarSystem.DecoState.AnimationTime, matrixVP, targetPixels, depthBuffer, drawCache);
 	}
 
 	if(iShip >= (int32_t)solarSystem.PlayState.CountPlayers || shipCore.Team)
 		return 0;
 
-	const ::ghg::SGHEntity				& entity			= solarSystem.ShipState.EntitySystem.Entities[shipCore.Entity];
+	const ::ghg::SGHEntity				& entity			= solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCoreEntity[iShip]];
 	const ::gpk::m4f32					& matrixTransform	= solarSystem.ShipState.Scene.Transforms[entity.Transform];
 	::gpk::n3f32						starPos				= matrixTransform.GetTranslation() + ::gpk::n3f32{0.0f, 8.0f, 0.0f};
 	starPos							= matrixVP.Transform(starPos);

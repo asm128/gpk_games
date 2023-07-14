@@ -529,7 +529,7 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 		{ // Update ship part render and health bar
 			::gpk::m4f32				matrixView		= {};
 			::gpk::SCameraPoints		& camera		= viewport.Camera;
-			camera.Target			= game.ShipState.Scene.Transforms[game.ShipState.EntitySystem.Entities[orbiter.Entity + 1].Transform].GetTranslation();
+			camera.Target			= game.ShipState.Scene.Transforms[game.ShipState.EntitySystem.Entities[game.ShipState.ShipPartEntity[iOrbiter] + 1].Transform].GetTranslation();
 			camera.Position			= camera.Target;
 			camera.Position.y		+= 7; //-= 20;
 			stacxpr	::gpk::n3f32		cameraUp		= {1, 0, 0};
@@ -546,7 +546,7 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 
 			drawCache.PixelCoords.clear();
 			uint32_t					pixelsDrawn		= 0;
-			pixelsDrawn				+= ::ghg::drawOrbiter(game.ShipState, orbiter, {}, (float)game.DecoState.AnimationTime, matrixView, targetPixels, depthBuffer, drawCache);
+			pixelsDrawn				+= ::ghg::drawOrbiter(game.ShipState, game.ShipState.ShipPartEntity[iOrbiter], {}, (float)game.DecoState.AnimationTime, matrixView, targetPixels, depthBuffer, drawCache);
 
 			if(healthRatio) {
 				gpk_necs(::ghg::gaugeImageUpdate(viewport.GaugeLife, targetPixels, ::gpk::RED, ::gpk::YELLOW, ::gpk::LIGHTGREEN));

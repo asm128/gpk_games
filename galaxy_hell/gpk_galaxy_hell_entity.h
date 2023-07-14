@@ -18,10 +18,10 @@ namespace ghg
 
 	struct SEntitySystem {
 		::gpk::apod<::ghg::SGHEntity>	Entities				= {};
-		::gpk::aobj<::gpk::au32>	EntityChildren			= {};
+		::gpk::aobj<::gpk::au32>		EntityChildren			= {};
 
-		::gpk::error_t				Create					(const ::ghg::SGHEntity & newEntity, ::gpk::vcu32 entityChildren = {}) { EntityChildren.push_back(entityChildren); return Entities.push_back(newEntity); }
-		::gpk::error_t				Create					()																{ Create({}); }
+		::gpk::error_t				Create					(const ::ghg::SGHEntity & newEntity, ::gpk::vcu32 entityChildren = {})	{ EntityChildren.push_back(entityChildren); return Entities.push_back(newEntity); }
+		::gpk::error_t				Create					()																		{ Create({}); }
 
 		::gpk::error_t				Save					(::gpk::au8 & output) const { 
 			gpk_necs(::gpk::saveView(output, Entities));

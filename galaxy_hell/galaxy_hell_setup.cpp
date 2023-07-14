@@ -36,9 +36,10 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 	::ghg::SShipScene			& scene					= shipState.Scene;
 	const uint32_t				countParts				= 6;
 
-	::gpk::SSpaceshipCore			ship					= {};
+	::gpk::SSpaceshipCore		ship					= {};
 	//shipState.Engine.CreateSphere();
 
+	int32_t						iEntityMain;
 	{	// Create main ship entity
 		::ghg::SGHEntity			entity					= {-1};
 		entity					= {-1};
@@ -46,7 +47,7 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 		entity.Transform		= scene.Transforms.push_back(shipState.Engine.Integrator.MatrixIdentity4);
 		entity.Image			= -1;	//iImage % 5;
 		entity.Body				= shipState.Engine.Integrator.Create();
-		ship.Entity				= shipState.EntitySystem.Create(entity, {});
+		gpk_necs(shipState.ShipCoreEntity.push_back(iEntityMain = shipState.EntitySystem.Create(entity, {})));
 		ship.Team				= teamId;
 		//const int32_t				indexBody				= shipState.ShipPhysics.Create(); 
 		//(void)indexBody;
@@ -56,10 +57,10 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 	shipState.SpaceshipManager.ShipScores.push_back({});
 
 	//ship.Parts.reserve(countParts);
-	::ghg::SGHEntity			entityOrbit				= {ship.Entity};
+	::ghg::SGHEntity			entityOrbit				= {};
 	for(uint32_t iPart = 0; iPart < countParts; ++iPart) {	// Create child parts
 		::ghg::SGHEntity			entityPart				= {-1};
-		entityOrbit.Parent		= ship.Entity;
+		entityOrbit.Parent		= iEntityMain;
 		entityOrbit.Geometry	= -1;
 		entityOrbit.Transform	= scene.Transforms.push_back(shipState.Engine.Integrator.MatrixIdentity4);
 		entityOrbit.Image		= -1;
@@ -88,12 +89,12 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 		shipState.Engine.Integrator.SetActive(entityPart.Body, true);
 
 		::gpk::SSpaceshipOrbiter				shipPart				= {};
-		shipPart.Entity			= entityPart.Parent;
+		shipState.ShipPartEntity.push_back(entityPart.Parent);
 		shipState.SpaceshipManager.ShipParts[indexShip].push_back((uint16_t)shipState.SpaceshipManager.Orbiters.push_back(shipPart));
 		shipState.SpaceshipManager.ShipOrbiterActionQueue.push_back({});
 
-		::gpk::au32					& parentEntityChildren	= shipState.EntitySystem.EntityChildren[ship.Entity];
-		parentEntityChildren.push_back(shipPart.Entity);
+		::gpk::au32					& parentEntityChildren	= shipState.EntitySystem.EntityChildren[iEntityMain];
+		parentEntityChildren.push_back(entityPart.Parent);
 	}
 	return indexShip;
 }
@@ -384,8 +385,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 
 			::gpk::au16					& enemyShipOrbiters		= solarSystem.ShipState.SpaceshipManager.ShipParts[indexShip];
 			for(uint32_t iPart = 0; iPart < enemyShipOrbiters.size(); ++iPart) {
-				const ::gpk::SSpaceshipOrbiter		& shipPart				= solarSystem.ShipState.SpaceshipManager.Orbiters[enemyShipOrbiters[iPart]];
-				solarSystem.ShipState.Engine.Integrator.Forces[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity].Body].Rotation.y *= float(1 + indexShip * .35);
+				solarSystem.ShipState.Engine.Integrator.Forces[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[enemyShipOrbiters[iPart]]].Body].Rotation.y *= float(1 + indexShip * .35);
 			}
 		}
 
@@ -393,7 +393,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		cnstxpr int32_t				DEFAULT_NITRO					= 1;
 		// set up weapons
 		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShip) {
-			::gpk::SSpaceshipCore			& ship							= solarSystem.ShipState.SpaceshipManager.ShipCores[iShip];
+			::gpk::SSpaceshipCore		& ship							= solarSystem.ShipState.SpaceshipManager.ShipCores[iShip];
 			::gpk::au16					& shipParts						= solarSystem.ShipState.SpaceshipManager.ShipParts[iShip];
 			ship.Health				= 0;
 			ship.Nitro				= float(ship.MaxNitro = DEFAULT_NITRO);
@@ -441,18 +441,18 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 				solarSystem.ShipState.SpaceshipManager.Shots.push_back({});
 				solarSystem.ShipState.SpaceshipManager.WeaponDistanceToTargets.push_back({});
 
-					 if(shipPart.Type == ::gpk::SHIP_PART_TYPE_Gun			) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = ::gpk::SHIP_GEOMETRY_Gun;			}
-				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_Wafer		) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = ::gpk::SHIP_GEOMETRY_Wafer;		}
- 				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_Shotgun		) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = ::gpk::SHIP_GEOMETRY_Shotgun;		}
- 				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_Cannon		) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = ::gpk::SHIP_GEOMETRY_Cannon;		}
- 				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_ShotgunWafer	) { solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Geometry = ::gpk::SHIP_GEOMETRY_WaferShotgun;	}
+					 if(shipPart.Type == ::gpk::SHIP_PART_TYPE_Gun			) { solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Geometry = ::gpk::SHIP_GEOMETRY_Gun;			}
+				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_Wafer		) { solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Geometry = ::gpk::SHIP_GEOMETRY_Wafer;		}
+ 				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_Shotgun		) { solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Geometry = ::gpk::SHIP_GEOMETRY_Shotgun;		}
+ 				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_Cannon		) { solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Geometry = ::gpk::SHIP_GEOMETRY_Cannon;		}
+ 				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_ShotgunWafer	) { solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Geometry = ::gpk::SHIP_GEOMETRY_WaferShotgun;	}
 				ship.Health				+= shipPart.Health;
 				const uint32_t				width		= ::gpk::get_value_count<::gpk::WEAPON_LOAD>();
 				const uint32_t				height		= ::gpk::get_value_count<::gpk::WEAPON_TYPE>();
 				const uint32_t				depth		= ::gpk::get_value_count<::gpk::SHIP_PART_TYPE>();
-				solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Image	= iShip * width * height * depth + shipPart.Type * width * height + newWeapon.Type * width + newWeapon.Load;
-				solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Image	%= solarSystem.ShipState.Scene.Image.size();
-				solarSystem.ShipState.Engine.Integrator.Centers[solarSystem.ShipState.EntitySystem.Entities[shipPart.Entity + 1].Body].Orientation = {0, 0, 0, 1};
+				solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Image	= iShip * width * height * depth + shipPart.Type * width * height + newWeapon.Type * width + newWeapon.Load;
+				solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Image	%= solarSystem.ShipState.Scene.Image.size();
+				solarSystem.ShipState.Engine.Integrator.Centers[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Body].Orientation = {0, 0, 0, 1};
 			}
 		}
 	}
