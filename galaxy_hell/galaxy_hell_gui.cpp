@@ -465,11 +465,11 @@ static	::gpk::error_t	sprintfTime			(const char *prefix, char (&dest)[_nStorageS
 }
 
 template<size_t _bufSize>
-static	::gpk::error_t	sprintfScore		(char (&buffer)[_bufSize], const ::ghg::SShipScore & shipScore, const double nitro) { 
+static	::gpk::error_t	sprintfScore		(char (&buffer)[_bufSize], const ::gpk::SSpaceshipScore & shipScore, const double nitro) { 
 	return sprintf_s(buffer, "%c %llu  %c %llu  %c %llu  %c %llu  %c %.2f", 4, shipScore.Score, 94, shipScore.Shots, 1, (uint64_t)shipScore.KilledShips, 2, (uint64_t)shipScore.KilledOrbiters, 24, nitro);
 }
 
-static	::gpk::error_t	uiPlayerUpdateHome	(::ghg::SUIPlayer & uiPlayer, uint16_t iPlayer, const ::gpk::vcc playerName, const ::gpk::bgra & shipColor, const ::ghg::SShipScore & shipScore, const double nitro) { 
+static	::gpk::error_t	uiPlayerUpdateHome	(::ghg::SUIPlayer & uiPlayer, uint16_t iPlayer, const ::gpk::vcc playerName, const ::gpk::bgra & shipColor, const ::gpk::SSpaceshipScore & shipScore, const double nitro) { 
 	sprintfScore(uiPlayer.TextScore.Storage, shipScore, nitro);
 	::gpk::SDialog				& playerDialog		= uiPlayer.DialogHome;
 	::gpk::SGUI					& playerGUI			= *playerDialog.GUI;
@@ -490,11 +490,11 @@ static	::gpk::error_t	uiPlayerUpdateHome	(::ghg::SUIPlayer & uiPlayer, uint16_t 
 	return 0;
 }
 
-static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t iPlayer, const ::ghg::SGalaxyHell & game, const ::ghg::SShipScore & shipScore, ::std::mutex & lockGame, ::ghg::SGalaxyHellDrawCache & drawCache) {
+static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t iPlayer, const ::ghg::SGalaxyHell & game, const ::gpk::SSpaceshipScore & shipScore, ::std::mutex & lockGame, ::ghg::SGalaxyHellDrawCache & drawCache) {
 	::gpk::SDialog				& playerDialog		= uiPlayer.DialogPlay;
 	::gpk::SGUI					& playerGUI			= *playerDialog.GUI;
 
-	const ::ghg::SShipCore		& shipCore			= game.ShipState.ShipCores[iPlayer];
+	const ::gpk::SSpaceshipCore		& shipCore			= game.ShipState.SpaceshipManager.ShipCores[iPlayer];
 	sprintfScore(uiPlayer.TextScore.Storage, shipScore, shipCore.Nitro);
 	const ::gpk::rgbaf			shipColor			= (shipCore.Team ? ::gpk::RED : ::gpk::rgbaf(game.Pilots[iPlayer].Color));
 	gpk_necs(::gpk::controlTextSet(playerGUI, 1 + ::ghg::UI_PILOT_Name	, game.Pilots[iPlayer].Name));
@@ -507,11 +507,11 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 		(*playerGUI.Colors->Palette)[colorCombo[::gpk::UI_CONTROL_AREA_TEXT_FACE	]] = shipColor;
 		(*playerGUI.Colors->Palette)[colorCombo[::gpk::UI_CONTROL_AREA_BACKGROUND	]] = shipColor;
 	}
-	for(uint32_t iOrbiter = 0, countViewports = game.ShipState.ShipParts[iPlayer].size(); iOrbiter < countViewports; ++iOrbiter) {
+	for(uint32_t iOrbiter = 0, countViewports = game.ShipState.SpaceshipManager.ShipParts[iPlayer].size(); iOrbiter < countViewports; ++iOrbiter) {
 		::ghg::SUIPlayShipPartViewport	& viewport		= *uiPlayer.ModuleViewports[iOrbiter];
 
-		const ::ghg::SOrbiter		& orbiter		= game.ShipState.Orbiters[game.ShipState.ShipParts[iPlayer][iOrbiter]];
-		const ::ghg::SWeapon		& weapon		= game.ShipState.Weapons[orbiter.Weapon];
+		const ::gpk::SSpaceshipOrbiter	& orbiter		= game.ShipState.SpaceshipManager.Orbiters[game.ShipState.SpaceshipManager.ShipParts[iPlayer][iOrbiter]];
+		const ::gpk::SWeapon			& weapon		= game.ShipState.SpaceshipManager.Weapons[orbiter.Weapon];
 
 		gpk_necall(::gpk::controlTextSet(playerGUI, viewport.Viewport + 1, ::gpk::get_value_label(weapon.Load)), "%s", "");
 		gpk_necall(::gpk::controlTextSet(playerGUI, viewport.Viewport + 2, ::gpk::get_value_label(weapon.Type)), "%s", "");
@@ -612,7 +612,7 @@ static	::gpk::error_t	guiUpdatePlay		(::ghg::SGalaxyHellApp & app) {
 	::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAY_TimeStage , ::gpk::vcs{app.UIPlay.TextTimeStage	.Storage});
 	::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAY_TimeReal	, ::gpk::vcs{app.UIPlay.TextTimeReal	.Storage});
 
-	if(0 == game.ShipState.ShipCores.size())
+	if(0 == game.ShipState.SpaceshipManager.ShipCores.size())
 		return 0;
 
 	for(uint32_t iPlayer = 0; iPlayer < app.TunerPlayerCount->ValueCurrent &&	iPlayer < app.UIPlay.PlayerUI.size(); ++iPlayer) { app.UIPlay.PlayerUI[iPlayer].DialogHome.GUI->Controls.SetHidden(0, false); }
@@ -627,7 +627,7 @@ static	::gpk::error_t	guiUpdatePlay		(::ghg::SGalaxyHellApp & app) {
 	if(app.ActiveState == ::ghg::APP_STATE_Play) {
 		for(uint32_t iPlayer = 0; iPlayer < game.PlayState.CountPlayers; ++iPlayer) {
 			::ghg::SUIPlayer			& uiPlayer			= app.UIPlay.PlayerUI[iPlayer];
-			gpk_necall(::uiPlayerUpdatePlay(uiPlayer, iPlayer, app.Game, app.Game.ShipState.ShipScores[iPlayer], app.Game.LockUpdate, drawCache), "iPlayer: %i", iPlayer);
+			gpk_necall(::uiPlayerUpdatePlay(uiPlayer, iPlayer, app.Game, app.Game.ShipState.SpaceshipManager.ShipScores[iPlayer], app.Game.LockUpdate, drawCache), "iPlayer: %i", iPlayer);
 			uiPlayer.DialogPlay.GUI->Controls.SetHidden(0, false);
 		}
 		for(uint32_t iPlayer = app.Game.PlayState.CountPlayers; iPlayer < ghg::MAX_PLAYERS; ++iPlayer) { 
@@ -653,14 +653,14 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpob
 
 		::gpk::rgbaf				shipColor					= ::ghg::PLAYER_COLORS[iPlayer];
 		double						nitro						= 0;
-		if((iPlayer < app.Game.ShipState.ShipCores.size())) {
-			const ::ghg::SShipCore		& shipCore				= app.Game.ShipState.ShipCores[iPlayer];
+		if((iPlayer < app.Game.ShipState.SpaceshipManager.ShipCores.size())) {
+			const ::gpk::SSpaceshipCore		& shipCore				= app.Game.ShipState.SpaceshipManager.ShipCores[iPlayer];
 			shipColor				= (shipCore.Team ? ::ghg::PLAYER_COLORS[iPlayer] : app.Game.Pilots[iPlayer].Color);
 			nitro					= shipCore.Nitro;
 		}
 
 		gpk_necall(::uiPlayerUpdateHome(uiPlayer, int16_t(iPlayer), app.Players[iPlayer].Name, shipColor
-			, (app.Game.ShipState.ShipScores.size() <= iPlayer) ? ::ghg::SShipScore{} : app.Game.ShipState.ShipScores[iPlayer]
+			, (app.Game.ShipState.SpaceshipManager.ShipScores.size() <= iPlayer) ? ::gpk::SSpaceshipScore{} : app.Game.ShipState.SpaceshipManager.ShipScores[iPlayer]
 			, nitro), "iPlayer: %i", iPlayer
 		);
 

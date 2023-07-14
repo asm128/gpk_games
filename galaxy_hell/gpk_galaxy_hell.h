@@ -165,7 +165,7 @@ namespace ghg
 
 	::gpk::error_t		drawOrbiter
 		( const ::ghg::SShipManager		& shipState
-		, const ::ghg::SOrbiter			& shipPart
+		, const ::gpk::SSpaceshipOrbiter& shipPart
 		, const ::gpk::rgbaf			& shipColor	
 		, const float					animationTime
 		, const ::gpk::m4f32			& matrixVP

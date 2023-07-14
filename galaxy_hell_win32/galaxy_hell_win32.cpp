@@ -248,7 +248,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	app.AudioState.listener.OrientTop	= {0, 1, 0}; 
 	app.AudioState.listener.OrientFront	= {1, 0, 0};  
 	
-	if(app.GalaxyHellApp.Game.ShipState.ShipCores.size())
+	if(app.GalaxyHellApp.Game.ShipState.SpaceshipManager.ShipCores.size())
 		app.AudioState.vEmitterPos			= app.GalaxyHellApp.Game.ShipState.GetShipPosition(0);
 	
 	app.AudioState.vEmitterPos 			*= .03f;

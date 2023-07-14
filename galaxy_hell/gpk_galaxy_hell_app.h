@@ -163,8 +163,8 @@ namespace ghg
 
 
 	struct SPlayerShip { 
-		::ghg::SShipCore				Core;
-		::ghg::SShipScore				Score;
+		::gpk::SSpaceshipCore			Core;
+		::gpk::SSpaceshipScore			Score;
 		::gpk::au32						Parts;
 		::gpk::au32						Weapons;
 
@@ -209,8 +209,8 @@ namespace ghg
 	struct SPlayer {
 		::gpk::vcc						Name			= {};
 		::ghg::SPlayerState				State			= {};
-		::gpk::apod<::ghg::SWeapon>		Weapons			= {};
-		::gpk::apod<::ghg::SOrbiter>	Orbiters		= {};
+		::gpk::apod<::gpk::SWeapon>		Weapons			= {};
+		::gpk::apod<::gpk::SSpaceshipOrbiter>	Orbiters		= {};
 		::gpk::aobj<::ghg::SPlayerShip>	Ships			= {};
 
 		::gpk::error_t					Save			(const ::gpk::vcc & filename) const {
@@ -360,7 +360,7 @@ namespace ghg
 			const uint64_t						timeStart					= (SAVE_MODE_AUTO == autosaveMode) ? 0 : Game.PlayState.TimeStart;
 			sprintf_s(fileName, "%s/%llu.%llu%s", SavegameFolder.begin(), timeStart, timeCurrent, extension.begin());
 
-			const int32_t						totalHealth					= Game.ShipState.GetTeamHealth(0);
+			const int32_t						totalHealth					= Game.ShipState.SpaceshipManager.GetTeamHealth(0);
 			if(totalHealth > 0) // Save only if a player is alive
 				return ::ghg::solarSystemSave(Game, fileName);
 			return 0;
