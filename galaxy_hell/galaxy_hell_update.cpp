@@ -39,7 +39,7 @@ static	::gpk::error_t	collisionDetect		(::gpk::SShots & shots, const ::gpk::n3f3
 }
 
 static	::gpk::error_t	handleCollisionPoint		(::ghg::SGalaxyHell & solarSystem, int32_t weaponDamage, ::gpk::SSpaceshipScore & attackerScore, ::gpk::SSpaceshipScore & damagedScore, ::gpk::SSpaceshipOrbiter & damagedPart, int32_t iAttackedPart, ::gpk::SSpaceshipCore & damagedShip, int32_t iAttackedShip, const ::gpk::n3f32 & sphereCenter, const ::gpk::n3f32 & collisionPoint)	{
-	solarSystem.ShipState.SpaceshipManager.ShipOrbiterActionQueue[iAttackedShip].push_back(::gpk::SHIP_ACTION_Hit);
+	solarSystem.ShipState.SpaceshipManager.ShipOrbiterActionQueue[iAttackedShip]->push_back(::gpk::SHIP_ACTION_Hit);
 	const ::gpk::n3f32			bounceVector				= (collisionPoint - sphereCenter).Normalize();
 	solarSystem.DecoState.Debris.SpawnDirected(1 + weaponDamage / 10, 0.3, bounceVector, collisionPoint, 50, 1);
 	attackerScore.Hits		+= 1;
@@ -207,7 +207,7 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 	return 0;
 }
 
-static	::gpk::error_t	updateDistancesToTargets	(::ghg::SGalaxyHell & solarSystem, int32_t team, int32_t iShipPart, ::gpk::apod<::gpk::n3f32> & orbiterDistancesToTargets, ::gpk::SShots & shots)	{
+static	::gpk::error_t	updateDistancesToTargets	(::ghg::SGalaxyHell & solarSystem, int32_t team, int32_t iShipPart, ::gpk::papod<::gpk::n3f32> & orbiterDistancesToTargets, ::gpk::SShots & shots)	{
 	{
 		::std::lock_guard			lockUpdate					(solarSystem.LockUpdate);
 		orbiterDistancesToTargets.clear();
@@ -232,7 +232,7 @@ static	::gpk::error_t	updateDistancesToTargets	(::ghg::SGalaxyHell & solarSystem
 			const ::gpk::n3f32				targetPosition			= solarSystem.ShipState.Scene.Transforms[solarSystem.ShipState.ShipPartEntity[shipCoresParts[iShip][iPart]]].GetTranslation();
 			{
 				::std::lock_guard				lockUpdate				(solarSystem.LockUpdate);
-				orbiterDistancesToTargets.push_back(targetPosition - weaponPosition);
+				orbiterDistancesToTargets->push_back(targetPosition - weaponPosition);
 				for(uint32_t iShot = 0; iShot < shots.Particles.Position.size(); ++iShot) {
 					shots.DistanceToTargets[iShot].push_back(targetPosition - shots.Particles.Position[iShot]);
 				}
@@ -242,7 +242,7 @@ static	::gpk::error_t	updateDistancesToTargets	(::ghg::SGalaxyHell & solarSystem
 	return 0;
 }
 
-static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int32_t team, ::gpk::SSpaceshipOrbiter & shipPart, int32_t iShip, int32_t iShipPart, ::gpk::apod<::gpk::n3f32> & shipPartDistancesToTargets, double secondsLastFrame)	{
+static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int32_t team, ::gpk::SSpaceshipOrbiter & shipPart, int32_t iShip, int32_t iShipPart, ::gpk::papod<::gpk::n3f32> & shipPartDistancesToTargets, double secondsLastFrame)	{
 	::gpk::SWeapon				& weapon					= solarSystem.ShipState.SpaceshipManager.Weapons	[shipPart.Weapon];
 	::gpk::SShots				& shots						= solarSystem.ShipState.SpaceshipManager.Shots	[shipPart.Weapon];
 	for(uint32_t iParticle = 0; iParticle < shots.Particles.Position.size(); ++iParticle)
@@ -261,7 +261,7 @@ static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int
 
 		const ::gpk::m4f32			& shipModuleMatrix			= solarSystem.ShipState.Scene.Transforms[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[iShipPart] + 1].Transform];
 		::gpk::n3f32				positionGlobal				= shipModuleMatrix.GetTranslation();
-		::gpk::n3f32				targetDistance				= shipPartDistancesToTargets.size() ? shipPartDistancesToTargets[::gpk::noise1DBase32(solarSystem.PlayState.Seed + iShip * ::ghg::MAX_ORBITER_COUNT + iShipPart) % shipPartDistancesToTargets.size()] : ::gpk::n3f32{};
+		::gpk::n3f32				targetDistance				= (shipPartDistancesToTargets && shipPartDistancesToTargets->size()) ? (*shipPartDistancesToTargets)[::gpk::noise1DBase32(solarSystem.PlayState.Seed + iShip * ::ghg::MAX_ORBITER_COUNT + iShipPart) % shipPartDistancesToTargets->size()] : ::gpk::n3f32{};
 		::gpk::n3f32				targetPosition				= targetDistance + positionGlobal;
 		if(weapon.Type == ::gpk::WEAPON_TYPE_Cannon) {
 			if(1 < targetDistance.LengthSquared()) {

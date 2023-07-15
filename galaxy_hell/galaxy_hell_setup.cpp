@@ -409,7 +409,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 					uint32_t				maxWeapon						= ::gpk::min(solarSystem.PlayState.Stage, ::gpk::size(weaponDefinitions) - 1);
 
 					weapon				= (int32_t)::gpk::clamp((uint32_t)minWeapon + iPart, minWeapon, maxWeapon);
-					solarSystem.ShipState.SpaceshipManager.ShipOrbiterActionQueue[shipParts[0]].push_back(::gpk::SHIP_ACTION_Spawn);
+					solarSystem.ShipState.SpaceshipManager.ShipOrbiterActionQueue[shipParts[0]]->push_back(::gpk::SHIP_ACTION_Spawn);
 
 				}
 				else {

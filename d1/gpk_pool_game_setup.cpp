@@ -296,14 +296,14 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	//gpk_necs(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[::gpk::VOXEL_FACE_Top], ::d1p::psTableCloth, "psTableCloth"));
 	//gpk_necs(engine.SetColorDiffuse((*engine.Entities.Children[pool.Entities.Table])[::gpk::VOXEL_FACE_Top], ::gpk::RED * .5f));
 	{	// pockets
-		::gpk::SParamsCylinder		params;
+		::gpk::SParamsCylinderWall		params;
 		params.DiameterRatio	= .65f;
 		params.CellCount		= {16, 16};
 		params.Reverse			= true;
-		params.Length			= 1;
+		params.Height			= 1;
 		params.Radius			= {.1f, .5f};
 
-		uint16_t					iPocketEntity			= (uint16_t)engine.CreateCylinder(params);
+		uint16_t					iPocketEntity			= (uint16_t)engine.CreateCylinderWall(params);
 		gpk_necs(pool.Entities.Pockets[0] = iPocketEntity);
 		gpk_necs(engine.SetColorDiffuse(iPocketEntity, ::gpk::DARKGRAY * .5f));
 		gpk_necs(engine.SetShader(iPocketEntity, ::d1p::psPocket, "psPocket"));
@@ -312,7 +312,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	}
 
 	// sticks
-	gpk_necs(pool.Entities.Sticks[0] = (uint16_t)engine.CreateCylinder(8, false, 1.0f));
+	gpk_necs(pool.Entities.Sticks[0] = (uint16_t)engine.CreateCylinderWall(8, false, 1.0f));
 	gpk_necs(engine.SetShader(pool.Entities.Sticks[0], ::d1p::psStick, "psStick"));
 	for(uint32_t iPlayer = 1; iPlayer < pool.Entities.Sticks.size(); ++iPlayer)
 		gpk_necs(pool.Entities.Sticks[iPlayer]	= (uint16_t)engine.Clone(pool.Entities.Sticks[0], true, true, false));
