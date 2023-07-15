@@ -252,7 +252,7 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 			colorShot				= ::gpk::DARKGRAY; 
 			intensity				= .25; 
 		}
-		else if(::gpk::WEAPON_LOAD_Shell == weapon.Load) { 
+		else if(::gpk::WEAPON_LOAD_Shot == weapon.Load) { 
 			colorShot				= ::gpk::GRAY; 
 			intensity				= .25; 
 		}

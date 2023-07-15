@@ -18,7 +18,7 @@
     <ClInclude Include="ssiege.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ssiege_world.h">
+    <ClInclude Include="ssiege_world_view.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ssiege_event.h">
@@ -30,7 +30,7 @@
     <ClInclude Include="ssiege_handle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ssiege_world_handle.h">
+    <ClInclude Include="ssiege_game_handle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ssiege_server.h">
@@ -68,7 +68,7 @@
     <ClCompile Include="ssiege.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ssiege_world.cpp">
+    <ClCompile Include="ssiege_game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ssiege_parse.cpp">
@@ -77,7 +77,7 @@
     <ClCompile Include="ssiege_handle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ssiege_world_handle.cpp">
+    <ClCompile Include="ssiege_game_handle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ssiege_client.cpp">

@@ -85,7 +85,7 @@
 		backBuffer.Color.View[coord.y][coord.x]	= color;
 	}
 
-	::gpk::drawScene(backBuffer.Color.View, backBuffer.DepthStencil.View, engine.Scene->RenderCache, *engine.Scene, constants);
+	gpk_necs(::gpk::drawScene(backBuffer.Color.View, backBuffer.DepthStencil.View, engine.Scene->RenderCache, *engine.Scene, cameraPosition, cameraTarget, cameraUp, nearFar));
 	timer.Frame();
 	info_printf("Render scene in %f seconds", timer.LastTimeSeconds);
 	return 0;

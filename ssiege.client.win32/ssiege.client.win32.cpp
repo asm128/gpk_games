@@ -56,7 +56,7 @@ static	::gpk::error_t	processScreenEvent	(::SApplication & app, const ::gpk::SEv
 	default: break;
 	case ::gpk::EVENT_SCREEN_Create:
 #if !defined(DISABLE_D3D11)
-		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.SSiegeApp.World.Engine.Scene->Graphics));
+		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.SSiegeApp.Game.Engine.Scene->Graphics));
 #endif
 	case ::gpk::EVENT_SCREEN_Resize: 
 		gpk_necs(::updateSizeDependentResources(app));
@@ -143,9 +143,9 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 	});
 
 #if !defined(DISABLE_D3D11)
-	if(app.SSiegeApp.ActiveState >= ::ssiege::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.World.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
-		//gpk_necs(app.D3DApp.CreateDeviceDependentEngineResources(app.D3DApp.DeviceResources->GetD3DDevice(), *app.D1.MainGame.World.Engine.Scene->Graphics));
-		gpk_necs(app.D3DApp.CreateDeviceResources(*app.SSiegeApp.World.Engine.Scene->Graphics));
+	if(app.SSiegeApp.ActiveState >= ::ssiege::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.Game.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
+		//gpk_necs(app.D3DApp.CreateDeviceDependentEngineResources(app.D3DApp.DeviceResources->GetD3DDevice(), *app.D1.Game.Engine.Scene->Graphics));
+		gpk_necs(app.D3DApp.CreateDeviceResources(*app.SSiegeApp.Game.Engine.Scene->Graphics));
 	}
 	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (uint32_t)frameInfo.FramesPerSecond);
 #endif
@@ -162,7 +162,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 
 ::gpk::error_t			draw					(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	const ::gpk::n3f32			sunlightPos				= ::gpk::calcSunPosition();
-	const double				sunlightFactor			= ::gpk::calcSunlightFactor(app.SSiegeApp.World.WorldState.DaylightRatioExtra, app.SSiegeApp.World.WorldState.DaylightOffsetMinutes);
+	const double				sunlightFactor			= ::gpk::calcSunlightFactor(app.SSiegeApp.Game.World.WorldState.DaylightRatioExtra, app.SSiegeApp.Game.World.WorldState.DaylightOffsetMinutes);
 	const ::gpk::rgbaf			clearColor				= ::gpk::interpolate_linear(::gpk::DARKBLUE * .25, ::gpk::LIGHTBLUE * 1.1, sunlightFactor);
 
 #if !defined(DISABLE_D3D11) 
@@ -171,7 +171,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 	gpk_necs(::gpk::guiDraw(*app.SSiegeApp.GUI, app.D3DApp.GUIStuff.RenderTarget));
 
 	const ::ssiege::SCamera		& cameraSelected		= app.SSiegeApp.Camera;
-	const ::gpk::SEngineScene	& engineScene			= *app.SSiegeApp.World.Engine.Scene;
+	const ::gpk::SEngineScene	& engineScene			= *app.SSiegeApp.Game.Engine.Scene;
 	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, sunlightPos, cameraSelected.Offset, cameraSelected.Target, {.001f, 500.f}));
 #else 
 	::gpk::SFramework			& framework				= app.Framework;

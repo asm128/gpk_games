@@ -322,7 +322,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		double					Cooldown		;
 		double					OverheatPerShot	;
 		double					ShotLifetime	;
-		::gpk::WEAPON_DAMAGE	DamageType		;
+		::gpk::DAMAGE_TYPE		DamageType		;
 
 	};
 #pragma pack(pop)
@@ -330,19 +330,19 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 	::gpk::SJSONFile			stageFile					= {};
 	char						stageFileName		[256]	= "./%s.json";
 	stacxpr SShipOrbiterSetup	weaponDefinitions	[]		=
-		{ {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .08, 0.975, ::gpk::WEAPON_LOAD_Bullet		,  256,    20, 1,   0,0.00,  1.5, ::gpk::WEAPON_DAMAGE_Pierce	}
-		, {::gpk::SHIP_PART_TYPE_Shotgun		, 128, ::gpk::WEAPON_TYPE_Shotgun	, .16, 0.925, ::gpk::WEAPON_LOAD_Bullet		,  160,    10, 6,   0,0.00,  1.5, ::gpk::WEAPON_DAMAGE_Impact	}
-		, {::gpk::SHIP_PART_TYPE_Wafer			, 128, ::gpk::WEAPON_TYPE_Gun		, .24, 0.99, ::gpk::WEAPON_LOAD_Ray			,  480,    30, 1,   1,0.50,  1, ::gpk::WEAPON_DAMAGE_Pierce	| ::gpk::WEAPON_DAMAGE_Burn	}
-		, {::gpk::SHIP_PART_TYPE_ShotgunWafer	, 128, ::gpk::WEAPON_TYPE_Shotgun	, .32, 0.98, ::gpk::WEAPON_LOAD_Ray			,  640,    15, 6,   1,0.50,  0.6, ::gpk::WEAPON_DAMAGE_Pierce	| ::gpk::WEAPON_DAMAGE_Burn	}
-		, {::gpk::SHIP_PART_TYPE_Cannon			, 160, ::gpk::WEAPON_TYPE_Cannon	,   2, 1.00, ::gpk::WEAPON_LOAD_Cannonball	,   48,   156, 1,   0,0.00, 10, ::gpk::WEAPON_DAMAGE_Impact	}
-		, {::gpk::SHIP_PART_TYPE_Cannon			, 128, ::gpk::WEAPON_TYPE_Cannon	,   2, 0.90, ::gpk::WEAPON_LOAD_Rocket		,   64,    80, 1,   0,0.00,  5, ::gpk::WEAPON_DAMAGE_Impact	| ::gpk::WEAPON_DAMAGE_Burn | ::gpk::WEAPON_DAMAGE_Wave }
-		, {::gpk::SHIP_PART_TYPE_Cannon			, 128, ::gpk::WEAPON_TYPE_Cannon	, 2.5, 0.80, ::gpk::WEAPON_LOAD_Missile		,   72,   112, 1,   0,0.00,  5, ::gpk::WEAPON_DAMAGE_Burn | ::gpk::WEAPON_DAMAGE_Wave }
-		, {::gpk::SHIP_PART_TYPE_Shotgun		, 160, ::gpk::WEAPON_TYPE_Shotgun	,   3, 0.95, ::gpk::WEAPON_LOAD_Cannonball	,   72,   112, 7,   0,0.00,  5, ::gpk::WEAPON_DAMAGE_Impact	}
-		, {::gpk::SHIP_PART_TYPE_Shotgun		, 128, ::gpk::WEAPON_TYPE_Shotgun	,   3, 0.75, ::gpk::WEAPON_LOAD_Rocket		,   80,    80, 6,   0,0.00,  5, ::gpk::WEAPON_DAMAGE_Pierce	| ::gpk::WEAPON_DAMAGE_Burn | ::gpk::WEAPON_DAMAGE_Wave }
-		, {::gpk::SHIP_PART_TYPE_Shotgun		, 128, ::gpk::WEAPON_TYPE_Shotgun	, 3.5, 0.50, ::gpk::WEAPON_LOAD_Missile		,   88,   128, 5,   0,0.00,7.5, ::gpk::WEAPON_DAMAGE_Burn | ::gpk::WEAPON_DAMAGE_Wave }
-		, {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .12, 0.98, ::gpk::WEAPON_LOAD_Cannonball	,  160,   128, 1,   1,0.25,  5, ::gpk::WEAPON_DAMAGE_Impact	}
-		, {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .12, 0.75, ::gpk::WEAPON_LOAD_Rocket		,  160,    80, 1,   1,0.25,  5, ::gpk::WEAPON_DAMAGE_Pierce	| ::gpk::WEAPON_DAMAGE_Burn | ::gpk::WEAPON_DAMAGE_Wave }
-		, {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .12, 0.50, ::gpk::WEAPON_LOAD_Missile		,  160,   112, 1,   1,0.25,  5, ::gpk::WEAPON_DAMAGE_Burn | ::gpk::WEAPON_DAMAGE_Wave }
+		{ {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .08, 0.975, ::gpk::WEAPON_LOAD_Bullet		,  256,    20, 1,   0,0.00,  1.5, ::gpk::DAMAGE_TYPE_Pierce	}
+		, {::gpk::SHIP_PART_TYPE_Shotgun		, 128, ::gpk::WEAPON_TYPE_Shotgun	, .16, 0.925, ::gpk::WEAPON_LOAD_Bullet		,  160,    10, 6,   0,0.00,  1.5, ::gpk::DAMAGE_TYPE_Impact	}
+		, {::gpk::SHIP_PART_TYPE_Wafer			, 128, ::gpk::WEAPON_TYPE_Gun		, .24, 0.99, ::gpk::WEAPON_LOAD_Ray			,  480,    30, 1,   1,0.50,  1, ::gpk::DAMAGE_TYPE_Pierce	| ::gpk::DAMAGE_TYPE_Burn	}
+		, {::gpk::SHIP_PART_TYPE_ShotgunWafer	, 128, ::gpk::WEAPON_TYPE_Shotgun	, .32, 0.98, ::gpk::WEAPON_LOAD_Ray			,  640,    15, 6,   1,0.50,  0.6, ::gpk::DAMAGE_TYPE_Pierce	| ::gpk::DAMAGE_TYPE_Burn	}
+		, {::gpk::SHIP_PART_TYPE_Cannon			, 160, ::gpk::WEAPON_TYPE_Cannon	,   2, 1.00, ::gpk::WEAPON_LOAD_Cannonball	,   48,   156, 1,   0,0.00, 10, ::gpk::DAMAGE_TYPE_Impact	}
+		, {::gpk::SHIP_PART_TYPE_Cannon			, 128, ::gpk::WEAPON_TYPE_Cannon	,   2, 0.90, ::gpk::WEAPON_LOAD_Rocket		,   64,    80, 1,   0,0.00,  5, ::gpk::DAMAGE_TYPE_Impact	| ::gpk::DAMAGE_TYPE_Burn | ::gpk::DAMAGE_TYPE_Wave }
+		, {::gpk::SHIP_PART_TYPE_Cannon			, 128, ::gpk::WEAPON_TYPE_Cannon	, 2.5, 0.80, ::gpk::WEAPON_LOAD_Missile		,   72,   112, 1,   0,0.00,  5, ::gpk::DAMAGE_TYPE_Burn | ::gpk::DAMAGE_TYPE_Wave }
+		, {::gpk::SHIP_PART_TYPE_Shotgun		, 160, ::gpk::WEAPON_TYPE_Shotgun	,   3, 0.95, ::gpk::WEAPON_LOAD_Cannonball	,   72,   112, 7,   0,0.00,  5, ::gpk::DAMAGE_TYPE_Impact	}
+		, {::gpk::SHIP_PART_TYPE_Shotgun		, 128, ::gpk::WEAPON_TYPE_Shotgun	,   3, 0.75, ::gpk::WEAPON_LOAD_Rocket		,   80,    80, 6,   0,0.00,  5, ::gpk::DAMAGE_TYPE_Pierce	| ::gpk::DAMAGE_TYPE_Burn | ::gpk::DAMAGE_TYPE_Wave }
+		, {::gpk::SHIP_PART_TYPE_Shotgun		, 128, ::gpk::WEAPON_TYPE_Shotgun	, 3.5, 0.50, ::gpk::WEAPON_LOAD_Missile		,   88,   128, 5,   0,0.00,7.5, ::gpk::DAMAGE_TYPE_Burn | ::gpk::DAMAGE_TYPE_Wave }
+		, {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .12, 0.98, ::gpk::WEAPON_LOAD_Cannonball	,  160,   128, 1,   1,0.25,  5, ::gpk::DAMAGE_TYPE_Impact	}
+		, {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .12, 0.75, ::gpk::WEAPON_LOAD_Rocket		,  160,    80, 1,   1,0.25,  5, ::gpk::DAMAGE_TYPE_Pierce	| ::gpk::DAMAGE_TYPE_Burn | ::gpk::DAMAGE_TYPE_Wave }
+		, {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .12, 0.50, ::gpk::WEAPON_LOAD_Missile		,  160,   112, 1,   1,0.25,  5, ::gpk::DAMAGE_TYPE_Burn | ::gpk::DAMAGE_TYPE_Wave }
 		};
 
 	sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage);

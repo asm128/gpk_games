@@ -100,7 +100,7 @@ namespace ssiege
 
 		::ssg::SSiegeGame		Game;
 
-		SWorldView				World				= {};
+		//SWorldView				World				= {};
 
 		SSSiegeUI				UI					= {};
 		gpk::apobj<EventSSiege>	EventQueue			= {};
@@ -119,7 +119,7 @@ namespace ssiege
 		::gpk::error_t			StateSwitch			(APP_STATE newState);
 
 		::gpk::error_t			Save				()	const	{
-			rni_if(CharacterControlled >= World.Characters.size(), "No active player character! %i >= %i", CharacterControlled, World.Characters.size());
+			rni_if(CharacterControlled >= Game.World.Characters.size(), "No active player character! %i >= %i", CharacterControlled, Game.World.Characters.size());
 				
 			::gpk::achar				playerPath;
 			gpk_necs(FileStrings.GetPlayerFilePath(::gpk::timeCurrent(), Players[0].Name, playerPath));
@@ -128,7 +128,7 @@ namespace ssiege
 
 		::gpk::error_t			Save				(::gpk::vcc fileName)	const	{
 			::gpk::au8					serialized;
-			gpk_necs(World.Save(serialized));
+			gpk_necs(Game.World.Save(serialized));
 			return ::gpk::deflateFromMemory(fileName, serialized);
 		}
 
@@ -136,7 +136,7 @@ namespace ssiege
 			::gpk::au8					serialized;
 			gpk_necs(::gpk::inflateToMemory(filename, serialized));
 			::gpk::vcu8					viewSerialized		= serialized;
-			return World.Load(viewSerialized);
+			return Game.World.Load(viewSerialized);
 		}
 	};
 

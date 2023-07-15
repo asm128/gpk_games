@@ -47,7 +47,7 @@ static	::gpk::error_t	processScreenEvent		(::SApplication & app, const ::gpk::SE
 	default: break;
 	case ::gpk::EVENT_SCREEN_Create:
 #if !defined(DISABLE_D3D11)
-		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.SSiegeApp.World.Engine.Scene->Graphics));
+		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.SSiegeApp.Game.Engine.Scene->Graphics));
 #endif
 	case ::gpk::EVENT_SCREEN_Resize: 
 		gpk_necs(::updateSizeDependentResources(app));
@@ -117,8 +117,8 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 	}
 
 #if !defined(DISABLE_D3D11)
-	if(app.SSiegeApp.ActiveState >= ::ssiege::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.World.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
-		gpk_necs(app.D3DApp.CreateDeviceResources(*app.SSiegeApp.World.Engine.Scene->Graphics));
+	if(app.SSiegeApp.ActiveState >= ::ssiege::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.Game.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
+		gpk_necs(app.D3DApp.CreateDeviceResources(*app.SSiegeApp.Game.Engine.Scene->Graphics));
 	}
 	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (uint32_t)frameInfo.FramesPerSecond);
 #endif
@@ -144,7 +144,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 	gpk_necs(::gpk::guiDraw(*app.SSiegeApp.GUI, app.D3DApp.GUIStuff.RenderTarget));
 
 	const ::ssiege::SCamera		& cameraSelected		= app.SSiegeApp.Camera;
-	const ::gpk::SEngineScene	& engineScene			= *app.SSiegeApp.World.Engine.Scene;
+	const ::gpk::SEngineScene	& engineScene			= *app.SSiegeApp.Game.Engine.Scene;
 	app.D3DApp.Scene.ConstantBufferScene.Time	= (float)app.Framework.FrameInfo.Seconds.Total;
 
 	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, {}/*sunlightPos*/, cameraSelected.Offset, cameraSelected.Target, {.001f, 1000.f}));

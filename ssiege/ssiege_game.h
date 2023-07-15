@@ -1,6 +1,8 @@
-#include "ssiege_world.h"
-#include "gpk_engine_planetary_system.h"
 #include "gpk_game.h"
+
+#include "ssiege_world_view.h"
+
+#include "gpk_engine_planetary_system.h"
 
 #ifndef SSIEGE_GAME_H
 #define SSIEGE_GAME_H
@@ -13,6 +15,23 @@ namespace ssg
 		::gpk::SGame					Global			= {};
 		::gpk::SEnginePlanetarySystem	SolarSystem		= {};
 		::ssiege::SWorldView			World			= {};
+
+		::gpk::SEngine					Engine			= {};
+
+		::gpk::error_t			Save			(::gpk::au8 & output)	const	{ 
+			gpk_necs(Global.Save(output));
+			//gpk_necs(SolarSystem.Save(output));
+			gpk_necs(Engine.Save(output));
+			return 0;
+		}
+
+		::gpk::error_t			Load				(::gpk::vcu8 & input)	{ 
+			gpk_necs(Global.Load(input));
+			//gpk_necs(SolarSystem.Load(input));
+			gpk_necs(Engine.Load(input));
+			return 0;
+		}
+
 	};
 
 	::gpk::error_t			ssiegeGameSetup		(::ssg::SSiegeGame & world);

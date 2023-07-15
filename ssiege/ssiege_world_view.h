@@ -275,9 +275,6 @@ namespace ssiege
 		::gpk::apod<SHangar>	Hangars;
 		::gpk::aobj<SMiniMe>	Characters;
 		SWorldTiles				Tiles;
-		::gpk::SEnginePlanetarySystem	SolarSystem;
-
-		::gpk::SEngine			Engine;
 
 		::gpk::error_t			Save				(::gpk::au8 & output)	const	{ 
 			gpk_necs(::gpk::savePOD(output, WorldConfig)); 
@@ -288,7 +285,6 @@ namespace ssiege
 				gpk_necall(Characters[iCharacter].Save(output), "Failed to save character %i", iCharacter);
 
 			gpk_necs(Tiles.Save(output));
-			gpk_necs(Engine.Save(output));
 			return 0;
 		}
 
@@ -305,21 +301,9 @@ namespace ssiege
 			}
 
 			gpk_necs(Tiles.Load(input));
-			gpk_necs(Engine.Load(input));
 			return 0;
 		}
 	};
-
-	::gpk::error_t			worldViewSetup		(::ssiege::SWorldView & world);
-	::gpk::error_t			worldViewUpdate		(::ssiege::SWorldView & world, ::gpk::vpobj<::ssiege::EventSSiege> inputEvents, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents, double secondsElapsed);
-	::gpk::error_t			worldViewDraw		(::ssiege::SWorldView & world
-		, ::gpk::rtbgra8d32			& backBuffer
-		, const ::gpk::n3f32		& cameraPosition
-		, const ::gpk::n3f32		& cameraTarget
-		, const ::gpk::n3f32		& cameraUp = {0, 1, 0}
-		, const ::gpk::minmaxf32	& nearFar = {.1f, 10000.f}
-		);
-
 } // namespace ssiege
 
 #endif // SSIEGE_WORLD_H_23701
