@@ -135,7 +135,7 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 						::std::lock_guard			lockUpdate				(solarSystem.LockUpdate);
 						::collisionDetect(solarSystem.ShipState.SpaceshipManager.Shots[shipPartAttacker.Weapon], attackedPosition, collisionPoints);
 						for(uint32_t iCollisionPoint = 0; iCollisionPoint < collisionPoints.size(); ++iCollisionPoint)
-							if(::handleCollisionPoint(solarSystem, weaponAttacker.Damage, shipAttackerScore, shipAttackedScore, shipPartAttacked, attackedPart, shipAttacked, iShipAttacked, attackedPosition, collisionPoints[iCollisionPoint]))	// returns true if part health reaches zero.
+							if(::handleCollisionPoint(solarSystem, weaponAttacker.Shot.Damage, shipAttackerScore, shipAttackedScore, shipPartAttacked, attackedPart, shipAttacked, iShipAttacked, attackedPosition, collisionPoints[iCollisionPoint]))	// returns true if part health reaches zero.
 								break;
 					}
 					const ::gpk::au32			& entityChildren		= solarSystem.ShipState.EntitySystem.EntityChildren[solarSystem.ShipState.ShipPartEntity[attackedPart]];
@@ -151,7 +151,7 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 						::std::lock_guard			lockUpdate				(solarSystem.LockUpdate);
 						::collisionDetect(solarSystem.ShipState.SpaceshipManager.Shots[shipPartAttacker.Weapon], attackedPosition, collisionPoints);
 						for(uint32_t iCollisionPoint = 0; iCollisionPoint < collisionPoints.size(); ++iCollisionPoint)
-							if(::handleCollisionPoint(solarSystem, weaponAttacker.Damage, shipAttackerScore, shipAttackedScore, shipPartAttacked, attackedPart, shipAttacked, iShipAttacked, attackedPosition, collisionPoints[iCollisionPoint])) {	// returns true if part health reaches zero.
+							if(::handleCollisionPoint(solarSystem, weaponAttacker.Shot.Damage, shipAttackerScore, shipAttackedScore, shipPartAttacked, attackedPart, shipAttacked, iShipAttacked, attackedPosition, collisionPoints[iCollisionPoint])) {	// returns true if part health reaches zero.
 								break;
 							}
 					}
@@ -160,7 +160,7 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 
 			::gpk::SWeapon	& weaponAttacker	= solarSystem.ShipState.SpaceshipManager.Weapons[shipPartAttacker.Weapon];
 			::gpk::SShots	& shotsAttacker		= solarSystem.ShipState.SpaceshipManager.Shots[shipPartAttacker.Weapon];
-			if(weaponAttacker.Load == ::gpk::WEAPON_LOAD_Rocket) {
+			if(weaponAttacker.Shot.Type == ::gpk::WEAPON_LOAD_Rocket) {
 				for(uint32_t iShot = 0; iShot < shotsAttacker.Particles.Position.size(); ++iShot) {
 					const ::gpk::apod<::gpk::n3f32> & distances =  shotsAttacker.DistanceToTargets[iShot];
 					if(0 == distances.size())
@@ -184,7 +184,7 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 					}
 				}
 			}
-			else if(weaponAttacker.Load == ::gpk::WEAPON_LOAD_Missile) {
+			else if(weaponAttacker.Shot.Type == ::gpk::WEAPON_LOAD_Missile) {
 				for(uint32_t iShot = 0; iShot < shotsAttacker.Particles.Position.size(); ++iShot) {
 					const ::gpk::apod<::gpk::n3f32>	& distances =  shotsAttacker.DistanceToTargets[iShot];
 					if(0 == distances.size())
@@ -248,20 +248,16 @@ static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int
 	for(uint32_t iParticle = 0; iParticle < shots.Particles.Position.size(); ++iParticle)
 		shots.Particles.Position[iParticle].x				-= (float)(solarSystem.PlayState.RelativeSpeedCurrent * secondsLastFrame * .2);
 
-	weapon.Delay.Value		+= (float)secondsLastFrame;
+	;
 
-	if(weapon.Load == ::gpk::WEAPON_LOAD_Rocket || weapon.Load == ::gpk::WEAPON_LOAD_Missile || weapon.Type == ::gpk::WEAPON_TYPE_Cannon) {
+	if(weapon.Shot.Type == ::gpk::WEAPON_LOAD_Rocket || weapon.Shot.Type == ::gpk::WEAPON_LOAD_Missile || weapon.Type == ::gpk::WEAPON_TYPE_Cannon) {
 		updateDistancesToTargets(solarSystem, team, iShipPart, shipPartDistancesToTargets, shots); 
 	}
 
-	weapon.Overheat.Value	-= (float)secondsLastFrame;
-	if(weapon.CoolingDown) {
-		if(0 >= weapon.Overheat.Value)
-			weapon.CoolingDown		= false;
-	}
+	if(weapon.Trigger.Update(secondsLastFrame)) {}
 	else {
 		solarSystem.ShipState.SpaceshipManager.ShipScores[iShip].Shots	+= 1;
-		solarSystem.ShipState.SpaceshipManager.ShipScores[iShip].Bullets	+= weapon.ParticleCount;
+		solarSystem.ShipState.SpaceshipManager.ShipScores[iShip].Bullets	+= weapon.Shot.ParticleCount;
 
 		const ::gpk::m4f32			& shipModuleMatrix			= solarSystem.ShipState.Scene.Transforms[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[iShipPart] + 1].Transform];
 		::gpk::n3f32				positionGlobal				= shipModuleMatrix.GetTranslation();
@@ -273,12 +269,12 @@ static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int
 				direction.Normalize(); 
 				{
 					::std::lock_guard		lockUpdate			(solarSystem.LockUpdate);
-					if(weapon.Load == ::gpk::WEAPON_LOAD_Rocket)
-						weapon.ShootDirected(shots, 1, positionGlobal, direction, weapon.Speed, 1, weapon.ShotLifetime);
-					else if(weapon.Load == ::gpk::WEAPON_LOAD_Cannonball)
-						weapon.ShootDirected(shots, 1, positionGlobal, direction, weapon.Speed, 1, weapon.ShotLifetime);
-					else if(weapon.Load == ::gpk::WEAPON_LOAD_Missile)
-						weapon.ShootDirected(shots, 1, positionGlobal, direction, weapon.Speed, 1, weapon.ShotLifetime);
+					if(weapon.Shot.Type == ::gpk::WEAPON_LOAD_Rocket)
+						weapon.Shoot(shots, positionGlobal, direction, 1);
+					else if(weapon.Shot.Type == ::gpk::WEAPON_LOAD_Cannonball)
+						weapon.Shoot(shots, positionGlobal, direction, 1);
+					else if(weapon.Shot.Type == ::gpk::WEAPON_LOAD_Missile)
+						weapon.Shoot(shots, positionGlobal, direction, 1);
 				}
 
 				if(solarSystem.PlayState.TimeStage > 1) {
@@ -298,22 +294,19 @@ static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int
 		else if(weapon.Type == ::gpk::WEAPON_TYPE_Gun) {
 			::gpk::n3f32				direction				= {team ? -1.0f : 1.0f, 0, 0};
 			::std::lock_guard			lockUpdate				(solarSystem.LockUpdate);
-			if(weapon.Load == ::gpk::WEAPON_LOAD_Ray)
-				weapon.Shoot(shots, positionGlobal, direction, weapon.Speed, .75f, weapon.ShotLifetime);
+			if(weapon.Shot.Type == ::gpk::WEAPON_LOAD_Ray)
+				weapon.Shoot(shots, positionGlobal, direction, .75f);
 			else
-				weapon.ShootDirected(shots, weapon.ParticleCount, positionGlobal, direction, weapon.Speed, 5.0f, weapon.ShotLifetime);
+				weapon.Shoot(shots, positionGlobal, direction, 5.0f);
 		}
 		else if(weapon.Type == ::gpk::WEAPON_TYPE_Shotgun) {
 			::gpk::n3f32				direction				= {team ? -1.0f : 1.0f, 0, 0};
 			::std::lock_guard			lockUpdate				(solarSystem.LockUpdate);
-			if(weapon.Load == ::gpk::WEAPON_LOAD_Ray)
-				weapon.ShootDirected(shots, weapon.ParticleCount, 1, positionGlobal, direction, weapon.Speed, .75f, weapon.ShotLifetime);
+			if(weapon.Shot.Type == ::gpk::WEAPON_LOAD_Ray)
+				weapon.Shoot(shots, positionGlobal, direction, .75f);
 			else
-				weapon.ShootDirected(shots, weapon.ParticleCount, 1, positionGlobal, direction, weapon.Speed, 5.0f, weapon.ShotLifetime);
+				weapon.Shoot(shots, positionGlobal, direction, 5.0f);
 		}
-	}
-	if(weapon.Overheat.Value >= weapon.Overheat.Limit) {
-		weapon.CoolingDown		= true;
 	}
 	return 0;
 }

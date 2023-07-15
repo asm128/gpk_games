@@ -513,12 +513,12 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 		const ::gpk::SSpaceshipOrbiter	& orbiter		= game.ShipState.SpaceshipManager.Orbiters[game.ShipState.SpaceshipManager.ShipParts[iPlayer][iOrbiter]];
 		const ::gpk::SWeapon			& weapon		= game.ShipState.SpaceshipManager.Weapons[orbiter.Weapon];
 
-		gpk_necall(::gpk::controlTextSet(playerGUI, viewport.Viewport + 1, ::gpk::get_value_label(weapon.Load)), "%s", "");
+		gpk_necall(::gpk::controlTextSet(playerGUI, viewport.Viewport + 1, ::gpk::get_value_label(weapon.Shot.Type)), "%s", "");
 		gpk_necall(::gpk::controlTextSet(playerGUI, viewport.Viewport + 2, ::gpk::get_value_label(weapon.Type)), "%s", "");
 
 		const float					healthRatio		= (float)::gpk::clamp(orbiter.Health.Weight(), 0.0, 1.0);
-		const float					ratioOverheat	= (orbiter.Health.Value > 0) ? (float)weapon.Overheat	.WeightClamp() : 0;
-		const float					ratioDelay		= (orbiter.Health.Value > 0) ? (float)weapon.Delay		.WeightClamp() : 0;
+		const float					ratioOverheat	= (orbiter.Health.Value > 0) ? (float)weapon.Trigger.Overheat.WeightClamp() : 0;
+		const float					ratioDelay		= (orbiter.Health.Value > 0) ? (float)weapon.Trigger.Delay  .WeightClamp() : 0;
 
 		const ::gpk::rgbaf			colorLife		= ::gpk::interpolate_linear(::gpk::RED, ::gpk::GREEN, healthRatio);
 		const ::gpk::rgbaf			colorDelay		= ::gpk::interpolate_linear(::gpk::GRAY * .5, ::gpk::YELLOW, ratioDelay);;

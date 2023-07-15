@@ -239,29 +239,29 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 	double						brightRadius			= 1;
 	double						intensity				= 1;
 	bool						line					= true;
-	if(::gpk::WEAPON_LOAD_Cannonball == weapon.Load) {
+	if(::gpk::WEAPON_LOAD_Cannonball == weapon.Shot.Type) {
 		colorShot				= shipCore.Team ? ::gpk::rgbaf{1.0f, 0.25f, 0.75f} : ::gpk::TURQUOISE;
 		line					= false;
 	}
 	else {
-		if(::gpk::WEAPON_LOAD_Ray == weapon.Load) { 
+		if(::gpk::WEAPON_LOAD_Ray == weapon.Shot.Type) { 
 			colorShot				= ::gpk::rgbaf{1.0f, 0.1f, 0.0f}; 
 			intensity				=  2; 
 		}
-		else if(::gpk::WEAPON_LOAD_Bullet == weapon.Load) { 
+		else if(::gpk::WEAPON_LOAD_Bullet == weapon.Shot.Type) { 
 			colorShot				= ::gpk::DARKGRAY; 
 			intensity				= .25; 
 		}
-		else if(::gpk::WEAPON_LOAD_Shot == weapon.Load) { 
+		else if(::gpk::WEAPON_LOAD_Shot == weapon.Shot.Type) { 
 			colorShot				= ::gpk::GRAY; 
 			intensity				= .25; 
 		}
-		else if(::gpk::WEAPON_LOAD_Rocket == weapon.Load) {
+		else if(::gpk::WEAPON_LOAD_Rocket == weapon.Shot.Type) {
 			colorShot				= shipCore.Team ? ::gpk::rgbaf{1.0f, 0.125f, 0.25f} : ::gpk::LIGHTORANGE;
 			//brightRadius			= 2.6;
 			line					= false;
 		}
-		else if(::gpk::WEAPON_LOAD_Missile == weapon.Load) {
+		else if(::gpk::WEAPON_LOAD_Missile == weapon.Shot.Type) {
 			colorShot				= shipCore.Team ? ::gpk::rgbaf{1.0f, 0.025f, 0.05f} : ::gpk::CYAN;
 			//brightRadius			= 2.6;
 			line					= false;
@@ -358,9 +358,9 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 		for(uint32_t iPart = 0; iPart < shipState.SpaceshipManager.ShipParts[iShip].size(); ++iPart) {
 			const ::gpk::SSpaceshipOrbiter									& shipPart				= shipState.SpaceshipManager.Orbiters[shipState.SpaceshipManager.ShipParts[iShip][iPart]];
 			const ::gpk::rgbaf								colorShot
-				= (::gpk::WEAPON_LOAD_Ray			== shipState.SpaceshipManager.Weapons[shipPart.Weapon].Load) ? ::gpk::rgbaf{1.0f, 0.1f, 0.0f}
-				: (::gpk::WEAPON_LOAD_Cannonball	== shipState.SpaceshipManager.Weapons[shipPart.Weapon].Load) ? ship.Team ? ::gpk::rgbaf{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE
-				: (::gpk::WEAPON_LOAD_Bullet		== shipState.SpaceshipManager.Weapons[shipPart.Weapon].Load) ? ::gpk::GRAY
+				= (::gpk::WEAPON_LOAD_Ray			== shipState.SpaceshipManager.Weapons[shipPart.Weapon].Shot.Type) ? ::gpk::rgbaf{1.0f, 0.1f, 0.0f}
+				: (::gpk::WEAPON_LOAD_Cannonball	== shipState.SpaceshipManager.Weapons[shipPart.Weapon].Shot.Type) ? ship.Team ? ::gpk::rgbaf{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE
+				: (::gpk::WEAPON_LOAD_Bullet		== shipState.SpaceshipManager.Weapons[shipPart.Weapon].Shot.Type) ? ::gpk::GRAY
 				: ::gpk::rgbaf{::gpk::bgra{0xFF, 0xFF, 0xFF}}
 				;
 			for(uint32_t iShot = 0; iShot < shipState.SpaceshipManager.Shots[shipPart.Weapon].Particles.Position.size(); ++iShot) {

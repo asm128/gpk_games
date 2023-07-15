@@ -2,7 +2,7 @@
 
 #include "gpk_framework.h"
 
-#define DISABLE_D3D11
+//#define DISABLE_D3D11
 //#define DISABLE_XAUDIO2
 
 #ifndef DISABLE_D3D11

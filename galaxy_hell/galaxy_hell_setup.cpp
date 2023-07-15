@@ -425,19 +425,19 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 				::gpk::SWeapon					newWeapon			= {};
 				shipPart.Health.Value		= (int32_t)(shipPart.Health.Limit = partCreationData.MaxHealth);
 				shipPart.Type				= partCreationData.Type;
-				newWeapon.Delay.Limit		= (float)partCreationData.MaxDelay;
+				newWeapon.Trigger.Delay.Limit		= (float)partCreationData.MaxDelay;
 				if(0 != ship.Team)
-					newWeapon.Delay.Limit		*= 1 + (2 * iPart);
-				newWeapon.Type				= partCreationData.Weapon;
-				newWeapon.Load				= partCreationData.Munition;
-				newWeapon.Damage			= partCreationData.Damage;
-				newWeapon.Speed				= partCreationData.Speed;
-				newWeapon.Delay.Value		= newWeapon.Delay.Limit / shipParts.size() * iPart;
-				newWeapon.Stability			= (float)partCreationData.Stability;
-				newWeapon.ParticleCount		= partCreationData.ParticleCount;
-				newWeapon.Overheat.Limit	= (float)partCreationData.Cooldown		;//= 1;
-				newWeapon.OverheatPerShot	= (float)partCreationData.OverheatPerShot	;//= 0;
-				newWeapon.ShotLifetime		= (float)partCreationData.ShotLifetime	;//= 0;
+					newWeapon.Trigger.Delay.Limit		*= 1 + (2 * iPart);
+				newWeapon.Type						= partCreationData.Weapon;
+				newWeapon.Trigger.Delay.Value		= newWeapon.Trigger.Delay.Limit / shipParts.size() * iPart;
+				newWeapon.Trigger.Overheat.Limit	= (float)partCreationData.Cooldown		;//= 1;
+				newWeapon.Trigger.OverheatPerShot	= (float)partCreationData.OverheatPerShot	;//= 0;
+				newWeapon.Shot.Type					= partCreationData.Munition;
+				newWeapon.Shot.Damage				= partCreationData.Damage;
+				newWeapon.Shot.Speed				= partCreationData.Speed;
+				newWeapon.Shot.Stability			= (float)partCreationData.Stability;
+				newWeapon.Shot.ParticleCount		= partCreationData.ParticleCount;
+				newWeapon.Shot.Lifetime				= (float)partCreationData.ShotLifetime	;//= 0;
 
 				shipPart.Weapon				= solarSystem.ShipState.SpaceshipManager.Weapons.push_back(newWeapon);
 				solarSystem.ShipState.SpaceshipManager.Shots.push_back({});
@@ -452,7 +452,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 				const uint32_t				width		= ::gpk::get_value_count<::gpk::WEAPON_LOAD>();
 				const uint32_t				height		= ::gpk::get_value_count<::gpk::WEAPON_TYPE>();
 				const uint32_t				depth		= ::gpk::get_value_count<::gpk::SHIP_PART_TYPE>();
-				solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Image	= iShip * width * height * depth + shipPart.Type * width * height + newWeapon.Type * width + newWeapon.Load;
+				solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Image	= iShip * width * height * depth + shipPart.Type * width * height + newWeapon.Type * width + newWeapon.Shot.Type;
 				solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Image	%= solarSystem.ShipState.Scene.Image.size();
 				solarSystem.ShipState.Engine.Integrator.Centers[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Body].Orientation = {0, 0, 0, 1};
 			}
