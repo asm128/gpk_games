@@ -143,11 +143,11 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 	
 	gpk_necs(::gpk::guiDraw(*app.SSiegeApp.GUI, app.D3DApp.GUIStuff.RenderTarget));
 
-	const ::ssiege::SCamera		& cameraSelected		= app.SSiegeApp.Camera;
-	const ::gpk::SEngineScene	& engineScene			= *app.SSiegeApp.Game.Engine.Scene;
 	app.D3DApp.Scene.ConstantBufferScene.Time	= (float)app.Framework.FrameInfo.Seconds.Total;
 
-	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, {}/*sunlightPos*/, cameraSelected.Offset, cameraSelected.Target, {.001f, 1000.f}));
+	const ::gpk::SCamera		& cameraSelected		= app.SSiegeApp.Game.Camera;
+	const ::gpk::SEngineScene	& engineScene			= *app.SSiegeApp.Game.Engine.Scene;
+	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, sunlightPos, cameraSelected.Position, cameraSelected.Target, cameraSelected.NearFar));
 #else 
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::prtbgra8d32			backBuffer				= framework.RootWindow.BackBuffer;

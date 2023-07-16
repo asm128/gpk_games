@@ -15,6 +15,12 @@ namespace ssg
 		::gpk::SGame					Global			= {};
 		::gpk::SEnginePlanetarySystem	SolarSystem		= {};
 		::ssiege::SWorldView			World			= {};
+		::gpk::SCamera					Camera			= {};
+
+		::gpk::eid_t					Controlled		= ::gpk::EID_INVALID;
+		::gpk::aobj<::gpk::SGamePlayer>	Players;
+
+		::gpk::eid_t					ShipEntity		= ::gpk::EID_INVALID;
 
 		::gpk::SEngine					Engine			= {};
 

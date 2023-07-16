@@ -270,6 +270,16 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	::d1p::SPoolEngine			& engine					= pool.Engine;
 	gpk_necs(::gpk::rasterFontDefaults(engine.Scene->Graphics->Fonts));
 
+	{	// table 
+		::gpk::SParamsGrid			argsGrid					= {};
+		argsGrid.CellCount		= {1, 1};
+		gpk_necs(pool.Entities.Table = (uint16_t)engine.CreateGrid(argsGrid));
+		gpk_necs(engine.SetShader(pool.Entities.Table, ::d1p::psTableCloth, "psTableCloth"));
+		gpk_necs(engine.SetColorDiffuse(pool.Entities.Table, ::gpk::RED * .5f));
+		//for(uint32_t iFace = 0; iFace < 6; ++iFace)
+		//	gpk_necs(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[iFace], ::d1p::psTableCloth, "psHidden"));
+	}
+
 	{	// balls
 		::gpk::SParamsSphere		params			= {};
 		params.CellCount	= {24, 24};
@@ -281,16 +291,6 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		gpk_necs(engine.SetShader(pool.Entities.Balls[0], ::d1p::psBallSolid, "psBallSolid"));
 		for(uint32_t iBall = 1; iBall < ::d1p::MAX_BALLS; ++iBall) 
 			gpk_necs(pool.Entities.Balls[iBall] = (uint16_t)engine.Clone(pool.Entities.Balls[0], true, true, true));
-	}
-
-	{	// table 
-		::gpk::SParamsGrid			argsGrid					= {};
-		argsGrid.CellCount		= {9, 4};
-		gpk_necs(pool.Entities.Table = (uint16_t)engine.CreateGrid(argsGrid));
-		gpk_necs(engine.SetShader(pool.Entities.Table, ::d1p::psTableCloth, "psTableCloth"));
-		gpk_necs(engine.SetColorDiffuse(pool.Entities.Table, ::gpk::RED * .5f));
-		//for(uint32_t iFace = 0; iFace < 6; ++iFace)
-		//	gpk_necs(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[iFace], ::d1p::psTableCloth, "psHidden"));
 	}
 
 	//gpk_necs(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[::gpk::VOXEL_FACE_Top], ::d1p::psTableCloth, "psTableCloth"));
@@ -311,11 +311,14 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 			gpk_necs(pool.Entities.Pockets[iPocket] = (uint16_t)engine.Clone(pool.Entities.Pockets[0], false, false, false));
 	}
 
-	// sticks
-	gpk_necs(pool.Entities.Sticks[0] = (uint16_t)engine.CreateCylinderWall(8, false, 1.0f));
-	gpk_necs(engine.SetShader(pool.Entities.Sticks[0], ::d1p::psStick, "psStick"));
-	for(uint32_t iPlayer = 1; iPlayer < pool.Entities.Sticks.size(); ++iPlayer)
-		gpk_necs(pool.Entities.Sticks[iPlayer]	= (uint16_t)engine.Clone(pool.Entities.Sticks[0], true, true, false));
+	{	// sticks
+		::gpk::SParamsCylinderWall	params				= {};
+		params.CellCount		= {8, 1};
+		gpk_necs(pool.Entities.Sticks[0] = (uint16_t)engine.CreateCylinderWall(params));
+		gpk_necs(engine.SetShader(pool.Entities.Sticks[0], ::d1p::psStick, "psStick"));
+		for(uint32_t iPlayer = 1; iPlayer < pool.Entities.Sticks.size(); ++iPlayer)
+			gpk_necs(pool.Entities.Sticks[iPlayer]	= (uint16_t)engine.Clone(pool.Entities.Sticks[0], true, true, false));
+	}
 
 	//gpk_necs(pool.Entities.Cushions[0] = (uint16_t)engine.CreateTableCushion());
 	//for(uint32_t iFace = 1; iFace < 6; ++iFace)

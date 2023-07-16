@@ -52,12 +52,6 @@ namespace ssiege
 		}
 	};
 
-	struct SCamera {
-		::gpk::n3f32			Offset				= {-0.5f, .05f, -.125f};
-		::gpk::n3f32			Target				= {0, 0, 0};
-		float					Zoom				= 2.0f;
-	};
-
 	struct SSSiegeUI {
 		::gpk::cid_t			Root				= ::gpk::CID_INVALID;
 		::gpk::SInputBox		UserInput			= {};
@@ -107,10 +101,6 @@ namespace ssiege
 
 		SFileStrings			FileStrings			= {};
 
-		SCamera					Camera				= {};
-
-		ssiegeid_t				CharacterControlled	= SSIEGEID_INVALID;
-		::gpk::aobj<::ssiege::SPlayer>	Players;
 
 		::gpk::pobj<gpk::SGUI>	GUI;
 		::gpk::prtbgra8d32		RenderTargetWorld;
@@ -119,10 +109,10 @@ namespace ssiege
 		::gpk::error_t			StateSwitch			(APP_STATE newState);
 
 		::gpk::error_t			Save				()	const	{
-			rni_if(CharacterControlled >= Game.World.Characters.size(), "No active player character! %i >= %i", CharacterControlled, Game.World.Characters.size());
+			rni_if(Game.Controlled >= Game.Engine.Entities.size(), "No active player character! %i >= %i", Game.Controlled, Game.Engine.Entities.size());
 				
 			::gpk::achar				playerPath;
-			gpk_necs(FileStrings.GetPlayerFilePath(::gpk::timeCurrent(), Players[0].Name, playerPath));
+			gpk_necs(FileStrings.GetPlayerFilePath(::gpk::timeCurrent(), Game.Players[0].Name, playerPath));
 			return Save(playerPath);
 		}
 

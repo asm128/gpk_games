@@ -2,8 +2,21 @@
 #include "ssiege_game_handle.h"
 #include "gpk_timer.h"
 
+static	::gpk::error_t	shipCoreCreate			(::ssg::SSiegeGame & world) { 
+	::gpk::SParamsRing			ring					= {};
+	ring.Height				= .025f;
+	ring.RadiusYMin.Max		*= .1f;
+	ring.RadiusYMin.Min		*= .1f;
+	ring.RadiusYMax.Max		*= .1f;
+	ring.RadiusYMax.Min		*= .1f;
+
+	world.ShipEntity		= world.Engine.CreateRing(ring);
+
+	return 0; 
+}
 
 ::gpk::error_t			ssg::ssiegeGameSetup	(::ssg::SSiegeGame & world) {
+	gpk_necs(::shipCoreCreate(world));
 	gpk_necs(::gpk::planetarySystemSetup(world.SolarSystem, world.Engine, "gpk_solar_system.json"));
 	return 0;
 }
