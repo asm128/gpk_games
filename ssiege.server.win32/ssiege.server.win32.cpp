@@ -159,9 +159,9 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 }
 
 ::gpk::error_t			draw					(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	const ::gpk::n3f32			sunlightPos				= ::gpk::calcSunPosition();
-	const double				sunlightFactor			= ::gpk::calcSunlightFactor(app.SSiegeApp.Game.World.WorldState.DaylightRatioExtra, app.SSiegeApp.Game.World.WorldState.DaylightOffsetMinutes);
-	const ::gpk::rgbaf			clearColor				= ::gpk::interpolate_linear(::gpk::DARKBLUE * .25, ::gpk::LIGHTBLUE * 1.1, sunlightFactor);
+	const ::gpk::n3f32			sunlightPos				= {}; //::gpk::calcSunPosition();
+	//const double				sunlightFactor			= .1;//:::gpk::calcSunlightFactor(app.SSiegeApp.World.WorldState.DaylightRatioExtra, app.SSiegeApp.World.WorldState.DaylightOffsetMinutes);
+	const ::gpk::rgbaf			clearColor				= ::gpk::DARKBLUE * .0625;//::gpk::interpolate_linear(::gpk::DARKBLUE * .25, ::gpk::LIGHTBLUE * 1.1, sunlightFactor);
 
 #if !defined(DISABLE_D3D11) 
 	memset(app.D3DApp.GUIStuff.RenderTarget.begin(), 0, app.D3DApp.GUIStuff.RenderTarget.byte_count());
