@@ -276,7 +276,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		params.Radius		= .5f;
 		params.Origin		= {};
 		params.Reverse		= false;
-		params.DiameterRatio	= 1.f;
+		params.Circumference	= 1.f;
 		gpk_necs(pool.Entities.Balls[0]	= (uint16_t)engine.CreateSphere(params));
 		gpk_necs(engine.SetShader(pool.Entities.Balls[0], ::d1p::psBallSolid, "psBallSolid"));
 		for(uint32_t iBall = 1; iBall < ::d1p::MAX_BALLS; ++iBall) 
@@ -297,7 +297,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	//gpk_necs(engine.SetColorDiffuse((*engine.Entities.Children[pool.Entities.Table])[::gpk::VOXEL_FACE_Top], ::gpk::RED * .5f));
 	{	// pockets
 		::gpk::SParamsCylinderWall		params;
-		params.DiameterRatio	= .65f;
+		params.Circumference	= .65f;
 		params.CellCount		= {16, 16};
 		params.Reverse			= true;
 		params.Height			= 1;
