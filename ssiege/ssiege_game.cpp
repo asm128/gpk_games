@@ -3,21 +3,33 @@
 #include "gpk_timer.h"
 
 static	::gpk::error_t	shipCoreCreate			(::ssg::SSiegeGame & world) { 
-	::gpk::SParamsRing			ring					= {};
-	ring.Height				= .025f;
-	ring.RadiusYMin.Max		*= .1f;
-	ring.RadiusYMin.Min		*= .1f;
-	ring.RadiusYMax.Max		*= .1f;
-	ring.RadiusYMax.Min		*= .1f;
+	{
+		::gpk::SParamsRing			ring					= {};
+		ring.Height				= .001f;
+		ring.RadiusYMin.Max		*= .01f;
+		ring.RadiusYMin.Min		*= .01f;
+		ring.RadiusYMax.Max		*= .01f;
+		ring.RadiusYMax.Min		*= .01f;
 
-	world.ShipEntity		= world.Engine.CreateRing(ring);
+		world.ShipEntity		= world.Engine.CreateRing(ring);
+		world.Engine.SetPosition	(world.ShipEntity, world.Camera.Position * .95);
+		world.Engine.SetOrientation	(world.ShipEntity, ::gpk::quatf32{}.MakeFromEuler(0, 0, ::gpk::math_pi_2).Normalize());
+	}
+	{
+		::gpk::SParamsSphere		sphere					= {};
+		sphere.Radius			*= .001f;
+
+		world.Engine.Entities.SetParent(world.Engine.CreateSphere(sphere), world.ShipEntity);
+	}
+	world.Engine.Integrator.Flags[world.Engine.Entities[world.ShipEntity].RigidBody].UpdatedTransform	= false;
+	world.Engine.Integrator.Flags[world.Engine.Entities[(*world.Engine.Entities.Children[world.ShipEntity])[0]].RigidBody].UpdatedTransform	= false;
 
 	return 0; 
 }
 
 ::gpk::error_t			ssg::ssiegeGameSetup	(::ssg::SSiegeGame & world) {
-	gpk_necs(::shipCoreCreate(world));
 	gpk_necs(::gpk::planetarySystemSetup(world.SolarSystem, world.Engine, "gpk_solar_system.json"));
+	gpk_necs(::shipCoreCreate(world));
 	return 0;
 }
 
