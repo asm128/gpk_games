@@ -11,6 +11,11 @@ namespace ssg
 {
 #pragma pack(push, 1)
 #pragma pack(pop)
+	//GDEFINE_ENUM_TYPE(SCENE_TYPE, uint8_t);Likely not needed
+	//GDEFINE_ENUM_VALUE(SCENE_TYPE, OuterSpace	, 0);
+	//GDEFINE_ENUM_VALUE(SCENE_TYPE, Planetary	, 1);
+	//GDEFINE_ENUM_VALUE(SCENE_TYPE, Submarine	, 2);
+
 	struct SSiegeGame {
 		::gpk::SGame					Global			= {};
 		::gpk::SEnginePlanetarySystem	SolarSystem		= {};
@@ -18,7 +23,7 @@ namespace ssg
 		::gpk::SCamera					Camera			= {};
 
 		::gpk::eid_t					Controlled		= ::gpk::EID_INVALID;
-		::gpk::aobj<::gpk::SGamePlayer>	Players;
+		::gpk::aobj<::gpk::SPlayer>		Players;
 
 		::gpk::eid_t					ShipEntity		= ::gpk::EID_INVALID;
 

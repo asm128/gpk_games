@@ -118,6 +118,7 @@ namespace ghg
 
 		::gpk::error_t				Save				(::gpk::au8 & output)	const	{ 
 			gpk_necs(SpaceshipManager.Save(output));
+			gpk_necs(WeaponManager.Save(output));
 
 			gpk_necs(::gpk::saveView(output, ShipCoreEntity));
 			gpk_necs(::gpk::saveView(output, ShipPartEntity));
@@ -130,6 +131,7 @@ namespace ghg
 		}
 		::gpk::error_t				Load				(::gpk::vcu8 & input) { 
 			gpk_necs(SpaceshipManager.Load(input));
+			gpk_necs(WeaponManager.Load(input));
 
 			gpk_necs(::gpk::loadView(input, ShipCoreEntity));
 			gpk_necs(::gpk::loadView(input, ShipPartEntity));

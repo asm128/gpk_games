@@ -246,7 +246,7 @@ static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int
 	::gpk::SWeapon				& weapon					= solarSystem.ShipState.WeaponManager.Weapons	[shipPart.Weapon];
 	::gpk::SShots				& shots						= solarSystem.ShipState.WeaponManager.Shots	[shipPart.Weapon];
 	for(uint32_t iParticle = 0; iParticle < shots.Particles.Position.size(); ++iParticle)
-		shots.Particles.Position[iParticle].x				-= (float)(solarSystem.PlayState.RelativeSpeedCurrent * secondsLastFrame * .2);
+		shots.Particles.Position[iParticle].x				-= (float)(solarSystem.PlayState.BackgroundSpeed.RelativeSpeedCurrent * secondsLastFrame * .2);
 
 	;
 
@@ -327,7 +327,7 @@ static	::gpk::error_t	shipsUpdate				(::ghg::SGalaxyHell & solarSystem, double s
 			playing					= 1;
 
 			shipTransform.Position.z	= (float)(sin(iShip + solarSystem.PlayState.TimeWorld) * (iShip * 5.0) * ((iShip % 2) ? -1 : 1));
-			shipTransform.Position.x	= (float)((iShip * 5.0) - solarSystem.PlayState.Stage + 10 - (solarSystem.PlayState.RelativeSpeedCurrent * solarSystem.PlayState.RelativeSpeedCurrent * .0005 * ((solarSystem.PlayState.RelativeSpeedCurrent >= 0) ? 1 : -1)  ));
+			shipTransform.Position.x	= (float)((iShip * 5.0) - solarSystem.PlayState.Stage + 10 - (solarSystem.PlayState.BackgroundSpeed.RelativeSpeedCurrent * solarSystem.PlayState.BackgroundSpeed.RelativeSpeedCurrent * .0005 * ((solarSystem.PlayState.BackgroundSpeed.RelativeSpeedCurrent >= 0) ? 1 : -1)  ));
 			double						timeWaveVertical					= .1;
 
 			if(0 == (solarSystem.PlayState.Stage % 7)) {
@@ -403,13 +403,13 @@ static	::gpk::error_t	processInput			(::ghg::SGalaxyHell & solarSystem, double s
 			}
 
 			{
-				solarSystem.PlayState.AccelerationControl	
+				solarSystem.PlayState.BackgroundSpeed.AccelerationControl	
 					= shipController.Forward	? +1
 					: shipController.Back		? -1
 					: 0
 					;
 
-				playerBody.Position.x	+= (float)(secondsLastFrame * speed * speedMultiplier * solarSystem.PlayState.AccelerationControl);
+				playerBody.Position.x	+= (float)(secondsLastFrame * speed * speedMultiplier * solarSystem.PlayState.BackgroundSpeed.AccelerationControl);
 
 				if(shipController.Left 	) { playerBody.Position.z += (float)(secondsLastFrame * speed * speedMultiplier); }
 				if(shipController.Right	) { playerBody.Position.z -= (float)(secondsLastFrame * speed * speedMultiplier); }
@@ -499,7 +499,7 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 
 	{
 		::std::lock_guard			lockUpdate					(solarSystem.LockUpdate);
-		::ghg::decoUpdate(solarSystem.DecoState, secondsToProcess, solarSystem.PlayState.RelativeSpeedCurrent, targetMetrics);
+		::ghg::decoUpdate(solarSystem.DecoState, secondsToProcess, solarSystem.PlayState.BackgroundSpeed.RelativeSpeedCurrent, targetMetrics);
 	}
 
 	::processInput(solarSystem, secondsToProcess, input, frameEvents);
@@ -513,17 +513,9 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 			solarSystem.PlayState.TimeScale	= ::gpk::min(1.0, solarSystem.PlayState.TimeScale += secondsToProcess * .45);
 	}
 	secondsToProcess		*= solarSystem.PlayState.TimeScale;
+	
 	stacxpr	double				relativeAcceleration	= 20;
-	if(solarSystem.PlayState.AccelerationControl > 0)
-		solarSystem.PlayState.RelativeSpeedCurrent	+= secondsToProcess * relativeAcceleration;
-	else if(solarSystem.PlayState.AccelerationControl < 0)
-		solarSystem.PlayState.RelativeSpeedCurrent	-= secondsToProcess * relativeAcceleration;
-	else { // == 0
-		if(solarSystem.PlayState.RelativeSpeedCurrent > solarSystem.PlayState.RelativeSpeedTarget)
-			solarSystem.PlayState.RelativeSpeedCurrent	-= secondsToProcess * relativeAcceleration;
-		else if(solarSystem.PlayState.RelativeSpeedCurrent < solarSystem.PlayState.RelativeSpeedTarget)
-			solarSystem.PlayState.RelativeSpeedCurrent	+= secondsToProcess * relativeAcceleration;
-	}
+	solarSystem.PlayState.BackgroundSpeed.Update(secondsToProcess, relativeAcceleration);
 
 	solarSystem.PlayState.TimeReal		+= actualSecondsLastFrame;
 	solarSystem.PlayState.TimeRealStage	+= actualSecondsLastFrame;

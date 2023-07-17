@@ -3,6 +3,9 @@
 #include "gpk_galaxy_hell_deco.h"
 
 #include "gpk_galaxy_hell_draw.h"
+
+#include "gpk_game.h"
+
 #include "gpk_view_color.h"
 
 #include "gpk_input.h"
@@ -41,29 +44,27 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(PLAY_MODE, VR			, 1);
 
 	struct SPlayState {
-		uint64_t			TimeStart				= 0;
-		uint64_t			TimeLast				= 0;
-		uint32_t			Seed					= 1;
-		uint16_t			OffsetStage				= 2;
-		uint8_t				CountPlayers			= 1;
-		PLAY_TYPE			PlayType				= (PLAY_TYPE)0;
-		PLAY_MODE			PlayMode				= (PLAY_MODE)PLAY_MODE_VR;
+		uint64_t				TimeStart				= 0;
+		uint64_t				TimeLast				= 0;
+		uint32_t				Seed					= 1;
+		::gpk::SGameSetup		PlaySetup				= {2};
+		uint8_t					CountPlayers			= 1;
+		PLAY_TYPE				PlayType				= (PLAY_TYPE)0;
+		PLAY_MODE				PlayMode				= (PLAY_MODE)PLAY_MODE_VR;
 
-		uint32_t			Stage					= 0;
-		double				TimeStage				= 0;
-		double				TimeWorld				= 0;
-		double				TimeRealStage			= 0;
-		double				TimeReal				= 0;
-		bool				Paused					= false;
+		uint32_t				Stage					= 0;
+		double					TimeStage				= 0;
+		double					TimeWorld				= 0;
+		double					TimeRealStage			= 0;
+		double					TimeReal				= 0;
+		bool					Paused					= false;
 
-		double				CameraSwitchDelay		= 0;
+		double					CameraSwitchDelay		= 0;
 
-		double				RelativeSpeedTarget		= 20;
-		double				RelativeSpeedCurrent	= -50;
-		int					AccelerationControl		= 0;
+		::gpk::SRelativeSpeed	BackgroundSpeed;
 
-		double				TimeScale				= 1.0f;
-		bool				Slowing					= true;
+		double					TimeScale				= 1.0f;
+		bool					Slowing					= true;
 
 	};
 	 
@@ -78,10 +79,7 @@ namespace ghg
 	};
 #pragma pack(pop)
 
-	struct SShipPilot {
-		::gpk::vcc			Name					= "Evil Dead";
-		::gpk::bgra			Color					= ::gpk::MAGENTA;
-	};
+	struct SShipPilot : ::gpk::SPlayer {};
 
 	struct SGalaxyHell {
 		::ghg::SShipManager					ShipState				= {};

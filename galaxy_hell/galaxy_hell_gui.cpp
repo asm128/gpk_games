@@ -655,7 +655,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpob
 		double						nitro						= 0;
 		if((iPlayer < app.Game.ShipState.SpaceshipManager.ShipCores.size())) {
 			const ::gpk::SSpaceshipCore		& shipCore				= app.Game.ShipState.SpaceshipManager.ShipCores[iPlayer];
-			shipColor				= (shipCore.Team ? ::ghg::PLAYER_COLORS[iPlayer] : app.Game.Pilots[iPlayer].Color);
+			shipColor				= (shipCore.Team ? ::ghg::PLAYER_COLORS[iPlayer] : ::gpk::bgra(app.Game.Pilots[iPlayer].Color));
 			nitro					= shipCore.Nitro.Value;
 		}
 

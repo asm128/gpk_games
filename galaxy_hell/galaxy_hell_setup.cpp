@@ -345,7 +345,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		, {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .12, 0.50, ::gpk::WEAPON_LOAD_Missile		,  160,   112, 1,   1,0.25,  5, ::gpk::DAMAGE_TYPE_Burn | ::gpk::DAMAGE_TYPE_Wave }
 		};
 
-	sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage);
+	sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.Stage + solarSystem.PlayState.PlaySetup.OffsetStage);
 	if(0 <= ::gpk::fileToMemory(stageFileName, stageFile.Bytes) && stageFile.Bytes.size()) {
 		::std::lock_guard			lock	(solarSystem.LockUpdate);
 		gpk_necall(-1 == ::gpk::jsonParse(stageFile.Reader, stageFile.Bytes), "%s", stageFileName);
@@ -379,7 +379,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 			}
 		}
 		// Set up enemy ships
-		while(((int)solarSystem.ShipState.SpaceshipManager.ShipCores.size() - (int)solarSystem.PlayState.CountPlayers - 1) < (int)(solarSystem.PlayState.Stage + solarSystem.PlayState.OffsetStage)) {	// Create enemy ships depending on stage.
+		while(((int)solarSystem.ShipState.SpaceshipManager.ShipCores.size() - (int)solarSystem.PlayState.CountPlayers - 1) < (int)(solarSystem.PlayState.Stage + solarSystem.PlayState.PlaySetup.OffsetStage)) {	// Create enemy ships depending on stage.
 			int32_t						indexShip				= ::shipCreate(solarSystem.ShipState, 1, -1, solarSystem.PlayState.Stage + solarSystem.ShipState.SpaceshipManager.ShipCores.size());
 			::gpk::SBodyCenter			& shipPivot				= solarSystem.ShipState.GetShipPivot(indexShip);
 			shipPivot.Orientation.MakeFromEuler({0, 0, (float)(::gpk::math_pi_2)});
@@ -413,7 +413,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 
 				}
 				else {
-					if(iShip < 4 || 0 != ((iShip - 1 - solarSystem.PlayState.CountPlayers - solarSystem.PlayState.OffsetStage) % 3) || 0 != iPart) 
+					if(iShip < 4 || 0 != ((iShip - 1 - solarSystem.PlayState.CountPlayers - solarSystem.PlayState.PlaySetup.OffsetStage) % 3) || 0 != iPart) 
 						weapon				= 4;
 					else {
 						weapon				= (iShip - 5) / 3;
