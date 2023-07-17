@@ -34,7 +34,6 @@
 
 namespace ssiege
 {
-#pragma pack(push, 1)
 	GDEFINE_ENUM_TYPE (TERRAIN_TYPE, uint8_t);
 	GDEFINE_ENUM_VALUE(TERRAIN_TYPE, Soil		, 0);
 	GDEFINE_ENUM_VALUE(TERRAIN_TYPE, Grass		, 1);
@@ -194,6 +193,18 @@ namespace ssiege
 	struct SHangar {
 		::gpk::n2u16			Size;
 		assiegeid				Furniture;
+
+		::gpk::error_t			Save				(::gpk::au8 & output)	const	{ 
+			gpk_necs(::gpk::savePOD (output, Size)); 
+			gpk_necs(::gpk::saveView(output, Furniture)); 
+			return 0;
+		}
+
+		::gpk::error_t			Load				(::gpk::vcu8 & input)	{ 
+			gpk_necs(::gpk::loadPOD (input, Size)); 
+			gpk_necs(::gpk::loadView(input, Furniture)); 
+			return 0;
+		}
 	};
 
 	struct SWorldArea {
@@ -253,6 +264,7 @@ namespace ssiege
 		}
 	};
 
+#pragma pack(push, 1)
 	struct SWorldConfig {
 		uint64_t				Seed					= ::gpk::noise1DBase(::gpk::timeCurrentInUs());
 		::gpk::n2u8				BlockSize				= {255, 255};

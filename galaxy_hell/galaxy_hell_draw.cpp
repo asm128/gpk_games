@@ -358,13 +358,13 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 		for(uint32_t iPart = 0; iPart < shipState.SpaceshipManager.ShipParts[iShip].size(); ++iPart) {
 			const ::gpk::SSpaceshipOrbiter									& shipPart				= shipState.SpaceshipManager.Orbiters[shipState.SpaceshipManager.ShipParts[iShip][iPart]];
 			const ::gpk::rgbaf								colorShot
-				= (::gpk::WEAPON_LOAD_Ray			== shipState.SpaceshipManager.Weapons[shipPart.Weapon].Shot.Type) ? ::gpk::rgbaf{1.0f, 0.1f, 0.0f}
-				: (::gpk::WEAPON_LOAD_Cannonball	== shipState.SpaceshipManager.Weapons[shipPart.Weapon].Shot.Type) ? ship.Team ? ::gpk::rgbaf{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE
-				: (::gpk::WEAPON_LOAD_Bullet		== shipState.SpaceshipManager.Weapons[shipPart.Weapon].Shot.Type) ? ::gpk::GRAY
+				= (::gpk::WEAPON_LOAD_Ray			== shipState.WeaponManager.Weapons[shipPart.Weapon].Shot.Type) ? ::gpk::rgbaf{1.0f, 0.1f, 0.0f}
+				: (::gpk::WEAPON_LOAD_Cannonball	== shipState.WeaponManager.Weapons[shipPart.Weapon].Shot.Type) ? ship.Team ? ::gpk::rgbaf{1.0f, 0.125f, 0.25f} : ::gpk::TURQUOISE
+				: (::gpk::WEAPON_LOAD_Bullet		== shipState.WeaponManager.Weapons[shipPart.Weapon].Shot.Type) ? ::gpk::GRAY
 				: ::gpk::rgbaf{::gpk::bgra{0xFF, 0xFF, 0xFF}}
 				;
-			for(uint32_t iShot = 0; iShot < shipState.SpaceshipManager.Shots[shipPart.Weapon].Particles.Position.size(); ++iShot) {
-				lightPoints.push_back(shipState.SpaceshipManager.Shots[shipPart.Weapon].Particles.Position[iShot]);
+			for(uint32_t iShot = 0; iShot < shipState.WeaponManager.Shots[shipPart.Weapon].Particles.Position.size(); ++iShot) {
+				lightPoints.push_back(shipState.WeaponManager.Shots[shipPart.Weapon].Particles.Position[iShot]);
 				lightColors.push_back(colorShot);
 			}
 		}
@@ -621,8 +621,8 @@ static	::gpk::error_t	drawExplosion
 			const ::gpk::au16		& shipParts			= solarSystem.ShipState.SpaceshipManager.ShipParts[iShip];
 			for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
 				const ::gpk::SSpaceshipOrbiter	& orbiter			= solarSystem.ShipState.SpaceshipManager.Orbiters[shipParts[iPart]];
-				const ::gpk::SWeapon	& weapon			= solarSystem.ShipState.SpaceshipManager.Weapons[orbiter.Weapon];
-				::drawShots(targetPixels, solarSystem.ShipState, solarSystem.ShipState.SpaceshipManager.Shots[orbiter.Weapon], matrixView, (float)solarSystem.DecoState.AnimationTime, shipCore, weapon, depthBuffer, drawCache.LightPointsModel, drawCache);
+				const ::gpk::SWeapon	& weapon			= solarSystem.ShipState.WeaponManager.Weapons[orbiter.Weapon];
+				::drawShots(targetPixels, solarSystem.ShipState, solarSystem.ShipState.WeaponManager.Shots[orbiter.Weapon], matrixView, (float)solarSystem.DecoState.AnimationTime, shipCore, weapon, depthBuffer, drawCache.LightPointsModel, drawCache);
 
 			}
 		}

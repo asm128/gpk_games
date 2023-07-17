@@ -83,25 +83,20 @@ namespace ghg
 
 	struct SShipManager  {
 		::gpk::SSpaceshipManager	SpaceshipManager;
+		::gpk::SWeaponManager		WeaponManager;
 
-		::gpk::au32					MeshMap				= {};
-
-		::gpk::SEngine				Engine;
 		::gpk::aeid					ShipCoreEntity		= {};
 		::gpk::aeid					ShipPartEntity		= {};
 
-
+		::gpk::SEngine				Engine;
 		::ghg::SEntitySystem		EntitySystem		= {};
 		::ghg::SShipScene			Scene				= {};
 
 		int32_t						Clear				()	{
 			SpaceshipManager.Clear();
-			::gpk::clear
-				( Scene.Transforms
-				, ShipCoreEntity
-				, ShipCoreEntity
-				, MeshMap
-				);
+			WeaponManager.Clear();
+			::gpk::clear(Scene.Transforms, ShipCoreEntity, ShipPartEntity);
+
 			Engine.Integrator.Clear();
 			Engine.Entities.clear();
 

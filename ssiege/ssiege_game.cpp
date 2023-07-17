@@ -1,23 +1,24 @@
-#include "ssiege_game.h"
 #include "ssiege_game_handle.h"
+#include "ssiege_game.h"
 #include "gpk_timer.h"
 
 static	::gpk::error_t	shipCoreCreate			(::ssg::SSiegeGame & world) { 
 	{
 		::gpk::SParamsRing			ring					= {};
-		ring.Height				= .001f;
-		ring.RadiusYMin.Max		*= .01f;
-		ring.RadiusYMin.Min		*= .01f;
-		ring.RadiusYMax.Max		*= .01f;
-		ring.RadiusYMax.Min		*= .01f;
+		ring.Height				= .0005f;
+		ring.RadiusYMin.Max		*= .005f;
+		ring.RadiusYMin.Min		*= .005f;
+		ring.RadiusYMax.Max		*= .005f;
+		ring.RadiusYMax.Min		*= .005f;
 
 		world.ShipEntity		= world.Engine.CreateRing(ring);
-		world.Engine.SetPosition	(world.ShipEntity, world.Camera.Position * .95);
+		world.Engine.SetPosition	(world.ShipEntity, (world.Camera.Position * .95) + ::gpk::n3f32{-.005f});
 		world.Engine.SetOrientation	(world.ShipEntity, ::gpk::quatf32{}.MakeFromEuler(0, 0, ::gpk::math_pi_2).Normalize());
+		world.Engine.SetRotation	(world.ShipEntity, ::gpk::n3f32{float(::gpk::math_pi * .25),});
 	}
 	{
 		::gpk::SParamsSphere		sphere					= {};
-		sphere.Radius			*= .001f;
+		sphere.Radius			*= .0005f;
 
 		world.Engine.Entities.SetParent(world.Engine.CreateSphere(sphere), world.ShipEntity);
 	}

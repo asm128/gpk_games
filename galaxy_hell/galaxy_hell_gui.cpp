@@ -511,7 +511,7 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 		::ghg::SUIPlayShipPartViewport	& viewport		= *uiPlayer.ModuleViewports[iOrbiter];
 
 		const ::gpk::SSpaceshipOrbiter	& orbiter		= game.ShipState.SpaceshipManager.Orbiters[game.ShipState.SpaceshipManager.ShipParts[iPlayer][iOrbiter]];
-		const ::gpk::SWeapon			& weapon		= game.ShipState.SpaceshipManager.Weapons[orbiter.Weapon];
+		const ::gpk::SWeapon			& weapon		= game.ShipState.WeaponManager.Weapons[orbiter.Weapon];
 
 		gpk_necall(::gpk::controlTextSet(playerGUI, viewport.Viewport + 1, ::gpk::get_value_label(weapon.Shot.Type)), "%s", "");
 		gpk_necall(::gpk::controlTextSet(playerGUI, viewport.Viewport + 2, ::gpk::get_value_label(weapon.Type)), "%s", "");

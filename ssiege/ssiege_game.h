@@ -26,14 +26,16 @@ namespace ssg
 
 		::gpk::error_t			Save			(::gpk::au8 & output)	const	{ 
 			gpk_necs(Global.Save(output));
-			//gpk_necs(SolarSystem.Save(output));
+			gpk_necs(SolarSystem.Save(output));
+			gpk_necs(World.Save(output));
 			gpk_necs(Engine.Save(output));
 			return 0;
 		}
 
 		::gpk::error_t			Load				(::gpk::vcu8 & input)	{ 
 			gpk_necs(Global.Load(input));
-			//gpk_necs(SolarSystem.Load(input));
+			gpk_necs(SolarSystem.Load(input));
+			gpk_necs(World.Load(input));
 			gpk_necs(Engine.Load(input));
 			return 0;
 		}

@@ -362,8 +362,8 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 			solarSystem.PlayState.TimeRealStage	= 0;
 			solarSystem.ShipState.Clear();
 		}
-		solarSystem.ShipState.SpaceshipManager.Weapons.clear();
-		solarSystem.ShipState.SpaceshipManager.Shots.clear();
+		solarSystem.ShipState.WeaponManager.Weapons.clear();
+		solarSystem.ShipState.WeaponManager.Shots.clear();
 	
 
 		if(0 == solarSystem.ShipState.SpaceshipManager.ShipCores.size()) { // Create player ship
@@ -439,9 +439,9 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 				newWeapon.Shot.ParticleCount		= partCreationData.ParticleCount;
 				newWeapon.Shot.Lifetime				= (float)partCreationData.ShotLifetime	;//= 0;
 
-				shipPart.Weapon				= solarSystem.ShipState.SpaceshipManager.Weapons.push_back(newWeapon);
-				solarSystem.ShipState.SpaceshipManager.Shots.push_back({});
-				solarSystem.ShipState.SpaceshipManager.WeaponDistanceToTargets.push_back({});
+				shipPart.Weapon				= solarSystem.ShipState.WeaponManager.Weapons.push_back(newWeapon);
+				solarSystem.ShipState.WeaponManager.Shots.push_back({});
+				solarSystem.ShipState.WeaponManager.WeaponTargets.push_back({});
 
 					 if(shipPart.Type == ::gpk::SHIP_PART_TYPE_Gun			) { solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Geometry = ::gpk::SHIP_GEOMETRY_Gun;			}
 				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_Wafer		) { solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Geometry = ::gpk::SHIP_GEOMETRY_Wafer;		}
