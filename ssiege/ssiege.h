@@ -31,10 +31,10 @@ namespace ssiege
 
 		::gpk::error_t			GetSaveGameExtension		(SAVE_MODE saveMode, ::gpk::vcc & extension)	const	{
 			switch(saveMode) {
-			case SAVE_MODE_USER		: extension = ExtensionSaveUser		; break;
-			case SAVE_MODE_STAGE	: extension = ExtensionSaveStage	; break;
-			case SAVE_MODE_QUICK	: extension = ExtensionSaveQuick	; break;
-			case SAVE_MODE_AUTO		: extension = ExtensionSaveAuto		; break;
+			case SAVE_MODE_USER		: extension = ExtensionSaveUser	; break;
+			case SAVE_MODE_STAGE	: extension = ExtensionSaveStage; break;
+			case SAVE_MODE_QUICK	: extension = ExtensionSaveQuick; break;
+			case SAVE_MODE_AUTO		: extension = ExtensionSaveAuto	; break;
 			}
 			return 0;
 		}

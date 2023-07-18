@@ -56,8 +56,8 @@ namespace ghg
 		::gpk::SRelativeSpeed	BackgroundSpeed;
 		::gpk::SRelativeTime	SimulatedTime;
 
-		stacxpr	double			Slowing					= -.35;
-		stacxpr	double			Fasting					= .45;
+		stacxpr	float			Slowing					= -.35f;
+		stacxpr	float			Fasting					= .45f;
 	};
 	 
 	struct SShipController {
