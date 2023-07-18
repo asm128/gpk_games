@@ -3,27 +3,26 @@
 #include "gpk_timer.h"
 
 static	::gpk::error_t	shipCoreCreate			(::ssg::SSiegeGame & world) { 
-	{
+	{	// Core
+		::gpk::SParamsSphere		sphere					= {};
+		sphere.Radius			*= .0005f;
+		world.ShipCore			= world.Engine.CreateSphere(sphere);
+	}
+	{	// Ring
 		::gpk::SParamsRing			ring					= {};
 		ring.Height				= .0005f;
 		ring.RadiusYMin.Max		*= .005f;
 		ring.RadiusYMin.Min		*= .005f;
 		ring.RadiusYMax.Max		*= .005f;
 		ring.RadiusYMax.Min		*= .005f;
-
-		world.ShipEntity		= world.Engine.CreateRing(ring);
-		world.Engine.SetPosition	(world.ShipEntity, (world.Camera.Position * .95) + ::gpk::n3f32{-.005f});
-		world.Engine.SetOrientation	(world.ShipEntity, ::gpk::quatf32{}.MakeFromEuler(0, 0, ::gpk::math_pi_2).Normalize());
-		world.Engine.SetRotation	(world.ShipEntity, ::gpk::n3f32{float(::gpk::math_pi * .25),});
+		world.ShipRing			= world.Engine.CreateRing(ring);
+		world.Engine.SetRotation(world.ShipRing, ::gpk::n3f32{0, float(::gpk::math_pi * .25),});
 	}
-	{
-		::gpk::SParamsSphere		sphere					= {};
-		sphere.Radius			*= .0005f;
 
-		world.Engine.Entities.SetParent(world.Engine.CreateSphere(sphere), world.ShipEntity);
-	}
-	world.Engine.Integrator.Flags[world.Engine.Entities[world.ShipEntity].RigidBody].UpdatedTransform	= false;
-	world.Engine.Integrator.Flags[world.Engine.Entities[(*world.Engine.Entities.Children[world.ShipEntity])[0]].RigidBody].UpdatedTransform	= false;
+	world.Engine.SetPosition	(world.ShipCore, (world.Camera.Position * .95) + ::gpk::n3f32{-.005f});
+	world.Engine.SetOrientation	(world.ShipCore, ::gpk::quatf32{}.MakeFromEuler(0, 0, ::gpk::math_pi_2));
+
+	world.Engine.Entities.SetParent(world.ShipRing, world.ShipCore);
 
 	return 0; 
 }

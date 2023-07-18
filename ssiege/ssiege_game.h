@@ -15,21 +15,30 @@ namespace ssg
 	//GDEFINE_ENUM_VALUE(SCENE_TYPE, OuterSpace	, 0);
 	//GDEFINE_ENUM_VALUE(SCENE_TYPE, Planetary	, 1);
 	//GDEFINE_ENUM_VALUE(SCENE_TYPE, Submarine	, 2);
+	//struct SGameObject {
+	//	int16_t						Definition		=  0;
+	//	int16_t						Modifier		=  0;
+	//	int16_t						Level			=  1;
+	//	int16_t						Owner			= -1;
+	//};
 
 	struct SSiegeGame {
-		::gpk::SGame					Global			= {};
+		::gpk::SGame				Global			= {};
 		::gpk::SEnginePlanetarySystem	SolarSystem		= {};
-		::ssiege::SWorldView			World			= {};
-		::gpk::SCamera					Camera			= {};
+		::ssiege::SWorldView		World			= {};
+		::gpk::SCamera				Camera			= {};
 
-		::gpk::eid_t					Controlled		= ::gpk::EID_INVALID;
-		::gpk::aobj<::gpk::SPlayer>		Players;
+		::gpk::eid_t				Controlled		= ::gpk::EID_INVALID;
+		::gpk::aobj<::gpk::SPlayer>	Players;
 
-		::gpk::eid_t					ShipEntity		= ::gpk::EID_INVALID;
+		::gpk::eid_t				ShipCore		= ::gpk::EID_INVALID;
+		::gpk::eid_t				ShipRing		= ::gpk::EID_INVALID;
+		::gpk::aeid					ShipEngines		= {};
+		::gpk::aeid					ShipWeapons		= {};
 
-		::gpk::SEngine					Engine			= {};
+		::gpk::SEngine				Engine			= {};
 
-		::gpk::error_t			Save			(::gpk::au8 & output)	const	{ 
+		::gpk::error_t				Save			(::gpk::au8 & output)	const	{ 
 			gpk_necs(Global.Save(output));
 			gpk_necs(SolarSystem.Save(output));
 			gpk_necs(World.Save(output));
@@ -37,7 +46,7 @@ namespace ssg
 			return 0;
 		}
 
-		::gpk::error_t			Load				(::gpk::vcu8 & input)	{ 
+		::gpk::error_t				Load				(::gpk::vcu8 & input)	{ 
 			gpk_necs(Global.Load(input));
 			gpk_necs(SolarSystem.Load(input));
 			gpk_necs(World.Load(input));
