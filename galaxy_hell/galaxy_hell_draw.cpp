@@ -471,7 +471,7 @@ static	::gpk::error_t	drawShip
 	const ::gpk::SSpaceshipCore				& shipCore			= solarSystem.ShipState.SpaceshipManager.ShipCores[iShip];
 
 	uint32_t							pixelsDrawn			= 0;
-	const ::gpk::bgra					playerColor			= ((uint32_t)iShip < solarSystem.PlayState.CountPlayers) ? ::gpk::bgra(solarSystem.Pilots[iShip].Color) : ::gpk::bgra(::gpk::RED);
+	const ::gpk::bgra					playerColor			= ((uint32_t)iShip < solarSystem.PlayState.Constants.Players) ? ::gpk::bgra(solarSystem.Pilots[iShip].Color) : ::gpk::bgra(::gpk::RED);
 	const ::gpk::vcu16					shipParts			= solarSystem.ShipState.SpaceshipManager.ShipParts[iShip];
 	for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
 		const ::gpk::SSpaceshipOrbiter				& shipPart			= solarSystem.ShipState.SpaceshipManager.Orbiters[shipParts[iPart]];
@@ -480,7 +480,7 @@ static	::gpk::error_t	drawShip
 		pixelsDrawn += ::ghg::drawOrbiter(solarSystem.ShipState, solarSystem.ShipState.ShipPartEntity[shipParts[iPart]], playerColor, (float)solarSystem.DecoState.AnimationTime, matrixVP, targetPixels, depthBuffer, drawCache);
 	}
 
-	if(iShip >= (int32_t)solarSystem.PlayState.CountPlayers || shipCore.Team)
+	if(iShip >= (int32_t)solarSystem.PlayState.Constants.Players || shipCore.Team)
 		return 0;
 
 	const ::ghg::SGHEntity				& entity			= solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCoreEntity[iShip]];

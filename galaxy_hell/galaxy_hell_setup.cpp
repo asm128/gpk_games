@@ -300,12 +300,12 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		solarSystem.DecoState.Stars.Reset(solarSystem.DrawCache.RenderTargetMetrics);
 		solarSystem.PlayState.TimeStart = solarSystem.PlayState.TimeLast = ::gpk::timeCurrent();
 		memset(solarSystem.ShipState.SpaceshipManager.ShipScores.begin(), 0, solarSystem.ShipState.SpaceshipManager.ShipScores.byte_count());
-		while(solarSystem.Pilots.size() < solarSystem.PlayState.CountPlayers) {
+		while(solarSystem.Pilots.size() < solarSystem.PlayState.Constants.Players) {
 			char						text [64]				= {};
 			sprintf_s(text, "Player %i", solarSystem.Pilots.size() + 1);
 			solarSystem.Pilots.push_back({::gpk::label(text), PLAYER_COLORS[solarSystem.Pilots.size() % ::gpk::size(PLAYER_COLORS)]});
 		}
-		solarSystem.ShipControllers.resize(solarSystem.PlayState.CountPlayers);
+		solarSystem.ShipControllers.resize(solarSystem.PlayState.Constants.Players);
 	}
 
 #pragma pack(push, 1)
@@ -356,7 +356,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		if(solarSystem.PlayState.Stage == 0) {
 			solarSystem.ShipState.ShipCoreEntity.clear();
 			solarSystem.ShipState.ShipPartEntity.clear();
-			solarSystem.PlayState.TimeWorld		= 0;
+			solarSystem.PlayState.SimulatedTime	= {};
 			solarSystem.PlayState.TimeReal		= 0;
 			solarSystem.PlayState.TimeStage		= 0;
 			solarSystem.PlayState.TimeRealStage	= 0;
@@ -370,16 +370,16 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 			solarSystem.PlayState.CameraSwitchDelay	= 0;
 			solarSystem.ShipState.Scene.Global.CameraReset();
 
-			for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.CountPlayers; ++iPlayer) {
+			for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.Constants.Players; ++iPlayer) {
 				const int32_t				indexShip			= ::shipCreate(solarSystem.ShipState, 0, 0, iPlayer);
 				::gpk::SBodyCenter			& shipPivot			= solarSystem.ShipState.GetShipPivot(indexShip);
 				shipPivot.Orientation.MakeFromEuler({0, 0, (float)(-::gpk::math_pi_2)});
 				shipPivot.Position		= {-30};
-				shipPivot.Position.z = float(solarSystem.PlayState.CountPlayers * 30) / 2 - iPlayer * 30;
+				shipPivot.Position.z = float(solarSystem.PlayState.Constants.Players * 30) / 2 - iPlayer * 30;
 			}
 		}
 		// Set up enemy ships
-		while(((int)solarSystem.ShipState.SpaceshipManager.ShipCores.size() - (int)solarSystem.PlayState.CountPlayers - 1) < (int)(solarSystem.PlayState.Stage + solarSystem.PlayState.PlaySetup.OffsetStage)) {	// Create enemy ships depending on stage.
+		while(((int)solarSystem.ShipState.SpaceshipManager.ShipCores.size() - (int)solarSystem.PlayState.Constants.Players - 1) < (int)(solarSystem.PlayState.Stage + solarSystem.PlayState.PlaySetup.OffsetStage)) {	// Create enemy ships depending on stage.
 			int32_t						indexShip				= ::shipCreate(solarSystem.ShipState, 1, -1, solarSystem.PlayState.Stage + solarSystem.ShipState.SpaceshipManager.ShipCores.size());
 			::gpk::SBodyCenter			& shipPivot				= solarSystem.ShipState.GetShipPivot(indexShip);
 			shipPivot.Orientation.MakeFromEuler({0, 0, (float)(::gpk::math_pi_2)});
@@ -413,7 +413,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 
 				}
 				else {
-					if(iShip < 4 || 0 != ((iShip - 1 - solarSystem.PlayState.CountPlayers - solarSystem.PlayState.PlaySetup.OffsetStage) % 3) || 0 != iPart) 
+					if(iShip < 4 || 0 != ((iShip - 1 - solarSystem.PlayState.Constants.Players - solarSystem.PlayState.PlaySetup.OffsetStage) % 3) || 0 != iPart) 
 						weapon				= 4;
 					else {
 						weapon				= (iShip - 5) / 3;
@@ -460,7 +460,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 	}
 
 	++solarSystem.PlayState.Stage;
-	solarSystem.PlayState.Slowing	= true;
+	solarSystem.PlayState.SimulatedTime.Step	= solarSystem.PlayState.Slowing;
 
 #if defined(GPK_WINDOWS)
 	//PlaySoundA((LPCSTR)SND_ALIAS_SYSTEMSTART, GetModuleHandle(0), SND_ALIAS_ID | SND_ASYNC);
