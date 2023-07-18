@@ -44,18 +44,13 @@ namespace ghg
 	GDEFINE_ENUM_VALUE(PLAY_MODE, VR			, 1);
 
 	struct SPlayState {
-		uint64_t				TimeStart				= 0;
-		uint64_t				TimeLast				= 0;
 		::gpk::SGameSetup		PlaySetup				= {2};
 		PLAY_MODE				PlayMode				= (PLAY_MODE)PLAY_MODE_VR;
 
-		uint32_t				Stage					= 0;
 		double					TimeStage				= 0;
 		double					TimeRealStage			= 0;
-		double					TimeReal				= 0;
-		bool					Paused					= false;
 
-		double					CameraSwitchDelay		= 0;
+		::gpk::SGameState		GlobalState;
 
 		::gpk::SStageSetup		Constants				= {1, 1};
 		::gpk::SRelativeSpeed	BackgroundSpeed;
@@ -71,8 +66,6 @@ namespace ghg
 		uint8_t				Left					: 1;
 		uint8_t				Right					: 1;
 		uint8_t				Turbo					: 1;
-		::gpk::n3i16		PointerDeltas			= {};
-		::gpk::n3i16		PointerPosition			= {};
 	};
 #pragma pack(pop)
 

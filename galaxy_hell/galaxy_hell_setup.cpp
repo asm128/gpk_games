@@ -27,8 +27,8 @@
 		return -1;
 	}
 
-	world.PlayState.TimeLast	= ::gpk::timeCurrent();
-	world.PlayState.Paused		= true;
+	world.PlayState.GlobalState.UserTime.Loaded	= ::gpk::timeCurrent();
+	world.PlayState.GlobalState.Paused		= true;
 	return 0;
 }
 
@@ -295,10 +295,11 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 
 	solarSystem.PlayState.TimeStage		= 0;
 	solarSystem.PlayState.TimeRealStage	= 0;
-	if(0 == solarSystem.PlayState.Stage) {
+	if(0 == solarSystem.PlayState.GlobalState.Stage) {
 		::std::lock_guard			lock(solarSystem.LockUpdate);
 		solarSystem.DecoState.Stars.Reset(solarSystem.DrawCache.RenderTargetMetrics);
-		solarSystem.PlayState.TimeStart = solarSystem.PlayState.TimeLast = ::gpk::timeCurrent();
+		solarSystem.PlayState.GlobalState.UserTime	= {};
+		solarSystem.PlayState.GlobalState.UserTime.Started = solarSystem.PlayState.GlobalState.UserTime.Loaded = ::gpk::timeCurrent();
 		memset(solarSystem.ShipState.SpaceshipManager.ShipScores.begin(), 0, solarSystem.ShipState.SpaceshipManager.ShipScores.byte_count());
 		while(solarSystem.Pilots.size() < solarSystem.PlayState.Constants.Players) {
 			char						text [64]				= {};
@@ -345,7 +346,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		, {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .12, 0.50, ::gpk::WEAPON_LOAD_Missile		,  160,   112, 1,   1,0.25,  5, ::gpk::DAMAGE_TYPE_Burn | ::gpk::DAMAGE_TYPE_Wave }
 		};
 
-	sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.Stage + solarSystem.PlayState.PlaySetup.OffsetStage);
+	sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.GlobalState.Stage + solarSystem.PlayState.PlaySetup.OffsetStage);
 	if(0 <= ::gpk::fileToMemory(stageFileName, stageFile.Bytes) && stageFile.Bytes.size()) {
 		::std::lock_guard			lock	(solarSystem.LockUpdate);
 		gpk_necall(-1 == ::gpk::jsonParse(stageFile.Reader, stageFile.Bytes), "%s", stageFileName);
@@ -353,13 +354,12 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 	else {
 		::std::lock_guard			lock	(solarSystem.LockUpdate);
 		// Set up player ships
-		if(solarSystem.PlayState.Stage == 0) {
+		if(solarSystem.PlayState.GlobalState.Stage == 0) {
 			solarSystem.ShipState.ShipCoreEntity.clear();
 			solarSystem.ShipState.ShipPartEntity.clear();
-			solarSystem.PlayState.SimulatedTime	= {};
-			solarSystem.PlayState.TimeReal		= 0;
-			solarSystem.PlayState.TimeStage		= 0;
-			solarSystem.PlayState.TimeRealStage	= 0;
+			solarSystem.PlayState.SimulatedTime			= {};
+			solarSystem.PlayState.TimeStage				= 0;
+			solarSystem.PlayState.TimeRealStage			= 0;
 			solarSystem.ShipState.Clear();
 		}
 		solarSystem.ShipState.WeaponManager.Weapons.clear();
@@ -367,7 +367,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 	
 
 		if(0 == solarSystem.ShipState.SpaceshipManager.ShipCores.size()) { // Create player ship
-			solarSystem.PlayState.CameraSwitchDelay	= 0;
+			solarSystem.PlayState.GlobalState.CameraSwitchDelay	= 0;
 			solarSystem.ShipState.Scene.Global.CameraReset();
 
 			for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.Constants.Players; ++iPlayer) {
@@ -379,8 +379,8 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 			}
 		}
 		// Set up enemy ships
-		while(((int)solarSystem.ShipState.SpaceshipManager.ShipCores.size() - (int)solarSystem.PlayState.Constants.Players - 1) < (int)(solarSystem.PlayState.Stage + solarSystem.PlayState.PlaySetup.OffsetStage)) {	// Create enemy ships depending on stage.
-			int32_t						indexShip				= ::shipCreate(solarSystem.ShipState, 1, -1, solarSystem.PlayState.Stage + solarSystem.ShipState.SpaceshipManager.ShipCores.size());
+		while(((int)solarSystem.ShipState.SpaceshipManager.ShipCores.size() - (int)solarSystem.PlayState.Constants.Players - 1) < (int)(solarSystem.PlayState.GlobalState.Stage + solarSystem.PlayState.PlaySetup.OffsetStage)) {	// Create enemy ships depending on stage.
+			int32_t						indexShip				= ::shipCreate(solarSystem.ShipState, 1, -1, solarSystem.PlayState.GlobalState.Stage + solarSystem.ShipState.SpaceshipManager.ShipCores.size());
 			::gpk::SBodyCenter			& shipPivot				= solarSystem.ShipState.GetShipPivot(indexShip);
 			shipPivot.Orientation.MakeFromEuler({0, 0, (float)(::gpk::math_pi_2)});
 			shipPivot.Position		= {5.0f + 5 * solarSystem.ShipState.SpaceshipManager.ShipCores.size()};
@@ -405,10 +405,10 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 				//ship.Team			= iShip ? 1 : 0;
 				int32_t					weapon							= 0;
 				if(0 == ship.Team) {
-					uint32_t				minWeapon						= solarSystem.PlayState.Stage / 4;
-					uint32_t				maxWeapon						= ::gpk::min(solarSystem.PlayState.Stage, ::gpk::size(weaponDefinitions) - 1);
+					uint32_t				minWeapon						= solarSystem.PlayState.GlobalState.Stage / 4;
+					uint32_t				maxWeapon						= ::gpk::min(solarSystem.PlayState.GlobalState.Stage, ::gpk::size(weaponDefinitions) - 1);
 
-					weapon				= (int32_t)::gpk::clamp((uint32_t)minWeapon + iPart, minWeapon, maxWeapon);
+					weapon				= (int32_t)::gpk::clamp(minWeapon + iPart, minWeapon, maxWeapon);
 					solarSystem.ShipState.SpaceshipManager.ShipOrbiterActionQueue[shipParts[0]]->push_back(::gpk::SHIP_ACTION_Spawn);
 
 				}
@@ -459,7 +459,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		}
 	}
 
-	++solarSystem.PlayState.Stage;
+	++solarSystem.PlayState.GlobalState.Stage;
 	solarSystem.PlayState.SimulatedTime.Step	= solarSystem.PlayState.Slowing;
 
 #if defined(GPK_WINDOWS)

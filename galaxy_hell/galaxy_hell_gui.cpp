@@ -381,10 +381,10 @@ static	::gpk::error_t	guiHandleHome		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI &
 			else
 				app.Game.Pilots[iPlayer].Name = app.Players[iPlayer].Name;
 		}
-		game.PlayState.Paused	= false;
+		game.PlayState.GlobalState.Paused	= false;
 		return ::ghg::APP_STATE_Play;
 	case ::ghg::UI_HOME_Continue: 
-		game.PlayState.Paused	= false;
+		game.PlayState.GlobalState.Paused	= false;
 		return ::ghg::APP_STATE_Play;
 	case ::ghg::UI_HOME_Save:
 		es_if(0 > app.Save(::ghg::SAVE_MODE_USER));
@@ -401,7 +401,7 @@ static	::gpk::error_t	guiHandleHome		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI &
 	case ::ghg::UI_HOME_Credits: return ::ghg::APP_STATE_About; 
 	case ::ghg::UI_HOME_Shop: return ::ghg::APP_STATE_Shop; 
 	case ::ghg::UI_HOME_Exit: 
-		game.PlayState.Paused	= true;
+		game.PlayState.GlobalState.Paused	= true;
 		return ::ghg::APP_STATE_Quit;
 	}
 	return ::ghg::APP_STATE_Home; 
@@ -605,8 +605,8 @@ static	::gpk::error_t	guiUpdatePlay		(::ghg::SGalaxyHellApp & app) {
 	::gpk::SDialog				& dialog			= app.DialogPerState[::ghg::APP_STATE_Play];
 	::gpk::SGUI					& gui				= *dialog.GUI;
 
-	sprintf_s(app.UIPlay.TextLevel.Storage, "Level: %i", game.PlayState.Stage);
-	sprintfTime("Total Time: "	, app.UIPlay.TextTimeReal	.Storage, game.PlayState.TimeReal);
+	sprintf_s(app.UIPlay.TextLevel.Storage, "Level: %i", game.PlayState.GlobalState.Stage);
+	sprintfTime("Total Time: "	, app.UIPlay.TextTimeReal	.Storage, game.PlayState.GlobalState.UserTime.Played);
 	sprintfTime("Stage Time: "	, app.UIPlay.TextTimeStage	.Storage, game.PlayState.TimeRealStage);
 	::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAY_Level		, ::gpk::vcs{app.UIPlay.TextLevel		.Storage});
 	::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAY_TimeStage , ::gpk::vcs{app.UIPlay.TextTimeStage	.Storage});

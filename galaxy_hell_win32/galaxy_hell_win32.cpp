@@ -261,7 +261,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	app.AudioState.emitter.DopplerScaler	= 6.0f; //float(app.GalaxyHellApp.World.PlayState.TimeScale);
 	app.AudioState.FrequencyRatio			= (float)app.GalaxyHellApp.Game.PlayState.SimulatedTime.Scale;
 
-	if(app.GalaxyHellApp.ActiveState == ::ghg::APP_STATE_Play && false == app.GalaxyHellApp.Game.PlayState.Paused) {
+	if(app.GalaxyHellApp.ActiveState == ::ghg::APP_STATE_Play && false == app.GalaxyHellApp.Game.PlayState.GlobalState.Paused) {
 		app.AudioState.PauseAudio(true);
 		//app.GamePad.Resume();
 	}

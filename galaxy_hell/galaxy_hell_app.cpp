@@ -74,7 +74,7 @@ static	::gpk::error_t	processKeyboardEvent	(::ghg::SGalaxyHellApp & app, const :
 					}
 				}
 				if(!editing) {
-					app.Game.PlayState.Paused	= false;
+					app.Game.PlayState.GlobalState.Paused	= false;
 					app.ActiveState				= ::ghg::APP_STATE_Play;
 				}
 			}
@@ -169,17 +169,6 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 		controllerPlayer[0].Left					= input.KeyboardCurrent.KeyState[VK_LEFT	] || input.KeyboardCurrent.KeyState['A'];
 		controllerPlayer[0].Right					= input.KeyboardCurrent.KeyState[VK_RIGHT	] || input.KeyboardCurrent.KeyState['D'];
 		controllerPlayer[0].Turbo					= input.KeyboardCurrent.KeyState[VK_RCONTROL] || input.KeyboardCurrent.KeyState[VK_CONTROL] || input.KeyboardCurrent.KeyState[VK_LSHIFT] || input.KeyboardCurrent.KeyState[VK_SHIFT];
-		if(input.MouseCurrent.Deltas.x || input.MouseCurrent.Deltas.y || input.MouseCurrent.Deltas.z)
-			controllerPlayer[0].PointerDeltas			= input.MouseCurrent.Deltas.i16();
-		else 
-			controllerPlayer[0].PointerDeltas			= {};
-		//or(uint32_t i = 0; i < input.JoystickCurrent.size(); ++i) {
-		//	controllerPlayer[0].Forward					= controllerPlayer[0].Forward	; //|| (input.JoystickCurrent[i].Deltas.y < 0);
-		//	controllerPlayer[0].Back					= controllerPlayer[0].Back		; //|| (input.JoystickCurrent[i].Deltas.y > 0);
-		//	controllerPlayer[0].Left					= controllerPlayer[0].Left		; //|| (input.JoystickCurrent[i].Deltas.x < 0);
-		//	controllerPlayer[0].Right					= controllerPlayer[0].Right		; //|| (input.JoystickCurrent[i].Deltas.x > 0);
-		//	controllerPlayer[0].Turbo					= controllerPlayer[0].Turbo		; //|| input.JoystickCurrent[i].ButtonState;
-		//
 	}
 	else if(controllerPlayer.size() > 1) {
 		controllerPlayer[0].Forward					= input.KeyboardCurrent.KeyState['W'];
@@ -193,14 +182,6 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 		controllerPlayer[1].Left					= input.KeyboardCurrent.KeyState[VK_LEFT	];
 		controllerPlayer[1].Right					= input.KeyboardCurrent.KeyState[VK_RIGHT	];
 		controllerPlayer[1].Turbo					= input.KeyboardCurrent.KeyState[VK_RCONTROL] || input.KeyboardCurrent.KeyState[VK_CONTROL];
-
-		//for(uint32_t i = 0; i < input.JoystickCurrent.size() && i < controllerPlayer.size(); ++i) {
-		//	controllerPlayer[i].Forward					= controllerPlayer[i].Forward	|| (input.JoystickCurrent[i].Deltas.y < 0);
-		//	controllerPlayer[i].Back					= controllerPlayer[i].Back		|| (input.JoystickCurrent[i].Deltas.y > 0);
-		//	controllerPlayer[i].Left					= controllerPlayer[i].Left		|| (input.JoystickCurrent[i].Deltas.x < 0);
-		//	controllerPlayer[i].Right					= controllerPlayer[i].Right		|| (input.JoystickCurrent[i].Deltas.x > 0);
-		//	controllerPlayer[i].Turbo					= controllerPlayer[i].Turbo		|| input.JoystickCurrent[i].ButtonState;
-		//}
 	}
 
 	::ghg::solarSystemUpdate(app.Game, (false == inGame) ? 0 : lastTimeSeconds, *inputState, systemEventsNew);
