@@ -32,7 +32,7 @@ static	::gpk::error_t	splitLines		(const ::gpk::achar & pageBytes, ::gpk::aobj<g
 	return 0;
 }
 
-template <typename _tCell>
+tplt <tpnm _tCell>
 static	::gpk::error_t	reverse			(_tCell* elements, uint32_t elementCount)	 {
 	for(uint32_t i = 0, swapCount = elementCount / 2; i < swapCount; ++i) {
 		_tCell						old				= elements[i];

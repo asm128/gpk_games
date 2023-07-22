@@ -171,7 +171,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssiege::EventSSieg
 	return 0;
 }
 
-template<typename _tEnum>
+tplt<tpnm _tEnum>
 static	::gpk::error_t	parseCommand		(::gpk::apobj<::ssiege::EventSSiege> & queue, ::gpk::vcc commandName, ::gpk::vcc commandArgs) { 
 	const _tEnum				command				= ::gpk::get_value<_tEnum>(commandName);
 	if(::gpk::get_value_count<_tEnum>() <= command)

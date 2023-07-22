@@ -487,8 +487,8 @@ static	::gpk::error_t	drawShip
 	const ::gpk::m4f32					& matrixTransform	= solarSystem.ShipState.Scene.Transforms[entity.Transform];
 	::gpk::n3f32						starPos				= matrixTransform.GetTranslation() + ::gpk::n3f32{0.0f, 8.0f, 0.0f};
 	starPos							= matrixVP.Transform(starPos);
-	starPos.x = ::gpk::clamp(starPos.x, 20.0f, targetPixels.metrics().x - 20.0f);
-	starPos.y = ::gpk::clamp(starPos.y, 20.0f, targetPixels.metrics().y - 20.0f);
+	starPos.x = ::gpk::clamped(starPos.x, 20.0f, targetPixels.metrics().x - 20.0f);
+	starPos.y = ::gpk::clamped(starPos.y, 20.0f, targetPixels.metrics().y - 20.0f);
 	const ::gpk::n2<int32_t>			pixelCoord			= {(int32_t)starPos.x, (int32_t)starPos.y};
 
 	const ::gpk::vcs					finalText			= solarSystem.Pilots[iShip].Name;

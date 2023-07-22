@@ -218,8 +218,9 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		gpk_necs(engine.SetCollides(iEntity, false));
 	}
 
-	gpk_necs(engine.SetMeshScale(pool.Entities.Table, {board.Table.Slate.x, board.Table.Slate.y * .25f, board.Table.Slate.y}, true));
+	gpk_necs(engine.SetMeshScale(pool.Entities.Table, {board.Table.Slate.x, 1, board.Table.Slate.y}, true));
 	gpk_necs(engine.SetPosition (pool.Entities.Table, {}));
+	gpk_necs(engine.InvalidateTransform(pool.Entities.Table));
 	//constexpr double		piPerPocket					= (::gpk::math_pi / 3);
 	for(uint32_t iPocket = 0; iPocket < pool.Entities.Pockets.size(); ++iPocket) {
 		const uint32_t			iEntity						= pool.Entities.Pockets[iPocket];
@@ -272,10 +273,10 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 
 	{	// table 
 		::gpk::SParamsGrid			argsGrid					= {};
-		argsGrid.CellCount		= {1, 1};
+		//argsGrid.CellCount		= {4, 4};
 		gpk_necs(pool.Entities.Table = (uint16_t)engine.CreateGrid(argsGrid));
 		gpk_necs(engine.SetShader(pool.Entities.Table, ::d1p::psTableCloth, "psTableCloth"));
-		gpk_necs(engine.SetColorDiffuse(pool.Entities.Table, ::gpk::RED * .5f));
+		gpk_necs(engine.SetColorDiffuse(pool.Entities.Table, ::gpk::DARKRED));
 		//for(uint32_t iFace = 0; iFace < 6; ++iFace)
 		//	gpk_necs(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[iFace], ::d1p::psTableCloth, "psHidden"));
 	}

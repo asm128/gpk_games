@@ -10,3 +10,5 @@ dryer/
 enc_temp_folder/
 bak/
 packages/
+/test_engine
+/test_engine.win32

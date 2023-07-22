@@ -122,10 +122,10 @@ namespace d1p
 		inline	::gpk::error_t				GetStickOrientation			(uint8_t iStick , ::gpk::quatf32 & out_orientation)	const	{ return Engine.GetOrientation(Entities.Sticks[iStick], out_orientation); }
 		inline	::gpk::error_t				GetStickOrientation			(::gpk::quatf32 & out_orientation)					const	{ return Engine.GetOrientation(Entities.Sticks[ActivePlayer()], out_orientation); }
 		inline	::gpk::error_t				SetBallPosition				(uint8_t iBall, const ::gpk::n3f32 & in_position)			{ return Engine.SetPosition(Entities.Balls[iBall], in_position); }
-		inline	::gpk::error_t				SetStickVelocity			(float velocity)											{ return ::gpk::error_t((ActiveStick().Velocity = ::gpk::clamp(velocity, 0.0f, ::d1p::MAX_SHOOT_VELOCITY)) * 1000); }
+		inline	::gpk::error_t				SetStickVelocity			(float velocity)											{ return ::gpk::error_t((ActiveStick().Velocity = ::gpk::clamped(velocity, 0.0f, ::d1p::MAX_SHOOT_VELOCITY)) * 1000); }
 		inline	::gpk::error_t				AddStickVelocity			(float velocity)											{ 
 			::d1p::SStickControl					& activeStick				= ActiveStick(); 
-			return ::gpk::error_t((activeStick.Velocity = ::gpk::clamp(activeStick.Velocity + velocity, 0.0f, ::d1p::MAX_SHOOT_VELOCITY)) * 1000);
+			return ::gpk::error_t((activeStick.Velocity = ::gpk::clamped(activeStick.Velocity + velocity, 0.0f, ::d1p::MAX_SHOOT_VELOCITY)) * 1000);
 		}
 		::gpk::error_t						ResetCueBall				()			{ 
 			::d1p::SPoolBoard						& board						= MatchState.Board;

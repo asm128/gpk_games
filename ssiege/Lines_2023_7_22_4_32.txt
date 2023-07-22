@@ -1,0 +1,262 @@
+File name: ssiege.cpp
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:44 2023
+File modification date: Mon Jul 17 00:32:59 2023
+File code lines: 176
+File directive lines: 6
+File comment lines: 15
+File blank lines: 81
+File bytes: 12413
+
+File name: ssiege.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:45 2023
+File modification date: Tue Jul 18 04:53:35 2023
+File code lines: 83
+File directive lines: 12
+File comment lines: 2
+File blank lines: 42
+File bytes: 4311
+
+File name: ssiege_client.cpp
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:47 2023
+File modification date: Wed Jul 12 02:14:28 2023
+File code lines: 102
+File directive lines: 2
+File comment lines: 0
+File blank lines: 24
+File bytes: 8229
+
+File name: ssiege_client.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:47 2023
+File modification date: Wed Jul 12 02:14:28 2023
+File code lines: 11
+File directive lines: 5
+File comment lines: 1
+File blank lines: 7
+File bytes: 1404
+
+File name: ssiege_event.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:47 2023
+File modification date: Thu Jul 20 08:03:15 2023
+File code lines: 17
+File directive lines: 9
+File comment lines: 1
+File blank lines: 6
+File bytes: 1212
+
+File name: ssiege_event_animal.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:47 2023
+File modification date: Wed Jul 12 01:29:33 2023
+File code lines: 31
+File directive lines: 6
+File comment lines: 1
+File blank lines: 4
+File bytes: 2512
+
+File name: ssiege_event_args.cpp
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:47 2023
+File modification date: Tue Jul  4 23:11:40 2023
+File code lines: 52
+File directive lines: 1
+File comment lines: 0
+File blank lines: 8
+File bytes: 1352
+
+File name: ssiege_event_args.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:47 2023
+File modification date: Tue Jul  4 23:11:40 2023
+File code lines: 13
+File directive lines: 7
+File comment lines: 1
+File blank lines: 9
+File bytes: 773
+
+File name: ssiege_event_game.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Wed Jul 12 04:28:18 2023
+File modification date: Wed Jul 12 04:29:14 2023
+File code lines: 8
+File directive lines: 6
+File comment lines: 1
+File blank lines: 4
+File bytes: 499
+
+File name: ssiege_event_user.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:47 2023
+File modification date: Wed Jul 12 02:14:28 2023
+File code lines: 6
+File directive lines: 6
+File comment lines: 1
+File blank lines: 4
+File bytes: 670
+
+File name: ssiege_event_vehicle.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:47 2023
+File modification date: Wed Jul 12 02:14:28 2023
+File code lines: 30
+File directive lines: 6
+File comment lines: 1
+File blank lines: 7
+File bytes: 2182
+
+File name: ssiege_event_world.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:47 2023
+File modification date: Wed Jul 12 04:26:26 2023
+File code lines: 64
+File directive lines: 6
+File comment lines: 6
+File blank lines: 10
+File bytes: 4559
+
+File name: ssiege_game.cpp
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:52 2023
+File modification date: Sat Jul 22 04:30:10 2023
+File code lines: 102
+File directive lines: 3
+File comment lines: 20
+File blank lines: 45
+File bytes: 7375
+
+File name: ssiege_game.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Wed Jul 12 04:28:09 2023
+File modification date: Sat Jul 22 04:19:02 2023
+File code lines: 33
+File directive lines: 8
+File comment lines: 10
+File blank lines: 19
+File bytes: 1934
+
+File name: ssiege_game_handle.cpp
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:54 2023
+File modification date: Sat Jul 15 03:28:07 2023
+File code lines: 85
+File directive lines: 2
+File comment lines: 0
+File blank lines: 15
+File bytes: 6080
+
+File name: ssiege_game_handle.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:54 2023
+File modification date: Sat Jul 15 02:55:26 2023
+File code lines: 7
+File directive lines: 4
+File comment lines: 1
+File blank lines: 4
+File bytes: 1088
+
+File name: ssiege_handle.cpp
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:48 2023
+File modification date: Wed Jul 12 02:14:28 2023
+File code lines: 83
+File directive lines: 2
+File comment lines: 0
+File blank lines: 18
+File bytes: 6106
+
+File name: ssiege_handle.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:48 2023
+File modification date: Wed Jul 12 02:14:28 2023
+File code lines: 7
+File directive lines: 4
+File comment lines: 1
+File blank lines: 4
+File bytes: 1096
+
+File name: ssiege_id.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:48 2023
+File modification date: Tue Jul  4 23:11:40 2023
+File code lines: 7
+File directive lines: 6
+File comment lines: 1
+File blank lines: 5
+File bytes: 458
+
+File name: ssiege_parse.cpp
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:50 2023
+File modification date: Thu Jul 20 08:03:15 2023
+File code lines: 161
+File directive lines: 4
+File comment lines: 0
+File blank lines: 36
+File bytes: 11304
+
+File name: ssiege_parse.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:50 2023
+File modification date: Tue Jul  4 23:11:40 2023
+File code lines: 2
+File directive lines: 4
+File comment lines: 1
+File blank lines: 4
+File bytes: 244
+
+File name: ssiege_server.cpp
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:52 2023
+File modification date: Wed Jul 12 02:14:28 2023
+File code lines: 100
+File directive lines: 2
+File comment lines: 0
+File blank lines: 24
+File bytes: 8089
+
+File name: ssiege_server.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:52 2023
+File modification date: Wed Jul 12 02:14:28 2023
+File code lines: 12
+File directive lines: 5
+File comment lines: 1
+File blank lines: 8
+File bytes: 1492
+
+File name: ssiege_world_view.h
+File folder: d:\bundle_galaxy_hell\gpk_games\ssiege\
+File creation date: Mon Jul  3 08:40:53 2023
+File modification date: Mon Jul 17 03:43:11 2023
+File code lines: 226
+File directive lines: 16
+File comment lines: 18
+File blank lines: 61
+File bytes: 10337
+
+
+----------------------------- Total Files: 24
+----------------------------- Total Lines: 2082
+
+Comments: 83
+Code: 1418
+Compiler directives: 132
+Blanks: 449
+Total bytes: 95719
+
+----------------------------- Stats: 
+
+Average lines per file: 86.75
+Average lines of comments per file: 3.4583333333333335
+Average lines of code per file: 59.083333333333336
+Average lines of compiler directives per file: 5.5
+Average blank lines per file: 18.708333333333332
+
+Comments: 3.9865513928914504%
+Code: 68.1075888568684%
+Compiler directives: 6.340057636887608%
+Blanks: 21.565802113352547%

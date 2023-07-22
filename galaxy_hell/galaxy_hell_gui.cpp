@@ -454,7 +454,7 @@ static	::gpk::error_t	guiHandleAbout		(::gpk::SGUI & /*gui*/, uint32_t idControl
 	return ::ghg::APP_STATE_About; 
 }
 
-template<size_t _nStorageSize>
+tplt<size_t _nStorageSize>
 static	::gpk::error_t	sprintfTime			(const char *prefix, char (&dest)[_nStorageSize], double seconds) {
 	uint32_t					timeHours			= (int)seconds / 3600;
 	uint32_t					timeMinutes			= (int)seconds / 60 % 60;
@@ -464,7 +464,7 @@ static	::gpk::error_t	sprintfTime			(const char *prefix, char (&dest)[_nStorageS
 	return 0;
 }
 
-template<size_t _bufSize>
+tplt<size_t _bufSize>
 static	::gpk::error_t	sprintfScore		(char (&buffer)[_bufSize], const ::gpk::SSpaceshipScore & shipScore, const double nitro) { 
 	return sprintf_s(buffer, "%c %llu  %c %llu  %c %llu  %c %llu  %c %.2f", 4, shipScore.Score, 94, shipScore.Shots, 1, (uint64_t)shipScore.KilledShips, 2, (uint64_t)shipScore.KilledOrbiters, 24, nitro);
 }
@@ -516,7 +516,7 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 		gpk_necall(::gpk::controlTextSet(playerGUI, viewport.Viewport + 1, ::gpk::get_value_label(weapon.Shot.Type)), "%s", "");
 		gpk_necall(::gpk::controlTextSet(playerGUI, viewport.Viewport + 2, ::gpk::get_value_label(weapon.Type)), "%s", "");
 
-		const float					healthRatio		= (float)::gpk::clamp(orbiter.Health.Weight(), 0.0, 1.0);
+		const float					healthRatio		= (float)::gpk::clamped(orbiter.Health.Weight(), 0.0, 1.0);
 		const float					ratioOverheat	= (orbiter.Health.Value > 0) ? (float)weapon.Trigger.Overheat.WeightClamp() : 0;
 		const float					ratioDelay		= (orbiter.Health.Value > 0) ? (float)weapon.Trigger.Delay  .WeightClamp() : 0;
 
@@ -756,9 +756,9 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpob
 ::gpk::error_t			ghg::gaugeBuildRadial			(::ghg::SUIRadialGauge & gauge, const ::gpk::circlef32 & gaugeMetrics, int16_t resolution, int16_t width) {
 	const double				stepUnit						= (1.0 / resolution) * ::gpk::math_2pi;
 	const ::gpk::spheref32		sphereMetrics					= {gaugeMetrics.Radius, {gaugeMetrics.Center.x, gaugeMetrics.Center.y, .5f}};
-	const double				finalRadius						= gaugeMetrics.Radius;	//::gpk::interpolate_linear(gaugeMetrics.Radius, gaugeMetrics.Radius * .5, ::gpk::clamp(abs(sinCos.Cos), 0.0, 1.0)); //
-	const double				outerRadius						= finalRadius;			//::gpk::interpolate_linear(gaugeMetrics.Radius, gaugeMetrics.Radius * .5, ::gpk::clamp(abs(sinCos.Cos), 0.0, 1.0)); //
-	const double				innerRadius						= outerRadius - width;	//::gpk::interpolate_linear(gaugeMetrics.Radius, gaugeMetrics.Radius * .5, ::gpk::clamp(abs(sinCos.Cos), 0.0, 1.0)); //
+	const double				finalRadius						= gaugeMetrics.Radius;	//::gpk::interpolate_linear(gaugeMetrics.Radius, gaugeMetrics.Radius * .5, ::gpk::clamped(abs(sinCos.Cos), 0.0, 1.0)); //
+	const double				outerRadius						= finalRadius;			//::gpk::interpolate_linear(gaugeMetrics.Radius, gaugeMetrics.Radius * .5, ::gpk::clamped(abs(sinCos.Cos), 0.0, 1.0)); //
+	const double				innerRadius						= outerRadius - width;	//::gpk::interpolate_linear(gaugeMetrics.Radius, gaugeMetrics.Radius * .5, ::gpk::clamped(abs(sinCos.Cos), 0.0, 1.0)); //
 	for(int16_t iStep = 0, stepCount = resolution; iStep < stepCount; ++iStep) {
 		::gpk::SSinCos				sinCos							= {sin(iStep * stepUnit), -cos(iStep * stepUnit)};
 		const ::gpk::n3f64			relativePosSmall				=

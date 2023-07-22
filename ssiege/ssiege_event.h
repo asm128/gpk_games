@@ -23,7 +23,7 @@ namespace ssiege
 	typedef	::gpk::SEvent		<SSIEGE_EVENT>	EventSSiege;
 	typedef	::gpk::SEventView	<SSIEGE_EVENT>	EViewSSiege;
 
-	template<typename _tChildEvent>
+	tplt<tpnm _tChildEvent>
 	stainli	::gpk::error_t	eventExtractAndHandle		(const EventSSiege & parentEvent, const ::std::function<::gpk::error_t(const ::gpk::SEventView<_tChildEvent>&)> & funcHandleChild) {
 		return ::gpk::eventExtractAndHandle<_tChildEvent, SSIEGE_EVENT>(parentEvent, funcHandleChild);
 	}

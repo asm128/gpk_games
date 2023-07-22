@@ -197,6 +197,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 			}
 		}
 	//::ghg::overlayUpdate(app.Overlay, app.World.PlayState.Stage, app.World.ShipState.ShipCores.size() ? app.World.ShipState.ShipCores[0].Score : 0, app.World.PlayState.TimeWorld);
+	// Galaxy3l
 	app.ActiveState					= (::ghg::APP_STATE)::ghg::guiUpdate(app, systemEventsNew);
 	return 0;
 }

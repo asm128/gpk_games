@@ -182,7 +182,7 @@ static	::gpk::error_t	cameraInputTransform	(::d1::SD1Game & clientGame, double a
 		}
 		if(zoomChange) {
 			cameraSelected.Zoom			+= zoomChange;
-			cameraSelected.Zoom			= ::gpk::clamp(cameraSelected.Zoom, 0.1f, 6.0f);
+			cameraSelected.Zoom			= ::gpk::clamped(cameraSelected.Zoom, 0.1f, 6.0f);
 		}
 	}
 	{ // Update camera position and target
