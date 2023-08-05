@@ -16,21 +16,21 @@ namespace ssg
 	typedef	::gpk::SEventView	<ADMIN_GAME>	EViewAdminGame;
 
 	// These events are sent for world contents manipulation
-	GDEFINE_ENUM_TYPE (ADMIN_WORLD, uint8_t);
-	GDEFINE_ENUM_VALUE(ADMIN_WORLD, Create		, 0);
-	GDEFINE_ENUM_VALUE(ADMIN_WORLD, Delete		, 1);
-	GDEFINE_ENUM_VALUE(ADMIN_WORLD, Rename		, 2);
-	GDEFINE_ENUM_VALUE(ADMIN_WORLD, Rotate		, 3);
-	GDEFINE_ENUM_VALUE(ADMIN_WORLD, Resize		, 4);
-	GDEFINE_ENUM_VALUE(ADMIN_WORLD, Reskin		, 5);
-	GDEFINE_ENUM_VALUE(ADMIN_WORLD, Deform		, 6);
-	GDEFINE_ENUM_VALUE(ADMIN_WORLD, Locate		, 7);
-	GDEFINE_ENUM_VALUE(ADMIN_WORLD, Relocate	, 8);
-	GDEFINE_ENUM_VALUE(ADMIN_WORLD, Generate	, 9);
-	GDEFINE_ENUM_VALUE(ADMIN_WORLD, Initialize	, 10); 
-	GDEFINE_ENUM_VALUE(ADMIN_WORLD, Reset		, 11); 
-	typedef	::gpk::SEvent		<ADMIN_WORLD>	EventAdminWorld;
-	typedef	::gpk::SEventView	<ADMIN_WORLD>	EViewAdminWorld;
+	GDEFINE_ENUM_TYPE (WORLD_ADMIN, uint8_t);
+	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Create		, 0);
+	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Delete		, 1);
+	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Rename		, 2);
+	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Rotate		, 3);
+	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Resize		, 4);
+	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Reskin		, 5);
+	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Deform		, 6);
+	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Locate		, 7);
+	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Relocate	, 8);
+	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Generate	, 9);
+	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Initialize	, 10); 
+	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Reset		, 11); 
+	typedef	::gpk::SEvent		<WORLD_ADMIN>	EventAdminWorld;
+	typedef	::gpk::SEventView	<WORLD_ADMIN>	EViewAdminWorld;
 
 	GDEFINE_ENUM_TYPE (ADMIN_CHARS, uint8_t);
 	GDEFINE_ENUM_VALUE(ADMIN_CHARS, Spawn	, 12); // Used with an SArgsEvent structure.

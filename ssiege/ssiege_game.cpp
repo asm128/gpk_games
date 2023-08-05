@@ -126,10 +126,11 @@ static	::gpk::error_t	createShipCrane		(::gpk::SEngine & engine) {
 	stacxpr	float				OFFSET_CORNER		= ::SHIP_CRANE_BOX_HALF + ::SHIP_CRANE_IRON_HALF;
 	for(uint32_t iArm = 0; iArm < 2; ++iArm) {
 		const bool					isLeft				= (1 + iArm) % 2;
+		if(isLeft)
+			continue;
+
 		::gpk::eid_t				iWheel;
-		if(isLeft)	// Create wheel
-			iWheel				= ::gpk::EID_INVALID;
-		else {
+		{	// Create wheel
 			gpk_necs(iWheel = ::createShipCraneWheel(engine, isLeft ? ::gpk::vcs{"Ship Crane Wheel Left?"} : ::gpk::vcs{"Ship Crane Wheel Right?"}));
 			::gpk::n3f32				barPosition			= {OFFSET_CORNER, -::SHIP_CRANE_BOX_HALF, OFFSET_CORNER * (iArm ? 1 : -1)};
 			engine.SetPosition(iWheel, barPosition);
@@ -198,12 +199,16 @@ static	::gpk::error_t	shipCreate			(::ssg::SSiegeGame & world) {
 
 			::gpk::error_t			result			= 0; 
 			switch(eventToProcess.Type) {
-			case ::ssg::SSG_EVENT_CHAR_ACTION: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::CHAR_ACTION>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleCHAR_ACTION(world, ev, worldOutputEvents); })); break; }
-			case ::ssg::SSG_EVENT_ADMIN_WORLD: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::ADMIN_WORLD>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleADMIN_WORLD(world, ev, worldOutputEvents); })); break; }
-			case ::ssg::SSG_EVENT_WORLD_EVENT: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::WORLD_EVENT>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleWORLD_EVENT(world, ev, worldOutputEvents); })); break; }
-			case ::ssg::SSG_EVENT_CLIENT_ASKS: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::CLIENT_ASKS>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleCLIENT_ASKS(world, ev, worldOutputEvents); })); break; }
-			case ::ssg::SSG_EVENT_WORLD_SETUP: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::WORLD_SETUP>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleWORLD_SETUP(world, ev, worldOutputEvents); })); break; }
-			case ::ssg::SSG_EVENT_WORLD_VALUE: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::WORLD_VALUE>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleWORLD_VALUE(world, ev, worldOutputEvents); })); break; }
+			CASE_SSG_EVENT(result, world, WORLD_EVENT, worldOutputEvents); 
+			CASE_SSG_EVENT(result, world, WORLD_ADMIN, worldOutputEvents); 
+			CASE_SSG_EVENT(result, world, ACT_SAILING, worldOutputEvents); 
+			CASE_SSG_EVENT(result, world, ACTION_CHAR, worldOutputEvents); 
+			CASE_SSG_EVENT(result, world, ACT_ENGINES, worldOutputEvents); 
+			CASE_SSG_EVENT(result, world, ACT_AIRSHIP, worldOutputEvents); 
+			CASE_SSG_EVENT(result, world, ACT_WHEELED, worldOutputEvents); 
+			CASE_SSG_EVENT(result, world, CLIENT_ASKS, worldOutputEvents); 
+			CASE_SSG_EVENT(result, world, WORLD_SETUP, worldOutputEvents); 
+			CASE_SSG_EVENT(result, world, WORLD_VALUE, worldOutputEvents); 
 			default: 
 				gpk_warning_unhandled_event(eventToProcess); 
 				break;

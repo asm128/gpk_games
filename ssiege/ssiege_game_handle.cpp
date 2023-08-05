@@ -1,48 +1,48 @@
 #include "ssiege_game_handle.h"
 #include "ssiege_event_args.h"
 
-::gpk::error_t	ssg::handleCHAR_ACTION		(::ssg::SSiegeGame & world, const ::ssg::EViewMinime & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+::gpk::error_t	ssg::handleACTION_CHAR		(::ssg::SSiegeGame & world, const ::ssg::EViewMe & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	const ::ssg::SArgsEvent	& eventArgs		= *(const ::ssg::SArgsEvent*)gameEvent.Data.begin();
 	::ssg::printArgsEvent(eventArgs);
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
-	case ::ssg::CHAR_ACTION_Walk	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Turn	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Rush	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Hide	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Dash	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Jump	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Duck	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Warp	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Pick	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Grab	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Wear	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Use	: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Spawn: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Shoot: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Throw: gpk_warning_not_implemented(gameEvent); break;
-	case ::ssg::CHAR_ACTION_Sleep: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Walk	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Turn	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Rush	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Hide	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Dash	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Jump	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Duck	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Warp	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Pick	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Grab	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Wear	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Use		: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Spawn	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Shoot	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Throw	: gpk_warning_not_implemented(gameEvent); break;
+	case ::ssg::ACTION_CHAR_Sleep	: gpk_warning_not_implemented(gameEvent); break;
 	}
 	return 0; 
 }
-::gpk::error_t	ssg::handleADMIN_WORLD		(::ssg::SSiegeGame & world, const ::ssg::EViewAdminWorld & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+::gpk::error_t	ssg::handleWORLD_ADMIN		(::ssg::SSiegeGame & world, const ::ssg::EViewAdminWorld & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	const ::ssg::SArgsEvent	& eventArgs			= *(const ::ssg::SArgsEvent*)gameEvent.Data.begin();
 	::ssg::printArgsEvent(eventArgs);
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
-	case ::ssg::ADMIN_WORLD_Create		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::ADMIN_WORLD_Rename		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::ADMIN_WORLD_Delete		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::ADMIN_WORLD_Locate		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::ADMIN_WORLD_Rotate		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::ADMIN_WORLD_Resize		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::ADMIN_WORLD_Reskin		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::ADMIN_WORLD_Relocate		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::ADMIN_WORLD_Generate		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::ADMIN_WORLD_Reset		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::ADMIN_WORLD_Initialize	: 
+	case ::ssg::WORLD_ADMIN_Create		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_ADMIN_Rename		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_ADMIN_Delete		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_ADMIN_Locate		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_ADMIN_Rotate		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_ADMIN_Resize		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_ADMIN_Reskin		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_ADMIN_Relocate	: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_ADMIN_Generate	: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_ADMIN_Reset		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_ADMIN_Initialize	: 
 		gpk_necs(::ssg::ssiegeGameSetup(world));
 		break; 
 	} 
@@ -54,13 +54,13 @@
 	::ssg::printArgsEvent(eventArgs);
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
-	case ::ssg::WORLD_EVENT_Rain			: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::WORLD_EVENT_Thunderstorm	: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_EVENT_Rain		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_EVENT_Thunderstorm: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssg::WORLD_EVENT_Earthquake	: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssg::WORLD_EVENT_Tornado		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::WORLD_EVENT_Wave			: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_EVENT_Wave		: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssg::WORLD_EVENT_Lightning	: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::WORLD_EVENT_Wildfire		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_EVENT_Wildfire	: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssg::WORLD_EVENT_Flood		: gpk_warning_not_implemented(gameEvent); break; 
 	} 
 	return 0; 
@@ -79,7 +79,7 @@
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
-	case ::ssg::WORLD_SETUP_Seed			: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_SETUP_Seed		: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssg::WORLD_SETUP_MaxPlayers	: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssg::WORLD_SETUP_BlockSize	: gpk_warning_not_implemented(gameEvent); break; 
 	}

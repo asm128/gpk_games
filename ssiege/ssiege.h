@@ -52,7 +52,7 @@ namespace ssg
 		}
 	};
 
-	struct SSSiegeUI {
+	struct SSiegeUI {
 		::gpk::cid_t			Root				= ::gpk::CID_INVALID;
 		::gpk::SInputBox		UserInput			= {};
 		::gpk::acid				RootPerState		= {};
@@ -60,7 +60,7 @@ namespace ssg
 		::gpk::apachar			InputQueue			= {};
 	};
 
-	::gpk::error_t			setupSSiegeUI			(::gpk::SGUI & gui, ::ssg::SSSiegeUI & ssiegeUI);
+	::gpk::error_t			setupSSiegeUI			(::gpk::SGUI & gui, ::ssg::SSiegeUI & ssiegeUI);
 
 
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
@@ -89,14 +89,14 @@ namespace ssg
 		uint32_t				Stage				= 0;
 	};
 
-	struct SSSiegeApp {
+	struct SSiegeApp {
 		APP_STATE				ActiveState			= {};
 
 		::ssg::SSiegeGame		Game;
 
 		//SWorldView				World				= {};
 
-		SSSiegeUI				UI					= {};
+		SSiegeUI				UI					= {};
 		gpk::apobj<EventSSiege>	EventQueue			= {};
 
 		SFileStrings			FileStrings			= {};
@@ -130,10 +130,10 @@ namespace ssg
 		}
 	};
 
-	::gpk::error_t			ssiegeUpdate		(::ssg::SSSiegeApp & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
+	::gpk::error_t			ssiegeUpdate		(::ssg::SSiegeApp & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
 		, ::gpk::FBool<::gpk::pobj<::ssg::EventSSiege> &, ::gpk::apobj<::ssg::EventSSiege> &> funcHandleEvent
 		);
-	::gpk::error_t			ssiegeDraw			(::ssg::SSSiegeApp & ssiege, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI);
+	::gpk::error_t			ssiegeDraw			(::ssg::SSiegeApp & ssiege, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI);
 } // namespace ssg
 
 #endif // SSIEGE_H_23701

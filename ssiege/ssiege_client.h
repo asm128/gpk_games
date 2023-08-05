@@ -6,19 +6,23 @@
 
 namespace ssg
 {
-	struct SSSiegeClient : ::ssg::SSSiegeApp {
+	struct SSiegeClient : ::ssg::SSiegeApp {
 		::gpk::apobj<::ssg::EventSSiege>	EventsToSend;
 		::gpk::apobj<::ssg::EventSSiege>	EventsReceived;
 	};
 
-	::gpk::error_t		handleCHAR_ACTION		(SSSiegeClient & app, const ::ssg::EViewMinime & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents);
-	::gpk::error_t		handleADMIN_WORLD		(SSSiegeClient & app, const ::ssg::EViewAdminWorld  & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents);
-	::gpk::error_t		handleWORLD_EVENT		(SSSiegeClient & app, const ::ssg::EViewWorld  & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents);
-	::gpk::error_t		handleCLIENT_ASKS		(SSSiegeClient & app, const ::ssg::EViewClient & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents);
-	::gpk::error_t		handleWORLD_SETUP		(SSSiegeClient & app, const ::ssg::EViewWorldSetup & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents);
-	::gpk::error_t		handleWORLD_VALUE		(SSSiegeClient & app, const ::ssg::EViewWorldValue & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents);
+	::gpk::error_t			handleWORLD_EVENT		(::ssg::SSiegeClient & world, const ::gpk::SEventView<ssg::WORLD_EVENT> & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents); // { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
+	::gpk::error_t			handleWORLD_ADMIN		(::ssg::SSiegeClient & world, const ::gpk::SEventView<ssg::WORLD_ADMIN> & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents); // { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
+	::gpk::error_t			handleACTION_CHAR		(::ssg::SSiegeClient & world, const ::gpk::SEventView<ssg::ACTION_CHAR> & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents); // { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
+	stainli	::gpk::error_t	handleACT_SAILING		(::ssg::SSiegeClient & world, const ::gpk::SEventView<ssg::ACT_SAILING> & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
+	stainli	::gpk::error_t	handleACT_ENGINES		(::ssg::SSiegeClient & world, const ::gpk::SEventView<ssg::ACT_ENGINES> & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
+	stainli	::gpk::error_t	handleACT_AIRSHIP		(::ssg::SSiegeClient & world, const ::gpk::SEventView<ssg::ACT_AIRSHIP> & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
+	stainli	::gpk::error_t	handleACT_WHEELED		(::ssg::SSiegeClient & world, const ::gpk::SEventView<ssg::ACT_WHEELED> & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
+	::gpk::error_t			handleCLIENT_ASKS		(::ssg::SSiegeClient & world, const ::gpk::SEventView<ssg::CLIENT_ASKS> & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents);// { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
+	::gpk::error_t			handleWORLD_SETUP		(::ssg::SSiegeClient & world, const ::gpk::SEventView<ssg::WORLD_SETUP> & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents);// { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
+	::gpk::error_t			handleWORLD_VALUE		(::ssg::SSiegeClient & world, const ::gpk::SEventView<ssg::WORLD_VALUE> & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents);// { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
 
-	::gpk::error_t		ssiegeClientUpdate		(SSSiegeClient & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents);
+	::gpk::error_t		ssiegeClientUpdate		(SSiegeClient & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents);
 } // namespace 
 
 #endif // SSIEGE_CLIENT_H_23701

@@ -26,7 +26,7 @@ struct SApplication {
 #endif
 	::gpk::SClient			Client			= {};
 
-	::ssg::SSSiegeClient	SSiegeApp			= {};
+	::ssg::SSiegeClient	SSiegeApp			= {};
 
 							SApplication	(::gpk::SRuntimeValues & runtimeValues)	noexcept
 	: Framework(runtimeValues) { 

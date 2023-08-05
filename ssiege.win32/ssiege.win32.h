@@ -25,7 +25,7 @@ struct SApplication {
 	::gpk::AUDIO_STATE		AudioState		= {};
 #endif
 
-	::ssg::SSSiegeApp	SSiegeApp			= {};
+	::ssg::SSiegeApp	SSiegeApp			= {};
 
 							SApplication	(::gpk::SRuntimeValues & runtimeValues)	noexcept	
 	: Framework(runtimeValues) { 

@@ -10,13 +10,13 @@ namespace ssg
 {
 #pragma pack(push, 1)
 	GDEFINE_ENUM_TYPE (SSG_EVENT, uint8_t);
-	GDEFINE_ENUM_VALUE(SSG_EVENT, SAIL_ACTION, 0);
-	GDEFINE_ENUM_VALUE(SSG_EVENT, CHAR_ACTION, 1);
-	GDEFINE_ENUM_VALUE(SSG_EVENT, ENGINE_ACTS, 2);
-	GDEFINE_ENUM_VALUE(SSG_EVENT, AIRSHIP_ACT, 3);
-	GDEFINE_ENUM_VALUE(SSG_EVENT, WHEELED_ACT, 4);
-	GDEFINE_ENUM_VALUE(SSG_EVENT, ADMIN_WORLD, 5);
-	GDEFINE_ENUM_VALUE(SSG_EVENT, WORLD_EVENT, 6);
+	GDEFINE_ENUM_VALUE(SSG_EVENT, WORLD_EVENT, 0);
+	GDEFINE_ENUM_VALUE(SSG_EVENT, WORLD_ADMIN, 1);
+	GDEFINE_ENUM_VALUE(SSG_EVENT, ACTION_CHAR, 2);
+	GDEFINE_ENUM_VALUE(SSG_EVENT, ACT_WHEELED, 3);
+	GDEFINE_ENUM_VALUE(SSG_EVENT, ACT_AIRSHIP, 4);
+	GDEFINE_ENUM_VALUE(SSG_EVENT, ACT_SAILING, 5);
+	GDEFINE_ENUM_VALUE(SSG_EVENT, ACT_ENGINES, 6);
 	GDEFINE_ENUM_VALUE(SSG_EVENT, CLIENT_ASKS, 7);
 	GDEFINE_ENUM_VALUE(SSG_EVENT, WORLD_SETUP, 8);
 	GDEFINE_ENUM_VALUE(SSG_EVENT, WORLD_VALUE, 9);
@@ -27,6 +27,16 @@ namespace ssg
 	stainli	::gpk::error_t	eventExtractAndHandle		(const EventSSiege & parentEvent, const ::std::function<::gpk::error_t(const ::gpk::SEventView<_tChildEvent>&)> & funcHandleChild) {
 		return ::gpk::eventExtractAndHandle<_tChildEvent, SSG_EVENT>(parentEvent, funcHandleChild);
 	}
+
+#define HANDLE_SSG_EVENT(_result, _state, _ssgEventName, _outputEvents) \
+	es_if_failed(_result = ::ssg::eventExtractAndHandle<::ssg::_ssgEventName>(eventToProcess, [&_state, &_outputEvents, &eventToProcess](auto ev){ \
+		return ::ssg::handle##_ssgEventName(_state, ev, _outputEvents); \
+	}))
+
+#define CASE_SSG_EVENT(_result, _state, _ssgEventName, _outputEvents) \
+	case ::ssg::SSG_EVENT_##_ssgEventName: \
+		HANDLE_SSG_EVENT(_result, _state, _ssgEventName, _outputEvents); \
+		break; 
 #pragma pack(pop)
 } // namespace
 

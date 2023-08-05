@@ -6,38 +6,38 @@
 namespace ssg
 {
 #pragma pack(push, 1)
-	GDEFINE_ENUM_TYPE (ENGINE_ACTS, uint8_t);
-	GDEFINE_ENUM_VALUE(ENGINE_ACTS, Off			, 0); // Used with an SArgsEvent structure.
-	GDEFINE_ENUM_VALUE(ENGINE_ACTS, On			, 1); // Used with an SArgsEvent structure.
-	GDEFINE_ENUM_VALUE(ENGINE_ACTS, Accelerate	, 2); // Used with an SArgsEvent structure.
-	GDEFINE_ENUM_VALUE(ENGINE_ACTS, Decelerate	, 3); // Used with an SArgsEvent structure.
-	GDEFINE_ENUM_VALUE(ENGINE_ACTS, Nitro		, 4); // Used with an SArgsEvent structure.
-	typedef	::gpk::SEvent		<ENGINE_ACTS>	EventEngine;
-	typedef	::gpk::SEventView	<ENGINE_ACTS>	EViewEngine;
+	GDEFINE_ENUM_TYPE (ACT_ENGINES, uint8_t);
+	GDEFINE_ENUM_VALUE(ACT_ENGINES, Off			, 0); // Used with an SArgsEvent structure.
+	GDEFINE_ENUM_VALUE(ACT_ENGINES, On			, 1); // Used with an SArgsEvent structure.
+	GDEFINE_ENUM_VALUE(ACT_ENGINES, Accelerate	, 2); // Used with an SArgsEvent structure.
+	GDEFINE_ENUM_VALUE(ACT_ENGINES, Decelerate	, 3); // Used with an SArgsEvent structure.
+	GDEFINE_ENUM_VALUE(ACT_ENGINES, Nitro		, 4); // Used with an SArgsEvent structure.
+	typedef	::gpk::SEvent		<ACT_ENGINES>	EventEngine;
+	typedef	::gpk::SEventView	<ACT_ENGINES>	EViewEngine;
 
-	GDEFINE_ENUM_TYPE (WHEELED_ACT, uint8_t);
-	GDEFINE_ENUM_VALUE(WHEELED_ACT, Turn		, 0); // Used with an SArgsEvent structure.
-	GDEFINE_ENUM_VALUE(WHEELED_ACT, Brake		, 1); // Used with an SArgsEvent structure.
-	GDEFINE_ENUM_VALUE(WHEELED_ACT, Reverse		, 2); // Used with an SArgsEvent structure.
-	GDEFINE_ENUM_VALUE(WHEELED_ACT, Handbrake	, 3); // Used with an SArgsEvent structure.
-	typedef	::gpk::SEvent		<WHEELED_ACT>	EventWheeled;
-	typedef	::gpk::SEventView	<WHEELED_ACT>	EViewWheeled;
+	GDEFINE_ENUM_TYPE (ACT_WHEELED, uint8_t);
+	GDEFINE_ENUM_VALUE(ACT_WHEELED, Turn		, 0); // Used with an SArgsEvent structure.
+	GDEFINE_ENUM_VALUE(ACT_WHEELED, Brake		, 1); // Used with an SArgsEvent structure.
+	GDEFINE_ENUM_VALUE(ACT_WHEELED, Reverse		, 2); // Used with an SArgsEvent structure.
+	GDEFINE_ENUM_VALUE(ACT_WHEELED, Handbrake	, 3); // Used with an SArgsEvent structure.
+	typedef	::gpk::SEvent		<ACT_WHEELED>	EventWheeled;
+	typedef	::gpk::SEventView	<ACT_WHEELED>	EViewWheeled;
 
-	GDEFINE_ENUM_TYPE (SAIL_ACTION, uint8_t);
-	GDEFINE_ENUM_VALUE(SAIL_ACTION, Turn		, 0); // Used with an SArgsEvent structure.
-	GDEFINE_ENUM_VALUE(SAIL_ACTION, Brake		, 1); // Used with an SArgsEvent structure.
-	GDEFINE_ENUM_VALUE(SAIL_ACTION, Reverse		, 2); // Used with an SArgsEvent structure.
-	GDEFINE_ENUM_VALUE(SAIL_ACTION, Handbrake	, 3); // Used with an SArgsEvent structure.
-	typedef	::gpk::SEvent		<SAIL_ACTION>	EventSail;
-	typedef	::gpk::SEventView	<SAIL_ACTION>	EViewSail;
+	GDEFINE_ENUM_TYPE (ACT_SAILING, uint8_t);
+	GDEFINE_ENUM_VALUE(ACT_SAILING, Turn		, 0); // Used with an SArgsEvent structure.
+	GDEFINE_ENUM_VALUE(ACT_SAILING, Brake		, 1); // Used with an SArgsEvent structure.
+	GDEFINE_ENUM_VALUE(ACT_SAILING, Reverse		, 2); // Used with an SArgsEvent structure.
+	GDEFINE_ENUM_VALUE(ACT_SAILING, Handbrake	, 3); // Used with an SArgsEvent structure.
+	typedef	::gpk::SEvent		<ACT_SAILING>	EventSail;
+	typedef	::gpk::SEventView	<ACT_SAILING>	EViewSail;
 
-	GDEFINE_ENUM_TYPE (AIRSHIP_ACT, uint8_t);
-	GDEFINE_ENUM_VALUE(AIRSHIP_ACT, Turn		, 0); // Used with an SArgsEvent structure.
-	GDEFINE_ENUM_VALUE(AIRSHIP_ACT, Brake		, 1); // Used with an SArgsEvent structure.
-	GDEFINE_ENUM_VALUE(AIRSHIP_ACT, Reverse		, 2); // Used with an SArgsEvent structure.
-	GDEFINE_ENUM_VALUE(AIRSHIP_ACT, Handbrake	, 3); // Used with an SArgsEvent structure.
-	typedef	::gpk::SEvent		<AIRSHIP_ACT>	EventAircraft;
-	typedef	::gpk::SEventView	<AIRSHIP_ACT>	EViewAircraft;
+	GDEFINE_ENUM_TYPE (ACT_AIRSHIP, uint8_t);
+	GDEFINE_ENUM_VALUE(ACT_AIRSHIP, Turn		, 0); // Used with an SArgsEvent structure.
+	GDEFINE_ENUM_VALUE(ACT_AIRSHIP, Brake		, 1); // Used with an SArgsEvent structure.
+	GDEFINE_ENUM_VALUE(ACT_AIRSHIP, Reverse		, 2); // Used with an SArgsEvent structure.
+	GDEFINE_ENUM_VALUE(ACT_AIRSHIP, Handbrake	, 3); // Used with an SArgsEvent structure.
+	typedef	::gpk::SEvent		<ACT_AIRSHIP>	EventAircraft;
+	typedef	::gpk::SEventView	<ACT_AIRSHIP>	EViewAircraft;
 #pragma pack(pop)
 } // namespace
 
