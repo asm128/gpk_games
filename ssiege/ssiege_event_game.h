@@ -1,9 +1,9 @@
 #include "gpk_event.h"
 
-#ifndef SSIEGE_EVENT_GAME_H
-#define SSIEGE_EVENT_GAME_H
+#ifndef SSG_EVENT_GAME_H
+#define SSG_EVENT_GAME_H
 
-namespace ssiege
+namespace ssg
 {
 #pragma pack(push, 1)
 	GDEFINE_ENUM_TYPE (ADMIN_GAME, uint8_t);
@@ -16,4 +16,4 @@ namespace ssiege
 #pragma pack(pop)
 } // namespace
 
-#endif // SSIEGE_EVENT_GAME_H
+#endif // SSG_EVENT_GAME_H

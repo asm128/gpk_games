@@ -56,8 +56,8 @@ static	::gpk::error_t	resolveCollision
 // this shoulnd't exist really but it will be here until we handle ball collisions properly
 static	::gpk::error_t	handleBallContact	(::d1p::SPoolGame & pool, const ::gpk::SContact & contact, ::gpk::SContactResult & contactResult) {
 	::gpk::SEngine					& engine			= pool.Engine;
-	const ::gpk::SVirtualEntity		& entityA			= engine.Entities[contact.EntityA]; 
-	const ::gpk::SVirtualEntity		& entityB			= engine.Entities[contact.EntityB]; 
+	const ::gpk::SEntity		& entityA			= engine.Entities[contact.EntityA]; 
+	const ::gpk::SEntity		& entityB			= engine.Entities[contact.EntityB]; 
 
 	contactResult.DistanceDirection	= contact.CenterDistance;
 	double							distanceLength		= contact.DistanceLength;
@@ -142,7 +142,7 @@ static	::gpk::error_t	handlePockets
 	::gpk::n3f32						positionBall			= positionA;
 	positionBall.y				= 0;
 	for(uint8_t iPocket = 0; iPocket < 6; ++iPocket) {
-		const ::gpk::SVirtualEntity		& entityPocket			= engine.Entities[pool.Entities.Pockets[iPocket]];
+		const ::gpk::SEntity		& entityPocket			= engine.Entities[pool.Entities.Pockets[iPocket]];
 		::gpk::n3f32					pocketPosition			= engine.Scene->RenderNodes.Transforms[entityPocket.RenderNode].Model.GetTranslation();
 		pocketPosition.y			= 0;
 
@@ -242,7 +242,7 @@ static	::gpk::error_t	handleFalling					(::d1p::SPoolGame & pool, uint32_t iRigi
 static	::gpk::error_t	handlePocketsAndBoundaries		(::d1p::SPoolGame & pool, uint8_t iBall, const ::d1p::SPoolTable & tableDimensions, const gpk::n2f32 & tableHalfDimensions, ::gpk::apobj<::d1p::SEventPool> & outputEvents) {
 	::gpk::SEngine				& engine						= pool.Engine;
 	const float					ballRadius						= pool.MatchState.Board.BallRadius;
-	const ::gpk::SVirtualEntity	& entityA						= engine.Entities[pool.Entities.Balls[iBall]]; 
+	const ::gpk::SEntity	& entityA						= engine.Entities[pool.Entities.Balls[iBall]]; 
 	::gpk::n3f32					& positionA						= engine.Integrator.Centers		[entityA.RigidBody].Position;
 	::gpk::SBodyForces			& forcesA						= engine.Integrator.Forces		[entityA.RigidBody];
 	::gpk::SBodyFlags			& flagsA						= engine.Integrator.Flags	[entityA.RigidBody];

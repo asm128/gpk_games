@@ -14,7 +14,7 @@
 
 #include <DirectXColors.h>
 
-GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "SSiege v0.1");
+GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Solar Siege v0.1");
 
 // --- Cleanup application resources.
 ::gpk::error_t			cleanup					(::SApplication & app)											{
@@ -25,7 +25,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "SSiege v0.1");
 #endif
 
 	gpk_necs(::gpk::mainWindowDestroy(mainWindow));
-	gpk_necs(::ssiege::ssiegeUpdate(app.SSiegeApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
+	gpk_necs(::ssg::ssiegeUpdate(app.SSiegeApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
 	return 0;
 }
 
@@ -111,13 +111,13 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 	::gpk::SFrameInfo			& frameInfo				= framework.FrameInfo;
 	{
 		::gpk::STimer				timer					= {};
-		rvis_if(::gpk::APPLICATION_STATE_EXIT, ::ssiege::APP_STATE_Quit == ::ssiege::ssiegeUpdate(app.SSiegeApp, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue, {}))
+		rvis_if(::gpk::APPLICATION_STATE_EXIT, ::ssg::APP_STATE_Quit == ::ssg::ssiegeUpdate(app.SSiegeApp, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue, {}))
 		timer.Frame();
 		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
 
 #if !defined(DISABLE_D3D11)
-	if(app.SSiegeApp.ActiveState >= ::ssiege::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.Game.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
+	if(app.SSiegeApp.ActiveState >= ::ssg::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.Game.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
 		gpk_necs(app.D3DApp.CreateDeviceResources(*app.SSiegeApp.Game.Engine.Scene->Graphics));
 	}
 	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (uint32_t)frameInfo.FramesPerSecond);
@@ -152,7 +152,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::prtbgra8d32			backBuffer				= framework.RootWindow.BackBuffer;
 	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), clearColor, (uint32_t)-1);
-	gpk_necs(::ssiege::ssiegeDraw(app.SSiegeApp, *backBuffer, false));
+	gpk_necs(::ssg::ssiegeDraw(app.SSiegeApp, *backBuffer, false));
 	memcpy(framework.RootWindow.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	//::gpk::grid_mirror_y(framework.RootWindow.BackBuffer->Color.View, backBuffer->Color.View);
 	//framework.RootWindow.BackBuffer		= backBuffer;

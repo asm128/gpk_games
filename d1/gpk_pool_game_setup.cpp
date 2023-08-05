@@ -83,7 +83,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		engine.SetHidden		(iEntity, false);
 		engine.SetShader		(iEntity, ps, psName);
 
-		const ::gpk::SVirtualEntity	& entity				= engine.Entities[iEntity];
+		const ::gpk::SEntity	& entity				= engine.Entities[iEntity];
 		const ::gpk::SRenderNode	& renderNode			= engine.Scene->RenderNodes[entity.RenderNode];
 		::gpk::SSkin				& skin					= *engine.Scene->Graphics->Skins[renderNode.Skin];
 		::gpk::SSurface				& surface				= *engine.Scene->Graphics->Surfaces[skin.Textures[0]];
@@ -370,7 +370,7 @@ static	::gpk::error_t	geometryBuildTableCushion	(::gpk::SGeometryBuffers & outpu
 
 	int32_t					iEntity								= this->Entities.Create();
 	Entities.Names[iEntity]	= ::gpk::vcs{"TableCushion"};
-	::gpk::SVirtualEntity	& entity							= Entities[iEntity];
+	::gpk::SEntity	& entity							= Entities[iEntity];
 	entity.RenderNode	= Scene->RenderNodes.Create();;
 	Integrator.BoundingVolumes[entity.RigidBody = this->Integrator.Create()].HalfSizes = {0.5f, 0.5f, 0.5f};
 

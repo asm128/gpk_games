@@ -2,6 +2,8 @@
 #include "ssiege_game.h"
 #include "gpk_timer.h"
 
+stacxpr	uint32_t		DEFAULT_ARM_COUNT		= 6;
+
 stacxpr	float			SCALE_SHIP				= .001f;	// 
 
 stacxpr	float			SHIP_CORE_RADIUS		= SCALE_SHIP * .5f;	// the ship core diameter represents the size unit
@@ -10,12 +12,15 @@ stacxpr	float			SHIP_RING_HEIGHT		= SHIP_CORE_RADIUS * 2;							//
 stacxpr	float			SHIP_RING_RADIUS_MAX	= SHIP_CORE_RADIUS * 10;						// 
 stacxpr	gpk::minmaxf32	SHIP_RING_RADIUS		= {SHIP_RING_RADIUS_MAX - SHIP_CORE_RADIUS, SHIP_RING_RADIUS_MAX};	// 
 stacxpr	float			SHIP_RING_BORDER		= SHIP_RING_RADIUS.Length();	// 
-stacxpr	float			SHIP_BASE_BOX_SIDE		= ::gpk::max(SHIP_RING_HEIGHT, SHIP_RING_BORDER);	// 
-stacxpr	float			SHIP_BASE_BOX			= SHIP_BASE_BOX_SIDE + SHIP_BASE_BOX_SIDE * .5f;	// 
-stacxpr	float			SHIP_BASE_IRON			= SHIP_BASE_BOX * .125f;		// 
+stacxpr	float			SHIP_RING_THICKNESS		= ::gpk::max(SHIP_RING_HEIGHT, SHIP_RING_BORDER);	// 
+stacxpr	float			SHIP_CRANE_BOX			= SHIP_RING_THICKNESS + SHIP_RING_THICKNESS * .5f;	// 
+stacxpr	float			SHIP_CRANE_BOX_HALF		= SHIP_CRANE_BOX * .5f;	// 
+stacxpr	float			SHIP_CRANE_IRON			= SHIP_CRANE_BOX_HALF * .125f;		// 
+stacxpr	float			SHIP_CRANE_IRON_HALF	= SHIP_CRANE_IRON * .5f;		// 
+stacxpr	float			SHIP_CRANE_WHEEL_RADIUS	= SHIP_CRANE_BOX_HALF * .5f;		// 
+stacxpr	float			SHIP_CRANE_WHEEL_HEIGHT	= SHIP_CRANE_BOX_HALF * .5f;		// 
+stacxpr	float			SHIP_ARM_RADIUS			= SHIP_CORE_RADIUS * .125f;	// 
 stacxpr	float			SHIP_ARM_LENGTH			= SHIP_RING_RADIUS_MAX;	// 
-stacxpr	::gpk::n3f32	SHIP_ARM_SIZE			= {SHIP_CORE_RADIUS * .5f, SHIP_ARM_LENGTH, SHIP_CORE_RADIUS * .5f};	// 
-stacxpr	uint32_t		DEFAULT_ARM_COUNT		= 6;
 
 static	::gpk::error_t	createShipCore		(::gpk::SEngine & engine) {
 	::gpk::SParamsSphere		sphere				= {};
@@ -27,24 +32,35 @@ static	::gpk::error_t	createShipCore		(::gpk::SEngine & engine) {
 }
 
 static	::gpk::error_t	createShipRing		(::gpk::SEngine & engine) {
-	::gpk::SParamsRing			ring				= {};
-	ring.Origin.y			= ::SHIP_RING_HEIGHT * .5f;
-	ring.Height				= ::SHIP_RING_HEIGHT;
-	ring.RadiusYMin			= ::SHIP_RING_RADIUS;
-	ring.RadiusYMax			= ::SHIP_RING_RADIUS;
-	ring.CellCount.x		= 32;
-
 	::gpk::eid_t				iShipRing; 
-	gpk_necs(iShipRing = engine.CreateRing(ring, "Ship Ring"));
+	{
+		::gpk::SParamsTube			ring				= {};
+		ring.Origin.y			= ::SHIP_RING_HEIGHT * .5f;
+		ring.Height				= ::SHIP_RING_HEIGHT;
+		ring.RadiusYMin			= ::SHIP_RING_RADIUS;
+		ring.RadiusYMax			= ::SHIP_RING_RADIUS;
+		ring.CellCount.x		= 32;
+
+		gpk_necs(iShipRing = engine.CreateTube(ring, "Ship Ring"));
+	}
+	{
+		::gpk::SParamsCircle		energy				= {};
+		energy.Radius			= ::SHIP_RING_RADIUS.Min;
+
+		::gpk::eid_t				iRingEnergy; 
+		gpk_necs(iRingEnergy = engine.CreateDisc(energy, "Ship Ring Energy"));
+		engine.SetColorDiffuse(iRingEnergy, {.2f, .5f, 1, .5f});
+		engine.Entities.SetParent(iRingEnergy, iShipRing);
+	}
 	engine.SetRotation(iShipRing, ::gpk::n3f32{0, float(::gpk::math_pi * .25),});
 	return iShipRing; 
 }
 
-static	::gpk::error_t	createShipCraneBase		(::gpk::SEngine & engine) {
+static	::gpk::error_t	createShipCraneBox		(::gpk::SEngine & engine) {
 	::gpk::eid_t				iArmRoot;
 	{	// construct the grip around the ship ring
 		::gpk::SParamsBox			base					= {};
-		base.HalfSizes.From(::SHIP_BASE_BOX * .5f);
+		base.HalfSizes.From(::SHIP_CRANE_BOX * .5f);
 		base.Origin				= base.HalfSizes;
 		gpk_necs(iArmRoot = engine.CreateBox(base, "Crane Base"));
 		engine.SetColorDiffuse(iArmRoot, {1, 1, 1, .5f});
@@ -56,37 +72,78 @@ static	::gpk::error_t	createShipCraneBase		(::gpk::SEngine & engine) {
 		::gpk::SParamsBox			iron					= {};
 		const uint32_t				iRow					= iIron / 2;
 		const uint32_t				iCol					= iIron % 2;
-		iron.HalfSizes.SetAxis  (iAxis, ::SHIP_BASE_BOX  * .5f);
-		iron.HalfSizes.SetOthers(iAxis, ::SHIP_BASE_IRON * .5f);
+		iron.HalfSizes.SetAxis  (iAxis, ::SHIP_CRANE_BOX_HALF);
+		iron.HalfSizes.SetOthers(iAxis, ::SHIP_CRANE_IRON_HALF);
 		iron.Origin				= iron.HalfSizes;
 		gpk_necs(iArmBaseBorder = engine.CreateBox(iron, "Crane Base Iron"));
 	
 		::gpk::n3f32				position				= {};
-		position.SetAxis((iAxis + 1) % 3, (::SHIP_BASE_BOX * .5f - ::SHIP_BASE_IRON * .5f) * (iRow ? 1 : -1));
-		position.SetAxis((iAxis + 2) % 3, (::SHIP_BASE_BOX * .5f - ::SHIP_BASE_IRON * .5f) * (iCol ? 1 : -1));
+		position.SetAxis((iAxis + 1) % 3, (::SHIP_CRANE_BOX_HALF - SHIP_CRANE_IRON_HALF) * (iRow ? 1 : -1));
+		position.SetAxis((iAxis + 2) % 3, (::SHIP_CRANE_BOX_HALF - SHIP_CRANE_IRON_HALF) * (iCol ? 1 : -1));
 		engine.SetPosition(iArmBaseBorder, position);
 		gpk_necs(engine.Entities.SetParent(iArmBaseBorder, iArmRoot));
 	}
 	return iArmRoot;
 }
 
-static	::gpk::error_t	createShipCrane		(::gpk::SEngine & engine) {
-	::gpk::eid_t				iCrane;
-	
-	gpk_necs(iCrane = ::createShipCraneBase(engine));	
-
+static	::gpk::error_t	createShipCraneBar	(::gpk::SEngine & engine, ::gpk::vcs entityName = "Crane Bar") {
 	// construct the arm itself
-	::gpk::SParamsCylinderWall	arm					= {};
-	arm.Radius				= {::SHIP_ARM_SIZE.x * .5f, ::SHIP_ARM_SIZE.x * .5f};
-	arm.Height				= SHIP_ARM_LENGTH;
-	::gpk::eid_t				iArm;
-	gpk_necs(iArm = engine.CreateDisc(arm, "Ship Crane Arm Right?"));
-	engine.SetPosition(iArm, ::gpk::n3f32{::SHIP_BASE_BOX * .5f, -SHIP_BASE_BOX * .5f, -SHIP_BASE_BOX * .5f});
-	gpk_necs(engine.Entities.SetParent(iArm, iCrane));
-	gpk_necs(iArm = engine.CreateDisc(arm, "Ship Crane Arm Left?"));
-	engine.SetPosition(iArm, ::gpk::n3f32{::SHIP_BASE_BOX * .5f, -SHIP_BASE_BOX * .5f, SHIP_BASE_BOX * .5f});
-	gpk_necs(engine.Entities.SetParent(iArm, iCrane));
-	
+	::gpk::SParamsCylinderWall	bar					= {};
+	bar.Radius				= {::SHIP_ARM_RADIUS, ::SHIP_ARM_RADIUS};
+	bar.Height				= ::SHIP_ARM_LENGTH;
+	::gpk::eid_t				iBar;
+	gpk_necall(iBar = engine.CreateCylinder(bar, entityName), "entityName: '%s'", ::gpk::toString(entityName).begin());
+	engine.SetOrientation(iBar, ::gpk::quatf32{1, 0, 0, 1}.Normalize());
+		;
+	engine.SetPosition(iBar, {0, ::SHIP_CRANE_WHEEL_RADIUS * .5f, });
+	return iBar;
+}
+
+static	::gpk::error_t	createShipCraneWheel(::gpk::SEngine & engine, ::gpk::vcs entityName = "Crane Wheel") {
+	// construct the arm itself
+	::gpk::SParamsCylinderWall	wheel				= {};
+	wheel.Radius			= ::gpk::dim2<::gpk::minmaxf32>(::SHIP_CRANE_WHEEL_RADIUS);
+	wheel.Height			= ::SHIP_CRANE_WHEEL_HEIGHT;
+	::gpk::eid_t				iWheel;
+	gpk_necall(iWheel = engine.CreateCylinder(wheel, entityName), "entityName: '%s'", ::gpk::toString(entityName).begin());
+	engine.SetOrientation(iWheel, ::gpk::quatf32{1, 0, 0, 1}.Normalize());
+	return iWheel;
+}
+
+static	::gpk::error_t	createShipCrane		(::gpk::SEngine & engine) {
+	::gpk::eid_t				iCrane; 
+	{
+		::gpk::SParamsSphere		sphere				= {};
+		sphere.Radius			= ::SHIP_CORE_RADIUS;
+		gpk_necs(iCrane = engine.CreateSphere(sphere, "Ship Crane"));
+	}
+	engine.SetColorDiffuse(iCrane, {.25f, 1, 1, .5f});
+	{
+		::gpk::eid_t				iBox;
+		gpk_necs(iBox = ::createShipCraneBox(engine));	
+		gpk_necs(engine.Entities.SetParent(iBox, iCrane));
+	}
+	stacxpr	float				OFFSET_CORNER		= ::SHIP_CRANE_BOX_HALF + ::SHIP_CRANE_IRON_HALF;
+	for(uint32_t iArm = 0; iArm < 2; ++iArm) {
+		const bool					isLeft				= (1 + iArm) % 2;
+		::gpk::eid_t				iWheel;
+		if(isLeft)	// Create wheel
+			iWheel				= ::gpk::EID_INVALID;
+		else {
+			gpk_necs(iWheel = ::createShipCraneWheel(engine, isLeft ? ::gpk::vcs{"Ship Crane Wheel Left?"} : ::gpk::vcs{"Ship Crane Wheel Right?"}));
+			::gpk::n3f32				barPosition			= {OFFSET_CORNER, -::SHIP_CRANE_BOX_HALF, OFFSET_CORNER * (iArm ? 1 : -1)};
+			engine.SetPosition(iWheel, barPosition);
+			engine.SetRotation(iWheel, ::gpk::n3f32{0, 0, float(::gpk::math_pi_2 * .15)});
+			gpk_necs(engine.Entities.SetParent(iWheel, iCrane));
+		}
+		::gpk::eid_t				iBar;	// Create bar
+		if(isLeft) 
+			iBar				= ::gpk::EID_INVALID;
+		else {
+			gpk_necs(iBar = ::createShipCraneBar(engine, iArm ? ::gpk::vcs{"Ship Crane Bar Right?"} : ::gpk::vcs{"Ship Crane Bar Left?"}));
+			gpk_necs(engine.Entities.SetParent(iBar, iWheel));
+		}
+	}
 	return iCrane; 
 }
 
@@ -107,11 +164,12 @@ static	::gpk::error_t	createShipCrane		(::gpk::SEngine & engine) {
 static	::gpk::error_t	shipCreate			(::ssg::SSiegeGame & world) { 
 	gpk_necs(world.ShipCore = ::createShipCore(world.Engine));
 	gpk_necs(world.ShipRing = ::createShipRing(world.Engine));
-	for(uint32_t iArm = 0; iArm < ::DEFAULT_ARM_COUNT; ++iArm) {
+	const int					armCount			= ::DEFAULT_ARM_COUNT;
+	for(uint32_t iArm = 0; iArm < armCount; ++iArm) {
 		::gpk::eid_t				iArmRoot			= ::createShipCrane(world.Engine);
 		::gpk::n3f32				position			= {::SHIP_RING_RADIUS.Middle()};
-		position.RotateY(::gpk::math_2pi * (1.0f / ::DEFAULT_ARM_COUNT) * iArm);
-		world.Engine.SetOrientation(iArmRoot, ::gpk::quatf32{}.MakeFromEuler(0, -(float)::gpk::math_2pi * (1.0f / ::DEFAULT_ARM_COUNT) * iArm, 0).Normalize());
+		position.RotateY(::gpk::math_2pi * (1.0f / armCount) * iArm);
+		world.Engine.SetOrientation(iArmRoot, ::gpk::quatf32{}.MakeFromEuler(0, -(float)::gpk::math_2pi * (1.0f / armCount) * iArm, 0).Normalize());
 		world.Engine.SetPosition(iArmRoot, position);
 		world.Engine.Entities.SetParent(iArmRoot, world.ShipCore);
 	}
@@ -129,23 +187,23 @@ static	::gpk::error_t	shipCreate			(::ssg::SSiegeGame & world) {
 	return 0;
 }
 
-::gpk::error_t			ssg::ssiegeGameUpdate	(::ssg::SSiegeGame & world, ::gpk::vpobj<::ssiege::EventSSiege> inputEvents, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents, double secondsElapsed) {
-	::gpk::FBool<::gpk::pobj<::ssiege::EventSSiege> &, ::gpk::apobj<::ssiege::EventSSiege> &>	funcHandleEvent 
-		= [&world](::gpk::pobj<::ssiege::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssiege::EventSSiege> & worldOutputEvents) { 
+::gpk::error_t			ssg::ssiegeGameUpdate	(::ssg::SSiegeGame & world, ::gpk::vpobj<::ssg::EventSSiege> inputEvents, ::gpk::apobj<::ssg::EventSSiege> & outputEvents, double secondsElapsed) {
+	::gpk::FBool<::gpk::pobj<::ssg::EventSSiege> &, ::gpk::apobj<::ssg::EventSSiege> &>	funcHandleEvent 
+		= [&world](::gpk::pobj<::ssg::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssg::EventSSiege> & worldOutputEvents) { 
 			if(!_eventToProcess)
 				return false;
 
-			const ::ssiege::EventSSiege	& eventToProcess		= *_eventToProcess;
+			const ::ssg::EventSSiege	& eventToProcess		= *_eventToProcess;
 			info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));
 
 			::gpk::error_t			result			= 0; 
 			switch(eventToProcess.Type) {
-			case ::ssiege::SSIEGE_EVENT_CHAR_ACTION: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CHAR_ACTION>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleCHAR_ACTION(world, ev, worldOutputEvents); })); break; }
-			case ::ssiege::SSIEGE_EVENT_ADMIN_WORLD: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::ADMIN_WORLD>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleADMIN_WORLD(world, ev, worldOutputEvents); })); break; }
-			case ::ssiege::SSIEGE_EVENT_WORLD_EVENT: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_EVENT>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleWORLD_EVENT(world, ev, worldOutputEvents); })); break; }
-			case ::ssiege::SSIEGE_EVENT_CLIENT_ASKS: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CLIENT_ASKS>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleCLIENT_ASKS(world, ev, worldOutputEvents); })); break; }
-			case ::ssiege::SSIEGE_EVENT_WORLD_SETUP: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_SETUP>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleWORLD_SETUP(world, ev, worldOutputEvents); })); break; }
-			case ::ssiege::SSIEGE_EVENT_WORLD_VALUE: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_VALUE>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleWORLD_VALUE(world, ev, worldOutputEvents); })); break; }
+			case ::ssg::SSG_EVENT_CHAR_ACTION: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::CHAR_ACTION>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleCHAR_ACTION(world, ev, worldOutputEvents); })); break; }
+			case ::ssg::SSG_EVENT_ADMIN_WORLD: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::ADMIN_WORLD>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleADMIN_WORLD(world, ev, worldOutputEvents); })); break; }
+			case ::ssg::SSG_EVENT_WORLD_EVENT: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::WORLD_EVENT>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleWORLD_EVENT(world, ev, worldOutputEvents); })); break; }
+			case ::ssg::SSG_EVENT_CLIENT_ASKS: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::CLIENT_ASKS>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleCLIENT_ASKS(world, ev, worldOutputEvents); })); break; }
+			case ::ssg::SSG_EVENT_WORLD_SETUP: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::WORLD_SETUP>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleWORLD_SETUP(world, ev, worldOutputEvents); })); break; }
+			case ::ssg::SSG_EVENT_WORLD_VALUE: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::WORLD_VALUE>(eventToProcess, [&world, &worldOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleWORLD_VALUE(world, ev, worldOutputEvents); })); break; }
 			default: 
 				gpk_warning_unhandled_event(eventToProcess); 
 				break;
@@ -153,7 +211,7 @@ static	::gpk::error_t	shipCreate			(::ssg::SSiegeGame & world) {
 			return bool(result == 1);
 		};
 
-	inputEvents.for_each([&outputEvents, &funcHandleEvent](::gpk::pobj<::ssiege::EventSSiege> & _eventToProcess){ 
+	inputEvents.for_each([&outputEvents, &funcHandleEvent](::gpk::pobj<::ssg::EventSSiege> & _eventToProcess){ 
 		if(funcHandleEvent(_eventToProcess, outputEvents))
 			_eventToProcess.clear();
 	});

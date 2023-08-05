@@ -32,7 +32,7 @@
 #ifndef SSIEGE_WORLD_H_23701
 #define SSIEGE_WORLD_H_23701
 
-namespace ssiege
+namespace ssg
 {
 	GDEFINE_ENUM_TYPE (TERRAIN_TYPE, uint8_t);
 	GDEFINE_ENUM_VALUE(TERRAIN_TYPE, Soil		, 0);
@@ -316,6 +316,6 @@ namespace ssiege
 			return 0;
 		}
 	};
-} // namespace ssiege
+} // namespace ssg
 
 #endif // SSIEGE_WORLD_H_23701

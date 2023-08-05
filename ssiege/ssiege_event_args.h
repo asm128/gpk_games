@@ -2,10 +2,10 @@
 
 #include "gpk_n3.h"
 
-#ifndef SSIEGE_EVENT_ARGS_H_23701
-#define SSIEGE_EVENT_ARGS_H_23701
+#ifndef SSG_EVENT_ARGS_H_23701
+#define SSG_EVENT_ARGS_H_23701
 
-namespace ssiege
+namespace ssg
 {
 #pragma pack(push, 1)
 	struct SArgsEvent { // TODO: This will do for now. Maybe we can use a json format later on for more flexibility customizing for each event type.
@@ -23,8 +23,8 @@ namespace ssiege
 	};
 #pragma pack(pop)
 
-	::gpk::error_t			printArgsEvent		(const ::ssiege::SArgsEvent & eventArgs, bool debugOutput = false);
-	::gpk::error_t			printArgsEvent		(const ::ssiege::SArgsEvent & eventArgs, ::gpk::achar & output);
+	::gpk::error_t			printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, bool debugOutput = false);
+	::gpk::error_t			printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, ::gpk::achar & output);
 } // namespace
 
-#endif // SSIEGE_EVENT_ARGS_H_23701
+#endif // SSG_EVENT_ARGS_H_23701

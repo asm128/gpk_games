@@ -1,6 +1,6 @@
 #include "ssiege_event_args.h"
 
-::gpk::error_t			ssiege::printArgsEvent		(const ::ssiege::SArgsEvent & eventArgs, bool debugOutput) {
+::gpk::error_t			ssg::printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, bool debugOutput) {
 	if(debugOutput)
 		info_printf(
 			"\nCoordSource  : " N3_F32
@@ -38,7 +38,7 @@
 	return 0;
 }
 
-::gpk::error_t			ssiege::printArgsEvent		(const ::ssiege::SArgsEvent & eventArgs, ::gpk::achar & output) {
+::gpk::error_t			ssg::printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, ::gpk::achar & output) {
 	char						temp	[1024]				= {};
 	sprintf_s(temp, 
 		"\nCoordSource  : " N3_F32

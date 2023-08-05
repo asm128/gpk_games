@@ -1,9 +1,9 @@
 #include "gpk_event.h"
 
-#ifndef SSIEGE_EVENT_WORLD_H_23701
-#define SSIEGE_EVENT_WORLD_H_23701
+#ifndef SSG_EVENT_WORLD_H_23701
+#define SSG_EVENT_WORLD_H_23701
 
-namespace ssiege
+namespace ssg
 {
 #pragma pack(push, 1)
 	// These events are sent for world contents manipulation
@@ -83,4 +83,4 @@ namespace ssiege
 #pragma pack(pop)
 } // namespace
 
-#endif // SSIEGE_EVENT_WORLD_H_23701
+#endif // SSG_EVENT_WORLD_H_23701

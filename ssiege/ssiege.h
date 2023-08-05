@@ -13,7 +13,7 @@
 #ifndef SSIEGE_H_23701
 #define SSIEGE_H_23701
 
-namespace ssiege
+namespace ssg
 {
 
 	enum SAVE_MODE { SAVE_MODE_AUTO, SAVE_MODE_QUICK, SAVE_MODE_STAGE, SAVE_MODE_USER };
@@ -60,7 +60,7 @@ namespace ssiege
 		::gpk::apachar			InputQueue			= {};
 	};
 
-	::gpk::error_t			setupSSiegeUI			(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & ssiegeUI);
+	::gpk::error_t			setupSSiegeUI			(::gpk::SGUI & gui, ::ssg::SSSiegeUI & ssiegeUI);
 
 
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
@@ -130,10 +130,10 @@ namespace ssiege
 		}
 	};
 
-	::gpk::error_t			ssiegeUpdate		(::ssiege::SSSiegeApp & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
-		, ::gpk::FBool<::gpk::pobj<::ssiege::EventSSiege> &, ::gpk::apobj<::ssiege::EventSSiege> &> funcHandleEvent
+	::gpk::error_t			ssiegeUpdate		(::ssg::SSSiegeApp & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
+		, ::gpk::FBool<::gpk::pobj<::ssg::EventSSiege> &, ::gpk::apobj<::ssg::EventSSiege> &> funcHandleEvent
 		);
-	::gpk::error_t			ssiegeDraw			(::ssiege::SSSiegeApp & ssiege, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI);
-} // namespace ssiege
+	::gpk::error_t			ssiegeDraw			(::ssg::SSSiegeApp & ssiege, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI);
+} // namespace ssg
 
 #endif // SSIEGE_H_23701

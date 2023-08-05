@@ -7,7 +7,7 @@
 #include "gpk_event_screen.h"
 #include "gpk_path.h"
 
-static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & ssiegeUI) {
+static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssg::SSSiegeUI & ssiegeUI) {
 	gpk_necs(::gpk::inputBoxCreate(ssiegeUI.UserInput, gui, ssiegeUI.Root));
 	ssiegeUI.UserInput.MaxLength	= 64;
 	gpk_necs(ssiegeUI.UserInput.Edit(gui, true));
@@ -19,20 +19,20 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & s
 }
 
 // initialize root gui layout and console input/virtual keyboard
-::gpk::error_t			ssiege::setupSSiegeUI		(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & ssiegeUI) {
+::gpk::error_t			ssg::setupSSiegeUI		(::gpk::SGUI & gui, ::ssg::SSSiegeUI & ssiegeUI) {
 	gpk_necs(ssiegeUI.Root = ::gpk::createScreenLayout(gui));
 	gpk_necs(::setupConsole(gui, ssiegeUI));
 	return 0; 
 }
 
-::gpk::error_t			ssiege::SSSiegeApp::StateSwitch(APP_STATE newState) {
+::gpk::error_t			ssg::SSSiegeApp::StateSwitch(APP_STATE newState) {
 	::gpk::SGUI					& gui				= *GUI;
 	::gpk::SControlTable		& table				= gui.Controls;
 	if(newState != ActiveState) {
 		info_printf("Switching state: (%i) -> (%i) - '%s' -> '%s'", ActiveState, newState, ::gpk::get_value_namep(ActiveState), ::gpk::get_value_namep(newState));
 
 		if(0 == ActiveState || 0 == gui.Controls.States.size() || ::gpk::CID_INVALID == UI.Root) {
-			gpk_necs(::ssiege::setupSSiegeUI(gui, UI));
+			gpk_necs(::ssg::setupSSiegeUI(gui, UI));
 		}
 		while(newState >= UI.RootPerState.size()) {	// create layouts for each state as they're required
 			::gpk::cid_t				rootId;
@@ -55,7 +55,7 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & s
 }
 
 
-::gpk::error_t			ssiege::ssiegeDraw		(::ssiege::SSSiegeApp & app, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI) { 
+::gpk::error_t			ssg::ssiegeDraw		(::ssg::SSSiegeApp & app, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI) { 
 	if(false == onlyGUI) {
 		const ::gpk::SCamera		& cameraSelected		= app.Game.Camera;
 		gpk_necs(::ssg::ssiegeGameDraw(app.Game, backBuffer, cameraSelected.Position, cameraSelected.Target, cameraSelected.Up, cameraSelected.NearFar));
@@ -64,13 +64,13 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssiege::SSSiegeUI & s
 	return 0; 
 }
 
-static	::gpk::error_t	processScreenEvent		(::ssiege::SSSiegeApp & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
+static	::gpk::error_t	processScreenEvent		(::ssg::SSSiegeApp & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_SCREEN_Close:
 	case ::gpk::EVENT_SCREEN_Deactivate: 
-		if(app.ActiveState != ::ssiege::APP_STATE_Welcome) 
-			gpk_necs(app.StateSwitch(::ssiege::APP_STATE_Home));
+		if(app.ActiveState != ::ssg::APP_STATE_Welcome) 
+			gpk_necs(app.StateSwitch(::ssg::APP_STATE_Home));
 		break;
 	case ::gpk::EVENT_SCREEN_Create:
 	case ::gpk::EVENT_SCREEN_Resize: {
@@ -93,7 +93,7 @@ static	::gpk::error_t	processScreenEvent		(::ssiege::SSSiegeApp & app, const ::g
 	return 0;
 }
 
-static	::gpk::error_t	processTextEvent		(::ssiege::SSSiegeApp & /*app*/, const ::gpk::SEventView<::gpk::EVENT_TEXT> & screenEvent) { 
+static	::gpk::error_t	processTextEvent		(::ssg::SSSiegeApp & /*app*/, const ::gpk::SEventView<::gpk::EVENT_TEXT> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_TEXT_Char: break;
@@ -101,16 +101,16 @@ static	::gpk::error_t	processTextEvent		(::ssiege::SSSiegeApp & /*app*/, const :
 	return 0;
 }
 
-static	::gpk::error_t	processKeyboardEvent	(::ssiege::SSSiegeApp & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
+static	::gpk::error_t	processKeyboardEvent	(::ssg::SSSiegeApp & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_KEYBOARD_Down:
 		if(screenEvent.Data[0] == VK_ESCAPE) {
 			if(false == app.UI.UserInput.Editing) {
-				if(app.ActiveState != ::ssiege::APP_STATE_Home) 
-					gpk_necs(app.StateSwitch(::ssiege::APP_STATE_Home));
+				if(app.ActiveState != ::ssg::APP_STATE_Home) 
+					gpk_necs(app.StateSwitch(::ssg::APP_STATE_Home));
 				else 
-					gpk_necs(app.StateSwitch(::ssiege::APP_STATE_Play));
+					gpk_necs(app.StateSwitch(::ssg::APP_STATE_Play));
 			}
 		}
 		else if(screenEvent.Data[0] == VK_OEM_5) {
@@ -121,7 +121,7 @@ static	::gpk::error_t	processKeyboardEvent	(::ssiege::SSSiegeApp & app, const ::
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent		(::ssiege::SSSiegeApp & app, const ::gpk::SSystemEvent & sysEvent) { 
+static	::gpk::error_t	processSystemEvent		(::ssg::SSSiegeApp & app, const ::gpk::SSystemEvent & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen		: gpk_necs(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN		>(sysEvent, [&app](auto ev) { return processScreenEvent		(app, ev); })); break;
@@ -131,7 +131,7 @@ static	::gpk::error_t	processSystemEvent		(::ssiege::SSSiegeApp & app, const ::g
 	return 0;
 }
 
-static	::gpk::error_t	updateInput				(::ssiege::SSSiegeUI & /*ui*/, ::ssiege::SWorldView & world, double actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 /*mouseDeltas*/, ::gpk::vcu8 /*buttonStates*/) { 
+static	::gpk::error_t	updateInput				(::ssg::SSSiegeUI & /*ui*/, ::ssg::SWorldView & world, double actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 /*mouseDeltas*/, ::gpk::vcu8 /*buttonStates*/) { 
 	const double				secondsElapsed			= actualSecondsElapsed * world.WorldState.TimeScale;
 
 	if(keyStates[VK_CONTROL]) {
@@ -146,12 +146,12 @@ static	::gpk::error_t	updateInput				(::ssiege::SSSiegeUI & /*ui*/, ::ssiege::SW
 	return 0;
 }
 
-static	::gpk::error_t	parseCommands			(gpk::vpobj<gpk::achar> inputQueue, gpk::apobj<gpk::achar> & inputHistory, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents) { 
+static	::gpk::error_t	parseCommands			(gpk::vpobj<gpk::achar> inputQueue, gpk::apobj<gpk::achar> & inputHistory, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	inputQueue.for_each([&outputEvents, &inputHistory](::gpk::pachar & textLine) {
 		res_if(!textLine || 0 == textLine->size());	// Shouldn't get here please
 
 		if(textLine->size() > 1 && (*textLine)[0] == '.')
-			e_if_failed(::ssiege::parseCommandLine(outputEvents, *textLine), ::gpk::toString(*textLine).begin());
+			e_if_failed(::ssg::parseCommandLine(outputEvents, *textLine), ::gpk::toString(*textLine).begin());
 
 		info_printf("Queued input processed: '%s'", textLine->begin());
 		es_if_failed(inputHistory.push_back(textLine));
@@ -159,21 +159,21 @@ static	::gpk::error_t	parseCommands			(gpk::vpobj<gpk::achar> inputQueue, gpk::a
 	return 0;
 }
 
-static	::gpk::error_t	handleSSiegeEvent		(::ssiege::SSSiegeApp & app, ::gpk::pobj<::ssiege::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssiege::EventSSiege> & appOutputEvents) { 
+static	::gpk::error_t	handleSSiegeEvent		(::ssg::SSSiegeApp & app, ::gpk::pobj<::ssg::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssg::EventSSiege> & appOutputEvents) { 
 	if(!_eventToProcess)
 		return false;
 
-	const ssiege::EventSSiege	& eventToProcess			= *_eventToProcess;
+	const ssg::EventSSiege	& eventToProcess			= *_eventToProcess;
 	info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));
 
 	::gpk::error_t			result			= 0; 
 	switch(eventToProcess.Type) {
-	case ::ssiege::SSIEGE_EVENT_CHAR_ACTION: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CHAR_ACTION>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCHAR_ACTION(app, ev, appOutputEvents); })); break; }
-	case ::ssiege::SSIEGE_EVENT_ADMIN_WORLD: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::ADMIN_WORLD>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleADMIN_WORLD(app, ev, appOutputEvents); })); break; }
-	case ::ssiege::SSIEGE_EVENT_WORLD_EVENT: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_EVENT>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_EVENT(app, ev, appOutputEvents); })); break; }
-	case ::ssiege::SSIEGE_EVENT_CLIENT_ASKS: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::CLIENT_ASKS>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleCLIENT_ASKS(app, ev, appOutputEvents); })); break; }
-	case ::ssiege::SSIEGE_EVENT_WORLD_SETUP: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_SETUP>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_SETUP(app, ev, appOutputEvents); })); break; }
-	case ::ssiege::SSIEGE_EVENT_WORLD_VALUE: { es_if_failed(result = ::ssiege::eventExtractAndHandle<::ssiege::WORLD_VALUE>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssiege::handleWORLD_VALUE(app, ev, appOutputEvents); })); break; }
+	case ::ssg::SSG_EVENT_CHAR_ACTION: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::CHAR_ACTION>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleCHAR_ACTION(app, ev, appOutputEvents); })); break; }
+	case ::ssg::SSG_EVENT_ADMIN_WORLD: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::ADMIN_WORLD>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleADMIN_WORLD(app, ev, appOutputEvents); })); break; }
+	case ::ssg::SSG_EVENT_WORLD_EVENT: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::WORLD_EVENT>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleWORLD_EVENT(app, ev, appOutputEvents); })); break; }
+	case ::ssg::SSG_EVENT_CLIENT_ASKS: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::CLIENT_ASKS>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleCLIENT_ASKS(app, ev, appOutputEvents); })); break; }
+	case ::ssg::SSG_EVENT_WORLD_SETUP: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::WORLD_SETUP>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleWORLD_SETUP(app, ev, appOutputEvents); })); break; }
+	case ::ssg::SSG_EVENT_WORLD_VALUE: { es_if_failed(result = ::ssg::eventExtractAndHandle<::ssg::WORLD_VALUE>(eventToProcess, [&app, &appOutputEvents, &eventToProcess](auto ev){ return ::ssg::handleWORLD_VALUE(app, ev, appOutputEvents); })); break; }
 	default: 
 		gpk_warning_unhandled_event(eventToProcess); 
 		break;
@@ -181,40 +181,40 @@ static	::gpk::error_t	handleSSiegeEvent		(::ssiege::SSSiegeApp & app, ::gpk::pob
 	return bool(result == 1);
 }
 
-::gpk::error_t			ssiege::ssiegeUpdate		(::ssiege::SSSiegeApp & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
-	, ::gpk::FBool<::gpk::pobj<::ssiege::EventSSiege> &, ::gpk::apobj<::ssiege::EventSSiege> &> funcHandleEvent
+::gpk::error_t			ssg::ssiegeUpdate		(::ssg::SSSiegeApp & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
+	, ::gpk::FBool<::gpk::pobj<::ssg::EventSSiege> &, ::gpk::apobj<::ssg::EventSSiege> &> funcHandleEvent
 	) {
 		gpk_necs(systemEvents.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { es_if_failed(::processSystemEvent(app, *sysEvent)); 
 	}));
 
-	::ssiege::SWorldView		& worldView				= app.Game.World;
+	::ssg::SWorldView		& worldView				= app.Game.World;
 	bool						processInput			= false;
 
 	switch(app.ActiveState) {
-	case ::ssiege::APP_STATE_Quit	: return 1;
-	case ::ssiege::APP_STATE_Welcome	: // APP_STATE_Welcome comes right after APP_STATE_Init.
-		gpk_necs(app.StateSwitch(::ssiege::APP_STATE_Home)); 
+	case ::ssg::APP_STATE_Quit	: return 1;
+	case ::ssg::APP_STATE_Welcome	: // APP_STATE_Welcome comes right after APP_STATE_Init.
+		gpk_necs(app.StateSwitch(::ssg::APP_STATE_Home)); 
 		break;	
-	case ::ssiege::APP_STATE_Init	: 
+	case ::ssg::APP_STATE_Init	: 
 		{
 			::gpk::aachar				fileNames				= {};
 			es_if_failed(::gpk::pathList(app.FileStrings.SavegameFolder, fileNames, app.FileStrings.ExtensionSaveAuto));
 			if(fileNames.size())
 				es_if_failed(app.Load(fileNames[0]));
 
-			::ssiege::SArgsEvent		dummy					= {};
-			gpk_necs(::gpk::eventEnqueueChild(app.EventQueue, ::ssiege::SSIEGE_EVENT_ADMIN_WORLD, ::ssiege::ADMIN_WORLD_Initialize, dummy));
+			::ssg::SArgsEvent		dummy					= {};
+			gpk_necs(::gpk::eventEnqueueChild(app.EventQueue, ::ssg::SSG_EVENT_ADMIN_WORLD, ::ssg::ADMIN_WORLD_Initialize, dummy));
 		}
-		gpk_necs(app.StateSwitch(::ssiege::APP_STATE_Welcome));
+		gpk_necs(app.StateSwitch(::ssg::APP_STATE_Welcome));
 		break;
 	default: 
 		gpk_necs(::updateInput(app.UI, worldView, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.i16(), inputState->MouseCurrent.ButtonState));
 
 		if(0 == funcHandleEvent)
-			funcHandleEvent			= [&app](::gpk::pobj<::ssiege::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssiege::EventSSiege> & appOutputEvents) { return handleSSiegeEvent(app, _eventToProcess, appOutputEvents); };
+			funcHandleEvent			= [&app](::gpk::pobj<::ssg::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssg::EventSSiege> & appOutputEvents) { return handleSSiegeEvent(app, _eventToProcess, appOutputEvents); };
 
 		// Process the input queue with the app handlers before sending it to the world view updates.
-		app.EventQueue.for_each([&app, &funcHandleEvent](::gpk::pobj<::ssiege::EventSSiege> & _eventToProcess){ 
+		app.EventQueue.for_each([&app, &funcHandleEvent](::gpk::pobj<::ssg::EventSSiege> & _eventToProcess){ 
 			const bool					remove				= funcHandleEvent(_eventToProcess, app.EventQueue); 
 			if(remove)
 				_eventToProcess.clear();
@@ -225,7 +225,7 @@ static	::gpk::error_t	handleSSiegeEvent		(::ssiege::SSSiegeApp & app, ::gpk::pob
 			gpk_necs(::ssg::ssiegeGameUpdate(app.Game, app.EventQueue, app.EventQueue, secondsElapsed));
 
 			if(app.EventQueue.size() > offsetToEnqueue)
-				app.EventQueue			= ::gpk::vpobj<::ssiege::EventSSiege>{(::gpk::pobj<::ssiege::EventSSiege>*)&app.EventQueue[offsetToEnqueue], app.EventQueue.size() - offsetToEnqueue};
+				app.EventQueue			= ::gpk::vpobj<::ssg::EventSSiege>{(::gpk::pobj<::ssg::EventSSiege>*)&app.EventQueue[offsetToEnqueue], app.EventQueue.size() - offsetToEnqueue};
 			else 
 				app.EventQueue.clear();
 		}
@@ -266,12 +266,12 @@ static	::gpk::error_t	handleSSiegeEvent		(::ssiege::SSSiegeApp & app, ::gpk::pob
 		//}
 	}
 
-	if(::ssiege::APP_STATE_Init < app.ActiveState && app.UI.InputQueue.size()) {
+	if(::ssg::APP_STATE_Init < app.ActiveState && app.UI.InputQueue.size()) {
 		gpk_necs(::parseCommands(app.UI.InputQueue, app.UI.InputHistory, app.EventQueue));
 		app.UI.InputQueue.clear();
 	}
 
-	//const ::ssiege::APP_STATE			newState			= ::ssiege::uiUpdate(app, systemEvents);
+	//const ::ssg::APP_STATE			newState			= ::ssg::uiUpdate(app, systemEvents);
 	//return app.StateSwitch(newState);
 	return app.ActiveState;
 }

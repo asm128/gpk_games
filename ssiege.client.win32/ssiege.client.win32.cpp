@@ -26,14 +26,14 @@ static	::gpk::error_t	loadNetworkConfig	(const ::gpk::SJSONReader & jsonConfig, 
 ::gpk::error_t			cleanup				(::SApplication & app)											{
 	::gpk::SFramework			& framework			= app.Framework;
 	::gpk::SWindow				& mainWindow		= framework.RootWindow;
-	ws_if_failed(::ssiege::ssiegeUpdate(app.SSiegeApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
+	ws_if_failed(::ssg::ssiegeUpdate(app.SSiegeApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
 #if !defined(DISABLE_D3D11)
 	app.D3DApp.Shutdown();
 #endif
 
 	ws_if_failed(::gpk::clientDisconnect(app.Client.UDP));
 	ws_if_failed(::gpk::mainWindowDestroy(mainWindow));
-	ws_if_failed(::ssiege::ssiegeUpdate(app.SSiegeApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
+	ws_if_failed(::ssg::ssiegeUpdate(app.SSiegeApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
 	ws_if_failed(::gpk::tcpipShutdown());
 	return 0;
 }
@@ -115,13 +115,13 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 	::gpk::SFrameInfo			& frameInfo			= framework.FrameInfo;
 	{	
 		::gpk::STimer				timer				= {};
-		rvis_if(::gpk::APPLICATION_STATE_EXIT, ::ssiege::APP_STATE_Quit == ::ssiege::ssiegeClientUpdate(app.SSiegeApp, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue));
+		rvis_if(::gpk::APPLICATION_STATE_EXIT, ::ssg::APP_STATE_Quit == ::ssg::ssiegeClientUpdate(app.SSiegeApp, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue));
 		timer.Frame();
 		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
 
 	::gpk::pau8					payloadCache;
-	app.SSiegeApp.EventsToSend.for_each([&app, &payloadCache](::gpk::pobj<::ssiege::EventSSiege> & ev){
+	app.SSiegeApp.EventsToSend.for_each([&app, &payloadCache](::gpk::pobj<::ssg::EventSSiege> & ev){
 		payloadCache.create();
 		gpk_necs(ev->Save(*payloadCache));
 		app.Client.QueueToSend.push_back(payloadCache);
@@ -135,7 +135,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 
 	app.Client.QueueReceived.for_each([&app](::gpk::pobj<::gpk::SUDPMessage> & udp){ 
 		if(udp && udp->Payload.size()) {
-			::gpk::pobj<::ssiege::EventSSiege>	eventReceived;
+			::gpk::pobj<::ssg::EventSSiege>	eventReceived;
 			::gpk::vcu8							inputBytes			= udp->Payload;
 			es_if_failed(eventReceived->Load(inputBytes)); 
 			app.SSiegeApp.EventsReceived.push_back(eventReceived);
@@ -143,7 +143,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 	});
 
 #if !defined(DISABLE_D3D11)
-	if(app.SSiegeApp.ActiveState >= ::ssiege::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.Game.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
+	if(app.SSiegeApp.ActiveState >= ::ssg::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.Game.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
 		//gpk_necs(app.D3DApp.CreateDeviceDependentEngineResources(app.D3DApp.DeviceResources->GetD3DDevice(), *app.D1.Game.Engine.Scene->Graphics));
 		gpk_necs(app.D3DApp.CreateDeviceResources(*app.SSiegeApp.Game.Engine.Scene->Graphics));
 	}
@@ -177,7 +177,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::pobj<::gpk::rtgbra8d32>	backBuffer	= framework.RootWindow.BackBuffer;
 	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), clearColor, (uint32_t)-1);
-	gpk_necs(::ssiege::ssiegeDraw(app.D1.AppUI, app.D1.MainGame, *backBuffer, false));
+	gpk_necs(::ssg::ssiegeDraw(app.D1.AppUI, app.D1.MainGame, *backBuffer, false));
 	memcpy(framework.RootWindow.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	//::gpk::grid_mirror_y(framework.RootWindow.BackBuffer->Color.View, backBuffer->Color.View);
 	//framework.RootWindow.BackBuffer		= backBuffer;

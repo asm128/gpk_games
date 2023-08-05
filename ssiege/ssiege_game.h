@@ -25,7 +25,7 @@ namespace ssg
 	struct SSiegeGame {
 		::gpk::SGame					Global				= {};
 		::gpk::SEnginePlanetarySystem	SolarSystem			= {};
-		::ssiege::SWorldView			World				= {};
+		::ssg::SWorldView			World				= {};
 		::gpk::SCamera					Camera				= {};
 
 		::gpk::eid_t					Controlled			= ::gpk::EID_INVALID;
@@ -57,7 +57,7 @@ namespace ssg
 	};
 
 	::gpk::error_t					ssiegeGameSetup		(::ssg::SSiegeGame & world);
-	::gpk::error_t					ssiegeGameUpdate	(::ssg::SSiegeGame & world, ::gpk::vpobj<::ssiege::EventSSiege> inputEvents, ::gpk::apobj<::ssiege::EventSSiege> & outputEvents, double secondsElapsed);
+	::gpk::error_t					ssiegeGameUpdate	(::ssg::SSiegeGame & world, ::gpk::vpobj<::ssg::EventSSiege> inputEvents, ::gpk::apobj<::ssg::EventSSiege> & outputEvents, double secondsElapsed);
 	::gpk::error_t					ssiegeGameDraw		(::ssg::SSiegeGame & world
 		, ::gpk::rtbgra8d32			& backBuffer
 		, const ::gpk::n3f32		& cameraPosition
