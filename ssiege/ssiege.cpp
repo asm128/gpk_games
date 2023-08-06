@@ -218,6 +218,7 @@ static	::gpk::error_t	handleSSiegeEvent		(::ssg::SSiegeApp & app, ::gpk::pobj<::
 			funcHandleEvent			= [&app](::gpk::pobj<::ssg::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssg::EventSSiege> & appOutputEvents) { return handleSSiegeEvent(app, _eventToProcess, appOutputEvents); };
 
 		// Process the input queue with the app handlers before sending it to the world view updates.
+		::gpk::eventEnqueueChild(app.EventQueue, ::ssg::SSG_EVENT_WORLD_EVENT, ::ssg::WORLD_EVENT_Tick, secondsElapsed);
 		app.EventQueue.for_each([&app, &funcHandleEvent](::gpk::pobj<::ssg::EventSSiege> & _eventToProcess){ 
 			const bool					remove				= funcHandleEvent(_eventToProcess, app.EventQueue); 
 			if(remove)

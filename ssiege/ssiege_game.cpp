@@ -13,14 +13,20 @@ stacxpr	float			SHIP_RING_RADIUS_MAX	= SHIP_CORE_RADIUS * 10;						//
 stacxpr	gpk::minmaxf32	SHIP_RING_RADIUS		= {SHIP_RING_RADIUS_MAX - SHIP_CORE_RADIUS, SHIP_RING_RADIUS_MAX};	// 
 stacxpr	float			SHIP_RING_BORDER		= SHIP_RING_RADIUS.Length();	// 
 stacxpr	float			SHIP_RING_THICKNESS		= ::gpk::max(SHIP_RING_HEIGHT, SHIP_RING_BORDER);	// 
+
 stacxpr	float			SHIP_CRANE_BOX			= SHIP_RING_THICKNESS + SHIP_RING_THICKNESS * .5f;	// 
 stacxpr	float			SHIP_CRANE_BOX_HALF		= SHIP_CRANE_BOX * .5f;	// 
 stacxpr	float			SHIP_CRANE_IRON			= SHIP_CRANE_BOX_HALF * .125f;		// 
 stacxpr	float			SHIP_CRANE_IRON_HALF	= SHIP_CRANE_IRON * .5f;		// 
 stacxpr	float			SHIP_CRANE_WHEEL_RADIUS	= SHIP_CRANE_BOX_HALF * .5f;		// 
 stacxpr	float			SHIP_CRANE_WHEEL_HEIGHT	= SHIP_CRANE_BOX_HALF * .5f;		// 
+
 stacxpr	float			SHIP_ARM_RADIUS			= SHIP_CORE_RADIUS * .125f;	// 
 stacxpr	float			SHIP_ARM_LENGTH			= SHIP_RING_RADIUS_MAX;	// 
+
+stacxpr	float			SHIP_GRIP_HEIGHT		= SHIP_CORE_RADIUS * 5;							// 
+stacxpr	float			SHIP_GRIP_RADIUS_MAX	= SHIP_CORE_RADIUS * 3;						// 
+stacxpr	gpk::minmaxf32	SHIP_GRIP_RADIUS		= {SHIP_GRIP_RADIUS_MAX - SHIP_CORE_RADIUS * .125f, SHIP_GRIP_RADIUS_MAX};	// 
 
 static	::gpk::error_t	createShipCore		(::gpk::SEngine & engine) {
 	::gpk::SParamsSphere		sphere				= {};
@@ -31,7 +37,7 @@ static	::gpk::error_t	createShipCore		(::gpk::SEngine & engine) {
 	return iShip;
 }
 
-static	::gpk::error_t	createShipRing		(::gpk::SEngine & engine) {
+static	::gpk::error_t	createShipRing		(::gpk::SEngine & engine, ::gpk::vcs entityName = "Ship Ring") {
 	::gpk::eid_t				iShipRing; 
 	{
 		::gpk::SParamsTube			ring				= {};
@@ -41,15 +47,16 @@ static	::gpk::error_t	createShipRing		(::gpk::SEngine & engine) {
 		ring.RadiusYMax			= ::SHIP_RING_RADIUS;
 		ring.CellCount.x		= 32;
 
-		gpk_necs(iShipRing = engine.CreateTube(ring, "Ship Ring"));
+		gpk_necs(iShipRing = engine.CreateTube(ring, entityName));
 	}
 	{
 		::gpk::SParamsCircle		energy				= {};
 		energy.Radius			= ::SHIP_RING_RADIUS.Min;
+		energy.Slices			= 32;
 
 		::gpk::eid_t				iRingEnergy; 
-		gpk_necs(iRingEnergy = engine.CreateDisc(energy, "Ship Ring Energy"));
-		engine.SetColorDiffuse(iRingEnergy, {.2f, .5f, 1, .5f});
+		gpk_necs(iRingEnergy = engine.CreateDisc(energy, "Energy Disc"));
+		engine.SetColorDiffuse(iRingEnergy, {.2f, .5f, 1, .25f});
 		engine.Entities.SetParent(iRingEnergy, iShipRing);
 	}
 	engine.SetRotation(iShipRing, ::gpk::n3f32{0, float(::gpk::math_pi * .25),});
@@ -63,7 +70,7 @@ static	::gpk::error_t	createShipCraneBox		(::gpk::SEngine & engine) {
 		base.HalfSizes.From(::SHIP_CRANE_BOX * .5f);
 		base.Origin				= base.HalfSizes;
 		gpk_necs(iArmRoot = engine.CreateBox(base, "Crane Base"));
-		engine.SetColorDiffuse(iArmRoot, {1, 1, 1, .5f});
+		engine.SetColorDiffuse(iArmRoot, {1, 1, 1, .25f});
 		//engine.SetHidden(iArmRoot, true);
 	}
 	for(uint32_t iAxis = 0; iAxis < 3; ++iAxis)
@@ -94,7 +101,6 @@ static	::gpk::error_t	createShipCraneBar	(::gpk::SEngine & engine, ::gpk::vcs en
 	::gpk::eid_t				iBar;
 	gpk_necall(iBar = engine.CreateCylinder(bar, entityName), "entityName: '%s'", ::gpk::toString(entityName).begin());
 	engine.SetOrientation(iBar, ::gpk::quatf32{1, 0, 0, 1}.Normalize());
-		;
 	engine.SetPosition(iBar, {0, ::SHIP_CRANE_WHEEL_RADIUS * .5f, });
 	return iBar;
 }
@@ -108,6 +114,32 @@ static	::gpk::error_t	createShipCraneWheel(::gpk::SEngine & engine, ::gpk::vcs e
 	gpk_necall(iWheel = engine.CreateCylinder(wheel, entityName), "entityName: '%s'", ::gpk::toString(entityName).begin());
 	engine.SetOrientation(iWheel, ::gpk::quatf32{1, 0, 0, 1}.Normalize());
 	return iWheel;
+}
+
+static	::gpk::error_t	createShipCraneGrip	(::gpk::SEngine & engine, ::gpk::vcs entityName = "Crane Grip") {
+	::gpk::eid_t				iShipRing; 
+	{
+		::gpk::SParamsTube			ring				= {};
+		ring.Origin.y			= ::SHIP_GRIP_HEIGHT * .5f;
+		ring.Height				= ::SHIP_GRIP_HEIGHT;
+		ring.RadiusYMin			= ::SHIP_GRIP_RADIUS;
+		ring.RadiusYMax			= ::SHIP_GRIP_RADIUS;
+		ring.CellCount.x		= 32;
+
+		gpk_necs(iShipRing = engine.CreateTube(ring, entityName));
+	}
+	{
+		::gpk::SParamsCircle		energy				= {};
+		energy.Radius			= ::SHIP_RING_RADIUS.Min;
+		energy.Slices			= 32;
+
+		::gpk::eid_t				iRingEnergy; 
+		gpk_necs(iRingEnergy = engine.CreateDisc(energy, "Energy Disc"));
+		engine.SetColorDiffuse(iRingEnergy, {.2f, .5f, 1, .25f});
+		engine.Entities.SetParent(iRingEnergy, iShipRing);
+	}
+	engine.SetRotation(iShipRing, ::gpk::n3f32{0, float(::gpk::math_pi * .25), -float(::gpk::math_pi_2 * .15f)});
+	return iShipRing; 
 }
 
 static	::gpk::error_t	createShipCrane		(::gpk::SEngine & engine) {
@@ -130,20 +162,21 @@ static	::gpk::error_t	createShipCrane		(::gpk::SEngine & engine) {
 			continue;
 
 		::gpk::eid_t				iWheel;
-		{	// Create wheel
-			gpk_necs(iWheel = ::createShipCraneWheel(engine, isLeft ? ::gpk::vcs{"Ship Crane Wheel Left?"} : ::gpk::vcs{"Ship Crane Wheel Right?"}));
-			::gpk::n3f32				barPosition			= {OFFSET_CORNER, -::SHIP_CRANE_BOX_HALF, OFFSET_CORNER * (iArm ? 1 : -1)};
-			engine.SetPosition(iWheel, barPosition);
-			engine.SetRotation(iWheel, ::gpk::n3f32{0, 0, float(::gpk::math_pi_2 * .15)});
-			gpk_necs(engine.Entities.SetParent(iWheel, iCrane));
-		}
+		gpk_necs(iWheel = ::createShipCraneWheel(engine, isLeft ? ::gpk::vcs{"Ship Crane Wheel Left?"} : ::gpk::vcs{"Ship Crane Wheel Right?"}));
+		::gpk::n3f32				barPosition			= {OFFSET_CORNER, -::SHIP_CRANE_BOX_HALF, OFFSET_CORNER * (isLeft ? -1 : 1)};
+		engine.SetPosition(iWheel, barPosition);
+		engine.SetRotation(iWheel, ::gpk::n3f32{0, 0, float(::gpk::math_pi_2 * .15)});
+		gpk_necs(engine.Entities.SetParent(iWheel, iCrane));
+
 		::gpk::eid_t				iBar;	// Create bar
-		if(isLeft) 
-			iBar				= ::gpk::EID_INVALID;
-		else {
-			gpk_necs(iBar = ::createShipCraneBar(engine, iArm ? ::gpk::vcs{"Ship Crane Bar Right?"} : ::gpk::vcs{"Ship Crane Bar Left?"}));
-			gpk_necs(engine.Entities.SetParent(iBar, iWheel));
-		}
+		gpk_necs(iBar = ::createShipCraneBar(engine, isLeft ? ::gpk::vcs{"Ship Crane Bar Left?"} : ::gpk::vcs{"Ship Crane Bar Right?"}));
+		gpk_necs(engine.Entities.SetParent(iBar, iWheel));
+
+		::gpk::eid_t				iGrip;	// Create bar
+		gpk_necs(iGrip = ::createShipCraneGrip(engine, isLeft ? ::gpk::vcs{"Ship Crane Grip Left?"} : ::gpk::vcs{"Ship Crane Grip Right?"}));
+		::gpk::n3f32				tubePosition			= {::SHIP_GRIP_RADIUS_MAX, ::SHIP_ARM_LENGTH, OFFSET_CORNER * (isLeft ? -1 : 1)};
+		engine.SetPosition(iGrip, tubePosition);
+		gpk_necs(engine.Entities.SetParent(iGrip, iBar));
 	}
 	return iCrane; 
 }

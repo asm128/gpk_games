@@ -90,13 +90,13 @@
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
-	case ::ssg::WORLD_VALUE_TimeCreated			: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::WORLD_VALUE_TimeOffset			: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::WORLD_VALUE_DaylightOffsetMinutes: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::WORLD_VALUE_DaylightRatioExtra	: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::WORLD_VALUE_TimeLastSaved		: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::WORLD_VALUE_WorldSize			: gpk_warning_not_implemented(gameEvent); break; 
-	case ::ssg::WORLD_VALUE_TimeScale			: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_VALUE_TimeCreated				: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_VALUE_TimeOffset				: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_VALUE_DaylightOffsetMinutes	: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_VALUE_DaylightRatioExtra		: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_VALUE_TimeLastSaved			: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_VALUE_WorldSize				: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::WORLD_VALUE_TimeScale				: gpk_warning_not_implemented(gameEvent); break; 
 	}
 	return 0;
 }

@@ -50,14 +50,15 @@ namespace ssg
 
 	// These events trigger or report effects that are spawned by the world 
 	GDEFINE_ENUM_TYPE (WORLD_EVENT, uint8_t);
-	GDEFINE_ENUM_VALUE(WORLD_EVENT, Rain		, 0);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Start drizzle, 2: Start rain, 3: Start storm, 4: Start storm.
-	GDEFINE_ENUM_VALUE(WORLD_EVENT, Thunderstorm, 1);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Start intra-cloud, 2: Start cloud to cloud, 3: Start cloud to ground.
-	GDEFINE_ENUM_VALUE(WORLD_EVENT, Earthquake	, 2);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1 to 10: Ritcher scale. 
-	GDEFINE_ENUM_VALUE(WORLD_EVENT, Tornado		, 3);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1 to 10: Ritcher scale. 
-	GDEFINE_ENUM_VALUE(WORLD_EVENT, Wave		, 4);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Small , 2: Medium , 3: Large, 4: Tsunami.
-	GDEFINE_ENUM_VALUE(WORLD_EVENT, Lightning	, 5);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Small , 2: Medium , 3: Large.
-	GDEFINE_ENUM_VALUE(WORLD_EVENT, Wildfire	, 6);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Small , 2: Medium , 3: Large.
-	GDEFINE_ENUM_VALUE(WORLD_EVENT, Flood		, 7);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Small , 2: Medium , 3: Large.
+	GDEFINE_ENUM_VALUE(WORLD_EVENT, Tick		, 0);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Start drizzle, 2: Start rain, 3: Start storm, 4: Start storm.
+	GDEFINE_ENUM_VALUE(WORLD_EVENT, Rain		, 1);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Start drizzle, 2: Start rain, 3: Start storm, 4: Start storm.
+	GDEFINE_ENUM_VALUE(WORLD_EVENT, Thunderstorm, 2);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Start intra-cloud, 2: Start cloud to cloud, 3: Start cloud to ground.
+	GDEFINE_ENUM_VALUE(WORLD_EVENT, Earthquake	, 3);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1 to 10: Ritcher scale. 
+	GDEFINE_ENUM_VALUE(WORLD_EVENT, Tornado		, 4);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1 to 10: Ritcher scale. 
+	GDEFINE_ENUM_VALUE(WORLD_EVENT, Wave		, 5);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Small , 2: Medium , 3: Large, 4: Tsunami.
+	GDEFINE_ENUM_VALUE(WORLD_EVENT, Lightning	, 6);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Small , 2: Medium , 3: Large.
+	GDEFINE_ENUM_VALUE(WORLD_EVENT, Wildfire	, 7);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Small , 2: Medium , 3: Large.
+	GDEFINE_ENUM_VALUE(WORLD_EVENT, Flood		, 9);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Small , 2: Medium , 3: Large.
 	typedef	::gpk::SEvent		<WORLD_EVENT>	EventWorld;
 	typedef	::gpk::SEventView	<WORLD_EVENT>	EViewWorld;
 
