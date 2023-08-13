@@ -54,6 +54,9 @@
 	::ssg::printArgsEvent(eventArgs);
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
+	case ::ssg::WORLD_EVENT_Tick			: 
+		//gpk_warning_not_implemented(gameEvent); 
+		break;
 	case ::ssg::WORLD_EVENT_Rain			: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssg::WORLD_EVENT_Thunderstorm	: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssg::WORLD_EVENT_Earthquake		: gpk_warning_not_implemented(gameEvent); break; 
