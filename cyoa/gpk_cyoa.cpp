@@ -1,4 +1,5 @@
 #include "gpk_cyoa.h"
+#include "gpk_io.h"
 
 #define superp(format, ...) printf(format "\n", __VA_ARGS__)
 
