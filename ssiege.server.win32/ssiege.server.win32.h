@@ -25,7 +25,7 @@ struct SApplication {
 #endif
 	::gpk::po<::gpk::SServer>	Server;
 
-	::ssg::SSiegeServer		SSiegeApp			= {};
+	::ssg::SSiegeServer			SSiegeApp			= {};
 
 								SApplication	(::gpk::SRuntimeValues & runtimeValues)	noexcept	
 	: Framework(runtimeValues) { 

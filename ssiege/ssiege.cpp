@@ -12,8 +12,10 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssg::SSiegeUI & ssieg
 	ssiegeUI.UserInput.MaxLength	= 64;
 	gpk_necs(ssiegeUI.UserInput.Edit(gui, true));
 
-	gui.Controls.Placement[ssiegeUI.UserInput.IdRoot].Align		= ::gpk::ALIGN_CENTER_BOTTOM;
-	gui.Controls.Placement[ssiegeUI.UserInput.IdRoot].Area.Size.y	= gui.Controls.Placement[ssiegeUI.UserInput.IdText].Area.Size.y;
+	::gpk::SControlPlacement & userInputRoot = gui.Controls.Placement[ssiegeUI.UserInput.IdRoot];
+	::gpk::SControlPlacement & userInputText = gui.Controls.Placement[ssiegeUI.UserInput.IdText];
+	userInputRoot.Align			= ::gpk::ALIGN_CENTER_BOTTOM;
+	userInputRoot.Area.Size.y	= userInputText.Area.Size.y;
 	gpk_necs(gui.Controls.SetHidden(ssiegeUI.UserInput.VirtualKeyboard.IdRoot, true));
 	return 0;
 }
@@ -239,6 +241,11 @@ static	::gpk::error_t	handleSSiegeEvent		(::ssg::SSiegeApp & app, ::gpk::pobj<::
 	} // switch
 
 	app.Game.Global.State.UserTime.Played += secondsElapsed;
+	if(app.Game.Global.Stages.size()) {
+		app.Game.Global.Stages[app.Game.Global.Stages.size() - 1].Time.Played += secondsElapsed;
+		stacxpr	float			Fasting					= .45f;
+		app.Game.Global.Stages[app.Game.Global.Stages.size() - 1].SimulatedTime.Update(secondsElapsed, Fasting);
+	}
 	if(processInput) { // process console
 		::gpk::SGUI					& gui				= *app.GUI;
 		::gpk::acid					controlsToProcess	= {};

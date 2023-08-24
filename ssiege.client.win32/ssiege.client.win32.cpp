@@ -18,7 +18,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "SSiege Client v0.1");
 
 static	::gpk::error_t	loadNetworkConfig	(const ::gpk::SJSONReader & jsonConfig, ::gpk::vcc & remote_ip, ::gpk::vcc & remote_port) {
 	::gpk::error_t				appNodeIndex;
-	gpk_necs(appNodeIndex = ::gpk::jsonExpressionResolve(::gpk::vcs{"ssiege.client"}, jsonConfig, 0));
+	gpk_necs(appNodeIndex = ::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client"}, jsonConfig, 0));
 	return ::gpk::loadClientConfig(jsonConfig, appNodeIndex, remote_ip, remote_port);
 }
 
@@ -170,14 +170,16 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 	
 	gpk_necs(::gpk::guiDraw(*app.SSiegeApp.GUI, app.D3DApp.GUIStuff.RenderTarget));
 
+	app.D3DApp.Scene.ConstantBufferScene.Time	= (float)app.Framework.FrameInfo.Seconds.Total;
+
 	const ::gpk::SCamera		& cameraSelected		= app.SSiegeApp.Game.Camera;
 	const ::gpk::SEngineScene	& engineScene			= *app.SSiegeApp.Game.Engine.Scene;
 	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, sunlightPos, cameraSelected.Position, cameraSelected.Target, cameraSelected.NearFar));
 #else 
 	::gpk::SFramework			& framework				= app.Framework;
-	::gpk::pobj<::gpk::rtgbra8d32>	backBuffer	= framework.RootWindow.BackBuffer;
+	::gpk::prtbgra8d32			backBuffer				= framework.RootWindow.BackBuffer;
 	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), clearColor, (uint32_t)-1);
-	gpk_necs(::ssg::ssiegeDraw(app.D1.AppUI, app.D1.MainGame, *backBuffer, false));
+	gpk_necs(::ssg::ssiegeDraw(app.SSiegeApp, *backBuffer, false));
 	memcpy(framework.RootWindow.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	//::gpk::grid_mirror_y(framework.RootWindow.BackBuffer->Color.View, backBuffer->Color.View);
 	//framework.RootWindow.BackBuffer		= backBuffer;
