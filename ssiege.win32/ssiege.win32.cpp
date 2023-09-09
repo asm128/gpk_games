@@ -68,7 +68,7 @@ static	::gpk::error_t	processGUIEvent			(::SApplication & /*app*/, const ::gpk::
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SSystemEvent & sysEvent) { 
+static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen	: return ::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN		>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_SCREEN		> & screenEvent) { return processScreenEvent(app, screenEvent); }); 
@@ -96,9 +96,9 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 
 	bool						systemExit				= false;
 
-	::gpk::apobj<::gpk::SSystemEvent>	eventsToProcess	= mainWindow.EventQueue;
+	::gpk::apobj<::gpk::SEventSystem>	eventsToProcess	= mainWindow.EventQueue;
 	gpk_necs(eventsToProcess.append(gui.Controls.EventQueue));
-	gpk_necs(eventsToProcess.for_each([&app, &systemExit](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { 
+	gpk_necs(eventsToProcess.for_each([&app, &systemExit](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { 
 		::gpk::error_t				result; 
 		gpk_necs(result = ::processSystemEvent(app, *sysEvent)); 
 		if(result == 1) 

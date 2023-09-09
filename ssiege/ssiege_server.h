@@ -24,7 +24,7 @@ namespace ssg
 	::gpk::error_t			handleWORLD_SETUP		(::ssg::SSiegeServer & world, const ::gpk::SEventView<ssg::WORLD_SETUP> & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents);// { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
 	::gpk::error_t			handleWORLD_VALUE		(::ssg::SSiegeServer & world, const ::gpk::SEventView<ssg::WORLD_VALUE> & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents);// { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
 
-	::gpk::error_t		ssiegeServerUpdate		(SSiegeServer & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents);
+	::gpk::error_t		ssiegeServerUpdate		(SSiegeServer & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents);
 } // namespace 
 
 #endif // SSIEGE_SERVER_H_23701

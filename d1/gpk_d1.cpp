@@ -293,7 +293,7 @@ static	::gpk::error_t	processKeyboardEvent	(::d1::SD1 & app, const ::gpk::SEvent
 	}
 	return 0;
 }
-static	::gpk::error_t	processSystemEvent		(::d1::SD1 & app, const ::gpk::SSystemEvent & sysEvent) { 
+static	::gpk::error_t	processSystemEvent		(::d1::SD1 & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen		: es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN	>(sysEvent, [&app](auto ev) { return processScreenEvent		(app, ev); }))); break;
@@ -488,10 +488,10 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 }
 
 
-::gpk::error_t				d1::d1Update		(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEventsNew) { 
+::gpk::error_t				d1::d1Update		(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEventsNew) { 
 	::d1::SD1Game					& clientGame		= app.MainGame;
 
-	gpk_necs(systemEventsNew.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
+	gpk_necs(systemEventsNew.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
 
 	::d1p::SPoolGame				& poolGame			= clientGame.Pool;
 

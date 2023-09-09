@@ -1,7 +1,7 @@
 #include "ssiege_client.h"
 #include "ssiege_event_args.h"
 
-::gpk::error_t		ssg::ssiegeClientUpdate		(::ssg::SSiegeClient & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents) { 
+::gpk::error_t		ssg::ssiegeClientUpdate		(::ssg::SSiegeClient & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents) { 
 	gpk_necs(::ssg::ssiegeUpdate(app, lastTimeSeconds, inputState, systemEvents, [&app](::gpk::pobj<::ssg::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) {
 		if(!_eventToProcess)
 			return false;

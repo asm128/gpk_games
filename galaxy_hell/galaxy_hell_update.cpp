@@ -371,7 +371,7 @@ static	::gpk::error_t	shipsUpdate				(::ghg::SGalaxyHell & solarSystem, double s
 	return playing;
 }
 
-static	::gpk::error_t	processInput			(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SSystemEvent> frameEvents) {
+static	::gpk::error_t	processInput			(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SEventSystem> frameEvents) {
 	(void)frameEvents;
 
 
@@ -470,7 +470,7 @@ static	::gpk::error_t	processInput			(::ghg::SGalaxyHell & solarSystem, double s
 
 stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 
-::gpk::error_t			ghg::solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double actualSecondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SSystemEvent> frameEvents)	{
+::gpk::error_t			ghg::solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double actualSecondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SEventSystem> frameEvents)	{
 	if(solarSystem.PlayState.GlobalState.Paused) 
 		return 0;
 

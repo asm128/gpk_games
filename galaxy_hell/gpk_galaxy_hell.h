@@ -126,7 +126,7 @@ namespace ghg
 	::gpk::error_t		solarSystemSetup		(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2u16 & windowSize);
 	::gpk::error_t		solarSystemReset		(::ghg::SGalaxyHell & solarSystem); 
 	::gpk::error_t		solarSystemDraw			(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
-	::gpk::error_t		solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SSystemEvent> frameEvents);
+	::gpk::error_t		solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SEventSystem> frameEvents);
 	::gpk::error_t		solarSystemLoad			(::ghg::SGalaxyHell & world,::gpk::vcc filename);
 	::gpk::error_t		solarSystemSave			(const ::ghg::SGalaxyHell & world,::gpk::vcc filename);
 	

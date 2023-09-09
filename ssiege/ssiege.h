@@ -130,7 +130,7 @@ namespace ssg
 		}
 	};
 
-	::gpk::error_t			ssiegeUpdate		(::ssg::SSiegeApp & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEvents
+	::gpk::error_t			ssiegeUpdate		(::ssg::SSiegeApp & ssiege, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents
 		, ::gpk::FBool<::gpk::pobj<::ssg::EventSSiege> &, ::gpk::apobj<::ssg::EventSSiege> &> funcHandleEvent
 		);
 	::gpk::error_t			ssiegeDraw			(::ssg::SSiegeApp & ssiege, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI);

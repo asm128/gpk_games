@@ -355,11 +355,11 @@ namespace d1
 
 	};
 
-	::gpk::error_t			d1Update				(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEventsNew);
+	::gpk::error_t			d1Update				(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEventsNew);
 	::gpk::error_t			d1Draw					(::d1::SD1UI & appUI, ::d1::SD1Game & poolGame, ::gpk::rtbgra8d32 & backBuffer, double totalSeconds, bool onlyGUI = false);
 
 	::gpk::error_t			guiSetup				(::d1::SD1UI & appUI, ::d1::SD1Game & appGame, const ::gpk::pobj<::gpk::SInput> & input);
-	::d1::APP_STATE			guiUpdate				(::d1::SD1 & app, ::gpk::vpobj<::gpk::SSystemEvent> sysEvents);
+	::d1::APP_STATE			guiUpdate				(::d1::SD1 & app, ::gpk::vpobj<::gpk::SEventSystem> sysEvents);
 } // namespace
 
 #endif

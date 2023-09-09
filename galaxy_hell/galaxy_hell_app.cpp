@@ -84,7 +84,7 @@ static	::gpk::error_t	processKeyboardEvent	(::ghg::SGalaxyHellApp & app, const :
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::gpk::SSystemEvent & sysEvent) { 
+static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen		: es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN	>(sysEvent, [&app](auto ev) { return processScreenEvent		(app, ev); }))); break;
@@ -94,10 +94,10 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 	return 0;
 }
 
-::gpk::error_t			ghg::galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SSystemEvent> systemEventsNew) {
+::gpk::error_t			ghg::galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEventsNew) {
 	rvis_if(1, app.ActiveState == ::ghg::APP_STATE_Quit);
 
-	gpk_necs(systemEventsNew.for_each([&app](const ::gpk::pobj<::gpk::SSystemEvent> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
+	gpk_necs(systemEventsNew.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
 
 	switch(app.ActiveState) {
 	case APP_STATE_Init		: {

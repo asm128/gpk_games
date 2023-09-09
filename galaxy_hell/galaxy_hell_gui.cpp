@@ -637,7 +637,7 @@ static	::gpk::error_t	guiUpdatePlay		(::ghg::SGalaxyHellApp & app) {
 	return 0;
 }
 
-static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpobj<::gpk::SSystemEvent> frameEvents) {
+static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpobj<::gpk::SEventSystem> frameEvents) {
 	for(uint32_t iPlayer = 0; iPlayer < app.TunerPlayerCount->ValueCurrent; ++iPlayer) {
 		::ghg::SUIPlayer			& uiPlayer					= app.UIPlay.PlayerUI[iPlayer];
 		::gpk::SDialog				& dialog					= uiPlayer.DialogHome;
@@ -701,7 +701,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpob
 	return 0;
 }
 
-::gpk::error_t			ghg::guiUpdate				(::ghg::SGalaxyHellApp & app, ::gpk::vpobj<::gpk::SSystemEvent> sysEvents) {
+::gpk::error_t			ghg::guiUpdate				(::ghg::SGalaxyHellApp & app, ::gpk::vpobj<::gpk::SEventSystem> sysEvents) {
 	{
 		::gpk::SDialog				& dialog					= app.DialogDesktop;
 		::gpk::SGUI					& gui						= *dialog.GUI;
