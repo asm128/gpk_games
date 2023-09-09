@@ -311,7 +311,7 @@ static	::gpk::error_t	guiSetupSettings	(::ghg::SGalaxyHellApp & app, ::gpk::SDia
 	es_if(errored(::dialogCreateCommon(app.DialogDesktop, input, {})));
 
 	for(uint32_t iGUI = 0; iGUI < app.DialogPerState.size(); ++iGUI)
-		e_if(errored(::dialogCreateCommon(app.DialogPerState[iGUI], input, {})), "iGUI: %i", iGUI);
+		ef_if(errored(::dialogCreateCommon(app.DialogPerState[iGUI], input, {})), "iGUI: %i", iGUI);
 
 	es_if(errored(::guiSetupWelcome	(app, app.DialogPerState[::ghg::APP_STATE_Welcome	])));
 	es_if(errored(::guiSetupHome	(app, app.DialogPerState[::ghg::APP_STATE_Home		])));
@@ -329,7 +329,7 @@ static	::gpk::error_t	guiSetupSettings	(::ghg::SGalaxyHellApp & app, ::gpk::SDia
 static	::gpk::error_t	guiHandleLoad		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & gui, uint32_t idControl, ::ghg::SGalaxyHell & /*game*/) { 
 	if(idControl < (gui.Controls.Text.size() - 2)) {
 		try {
-			gerror_if(0 > ::ghg::solarSystemLoad(app.Game, gui.Controls.Text[idControl + 1].Text), "Failed to load file: '%s'", gui.Controls.Text[idControl + 1].Text.begin());
+			ef_if(0 > ::ghg::solarSystemLoad(app.Game, gui.Controls.Text[idControl + 1].Text), "Failed to load file %i: '%s'", idControl + 1, gui.Controls.Text[idControl + 1].Text.begin());
 		}
 		catch (const char * ) {
 			::ghg::solarSystemReset(app.Game);

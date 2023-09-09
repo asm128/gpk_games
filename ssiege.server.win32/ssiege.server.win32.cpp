@@ -88,7 +88,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SS
 
 	gpk_necs(::gpk::tcpipInitialize());
 
-	ws_if_failed(::loadNetworkConfig(framework.JSONConfig.Reader, app.Server->Port, app.Server->Adapter))
+	ws_if_failed(::loadNetworkConfig(framework.JSONConfig.Reader, app.Server->Port, app.Server->Adapter));
 	es_if_failed(::gpk::serverStart(*app.Server, *framework.GUI));
 
 	return 0;

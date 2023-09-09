@@ -153,7 +153,7 @@ static	::gpk::error_t	parseCommands			(gpk::vpobj<gpk::achar> inputQueue, gpk::a
 		res_if(!textLine || 0 == textLine->size());	// Shouldn't get here please
 
 		if(textLine->size() > 1 && (*textLine)[0] == '.')
-			e_if_failed(::ssg::parseCommandLine(outputEvents, *textLine), ::gpk::toString(*textLine).begin());
+			e_if_failed(::ssg::parseCommandLine(outputEvents, *textLine), "%s", ::gpk::toString(*textLine).begin());
 
 		info_printf("Queued input processed: '%s'", textLine->begin());
 		es_if_failed(inputHistory.push_back(textLine));

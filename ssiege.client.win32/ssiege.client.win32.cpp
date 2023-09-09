@@ -87,7 +87,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SSy
 	gpk_necs(::gpk::setupGUI(app.Client.UI, gui));
 
 	gpk_necs(::gpk::tcpipInitialize());
-	ws_if_failed(::loadNetworkConfig(framework.JSONConfig.Reader, app.Client.RemoteIp, app.Client.RemotePort))
+	ws_if_failed(::loadNetworkConfig(framework.JSONConfig.Reader, app.Client.RemoteIp, app.Client.RemotePort));
 	es_if_failed(::gpk::clientConnect(app.Client, *framework.GUI));	// Preemptively try to connect to the gate server. 
 
 	return 0;

@@ -289,7 +289,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 
 ::gpk::error_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames) {
 	::gpk::aobj<::gpk::apod<char>>	fileNames;
-	gerror_if(errored(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionSave)), "%s", saveGameFolder.begin());
+	ef_if(errored(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionSave)), "%s", saveGameFolder.begin());
 
 	::gpk::aobj<::gpk::vcc>				pathFileNames;
 	for(uint32_t iFile = 0; iFile < fileNames.size(); ++iFile)
@@ -310,7 +310,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 
 ::gpk::error_t					ghg::listFilesProfile		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames) {
 	::gpk::aobj<::gpk::apod<char>>	fileNames;
-	gerror_if(errored(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionProfile)), "%s", saveGameFolder.begin());
+	ef_if(errored(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionProfile)), "%s", saveGameFolder.begin());
 
 	::gpk::aobj<::gpk::vcc>				pathFileNames;
 	for(uint32_t iFile = 0; iFile < fileNames.size(); ++iFile)
