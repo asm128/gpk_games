@@ -295,7 +295,7 @@ namespace ghg
 		::gpk::apobj<TRenderTarget>			RenderTargetQueue			= {};
 		::std::mutex						RenderTargetLockPool		= {};
 		::std::mutex						RenderTargetLockQueue		= {};
-		volatile uint64_t					CurrentRenderTarget			= 0;
+		vltl	uint64_t					CurrentRenderTarget			= 0;
 		int32_t								PlayerSelected				= 0;
 
 		bool								Exit						= false;
