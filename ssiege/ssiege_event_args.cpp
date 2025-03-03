@@ -39,7 +39,7 @@
 }
 
 ::gpk::error_t			ssg::printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, ::gpk::achar & output) {
-	char						temp	[1024]				= {};
+	sc_t						temp	[1024]				= {};
 	sprintf_s(temp, 
 		"\nCoordSource  : " N3_F32
 		"\nCoordTarget  : " N3_F32

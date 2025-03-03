@@ -125,7 +125,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 
 	//-----------------------------
 	::gpk::STimer				& timer					= app.Framework.Timer;
-	char						buffer	[256]			= {};
+	sc_t						buffer	[256]			= {};
 	sprintf_s(buffer, "[%u x %u]. FPS: %g. Last frame seconds: %g.", mainWindow.Size.x, mainWindow.Size.y, 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
 	::HWND						windowHandle			= mainWindow.PlatformDetail.WindowHandle;
 	SetWindowTextA(windowHandle, buffer);

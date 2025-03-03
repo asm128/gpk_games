@@ -9,6 +9,8 @@
 #include "gpk_file.h"
 #include "gpk_voxel.h"
 
+GPK_USING_TYPEINT();
+
 
 ::gpk::error_t			d1p::poolGameSave		(const ::d1p::SPoolGame & game, ::gpk::vcc fileName) {
 	::gpk::au8					serialized;
@@ -49,11 +51,11 @@ static	::gpk::error_t	poolGameResetTest2Balls	(::d1p::SPoolGame & pool, ::d1p::S
 }
 
 static	::gpk::error_t	textureBallNumber		(::gpk::g8bgra view, uint32_t number, const ::gpk::SRasterFont & font) { 
-	char						strNumber[4]			= {};
+	sc_t						strNumber[4]			= {};
 	sprintf_s(strNumber, "%i", number);
 	const ::gpk::rect2i16		targetRect				= 
 		{ {int16_t(view.metrics().x / 2 - (font.CharSize.x * strlen(strNumber)) / 2), int16_t(view.metrics().y / 2 - font.CharSize.y / 2)}
-		, font.CharSize.i16()
+		, font.CharSize.s1_t()
 		};
 	::gpk::apod<::gpk::n2u16>	coords;
 	::gpk::textLineRaster(view.metrics(), font.CharSize, targetRect, font.Texture, strNumber, coords);
@@ -93,7 +95,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		material.Color.Diffuse	= color;
   		material.Color.Ambient	= material.Color.Diffuse * .1f;
 		if(iBall) {
-			::gpk::g8bgra	view					= {(::gpk::bgra*)surface.Data.begin(), surface.Desc.Dimensions.u32()};
+			::gpk::g8bgra	view					= {(::gpk::bgra*)surface.Data.begin(), surface.Desc.Dimensions.u2_t()};
 			textureBallNumber(view, iBall, font);
 			//if(0 == iBall)
 			//	textureBallCue(view, ::gpk::RED);
@@ -113,7 +115,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	ballOrder[5]			= ball5;
 	ballOrder[11]			= 8;
 
-	constexpr char				ballsToSet	[12]		= {2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15};
+	constexpr sc_t				ballsToSet	[12]		= {2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15};
 	::gpk::au8					ballPool				= {};
 	for(uint8_t iBall = 0; ballPool.size() < ::gpk::size(ballsToSet); ++iBall) {
 		if(iBall == 8)
@@ -439,7 +441,7 @@ static	::gpk::error_t	geometryBuildTableCushion	(::gpk::SGeometryBuffers & outpu
 	surface->Desc.Dimensions			= {32, 32};
 	surface->Data.resize(surface->Desc.Dimensions.Area() * sizeof(::gpk::bgra));
 	memset(surface->Data.begin(), 0xFF, surface->Data.size());
-	::gpk::g8bgra				view					= {(::gpk::bgra*)surface->Data.begin(), surface->Desc.Dimensions.u32()};
+	::gpk::g8bgra				view					= {(::gpk::bgra*)surface->Data.begin(), surface->Desc.Dimensions.u2_t()};
 	::gpk::rgba								color					= {::gpk::ASCII_PALETTE[rand() % 16]};
 	for(uint32_t y = surface->Desc.Dimensions.y / 3; y < surface->Desc.Dimensions.y / 3U * 2U; ++y)
 	for(uint32_t x = 0; x < surface->Desc.Dimensions.x; ++x)
@@ -490,7 +492,7 @@ static	::gpk::error_t	geometryBuildTableCushion	(::gpk::SGeometryBuffers & outpu
 //}
 //
 //static	::gpk::error_t	textureBallCue			(::gpk::g8bgra view, ::gpk::bgra color) {
-//	::gpk::n2f						viewCenter				= view.metrics().f32() / 2;
+//	::gpk::n2f						viewCenter				= view.metrics().f2_t() / 2;
 //	::gpk::n2f						pointCenters[]			= 
 //		{ {0, viewCenter.y}
 //		, {view.metrics().x / 4.0f * 1, viewCenter.y}

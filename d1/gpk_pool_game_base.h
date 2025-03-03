@@ -10,6 +10,8 @@
 
 namespace d1p
 {
+	GPK_USING_TYPEINT();
+
 #pragma pack(push, 1)
 	stacxpr	float		SCALE_FOOT_TO_METER	= 1.0f / 3.281f;
 	stacxpr	float		SCALE_INCH_TO_METER	= 2.54f * .01f;

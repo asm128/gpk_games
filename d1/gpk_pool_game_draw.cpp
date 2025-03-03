@@ -39,7 +39,7 @@
 			screenDelta.A.y = screenDelta.B.y = 0;
 			::gpk::drawLine(offscreenMetrics, screenDelta, constants.VPS, wireframePixelCoords, backBuffer.DepthStencil);
 			for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
-				::gpk::n3<int16_t>								coord					= wireframePixelCoords[iCoord].i16();
+				::gpk::n3<int16_t>								coord					= wireframePixelCoords[iCoord].s1_t();
 				backBuffer.Color.View[coord.y][coord.x]		= pool.BallColors[iBall];
 			}
 		}
@@ -76,7 +76,7 @@
 	::gpk::drawLine(offscreenMetrics, ::gpk::line3<float>{limitsBottom[3], limitsTop[3]}, constants.VPS, wireframePixelCoords, backBuffer.DepthStencil);
 
 	for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
-		::gpk::n3i16				coord		= wireframePixelCoords[iCoord].i16();
+		::gpk::n3i16				coord		= wireframePixelCoords[iCoord].s1_t();
 		::gpk::rgbaf				color		= 
 			{ (float)(totalSeconds - iCoord / 1.0f / totalSeconds)
 			, (float)(totalSeconds - iCoord / 2.0f / totalSeconds)

@@ -10,7 +10,9 @@
 
 #include <algorithm>
 
-stacxpr	uint32_t		MAX_LIGHT_RANGE		= 10;
+GPK_USING_TYPEINT();
+
+stxp	u2_t			MAX_LIGHT_RANGE		= 10;
 
 static	::gpk::error_t	drawStars			(const ::ghg::SStars & stars, ::gpk::g8bgra targetPixels)	{
 	::gpk::bgra					colors[]			=
@@ -22,7 +24,7 @@ static	::gpk::error_t	drawStars			(const ::ghg::SStars & stars, ::gpk::g8bgra ta
 	for(uint32_t iStar = 0; iStar < stars.Brightness.size(); ++iStar) {
 		::gpk::n2f32				starPos				= stars.Position[iStar];
 		::gpk::bgra					starFinalColor		= colors[iStar % ::gpk::size(colors)] * stars.Brightness[iStar];
-		::gpk::setPixel(targetPixels, starPos.i16(), starFinalColor);
+		::gpk::setPixel(targetPixels, starPos.s1_t(), starFinalColor);
 		const	int32_t					brightRadius		= 1 + (iStar % 3) + (rand() % 2);
 		const	double					brightRadiusSquared	= brightRadius * (double)brightRadius;
 		double							brightUnit			= 1.0 / brightRadiusSquared;
@@ -31,7 +33,7 @@ static	::gpk::error_t	drawStars			(const ::ghg::SStars & stars, ::gpk::g8bgra ta
 			::gpk::n2f32					brightPos			= {(float)x, (float)y};
 			const double					brightDistance		= brightPos.LengthSquared();
 			if(brightDistance <= brightRadiusSquared) {
-				::gpk::n2i16				pixelPos			= (starPos + brightPos).i16();
+				::gpk::n2i16				pixelPos			= (starPos + brightPos).s1_t();
 				if( pixelPos.y >= 0 && pixelPos.y < (int32_t)targetPixels.metrics().y
 				 && pixelPos.x >= 0 && pixelPos.x < (int32_t)targetPixels.metrics().x
  				)
@@ -79,7 +81,7 @@ static	::gpk::error_t	drawDebris
 			::gpk::n2f32				brightPos			= {(float)x, (float)y};
 			const double				brightDistance		= brightPos.LengthSquared();
 			if(brightDistance <= brightRadiusSquared) {
-				::gpk::n2i32				blendPos			= pixelCoord + (brightPos).i32();
+				::gpk::n2i32				blendPos			= pixelCoord + (brightPos).s2_t();
 				if( blendPos.y < 0 || blendPos.y >= (int32_t)targetPixels.metrics().y
 				 || blendPos.x < 0 || blendPos.x >= (int32_t)targetPixels.metrics().x
 				)
@@ -131,7 +133,7 @@ static	::gpk::error_t	drawScoreParticles
 		starFinalColor.a		= starFinalColor.g;
 		::gpk::apod<::gpk::n2u16>	dstCoords;
 
-		char						textToShow[64]		= {};
+		sc_t						textToShow[64]		= {};
 		sprintf_s(textToShow, "%i", particle.Score);
 		const ::gpk::vcs			finalText			= textToShow;
 		::gpk::rect2i16				rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
@@ -139,7 +141,7 @@ static	::gpk::error_t	drawScoreParticles
 
 		gpk_necs(::gpk::textLineRaster(targetPixels.metrics(), font.CharSize, rectText, font.Texture, finalText, dstCoords));
 		for(uint32_t iCoord = 0; iCoord < dstCoords.size(); ++iCoord) {
-			::gpk::pixelBlend(targetPixels, dstCoords[iCoord].i16(), starFinalColor);
+			::gpk::pixelBlend(targetPixels, dstCoords[iCoord].s1_t(), starFinalColor);
 		}
 	}
 	return 0;
@@ -267,7 +269,7 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 			line					= false;
 		}
 	}
-	const ::gpk::n2i32			targetMetrics			= targetPixels.metrics().i32();
+	const ::gpk::n2i32			targetMetrics			= targetPixels.metrics().s2_t();
 	for(uint32_t iShot = 0; iShot < shots.Brightness.size(); ++iShot) {
 		float						brightness				= shots.Brightness[iShot];
 		pixelCoordsCache.clear();
@@ -280,7 +282,7 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 		raySegment.B			= matrixVPV.Transform(raySegment.B);
 		if(raySegment.A.z < 0 || raySegment.A.z > 1) continue;
 		if(raySegment.B.z < 0 || raySegment.B.z > 1) continue;
-		::gpk::drawLine(targetMetrics.u16(), raySegment, pixelCoordsCache, depthBuffer);
+		::gpk::drawLine(targetMetrics.u1_t(), raySegment, pixelCoordsCache, depthBuffer);
 		if(line) {
 		}
 		else {
@@ -305,7 +307,7 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 				::gpk::n2f32			brightPos			= {(float)x, (float)y};
 				const double			brightDistance		= brightPos.LengthSquared();
 				if(brightDistance <= brightRadiusSquared) {
-					::gpk::n2i32			blendPos			= ::gpk::n2<int32_t>{(int32_t)pixelCoord.x, (int32_t)pixelCoord.y} + (brightPos).i32();
+					::gpk::n2i32			blendPos			= ::gpk::n2<int32_t>{(int32_t)pixelCoord.x, (int32_t)pixelCoord.y} + (brightPos).s2_t();
 					if( blendPos.y < 0 || blendPos.y >= targetMetrics.y
 					 || blendPos.x < 0 || blendPos.x >= targetMetrics.x
 					)
@@ -493,14 +495,14 @@ static	::gpk::error_t	drawShip
 
 	const ::gpk::vcs					finalText			= solarSystem.Pilots[iShip].Name;
 	::gpk::rect2i16						rectText			= {{}, {int16_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
-	rectText.Offset = (pixelCoord - ::gpk::n2i32{(rectText.Size.x >> 1), (rectText.Size.y >> 1)}).i16();
+	rectText.Offset = (pixelCoord - ::gpk::n2i32{(rectText.Size.x >> 1), (rectText.Size.y >> 1)}).s1_t();
 
 	::gpk::an2u16						dstCoords;
 	gpk_necs(::gpk::textLineRaster(targetPixels.metrics(), font.CharSize, rectText, font.Texture, finalText, dstCoords));
 	for(uint32_t iCoord = 0; iCoord < dstCoords.size(); ++iCoord) {
 		const ::gpk::n2u16					dstCoord			= dstCoords[iCoord];
-		if(::gpk::in_range(dstCoord, {{}, targetPixels.metrics().u16()})) {
-			::gpk::setPixel(targetPixels, dstCoord.i16(), (shipCore.Health > 0) ? playerColor : ::gpk::bgra(::gpk::interpolate_linear(::gpk::rgbaf(playerColor), ::gpk::rgbaf(targetPixels[dstCoord.y][dstCoord.x]), .8f)));
+		if(::gpk::in_range(dstCoord, {{}, targetPixels.metrics().u1_t()})) {
+			::gpk::setPixel(targetPixels, dstCoord.s1_t(), (shipCore.Health > 0) ? playerColor : ::gpk::bgra(::gpk::interpolate_linear(::gpk::rgbaf(playerColor), ::gpk::rgbaf(targetPixels[dstCoord.y][dstCoord.x]), .8f)));
 		}
 	}
 	return pixelsDrawn;

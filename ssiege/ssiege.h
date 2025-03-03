@@ -46,7 +46,7 @@ namespace ssg
 			gpk_necs(playerFilePath.append_string("/"));
 			gpk_necs(playerFilePath.append(b64PlayerName.cc()));
 
-			char						postfix[64]					= {};
+			sc_t						postfix[64]					= {};
 			sprintf_s(postfix, "%llu%s", time, ExtensionProfile.begin());
 			return playerFilePath.append_string(postfix);
 		}

@@ -302,7 +302,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		solarSystem.PlayState.GlobalState.UserTime.Started = solarSystem.PlayState.GlobalState.UserTime.Loaded = ::gpk::timeCurrent();
 		memset(solarSystem.ShipState.SpaceshipManager.ShipScores.begin(), 0, solarSystem.ShipState.SpaceshipManager.ShipScores.byte_count());
 		while(solarSystem.Pilots.size() < solarSystem.PlayState.Constants.Players) {
-			char						text [64]				= {};
+			sc_t						text [64]				= {};
 			sprintf_s(text, "Player %i", solarSystem.Pilots.size() + 1);
 			solarSystem.Pilots.push_back({::gpk::label(text), PLAYER_COLORS[solarSystem.Pilots.size() % ::gpk::size(PLAYER_COLORS)]});
 		}
@@ -329,7 +329,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 #pragma pack(pop)
 
 	::gpk::SJSONFile			stageFile					= {};
-	char						stageFileName		[256]	= "./%s.json";
+	sc_t						stageFileName		[256]	= "./%s.json";
 	stacxpr SShipOrbiterSetup	weaponDefinitions	[]		=
 		{ {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .08, 0.975, ::gpk::WEAPON_LOAD_Bullet		,  256,    20, 1,   0,0.00,  1.5, ::gpk::DAMAGE_TYPE_Pierce	}
 		, {::gpk::SHIP_PART_TYPE_Shotgun		, 128, ::gpk::WEAPON_TYPE_Shotgun	, .16, 0.925, ::gpk::WEAPON_LOAD_Bullet		,  160,    10, 6,   0,0.00,  1.5, ::gpk::DAMAGE_TYPE_Impact	}
@@ -481,7 +481,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 	matrixProjection.FieldOfView(::gpk::math_pi * .25, windowSize.x / (double)windowSize.y, 0.01, 500.0);
 
 	::gpk::m4f32				matrixViewport			= {};
-	matrixViewport.ViewportLH(windowSize.u16());
+	matrixViewport.ViewportLH(windowSize.u1_t());
 	matrixProjection		*= matrixViewport;
 	return 0;
 }

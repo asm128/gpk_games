@@ -69,8 +69,8 @@ static	::gpk::error_t	loadLines		(::gpkg::SPage & page, const ::gpk::aachar & pa
 	return 0;
 }
 
-::gpk::error_t			gpkg::loadPage	(const char* folderName, gpkg::SPage & page, uint32_t pageIndex) {
-	char						fileName[4096]	= {};
+::gpk::error_t			gpkg::loadPage	(const sc_t* folderName, gpkg::SPage & page, uint32_t pageIndex) {
+	sc_t						fileName[4096]	= {};
 	sprintf_s(fileName, "%s/%u.txt", folderName, pageIndex);
 	FILE						* fp			= 0;
 	if(::gpk::fopen_s(&fp, fileName, "rb")) {

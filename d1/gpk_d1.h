@@ -14,6 +14,7 @@
 
 namespace d1 
 {
+	GPK_USING_TYPEINT();
 
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
 	GDEFINE_ENUM_VALUE(APP_STATE, Init		,  0);
@@ -223,12 +224,12 @@ namespace d1
 		::gpk::astatic<::d1::STeamUI, 2>	TeamUI					= {};
 		::gpk::SInputBox					NameEditBox;
 		
-		::gpk::astatic<char, 64>			turnsbuffer;
-		::gpk::astatic<char, 64>			secdsbuffer;
-		::gpk::astatic<char, 64>			playrbuffer[6]			=  {{"Player 1"}, {"Player 2"}, {"Player 3"}, {"Player 4"}, {"Player 5"}, {"Player 6"}};
-		::gpk::astatic<char, 64>			teamsbuffer[2]			=  {{"Team 1"}, {"Team 2"}};
-		::gpk::astatic<char, 64>			scorebuffer[2]			=  {{"Score: 0"}, {"Score: 0"}};
-		::gpk::astatic<char, 64>			foulsbuffer[2]			=  {{"Fouls: 0"}, {"Fouls: 0"}};
+		::gpk::astatic<sc_t, 64>			turnsbuffer;
+		::gpk::astatic<sc_t, 64>			secdsbuffer;
+		::gpk::astatic<sc_t, 64>			playrbuffer[6]			=  {{"Player 1"}, {"Player 2"}, {"Player 3"}, {"Player 4"}, {"Player 5"}, {"Player 6"}};
+		::gpk::astatic<sc_t, 64>			teamsbuffer[2]			=  {{"Team 1"}, {"Team 2"}};
+		::gpk::astatic<sc_t, 64>			scorebuffer[2]			=  {{"Score: 0"}, {"Score: 0"}};
+		::gpk::astatic<sc_t, 64>			foulsbuffer[2]			=  {{"Fouls: 0"}, {"Fouls: 0"}};
 
 		//::gpk::pnco<::gpk::SDialogTuner<uint8_t>>	TunerTeamCount;
 		//::gpk::pnco<::gpk::SDialogTuner<uint8_t>>	TunerPlayerCount;
@@ -237,7 +238,7 @@ namespace d1
 		float								ClearColor	[4]				= {.25f, .125f, .35f, 1.0f};
 
 		::gpk::error_t						RefreshTeamStrings			(uint8_t teamStripped)			{
-			stacxpr const char*						strteam[]					= {"Solid", "Stripped"};
+			stacxpr const sc_t*						strteam[]					= {"Solid", "Stripped"};
 			sprintf_s(teamsbuffer[0].Storage, "Team 1 - %s", strteam[(teamStripped + 1) & 1]);
 			sprintf_s(teamsbuffer[1].Storage, "Team 2 - %s", strteam[teamStripped]);
 			return 0;
@@ -310,7 +311,7 @@ namespace d1
 
 			const uint64_t				timeCurrent		= (SAVE_MODE_USER != autosaveMode) ? 0 : ::gpk::timeCurrent();
 			const uint64_t				timeStart		= (SAVE_MODE_AUTO == autosaveMode) ? 0 : MainGame.Pool.MatchState.TimeStart;
-			char						fileName[4096]	= {};
+			sc_t						fileName[4096]	= {};
 			sprintf_s(fileName, "%s/%llu.%llu%s", FileStrings.SavegameFolder.begin(), timeStart, timeCurrent, extension.begin());
 
 			if(false == MainGame.Pool.MatchState.Flags.GameOver) // Save only if a player is alive

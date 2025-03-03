@@ -4,16 +4,17 @@
 #include "gpk_grid_copy.h"
 #include "gpk_sphere.h"
 
+GPK_USING_TYPEINT();
 
-stacxpr	::gpk::GUI_COLOR_MODE	GHG_MENU_COLOR_MODE		= ::gpk::GUI_COLOR_MODE_3D;
-stacxpr	bool					BACKGROUND_3D_ONLY		= true;
-stacxpr	::gpk::n2u16			MODULE_CAMERA_SIZE		= {48, 48};
-stacxpr	::gpk::n2u16			MODULE_VIEWPORT_SIZE	= {128, 64};
-stacxpr	::gpk::n2u16			WEAPON_BAR_SIZE			= {96, 16};
-stacxpr	::gpk::n2u16			PLAYER_UI_SIZE			= {320, 40};
-stacxpr	::gpk::n2u16			HOME_BUTTON_SIZE		= {160, 24};
+stxp	::gpk::GUI_COLOR_MODE	GHG_MENU_COLOR_MODE		= ::gpk::GUI_COLOR_MODE_3D;
+stxp	bool					BACKGROUND_3D_ONLY		= true;
+stxp	::gpk::n2u16			MODULE_CAMERA_SIZE		= {48, 48};
+stxp	::gpk::n2u16			MODULE_VIEWPORT_SIZE	= {128, 64};
+stxp	::gpk::n2u16			WEAPON_BAR_SIZE			= {96, 16};
+stxp	::gpk::n2u16			PLAYER_UI_SIZE			= {320, 40};
+stxp	::gpk::n2u16			HOME_BUTTON_SIZE		= {160, 24};
 
-static	::gpk::error_t	guiSetupCommon		(::gpk::SGUI & gui) {
+static	::gpk::error_t			guiSetupCommon			(::gpk::SGUI & gui) {
 	gui.ColorModeDefault	= ::gpk::GUI_COLOR_MODE_3D;
 	gui.ThemeDefault		= ::gpk::ASCII_COLOR_DARKRED * 16 + 10;
 	gui.SelectedFont		= 7;
@@ -24,10 +25,10 @@ static	::gpk::error_t	guiSetupCommon		(::gpk::SGUI & gui) {
 	return 0;
 }
 
-static	::gpk::error_t	dialogCreateCommon	(::gpk::SDialog & dialogLoad, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2f32 & cursorPos) { 
-	dialogLoad					= {};
-	dialogLoad.Input			= inputState;
-	dialogLoad.GUI->CursorPos	= cursorPos;
+static	::gpk::error_t			dialogCreateCommon		(::gpk::SDialog & dialogLoad, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2f32 & cursorPos) { 
+	dialogLoad						= {};
+	dialogLoad.Input				= inputState;
+	dialogLoad.GUI->CursorPos		= cursorPos;
 	dialogLoad.GUI->Controls.Draw[0].NoClient	= true;
 	dialogLoad.GUI->Controls.Draw[0].NoBorder	= true;
 	::guiSetupCommon(*dialogLoad.GUI);
@@ -36,9 +37,9 @@ static	::gpk::error_t	dialogCreateCommon	(::gpk::SDialog & dialogLoad, const ::g
 }
 
 // -------------------------------- Set up player GUI for home screen
-static	::gpk::error_t	uiPlayerSetupHome	(::ghg::SUIPlayer & uiPlayer, ::gpk::pobj<::gpk::SInput> input, ::gpk::n2f32 cursorPos, uint32_t iPlayer, const ::gpk::vcc playerName) {
-	::gpk::ALIGN				playerAlign		;
-	::gpk::n2i16				playerPosition	;
+static	::gpk::error_t			uiPlayerSetupHome		(::ghg::SUIPlayer & uiPlayer, ::gpk::pobj<::gpk::SInput> input, ::gpk::n2f32 cursorPos, uint32_t iPlayer, const ::gpk::vcc playerName) {
+	::gpk::ALIGN						playerAlign			= {};
+	::gpk::n2i16						playerPosition		= {};
 	switch(iPlayer) {
 	default:
 	case 0: playerAlign = ::gpk::ALIGN_BOTTOM_LEFT;		break;
@@ -164,11 +165,11 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 		else if(3 == iPlayer) controlOrbiter.Align = controlWeaponLoad.Align = controlWeaponType.Align = ::gpk::ALIGN_CENTER_TOP	;
 		if(1 >= iPlayer)	controlOrbiter.Area.Offset	= controlWeaponLoad.Area.Offset	= controlWeaponType.Area.Offset	= {0, int16_t(-(int16_t(countViewports * (MODULE_CAMERA_SIZE.y + 4)) >> 1) + (MODULE_CAMERA_SIZE.y + 4) * iOrbiter)};
 		else	 			controlOrbiter.Area.Offset	= controlWeaponLoad.Area.Offset	= controlWeaponType.Area.Offset	= {int16_t(-(int16_t(countViewports * (WEAPON_BAR_SIZE.x + 4)) >> 1) + (WEAPON_BAR_SIZE.x + 4) * iOrbiter)};
-		controlOrbiter.Area.Size	= MODULE_CAMERA_SIZE.i16();
+		controlOrbiter.Area.Size	= MODULE_CAMERA_SIZE.s1_t();
 		controlOrbiter.Border		= {};
 		controlOrbiter.Margin		= {};
 
-		controlWeaponLoad.Area.Size	= controlWeaponType.Area.Size	= WEAPON_BAR_SIZE.i16();	//MODULE_VIEWPORT_SIZE.i16();
+		controlWeaponLoad.Area.Size	= controlWeaponType.Area.Size	= WEAPON_BAR_SIZE.s1_t();	//MODULE_VIEWPORT_SIZE.s1_t();
 		controlWeaponLoad.Border	= controlWeaponType.Border		= {1, 1, 1, 1};
 		controlWeaponLoad.Margin	= controlWeaponType.Margin		= {};
 
@@ -196,13 +197,13 @@ static	::gpk::error_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pob
 		::gpk::m4f32				& matrixProjection	= viewport.MatrixProjection;
 		matrixProjection.FieldOfView(::gpk::math_pi * .25, MODULE_CAMERA_SIZE.x / (double)MODULE_CAMERA_SIZE.y, 0.01, 500.0);
 		::gpk::m4f32				matrixViewport		= {};
-		matrixViewport.ViewportLH(MODULE_CAMERA_SIZE.u16());
+		matrixViewport.ViewportLH(MODULE_CAMERA_SIZE.u1_t());
 		matrixProjection		*= matrixViewport;
 
 
-		const ::gpk::circlef32		circleLife			= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 0, viewport.RenderTargetOrbiter.Color.View.metrics().f32() * .5};
-		const ::gpk::circlef32		circleDelay			= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 1, viewport.RenderTargetOrbiter.Color.View.metrics().f32() * .5};
-		const ::gpk::circlef32		circleCooldown		= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 2, viewport.RenderTargetOrbiter.Color.View.metrics().f32() * .5};
+		const ::gpk::circlef32		circleLife			= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 0, viewport.RenderTargetOrbiter.Color.View.metrics().f2_t() * .5};
+		const ::gpk::circlef32		circleDelay			= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 1, viewport.RenderTargetOrbiter.Color.View.metrics().f2_t() * .5};
+		const ::gpk::circlef32		circleCooldown		= {::gpk::min(MODULE_CAMERA_SIZE.x, MODULE_CAMERA_SIZE.y) * .5f - 6 * 2, viewport.RenderTargetOrbiter.Color.View.metrics().f2_t() * .5};
 		
 		::ghg::gaugeBuildRadial(viewport.GaugeLife, circleLife, 32, 12);
 	}
@@ -331,7 +332,7 @@ static	::gpk::error_t	guiHandleLoad		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI &
 		try {
 			ef_if(0 > ::ghg::solarSystemLoad(app.Game, gui.Controls.Text[idControl + 1].Text), "Failed to load file %i: '%s'", idControl + 1, gui.Controls.Text[idControl + 1].Text.begin());
 		}
-		catch (const char * ) {
+		catch (const sc_t * ) {
 			::ghg::solarSystemReset(app.Game);
 			return -1;
 		}
@@ -371,7 +372,7 @@ static	::gpk::error_t	guiHandleHome		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI &
 		::ghg::solarSystemReset(game);
 		game.PlayState.Constants.Players = (uint32_t)app.TunerPlayerCount->ValueCurrent;
 		for(uint32_t iPlayer = app.Players.size(); iPlayer < app.Game.PlayState.Constants.Players; ++iPlayer) {
-			char				text [64]			= {};
+			sc_t				text [64]			= {};
 			sprintf_s(text, "Player %i", app.Players.size() + 1);
 			app.AddNewPlayer(text);
 		}
@@ -455,7 +456,7 @@ static	::gpk::error_t	guiHandleAbout		(::gpk::SGUI & /*gui*/, uint32_t idControl
 }
 
 tplt<size_t _nStorageSize>
-static	::gpk::error_t	sprintfTime			(const char *prefix, char (&dest)[_nStorageSize], double seconds) {
+static	::gpk::error_t	sprintfTime			(const sc_t *prefix, sc_t (&dest)[_nStorageSize], double seconds) {
 	uint32_t					timeHours			= (int)seconds / 3600;
 	uint32_t					timeMinutes			= (int)seconds / 60 % 60;
 	uint32_t					timeSeconds			= (int)seconds % 60;
@@ -465,7 +466,7 @@ static	::gpk::error_t	sprintfTime			(const char *prefix, char (&dest)[_nStorageS
 }
 
 tplt<size_t _bufSize>
-static	::gpk::error_t	sprintfScore		(char (&buffer)[_bufSize], const ::gpk::SSpaceshipScore & shipScore, const double nitro) { 
+static	::gpk::error_t	sprintfScore		(sc_t (&buffer)[_bufSize], const ::gpk::SSpaceshipScore & shipScore, const double nitro) { 
 	return sprintf_s(buffer, "%c %llu  %c %llu  %c %llu  %c %llu  %c %.2f", 4, shipScore.Score, 94, shipScore.Shots, 1, (uint64_t)shipScore.KilledShips, 2, (uint64_t)shipScore.KilledOrbiters, 24, nitro);
 }
 
@@ -564,11 +565,11 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 			if(ratioDelay) {
 				drawCache.PixelCoords.clear();
 				for(uint32_t iLine = 0; iLine < targetPixels.metrics().y; ++iLine)
-					::gpk::drawLine(targetPixels.metrics().u16(), ::gpk::line2<int16_t>{{0, (int16_t)iLine}, {int16_t((targetPixels.metrics().x - 1) * ratioDelay), (int16_t)iLine}}, drawCache.PixelCoords);
+					::gpk::drawLine(targetPixels.metrics().u1_t(), ::gpk::line2<int16_t>{{0, (int16_t)iLine}, {int16_t((targetPixels.metrics().x - 1) * ratioDelay), (int16_t)iLine}}, drawCache.PixelCoords);
 				
 				for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) {
 					const ::gpk::n2i16		& pixelCoord = drawCache.PixelCoords[iPixel];
-					const ::gpk::n2f32		floatCoord			= pixelCoord.f32();
+					const ::gpk::n2f32		floatCoord			= pixelCoord.f2_t();
 					const double			distanceFromCenter	= fabs((floatCoord.y / (targetPixels.metrics().y)) - .5) * 2.0;
 					::gpk::setPixel(targetPixels, pixelCoord, ::gpk::interpolate_linear(colorDelay, ::gpk::GRAY * .25, distanceFromCenter));
 				}
@@ -585,11 +586,11 @@ static	::gpk::error_t	uiPlayerUpdatePlay	(::ghg::SUIPlayer & uiPlayer, uint32_t 
 			if(ratioOverheat) {
 				drawCache.PixelCoords.clear();
 				for(uint32_t iLine = 0; iLine < targetPixels.metrics().y; ++iLine)
-					::gpk::drawLine(targetPixels.metrics().u16(), ::gpk::line2<int16_t>{{0, (int16_t)iLine}, {int16_t((targetPixels.metrics().x - 1) * ratioOverheat), (int16_t)iLine}}, drawCache.PixelCoords);
+					::gpk::drawLine(targetPixels.metrics().u1_t(), ::gpk::line2<int16_t>{{0, (int16_t)iLine}, {int16_t((targetPixels.metrics().x - 1) * ratioOverheat), (int16_t)iLine}}, drawCache.PixelCoords);
 				
 				for(uint32_t iPixel = 0; iPixel < drawCache.PixelCoords.size(); ++iPixel) {
 					const ::gpk::n2i16			& pixelCoord		= drawCache.PixelCoords[iPixel];
-					const ::gpk::n2f32			floatCoord			= pixelCoord.f32();
+					const ::gpk::n2f32			floatCoord			= pixelCoord.f2_t();
 					const double				distanceFromCenter	= fabs((floatCoord.y / (targetPixels.metrics().y)) - .5) * 2.0;
 					::gpk::setPixel(targetPixels, drawCache.PixelCoords[iPixel], ::gpk::interpolate_linear(colorCooldown, ::gpk::GRAY * .25, distanceFromCenter));
 				}
@@ -646,7 +647,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpob
 
 		if(app.Players.size() <= iPlayer) {
 			::std::lock_guard			lock						(app.Game.LockUpdate);
-			char text [64] = {};
+			sc_t text [64] = {};
 			sprintf_s(text, "Player %i", app.Players.size() + 1);
 			app.AddNewPlayer(text);
 		}
@@ -769,8 +770,8 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpob
 			{ sinCos.Sin * outerRadius
 	  		, sinCos.Cos * outerRadius
 			};
-		gauge.Vertices.push_back(sphereMetrics.Center + relativePosSmall.f32());
-		gauge.Vertices.push_back(sphereMetrics.Center + relativePos.f32());
+		gauge.Vertices.push_back(sphereMetrics.Center + relativePosSmall.f2_t());
+		gauge.Vertices.push_back(sphereMetrics.Center + relativePos.f2_t());
 	}
 	for(int16_t iStep = 0, stepCount = (int16_t)(resolution * 2) - 3; iStep < stepCount; ++iStep) {
 		gauge.Indices.push_back({int16_t(0 + iStep), int16_t(1 + iStep), int16_t(2 + iStep)});
@@ -815,7 +816,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpob
 			const ::gpk::n2i16		pixelCoord					= pixelCoords[iPixelCoords];
 //#define GAUGE_NO_SHADING
 #ifndef GAUGE_NO_SHADING
-			const ::gpk::n2f32				floatCoord					= pixelCoord.f32();
+			const ::gpk::n2f32				floatCoord					= pixelCoord.f2_t();
 			const double					distanceFromCenter			= (floatCoord - center2).Length();
 			const double					distanceFromRadiusCenter	= fabs(distanceFromCenter - radiusCenter) / ((radiusLarge - radiusSmall) / 2);
 			finalColor.a				= (float)(1.f - distanceFromRadiusCenter);

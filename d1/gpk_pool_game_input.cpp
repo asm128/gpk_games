@@ -1,5 +1,7 @@
 #include "gpk_pool_game_update.h"
 
+GPK_USING_TYPEINT();
+
 static	::gpk::error_t	shootCueBall			(::d1p::SPoolGame & pool, const ::d1p::SStickControl & activeStick, uint16_t activeStickEntity)		{
 	::gpk::SEngine					& engine				= pool.Engine;
 	::d1p::STurnInfo			& activeTurn			= pool.ActiveTurn();

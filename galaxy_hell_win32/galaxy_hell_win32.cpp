@@ -98,7 +98,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 //-----------------------------------------------------------------------------
 // Purpose: callback hook for debug text emitted from the Steam API
 //-----------------------------------------------------------------------------
-extern "C" void __cdecl SteamAPIDebugTextHook( int nSeverity, const char *pchDebugText ) {
+extern "C" void __cdecl SteamAPIDebugTextHook( int nSeverity, const sc_t *pchDebugText ) {
 	// if you're running in the debugger, only warnings (nSeverity >= 1) will be sent
 	// if you add -debug_steamapi to the command-line, a lot of extra informational messages will also be sent
 	error_printf("%s", pchDebugText );
@@ -109,17 +109,17 @@ extern "C" void __cdecl SteamAPIDebugTextHook( int nSeverity, const char *pchDeb
 }
 
 // Extracts some feature from the command line
-bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, const char **ppchLobbyID ) {
+bool ParseCommandLine( const sc_t *pchCmdLine, const sc_t **ppchServerAddress, const sc_t **ppchLobbyID ) {
 	// Look for the +connect ipaddress:port parameter in the command line, Steam will pass this when a user has used the Steam Server browser to find a server for our game and is trying to join it. 
-	const char *pchConnectParam = "+connect ";
-	const char *pchConnect = strstr( pchCmdLine, pchConnectParam );
+	const sc_t *pchConnectParam = "+connect ";
+	const sc_t *pchConnect = strstr( pchCmdLine, pchConnectParam );
 	*ppchServerAddress = NULL;
 	if ( pchConnect && strlen( pchCmdLine ) > (pchConnect - pchCmdLine) + strlen( pchConnectParam ) )
 		*ppchServerAddress = pchCmdLine + ( pchConnect - pchCmdLine ) + strlen( pchConnectParam );	// Address should be right after the +connect
 
 	// look for +connect_lobby lobbyid paramter on the command line. Steam will pass this in if a user taken up an invite to a lobby
-	const char *pchConnectLobbyParam = "+connect_lobby ";
-	const char *pchConnectLobby = strstr( pchCmdLine, pchConnectLobbyParam );
+	const sc_t *pchConnectLobbyParam = "+connect_lobby ";
+	const sc_t *pchConnectLobby = strstr( pchCmdLine, pchConnectLobbyParam );
 	*ppchLobbyID = NULL;
 	if ( pchConnectLobby && strlen( pchCmdLine ) > (pchConnectLobby - pchCmdLine) + strlen( pchConnectLobbyParam ) )
 		*ppchLobbyID = pchCmdLine + ( pchConnectLobby - pchCmdLine ) + strlen( pchConnectLobbyParam );	// lobby ID should be right after the +connect_lobby
@@ -142,11 +142,11 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	SteamClient()->SetWarningMessageHook( &SteamAPIDebugTextHook );	// set our debug handler
 	ree_if(!SteamUser()->BLoggedOn(), "%s", "Steam user is not logged in\n");	// Ensure that the user has logged into Steam. This will always return true if the game is launched from Steam, but if Steam is at the login prompt when you run your game from the debugger, it will return false.
 
-	const char *pchServerAddress = 0, *pchLobbyID = 0;
+	const sc_t *pchServerAddress = 0, *pchLobbyID = 0;
 	if ( !ParseCommandLine( app.Framework.RuntimeValues.PlatformDetail.EntryPointArgsWin.lpCmdLine, &pchServerAddress, &pchLobbyID ) ) {
 		// no connect string on process command line. If app was launched via a Steam URL, the extra command line parameters in that URL get be retrieved with GetLaunchCommandLine. 
 		// This way an attacker can't put malicious parameters in the process command line which might allow much more functionality then indented.
-		char szCommandLine[1024] = {};
+		sc_t szCommandLine[1024] = {};
 		if ( SteamApps()->GetLaunchCommandLine( szCommandLine, sizeof( szCommandLine ) ) > 0 )
 			ParseCommandLine( szCommandLine, &pchServerAddress, &pchLobbyID );
 	}
@@ -154,11 +154,11 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
 	Steamworks_SelfCheck();	// do a DRM self check
 	ree_if(!SteamInput()->Init( false ), "%s", "SteamInput()->Init failed.\n" );
 
-	char rgchCWD[1024] = {};
+	sc_t rgchCWD[1024] = {};
 	if (!_getcwd(rgchCWD, sizeof(rgchCWD)))
 		strcpy_s( rgchCWD, "." );
 
-	char rgchFullPath[1024] = {};
+	sc_t rgchFullPath[1024] = {};
 #if defined(GPK_WINDOWS)
 	sprintf_s(rgchFullPath, "%s/%s", rgchCWD, "steam_input_manifest.vdf" );
 #elif defined(GPK_OSX)
@@ -307,7 +307,7 @@ bool ParseCommandLine( const char *pchCmdLine, const char **ppchServerAddress, c
     //glVertex2i(1, -1);
     //glEnd();
     //glFlush();
-	return ::ghg::galaxyHellDraw(app.GalaxyHellApp, app.Framework.RootWindow.Size.u16());
+	return ::ghg::galaxyHellDraw(app.GalaxyHellApp, app.Framework.RootWindow.Size.u1_t());
 }
 
 

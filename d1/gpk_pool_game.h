@@ -10,6 +10,7 @@
 
 namespace d1p
 {
+	GPK_USING_TYPEINT();
 
 #pragma pack(push, 1)
 	struct SStickControl {

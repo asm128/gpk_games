@@ -3,6 +3,7 @@
 #include "gpk_path.h"
 #include "gpk_event_screen.h"
 
+GPK_USING_TYPEINT();
 
 static	::gpk::error_t	d1Setup				(::d1::SD1UI & appUI, ::d1::SD1Game & game, const ::gpk::pobj<::gpk::SInput> & inputState) { 
 	gpk_necs(::d1p::poolGameSetup(game.Pool));
@@ -419,7 +420,7 @@ static	::gpk::error_t	handleMATCH_EVENT		(::d1::SD1 & app, const ::gpk::SEventVi
 	case d1p::MATCH_EVENT_Lost				: info_printf("Reason: %s", ::gpk::get_value_namep(argsMatch->Reason));
 	case d1p::MATCH_EVENT_Won				: {
 		const uint8_t				iTeam		= app.MainGame.Pool.TurnHistory[argsMatch->ArgsBall.Turn].Team;
-		stacxpr const char*			strwin[]	= {"Lost", "Won"};
+		stacxpr const sc_t*			strwin[]	= {"Lost", "Won"};
 		sprintf_s(app.AppUI.scorebuffer[0].Storage, "%s - %s", app.AppUI.scorebuffer[0].Storage, strwin[(one_if(childEvent.Type == d1p::MATCH_EVENT_Lost) + one_if(0 == iTeam)) % 2]);
 		sprintf_s(app.AppUI.scorebuffer[1].Storage, "%s - %s", app.AppUI.scorebuffer[1].Storage, strwin[(one_if(childEvent.Type == d1p::MATCH_EVENT_Lost) + one_if(1 == iTeam)) % 2]);
 		app.AppUI.RefreshTeamUI();
@@ -501,7 +502,7 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 	case ::d1::APP_STATE_Init		: {
 		gpk_necs(::d1Setup(app.AppUI, clientGame, inputState));
 
-		::gpk::aobj<::gpk::apod<char>>	fileNames				= {};
+		::gpk::aobj<::gpk::apod<sc_t>>	fileNames				= {};
 		::gpk::pathList(app.FileStrings.SavegameFolder, fileNames, app.FileStrings.ExtensionSaveAuto);
 		if(fileNames.size()) {
 			//if errored(app.Load(fileNames[0])) 
@@ -518,7 +519,7 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 		break;
 	} // APP_STATE_Init
 	case ::d1::APP_STATE_Play		: {
-		gpk_necs(::updateInput(app.AppUI, clientGame, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.i16(), inputState->MouseCurrent.ButtonState));
+		gpk_necs(::updateInput(app.AppUI, clientGame, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.s1_t(), inputState->MouseCurrent.ButtonState));
 		if(false == poolGame.MatchState.Flags.PhysicsActive)
 			::gpk::sliderSetValue(*app.AppUI.ForceSlider, int64_t(app.AppUI.ForceSlider->ValueLimits.Max - poolGame.ActiveStick().Velocity * (app.AppUI.ForceSlider->ValueLimits.Max / ::d1p::MAX_SHOOT_VELOCITY)));
 

@@ -214,7 +214,7 @@ static	::gpk::error_t	handleSSiegeEvent		(::ssg::SSiegeApp & app, ::gpk::pobj<::
 		gpk_necs(app.StateSwitch(::ssg::APP_STATE_Welcome));
 		break;
 	default: 
-		gpk_necs(::updateInput(app.UI, worldView, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.i16(), inputState->MouseCurrent.ButtonState));
+		gpk_necs(::updateInput(app.UI, worldView, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.s1_t(), inputState->MouseCurrent.ButtonState));
 
 		if(0 == funcHandleEvent)
 			funcHandleEvent			= [&app](::gpk::pobj<::ssg::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssg::EventSSiege> & appOutputEvents) { return handleSSiegeEvent(app, _eventToProcess, appOutputEvents); };

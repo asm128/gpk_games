@@ -20,6 +20,8 @@
 
 namespace ghg
 {
+	GPK_USING_TYPEINT();
+	
 	stacxpr uint16_t	MAX_PLAYERS				= 4;
 	stacxpr uint32_t	MAX_ORBITER_COUNT		= 6;
 
@@ -88,7 +90,7 @@ namespace ghg
 
 		::gpk::error_t						PilotsReset				()			{
 			while(Pilots.size() < PlayState.Constants.Players) {
-				char									text [64]				= {};
+				sc_t									text [64]				= {};
 				sprintf_s(text, "Player %i", Pilots.size() + 1);
 				gpk_necs(Pilots.push_back({::gpk::label(text), PLAYER_COLORS[Pilots.size() % ::gpk::size(PLAYER_COLORS)]}));
 			}

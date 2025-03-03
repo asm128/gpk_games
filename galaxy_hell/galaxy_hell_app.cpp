@@ -104,7 +104,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 		::ghg::solarSystemSetup(app.Game, app.Game.DrawCache.RenderTargetMetrics);
 		::ghg::guiSetup(app, inputState);
 
-		::gpk::aobj<::gpk::apod<char>>					fileNames					= {};
+		::gpk::aobj<::gpk::apod<sc_t>>					fileNames					= {};
 		::gpk::pathList(app.SavegameFolder, fileNames, app.ExtensionSaveAuto);
 		if(fileNames.size()) {
 			if(errored(::ghg::solarSystemLoad(app.Game, fileNames[0]))) {
@@ -119,7 +119,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 			try {
 				gpk_necall(app.Players[iPlayer].Load(fileNames[iPlayer]), "fileNames[iPlayer]: %s", fileNames[iPlayer].begin());
 			}
-			catch (const char * ) {
+			catch (const sc_t * ) {
 				app.Players[iPlayer] = {};
 			}
 
@@ -222,7 +222,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 		}
 	}
 
-	target->resize(renderTargetSize.u32(), {0, 0, 0, 1}, 0xFFFFFFFFU);
+	target->resize(renderTargetSize.u2_t(), {0, 0, 0, 1}, 0xFFFFFFFFU);
 
 	::gpk::g8bgra							targetPixels			= target->Color.View;
 	::gpk::grid<uint32_t>									depthBuffer				= target->DepthStencil.View;
@@ -236,15 +236,15 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 			break;
 
 		::gpk::g8bgra			cameraView			= sourceRT->Color.View;
-		::gpk::n2i16						cameraViewMetrics	= cameraView.metrics().i16();
+		::gpk::n2i16						cameraViewMetrics	= cameraView.metrics().s1_t();
 		::gpk::grid_copy(targetPixels, cameraView, ::gpk::n2<uint32_t>
 				{ (targetPixels.metrics().x >> 1) - (cameraView.metrics().x >> 1)
 				, (targetPixels.metrics().y >> 1) - (cameraView.metrics().y >> 1)
 				}
 			);
 
-		const ::gpk::n2i16		targetCenter		= targetPixels.metrics().i16() / 2;
-		const ::gpk::n2i16		cameraCenter		= cameraView.metrics().i16() / 2;
+		const ::gpk::n2i16		targetCenter		= targetPixels.metrics().s1_t() / 2;
+		const ::gpk::n2i16		cameraCenter		= cameraView.metrics().s1_t() / 2;
 		::gpk::n2i16				cornerTopLeft		= targetCenter + ::gpk::n2i16{int16_t(-cameraCenter.x), int16_t(-cameraCenter.y)};
 		::gpk::n2i16				cornerTopRight		= targetCenter + ::gpk::n2i16{int16_t( cameraCenter.x), int16_t(-cameraCenter.y)};
 		::gpk::n2i16				cornerBottomLeft	= targetCenter + ::gpk::n2i16{int16_t(-cameraCenter.x), int16_t( cameraCenter.y)};
@@ -288,7 +288,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 }
 
 ::gpk::error_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames) {
-	::gpk::aobj<::gpk::apod<char>>	fileNames;
+	::gpk::aobj<::gpk::apod<sc_t>>	fileNames;
 	ef_if(errored(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionSave)), "%s", saveGameFolder.begin());
 
 	::gpk::aobj<::gpk::vcc>				pathFileNames;
@@ -309,7 +309,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 }
 
 ::gpk::error_t					ghg::listFilesProfile		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames) {
-	::gpk::aobj<::gpk::apod<char>>	fileNames;
+	::gpk::aobj<::gpk::apod<sc_t>>	fileNames;
 	ef_if(errored(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionProfile)), "%s", saveGameFolder.begin());
 
 	::gpk::aobj<::gpk::vcc>				pathFileNames;

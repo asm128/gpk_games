@@ -1,5 +1,7 @@
 #include "gpk_d1.h"
 
+GPK_USING_TYPEINT();
+
 stacxpr	bool			BACKGROUND_3D_ONLY			= true;
 stacxpr	::gpk::n2u16	SHOOT_SLIDER_SIZE			= {24, 320};
 stacxpr	::gpk::n2u16	MODULE_VIEWPORT_SIZE		= {128, 64};
@@ -120,12 +122,12 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 
 	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Border			= {};
 	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Offset		= {offsetX + 36};
-	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Size		= SHOOT_SLIDER_SIZE.i16();
+	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Size		= SHOOT_SLIDER_SIZE.s1_t();
 	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Align			= ::gpk::ALIGN_CENTER_RIGHT;
 	gui.Controls.Placement[appUI.ForceSlider->IdButton].Area.Size.y			= 8;
 	//gui.Controls.Modes[app.ForceSlider->IdGUIControl].NoBackgroundRect	= true;
 	//gui.Controls.States[appUI.ForceSlider->IdGUIControl].Mask				&= ~::gpk::GUI_CONTROL_FLAG_Hovered;
-	appUI.ForceSliderRenderTarget.resize(gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Size.u32()); 
+	appUI.ForceSliderRenderTarget.resize(gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Size.u2_t()); 
 
 	cnstxpr ::gpk::rgbaf		min							= ::gpk::GREEN;
 	cnstxpr ::gpk::rgbaf		mid							= ::gpk::YELLOW;
@@ -143,7 +145,7 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 
 	gui.Controls.Images[appUI.ForceSlider->IdGUIControl].Image = appUI.ForceSliderRenderTarget.Color;
 
-	static char					velocityString[32]			= {};
+	static sc_t					velocityString[32]			= {};
 	appUI.ForceSlider->FuncValueFormat	= [&appGame](::gpk::vcc & string, int64_t value, const ::gpk::minmax<int64_t> & limits) mutable { 
 		const float					newVelocity					= ::d1p::MAX_SHOOT_VELOCITY / limits.Max * (limits.Max - value);
 		const float					currentVelocity				= appGame.Pool.ActiveStick().Velocity;

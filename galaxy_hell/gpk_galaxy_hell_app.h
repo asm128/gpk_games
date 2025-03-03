@@ -155,10 +155,10 @@ namespace ghg
 		::gpk::aobj<::ghg::SUIPlayer>	PlayerUI				= {};
 		::ghg::SGalaxyHellDrawCache		DrawCache				= {};
 
-		::gpk::astatic<char, 128>		TextLevel				= {};
-		::gpk::astatic<char, 128>		TextTimeStage			= {};
-		::gpk::astatic<char, 128>		TextTimeWorld			= {};
-		::gpk::astatic<char, 128>		TextTimeReal			= {};
+		::gpk::astatic<sc_t, 128>		TextLevel				= {};
+		::gpk::astatic<sc_t, 128>		TextTimeStage			= {};
+		::gpk::astatic<sc_t, 128>		TextTimeWorld			= {};
+		::gpk::astatic<sc_t, 128>		TextTimeReal			= {};
 	};
 
 
@@ -317,9 +317,9 @@ namespace ghg
 		::gpk::aobj<::ghg::SUserCredentials>	UserCredentials				= {};
 
 		::gpk::pobj<::gpk::SDialogViewport>	Inputbox;
-		::gpk::apod<char>					InputboxText;
+		::gpk::apod<sc_t>					InputboxText;
 
-		::gpk::aobj<::gpk::apod<char>>	FileNames					= {};
+		::gpk::aobj<::gpk::apod<sc_t>>	FileNames					= {};
 		::gpk::vcs						SavegameFolder				= ".";
 		::gpk::vcs						ExtensionSaveAuto			= ".auto.ghz";
 		::gpk::vcs						ExtensionSaveStage			= ".stage.ghz";
@@ -339,7 +339,7 @@ namespace ghg
 		}
 
 		::gpk::error_t					Save						(SAVE_MODE autosaveMode)				{
-			char								fileName[4096]				= {};
+			sc_t								fileName[4096]				= {};
 			::gpk::au8							b64PlayerName				= {};
 			for(uint32_t iPlayer = 0; iPlayer < Players.size(); ++iPlayer) {
 				b64PlayerName.clear();
