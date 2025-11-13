@@ -5,7 +5,7 @@
 
 namespace ssg
 {
-	::gpk::error_t			parseCommandLine	(::gpk::apobj<::ssg::EventSSiege> & queue, ::gpk::vcc inputLine);
+	::gpk::error_t			parseCommandLine	(::gpk::apobj<::ssg::EventSSiege> & queue, ::gpk::vcsc_t inputLine);
 } // namespace 
 
 #endif // SSIEGE_PARSE_H_23701

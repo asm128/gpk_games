@@ -15,7 +15,7 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "SSiege Server v0.1");
 
-static	::gpk::error_t	loadNetworkConfig		(const ::gpk::SJSONReader & jsonConfig, ::gpk::vcc & port, ::gpk::vcc & adapter) {
+static	::gpk::error_t	loadNetworkConfig		(const ::gpk::SJSONReader & jsonConfig, ::gpk::vcsc_t & port, ::gpk::vcsc_t & adapter) {
 	::gpk::error_t				appNodeIndex;
 	gpk_necs(appNodeIndex = ::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_server"}, jsonConfig, 0));
 	return ::gpk::loadServerConfig(jsonConfig, appNodeIndex, port, adapter);
@@ -40,7 +40,7 @@ static	::gpk::error_t	loadNetworkConfig		(const ::gpk::SJSONReader & jsonConfig,
 
 static	::gpk::error_t	updateSizeDependentResources(::SApplication & app)											{
 	::gpk::SWindow				& mainWindow			= app.Framework.RootWindow;
-	const ::gpk::n2u16			newSize					= mainWindow.Size;
+	const ::gpk::n2u1_t			newSize					= mainWindow.Size;
 #if !defined(DISABLE_D3D11)
 	mainWindow.BackBuffer	= {};
 	gpk_necs(app.D3DApp.SetWindowSize(newSize));
@@ -130,7 +130,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 			if(!message)
 				return 0;
 
-			gpk::vcu8						input					= message->Payload;
+			::gpk::vcu0_t						input					= message->Payload;
 			gpk::pobj<ssg::EventSSiege>	newEvent;
 			gpk_necs(newEvent->Load(input));
 			info_printf("Received '%s' from client %i: %s.", ::gpk::get_enum_namep(newEvent->Type), index, ::gpk::get_value_namep(newEvent->Type));
@@ -159,7 +159,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 }
 
 ::gpk::error_t			draw					(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
-	const ::gpk::n3f32			sunlightPos				= {}; //::gpk::calcSunPosition();
+	const ::gpk::n3f2_t			sunlightPos				= {}; //::gpk::calcSunPosition();
 	//const double				sunlightFactor			= .1;//:::gpk::calcSunlightFactor(app.SSiegeApp.World.WorldState.DaylightRatioExtra, app.SSiegeApp.World.WorldState.DaylightOffsetMinutes);
 	const ::gpk::rgbaf			clearColor				= ::gpk::DARKBLUE * .0625;//::gpk::interpolate_linear(::gpk::DARKBLUE * .25, ::gpk::LIGHTBLUE * 1.1, sunlightFactor);
 

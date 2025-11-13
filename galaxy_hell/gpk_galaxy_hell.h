@@ -126,7 +126,7 @@ namespace ghg
 			return ShipControllers.resize(PlayState.Constants.Players);
 		}
 
-		::gpk::error_t						Save					(::gpk::au8 & output)		const	{
+		::gpk::error_t						Save					(::gpk::au0_t & output)		const	{
 			gpk_necs(::gpk::savePOD(output, PlayState));
 			for(uint32_t iPlayer = 0; iPlayer < PlayState.Constants.Players; ++iPlayer) {
 				gpk_necs(::gpk::saveView(output, Pilots[iPlayer].Name));
@@ -137,7 +137,7 @@ namespace ghg
 			return 0;
 		}
 
-		::gpk::error_t						Load					(::gpk::vcu8 & input) {
+		::gpk::error_t						Load					(::gpk::vcu0_t & input) {
 			::std::lock_guard						lock(LockUpdate);
 			::gpk::view<const ::ghg::SPlayState>	readPlayState			= {};
 			gpk_necs(::gpk::loadPOD(input, PlayState));
@@ -154,12 +154,12 @@ namespace ghg
 	};
 
 	::gpk::error_t		stageSetup				(::ghg::SGalaxyHell & solarSystem);
-	::gpk::error_t		solarSystemSetup		(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2u16 & windowSize);
+	::gpk::error_t		solarSystemSetup		(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2u1_t & windowSize);
 	::gpk::error_t		solarSystemReset		(::ghg::SGalaxyHell & solarSystem); 
 	::gpk::error_t		solarSystemDraw			(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
 	::gpk::error_t		solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SEventSystem> frameEvents);
-	::gpk::error_t		solarSystemLoad			(::ghg::SGalaxyHell & world,::gpk::vcc filename);
-	::gpk::error_t		solarSystemSave			(const ::ghg::SGalaxyHell & world,::gpk::vcc filename);
+	::gpk::error_t		solarSystemLoad			(::ghg::SGalaxyHell & world,::gpk::vcsc_t filename);
+	::gpk::error_t		solarSystemSave			(const ::ghg::SGalaxyHell & world,::gpk::vcsc_t filename);
 	
 	::gpk::error_t		getLightArraysFromDebris
 		( const ::ghg::SDecoState	& decoState

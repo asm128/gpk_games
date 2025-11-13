@@ -9,7 +9,7 @@
 #include "gpk_deflate.h"
 #include "gpk_array_ptr.h"
 #include "gpk_noise.h"
-#include <ctime>
+#include "gpk_chrono.h"
 
 // Mercury - 20° E of crater Hun Kal
 // Venus - central peak of crater Ariadne
@@ -157,16 +157,16 @@ namespace ssg
 	struct SBox			{ uint32_t Color; };
 
 	struct STown {
-		::gpk::vcc				Name;
+		::gpk::vcsc_t				Name;
 		uint32_t				Country;
 
-		::gpk::error_t			Save				(::gpk::au8 & output)	const	{ 
+		::gpk::error_t			Save				(::gpk::au0_t & output)	const	{ 
 			gpk_necs(::gpk::saveView(output, Name)); 
 			gpk_necs(::gpk::savePOD (output, Country)); 
 			return 0;
 		}
 
-		::gpk::error_t			Load				(::gpk::vcu8 & input)	{ 
+		::gpk::error_t			Load				(::gpk::vcu0_t & input)	{ 
 			gpk_necs(::gpk::loadLabel(input, Name)); 
 			gpk_necs(::gpk::loadPOD  (input, Country)); 
 			return 0;
@@ -174,16 +174,16 @@ namespace ssg
 	};
 
 	struct SMiniMe {
-		::gpk::vcc				Name;
+		::gpk::vcsc_t				Name;
 		uint32_t				Hangar;
 
-		::gpk::error_t			Save				(::gpk::au8 & output)	const	{ 
+		::gpk::error_t			Save				(::gpk::au0_t & output)	const	{ 
 			gpk_necs(::gpk::saveView(output, Name)); 
 			gpk_necs(::gpk::savePOD (output, Hangar)); 
 			return 0;
 		}
 
-		::gpk::error_t			Load				(::gpk::vcu8 & input)	{ 
+		::gpk::error_t			Load				(::gpk::vcu0_t & input)	{ 
 			gpk_necs(::gpk::loadLabel(input, Name)); 
 			gpk_necs(::gpk::loadPOD  (input, Hangar)); 
 			return 0;
@@ -191,16 +191,16 @@ namespace ssg
 	};
 
 	struct SHangar {
-		::gpk::n2u16			Size;
+		::gpk::n2u1_t			Size;
 		assiegeid				Furniture;
 
-		::gpk::error_t			Save				(::gpk::au8 & output)	const	{ 
+		::gpk::error_t			Save				(::gpk::au0_t & output)	const	{ 
 			gpk_necs(::gpk::savePOD (output, Size)); 
 			gpk_necs(::gpk::saveView(output, Furniture)); 
 			return 0;
 		}
 
-		::gpk::error_t			Load				(::gpk::vcu8 & input)	{ 
+		::gpk::error_t			Load				(::gpk::vcu0_t & input)	{ 
 			gpk_necs(::gpk::loadPOD (input, Size)); 
 			gpk_necs(::gpk::loadView(input, Furniture)); 
 			return 0;
@@ -208,18 +208,18 @@ namespace ssg
 	};
 
 	struct SWorldArea {
-		::gpk::n2u32			Offset;
-		::gpk::au32				Hangars;
-		::gpk::au32				Characters;
+		::gpk::n2u2_t			Offset;
+		::gpk::au2_t			Hangars;
+		::gpk::au2_t			Characters;
 
-		::gpk::error_t			Save				(::gpk::au8 & output)	const	{ 
+		::gpk::error_t			Save				(::gpk::au0_t & output)	const	{ 
 			gpk_necs(::gpk::savePOD (output, Offset)); 
 			gpk_necs(::gpk::saveView(output, Hangars)); 
 			gpk_necs(::gpk::saveView(output, Characters)); 
 			return 0;
 		}
 
-		::gpk::error_t			Load				(::gpk::vcu8 & input)	{ 
+		::gpk::error_t			Load				(::gpk::vcu0_t & input)	{ 
 			gpk_necs(::gpk::loadPOD (input, Offset)); 
 			gpk_necs(::gpk::loadView(input, Hangars)); 
 			gpk_necs(::gpk::loadView(input, Characters)); 
@@ -231,7 +231,7 @@ namespace ssg
 		gpk::apimg8bgra			Values;
 		gpk::apobj<SWorldArea>	Blocks;
 
-		::gpk::error_t			Save				(::gpk::au8 & output)	const	{ 
+		::gpk::error_t			Save				(::gpk::au0_t & output)	const	{ 
 			gpk_necs(::gpk::savePOD(output, Values.size())); 
 			for(uint32_t iValueMap = 0; iValueMap < Values.size(); ++iValueMap)
 				gpk_necall(::gpk::saveImage<::gpk::bgra>(output, Values[iValueMap]->View), "Failed to load tile map %i", iValueMap);
@@ -242,7 +242,7 @@ namespace ssg
 
 			return 0; 
 		}
-		::gpk::error_t			Load				(::gpk::vcu8 & input) { 
+		::gpk::error_t			Load				(::gpk::vcu0_t & input) { 
 			uint32_t					valuesSize;
 			gpk_necs(::gpk::loadPOD(input, valuesSize)); 
 			gpk_necs(Values.reserve(valuesSize));
@@ -267,8 +267,8 @@ namespace ssg
 #pragma pack(push, 1)
 	struct SWorldConfig {
 		uint64_t				Seed					= ::gpk::noise1DBase(::gpk::timeCurrentInUs());
-		::gpk::n2u8				BlockSize				= {255, 255};
-		::gpk::n2u32			WorldSizeInBlocks		= {};	// in blocks
+		::gpk::n2u0_t				BlockSize				= {255, 255};
+		::gpk::n2u2_t			WorldSizeInBlocks		= {};	// in blocks
 	};
 
 	struct SWorldState {
@@ -288,7 +288,7 @@ namespace ssg
 		::gpk::aobj<SMiniMe>	Characters;
 		SWorldTiles				Tiles;
 
-		::gpk::error_t			Save				(::gpk::au8 & output)	const	{ 
+		::gpk::error_t			Save				(::gpk::au0_t & output)	const	{ 
 			gpk_necs(::gpk::savePOD(output, WorldConfig)); 
 			gpk_necs(::gpk::savePOD(output, WorldState)); 
 			gpk_necs(::gpk::saveView(output, Hangars));
@@ -300,7 +300,7 @@ namespace ssg
 			return 0;
 		}
 
-		::gpk::error_t			Load				(::gpk::vcu8 & input)	{ 
+		::gpk::error_t			Load				(::gpk::vcu0_t & input)	{ 
 			gpk_necs(::gpk::loadPOD(input, WorldConfig)); 
 			gpk_necs(::gpk::loadPOD(input, WorldState)); 
 			gpk_necs(::gpk::loadView(input, Hangars));

@@ -9,7 +9,7 @@ namespace gpkg
 	GPK_USING_TYPEINT();
 
 	struct SJump {
-		::gpk::achar				Text;
+		::gpk::asc_t				Text;
 		uint32_t					Jump;
 	};
 

@@ -1,6 +1,9 @@
 #include "ssiege_server.h"
 #include "ssiege_event_args.h"
 
+using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
+GPK_USING_TYPEINT();
+
 ::gpk::error_t	ssg::ssiegeServerUpdate		(::ssg::SSiegeServer & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents) { 
 	gpk_necs(::ssg::ssiegeUpdate(app, lastTimeSeconds, inputState, systemEvents, [&app](::gpk::pobj<::ssg::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) {
 		if(!_eventToProcess)

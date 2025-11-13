@@ -3,8 +3,8 @@
 ::gpk::error_t			ssg::printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, bool debugOutput) {
 	if(debugOutput)
 		info_printf(
-			"\nCoordSource  : " N3_F32
-			"\nCoordTarget  : " N3_F32
+			"\nCoordSource  : " N3_F2
+			"\nCoordTarget  : " N3_F2
 			"\nIdSource     : %i"
 			"\nIdTarget     : %i"
 			"\nValue.AsInt  : %i"
@@ -20,8 +20,8 @@
 			);
 	else
 		printf(
-			"\nCoordSource  : " N3_F32
-			"\nCoordTarget  : " N3_F32
+			"\nCoordSource  : " N3_F2
+			"\nCoordTarget  : " N3_F2
 			"\nIdSource     : %i"
 			"\nIdTarget     : %i"
 			"\nValue.AsInt  : %i"
@@ -38,11 +38,11 @@
 	return 0;
 }
 
-::gpk::error_t			ssg::printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, ::gpk::achar & output) {
+::gpk::error_t			ssg::printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, ::gpk::asc_t & output) {
 	sc_t						temp	[1024]				= {};
 	sprintf_s(temp, 
-		"\nCoordSource  : " N3_F32
-		"\nCoordTarget  : " N3_F32
+		"\nCoordSource  : " N3_F2
+		"\nCoordTarget  : " N3_F2
 		"\nIdSource     : %i"
 		"\nIdTarget     : %i"
 		"\nValue.AsInt  : %i"

@@ -11,22 +11,22 @@ static	::gpk::error_t	fileSize		(FILE* fp) {
 	return (int)lastPosition;
 }
 
-static	::gpk::error_t	splitLines		(const ::gpk::achar & pageBytes, ::gpk::aobj<gpk::achar> & pageLines) {
+static	::gpk::error_t	splitLines		(const ::gpk::asc_t & pageBytes, ::gpk::aobj<::gpk::asc_t> & pageLines) {
 	pageLines.clear();
 	uint32_t					lastOffset		= 0;
 	for(uint32_t iOffset = 0; iOffset < pageBytes.size(); ++iOffset) {
 		if(pageBytes[iOffset] == '\n') {
-			::gpk::vcc					lineToPush		= {};
+			::gpk::vcsc_t					lineToPush		= {};
 			pageBytes.slice(lineToPush, lastOffset, iOffset - lastOffset + 1);
 			pageLines.push_back(lineToPush);
 			lastOffset				= ++iOffset;
 		}
 	}
 	if(pageBytes.size() > lastOffset) {
-		::gpk::vcc					vline			= {};
+		::gpk::vcsc_t					vline			= {};
 		pageBytes.slice(vline, lastOffset, lastOffset + 1);
 
-		::gpk::achar				lineToPush		= vline;
+		::gpk::asc_t				lineToPush		= vline;
 		lineToPush.append_string("\n");
 		pageLines.push_back(lineToPush);
 	}
@@ -47,8 +47,8 @@ static	::gpk::error_t	loadLines		(::gpkg::SPage & page, const ::gpk::aachar & pa
 	page.TextLines			= pageLines;
 	page.PageJumps			= {};
 	for(int32_t iLine = (int32_t)page.TextLines.size() - 1; iLine >= 0; --iLine) {
-		::gpk::achar				& currentLine	= page.TextLines[iLine];
-		::gpk::vcc					trimmed;
+		::gpk::asc_t				& currentLine	= page.TextLines[iLine];
+		::gpk::vcsc_t					trimmed;
 		::gpk::trim(trimmed, currentLine);
 		currentLine				= trimmed;
 		if(currentLine.size() <= 2 && 0 == page.PageJumps.size()) {
@@ -78,7 +78,7 @@ static	::gpk::error_t	loadLines		(::gpkg::SPage & page, const ::gpk::aachar & pa
 	}
 
 	int							textSize		= fileSize(fp);
-	::gpk::achar				pageBytes;
+	::gpk::asc_t				pageBytes;
 	pageBytes.resize(textSize);
 	fread(&pageBytes[0], 1, textSize, fp);
 	fclose(fp);	

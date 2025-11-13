@@ -7,6 +7,9 @@
 #include "gpk_event_screen.h"
 #include "gpk_path.h"
 
+using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
+GPK_USING_TYPEINT();
+
 static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssg::SSiegeUI & ssiegeUI) {
 	gpk_necs(::gpk::inputBoxCreate(ssiegeUI.UserInput, gui, ssiegeUI.Root));
 	ssiegeUI.UserInput.MaxLength	= 64;
@@ -39,14 +42,14 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssg::SSiegeUI & ssieg
 		while(newState >= UI.RootPerState.size()) {	// create layouts for each state as they're required
 			::gpk::cid_t				rootId;
 			gpk_necs(rootId = UI.RootPerState[UI.RootPerState.push_back(::gpk::createScreenLayout(*GUI, UI.Root))]);
-			es_if_failed(GUI->Controls.SetHidden(rootId, true));
+			if_zero_e(GUI->Controls.SetHidden(rootId, true));
 		}
 				
 		const ::gpk::cid_t iDialogNew		= UI.RootPerState[newState];
 		const ::gpk::cid_t iDialogActive	= UI.RootPerState[ActiveState];
-		es_if_failed(table.SetHidden(iDialogNew, false));
+		if_true_e(table.SetHidden(iDialogNew, false));
 		if(ActiveState >= APP_STATE_Welcome && iDialogActive) {
-			es_if_failed(table.SetHidden(iDialogActive, true));
+			if_zero_e(table.SetHidden(iDialogActive, true));
 		}
 		if(newState == APP_STATE_Home && ActiveState > APP_STATE_Home) // Don't autosave first time we enter Home.
 			es_if_failed(Save());
@@ -76,10 +79,10 @@ static	::gpk::error_t	processScreenEvent		(::ssg::SSiegeApp & app, const ::gpk::
 		break;
 	case ::gpk::EVENT_SCREEN_Create:
 	case ::gpk::EVENT_SCREEN_Resize: {
-		::gpk::n2u16				newMetrics				= *(const ::gpk::n2u16*)screenEvent.Data.begin();
+		::gpk::n2u1_t				newMetrics				= *(const ::gpk::n2u1_t*)screenEvent.Data.begin();
 		gpk_necs(::gpk::guiUpdateMetrics(*app.GUI, newMetrics, true));
 
-		::gpk::n2u16				renderTargetWorldSize;	
+		::gpk::n2u1_t				renderTargetWorldSize;	
 		renderTargetWorldSize	= newMetrics;
 		double						currentRatio			= renderTargetWorldSize.y / (double)renderTargetWorldSize.x;
 		double						targetRatioY			= 9 / 16.0;
@@ -133,7 +136,7 @@ static	::gpk::error_t	processSystemEvent		(::ssg::SSiegeApp & app, const ::gpk::
 	return 0;
 }
 
-static	::gpk::error_t	updateInput				(::ssg::SSiegeUI & /*ui*/, ::ssg::SWorldView & world, double actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 /*mouseDeltas*/, ::gpk::vcu8 /*buttonStates*/) { 
+static	::gpk::error_t	updateInput				(::ssg::SSiegeUI & /*ui*/, ::ssg::SWorldView & world, double actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t /*mouseDeltas*/, ::gpk::vcu0_t /*buttonStates*/) { 
 	const double				secondsElapsed			= actualSecondsElapsed * world.WorldState.TimeScale;
 
 	if(keyStates[VK_CONTROL]) {
@@ -148,15 +151,16 @@ static	::gpk::error_t	updateInput				(::ssg::SSiegeUI & /*ui*/, ::ssg::SWorldVie
 	return 0;
 }
 
-static	::gpk::error_t	parseCommands			(gpk::vpobj<gpk::achar> inputQueue, gpk::apobj<gpk::achar> & inputHistory, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+static	::gpk::error_t	parseCommands			(gpk::vpobj<::gpk::asc_t> inputQueue, gpk::apobj<::gpk::asc_t> & inputHistory, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	inputQueue.for_each([&outputEvents, &inputHistory](::gpk::pachar & textLine) {
-		res_if(!textLine || 0 == textLine->size());	// Shouldn't get here please
+		if_true_re(!textLine || 0 == textLine->size());	// Shouldn't get here please
 
 		if(textLine->size() > 1 && (*textLine)[0] == '.')
-			e_if_failed(::ssg::parseCommandLine(outputEvents, *textLine), "%s", ::gpk::toString(*textLine).begin());
+			if_fail_ef(::ssg::parseCommandLine(outputEvents, *textLine), "%s", ::gpk::toString(*textLine).begin());
 
 		info_printf("Queued input processed: '%s'", textLine->begin());
-		es_if_failed(inputHistory.push_back(textLine));
+		if_fail_e(inputHistory.push_back(textLine));
+
 	});
 	return 0;
 }
@@ -252,7 +256,7 @@ static	::gpk::error_t	handleSSiegeEvent		(::ssg::SSiegeApp & app, ::gpk::pobj<::
 		gpk_necs(::gpk::guiGetProcessableControls(gui, controlsToProcess));
 		if(int32_t result = app.UI.UserInput.Update(gui, app.UI.UserInput.VirtualKeyboard, systemEvents, controlsToProcess)) {
 			if(result == INT_MAX) { // enter key pressed
-				::gpk::vcc					trimmed				= {};
+				::gpk::vcsc_t					trimmed				= {};
 				gpk_necs(app.UI.UserInput.Text.slice(trimmed, 0, ::gpk::min(app.UI.UserInput.Text.size(), 128U)));
 				gpk_necs(::gpk::trim(trimmed));
 				if(trimmed.size()) {

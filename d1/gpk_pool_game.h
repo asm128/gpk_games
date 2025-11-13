@@ -112,8 +112,8 @@ namespace d1p
 		inline	::d1p::SStickControl&		ActiveStick					()			{ return Players[ActivePlayer()].StickControl; }
 		inline	const ::d1p::SStickControl&	ActiveStick					()	const	{ return Players[ActivePlayer()].StickControl; }
 
-		inline	uint8_t						EntityToPocket				(uint16_t iEntity)									const	{ return (uint8_t)::gpk::find(iEntity, ::gpk::vcu16{Entities.Pockets}); }
-		inline	uint8_t						EntityToBall				(uint16_t iEntity)									const	{ return (uint8_t)::gpk::find(iEntity, ::gpk::vcu16{Entities.Balls  }); }
+		inline	uint8_t						EntityToPocket				(uint16_t iEntity)									const	{ return (uint8_t)::gpk::find(iEntity, ::gpk::vcu1_t{Entities.Pockets}); }
+		inline	uint8_t						EntityToBall				(uint16_t iEntity)									const	{ return (uint8_t)::gpk::find(iEntity, ::gpk::vcu1_t{Entities.Balls  }); }
 		inline	::gpk::error_t				BallToEntity				(uint8_t iBall)										const	{ return Entities.Balls[iBall]; }
 		inline	::gpk::error_t				BallToRenderNode			(uint8_t iBall)										const	{ return Engine.Entities[Entities.Balls[iBall]].RenderNode; }
 		inline	::gpk::error_t				BallToBody					(uint8_t iBall)										const	{ return Engine.Entities[Entities.Balls[iBall]].RigidBody; }

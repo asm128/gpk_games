@@ -6,6 +6,7 @@
 #include "gpk_noise.h"
 #include "gpk_deflate.h"
 #include "gpk_engine_orbit.h"
+#include "gpk_chrono.h"
 
 #include <windows.h>
 #include <mmsystem.h>
@@ -13,18 +14,18 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-::gpk::error_t			ghg::solarSystemSave	(const ::ghg::SGalaxyHell & game, ::gpk::vcc fileName) {
-	::gpk::au8					serialized;
+::gpk::error_t			ghg::solarSystemSave	(const ::ghg::SGalaxyHell & game, ::gpk::vcsc_t fileName) {
+	::gpk::au0_t					serialized;
 	gpk_necs(game.Save(serialized));
 	gpk_necs(::gpk::deflateFromMemory(fileName, serialized));
 	return 0;
 }
 
-::gpk::error_t			ghg::solarSystemLoad	(::ghg::SGalaxyHell & world,::gpk::vcc filename) {
-	::gpk::au8					serialized;
+::gpk::error_t			ghg::solarSystemLoad	(::ghg::SGalaxyHell & world,::gpk::vcsc_t filename) {
+	::gpk::au0_t					serialized;
 	gpk_necs(::gpk::inflateToMemory(filename, serialized));
 
-	::gpk::vcu8					viewSerialized			= serialized;
+	::gpk::vcu0_t					viewSerialized			= serialized;
 	if (failed(world.Load(viewSerialized))) {
 		gpk_necs(::ghg::solarSystemReset(world));
 		return -1;
@@ -96,7 +97,7 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 		shipState.SpaceshipManager.ShipParts[indexShip].push_back((uint16_t)shipState.SpaceshipManager.Orbiters.push_back(shipPart));
 		shipState.SpaceshipManager.ShipOrbiterActionQueue.push_back({});
 
-		::gpk::au32					& parentEntityChildren	= shipState.EntitySystem.EntityChildren[iEntityMain];
+		::gpk::au2_t					& parentEntityChildren	= shipState.EntitySystem.EntityChildren[iEntityMain];
 		parentEntityChildren.push_back(entityPart.Parent);
 	}
 	return indexShip;
@@ -219,7 +220,7 @@ static	::gpk::error_t	modelsSetupOld			(::ghg::SShipScene & scene)			{
 			::gpk::img<::gpk::bgra>		& image					= scene.Image[iImage];
 			if(image.Texels.size())
 				continue;
-			image.resize(::gpk::n2u32{32, 5});
+			image.resize(::gpk::n2u2_t{32, 5});
 			for(uint32_t y = 0; y < image.metrics().y; ++y) {// Generate noise color for planet texture
 				bool						xAffect					= (y % 2);
 				::gpk::rgbaf				lineColor				= baseColors[(iImage + (rand() % 4)) % (baseColors.size() - 4)];
@@ -388,7 +389,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 			shipPivot.Orientation.MakeFromEuler({0, 0, (float)(::gpk::math_pi_2)});
 			shipPivot.Position		= {5.0f + 5 * solarSystem.ShipState.SpaceshipManager.ShipCores.size()};
 
-			::gpk::au16					& enemyShipOrbiters		= solarSystem.ShipState.SpaceshipManager.ShipParts[indexShip];
+			::gpk::au1_t					& enemyShipOrbiters		= solarSystem.ShipState.SpaceshipManager.ShipParts[indexShip];
 			for(uint32_t iPart = 0; iPart < enemyShipOrbiters.size(); ++iPart) {
 				solarSystem.ShipState.Engine.Integrator.Forces[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[enemyShipOrbiters[iPart]]].Body].Rotation.y *= float(1 + indexShip * .35);
 			}
@@ -399,7 +400,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		// set up weapons
 		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShip) {
 			::gpk::SSpaceshipCore		& ship							= solarSystem.ShipState.SpaceshipManager.ShipCores[iShip];
-			::gpk::au16					& shipParts						= solarSystem.ShipState.SpaceshipManager.ShipParts[iShip];
+			::gpk::au1_t					& shipParts						= solarSystem.ShipState.SpaceshipManager.ShipParts[iShip];
 			ship.Health				= 0;
 			ship.Nitro				= {DEFAULT_NITRO, DEFAULT_NITRO};
 
@@ -471,7 +472,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 	return 0;
 }
 
-::gpk::error_t			ghg::solarSystemSetup	(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2u16 & windowSize)	{
+::gpk::error_t			ghg::solarSystemSetup	(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2u1_t & windowSize)	{
 	gpk_necs(::modelsSetup(solarSystem.ShipState.Engine));
 	gpk_necs(::modelsSetupOld(solarSystem.ShipState.Scene));
 

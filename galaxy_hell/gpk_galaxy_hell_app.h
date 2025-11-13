@@ -5,6 +5,7 @@
 #include "gpk_file.h"
 #include "gpk_circle.h"
 #include "gpk_gui_inputbox.h"
+#include "gpk_chrono.h"
 
 namespace ghg
 {
@@ -86,7 +87,7 @@ namespace ghg
 	GDEFINE_ENUM_TYPE(UI_SCORE, uint8_t);
 
 	struct SUIRadialGauge {
-		::gpk::apod<::gpk::n3f32>		Vertices				= {};
+		::gpk::apod<::gpk::n3f2_t>		Vertices				= {};
 		::gpk::apod<::gpk::trii16>		Indices					= {};
 		int16_t							CurrentValue			= 0;
 		int16_t							MaxValue				= 64;
@@ -165,10 +166,10 @@ namespace ghg
 	struct SPlayerShip { 
 		::gpk::SSpaceshipCore			Core;
 		::gpk::SSpaceshipScore			Score;
-		::gpk::au32						Parts;
-		::gpk::au32						Weapons;
+		::gpk::au2_t						Parts;
+		::gpk::au2_t						Weapons;
 
-		::gpk::error_t					Save					(::gpk::au8 & output) const {
+		::gpk::error_t					Save					(::gpk::au0_t & output) const {
 			gpk_necs(::gpk::savePOD (output, Core	));
 			gpk_necs(::gpk::savePOD (output, Score	));
 			gpk_necs(::gpk::saveView(output, Parts	));
@@ -176,7 +177,7 @@ namespace ghg
 			return 0;
 		}
 
-		::gpk::error_t					Load					(::gpk::vcu8 & input) {
+		::gpk::error_t					Load					(::gpk::vcu0_t & input) {
 			gpk_necs(::gpk::loadPOD	(input, Core	));
 			gpk_necs(::gpk::loadPOD	(input, Score	));
 			gpk_necs(::gpk::loadView(input, Parts	));
@@ -207,16 +208,16 @@ namespace ghg
 #pragma pack(pop)
 
 	struct SPlayer {
-		::gpk::vcc						Name			= {};
+		::gpk::vcsc_t						Name			= {};
 		::ghg::SPlayerState				State			= {};
 		::gpk::apod<::gpk::SWeapon>		Weapons			= {};
 		::gpk::apod<::gpk::SSpaceshipOrbiter>	Orbiters		= {};
 		::gpk::aobj<::ghg::SPlayerShip>	Ships			= {};
 
-		::gpk::error_t					Save			(const ::gpk::vcc & filename) const {
-			::gpk::au8							serialized;
+		::gpk::error_t					Save			(const ::gpk::vcsc_t & filename) const {
+			::gpk::au0_t							serialized;
 			gpk_necs(Save(serialized));
-			::gpk::au8							deflated;
+			::gpk::au0_t							deflated;
 			gpk_necs(::gpk::arrayDeflate(serialized, deflated));
 			info_printf("Player size in bytes: %u.", serialized.size());
 			info_printf("Player file size: %u.", deflated.size());
@@ -224,30 +225,30 @@ namespace ghg
 			return 0;
 		}
 
-		::gpk::error_t					Load			(const ::gpk::vcc & filename) {
-			::gpk::au8							serialized;
+		::gpk::error_t					Load			(const ::gpk::vcsc_t & filename) {
+			::gpk::au0_t							serialized;
 			gpk_necall(::gpk::fileToMemory({filename}, serialized), "fileName: %s", ::gpk::toString(filename).begin());
-			::gpk::au8							inflated;
+			::gpk::au0_t							inflated;
 			gpk_necs(::gpk::arrayInflate(serialized, inflated));
 			info_printf("Player file size: %u.", inflated.size());
 			info_printf("Player size in bytes: %u.", serialized.size());
-			::gpk::vcu8							input		= inflated;
+			::gpk::vcu0_t							input		= inflated;
 			return Load(input);
 		}
 
-		::gpk::error_t					Save			(::gpk::au8 & output) const {
+		::gpk::error_t					Save			(::gpk::au0_t & output) const {
 			gpk_necs(::gpk::saveView(output, Name));
 			gpk_necs(::gpk::savePOD(output, State));
 			gpk_necs(::gpk::saveView(output, Weapons));
 			gpk_necs(::gpk::saveView(output, Orbiters));
-			gpk_necs(output.append(::gpk::vcu8{(const uint8_t*)&Ships.size(), 4}));
+			gpk_necs(output.append(::gpk::vcu0_t{(const uint8_t*)&Ships.size(), 4}));
 			for(uint32_t iShip = 0; iShip < Ships.size(); ++iShip) {
 				gpk_necall(Ships[iShip].Save(output), "iShip: %u", iShip);
 			}
 			return 0;
 		}
 
-		::gpk::error_t					Load			(::gpk::vcu8 & input) {
+		::gpk::error_t					Load			(::gpk::vcu0_t & input) {
 			gpk_necs(::gpk::loadLabel	(input, Name	));
 			gpk_necs(::gpk::loadPOD		(input, State	));
 			gpk_necs(::gpk::loadView	(input, Weapons	));
@@ -266,8 +267,8 @@ namespace ghg
 	};
 
 	struct SUserCredentials {
-		::gpk::vcc		Username;
-		::gpk::vcc		Password;
+		::gpk::vcsc_t		Username;
+		::gpk::vcsc_t		Password;
 	};
 
 	enum SAVE_MODE { SAVE_MODE_AUTO, SAVE_MODE_QUICK, SAVE_MODE_STAGE, SAVE_MODE_USER };
@@ -333,14 +334,14 @@ namespace ghg
 
 		::ghg::APP_STATE				ActiveState					= APP_STATE_Init;
 
-		::gpk::error_t					AddNewPlayer				(::gpk::vcc playerName)			{
+		::gpk::error_t					AddNewPlayer				(::gpk::vcsc_t playerName)			{
 			::gpk::trim(playerName);
 			return Players.push_back({::gpk::label(::gpk::vcs{playerName})});
 		}
 
 		::gpk::error_t					Save						(SAVE_MODE autosaveMode)				{
 			sc_t								fileName[4096]				= {};
-			::gpk::au8							b64PlayerName				= {};
+			::gpk::au0_t							b64PlayerName				= {};
 			for(uint32_t iPlayer = 0; iPlayer < Players.size(); ++iPlayer) {
 				b64PlayerName.clear();
 				const ::ghg::SPlayer				& player					= Players[iPlayer];
@@ -348,7 +349,7 @@ namespace ghg
 				sprintf_s(fileName, "%s/%s.%llu%s", SavegameFolder.begin(), b64PlayerName.begin(), 0ULL, ExtensionProfile.begin());
 				gpk_necall(player.Save(fileName), "iPlayer: %i", iPlayer);
 			}
-			::gpk::vcc							extension;
+			::gpk::vcsc_t							extension;
 			switch(autosaveMode) {
 			case SAVE_MODE_USER		: extension = ExtensionSaveUser		; break;
 			case SAVE_MODE_STAGE	: extension = ExtensionSaveStage	; break;
@@ -371,9 +372,9 @@ namespace ghg
 	::gpk::error_t	guiUpdate			(::ghg::SGalaxyHellApp & gameui, ::gpk::vpobj<::gpk::SEventSystem> sysEvents);
 	
 	::gpk::error_t	galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEventsNew);
-	::gpk::error_t	galaxyHellDraw		(::ghg::SGalaxyHellApp & app, ::gpk::n2u16 renderTargetSize);
+	::gpk::error_t	galaxyHellDraw		(::ghg::SGalaxyHellApp & app, ::gpk::n2u1_t renderTargetSize);
 
-	::gpk::error_t	listFilesSavegame	(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames);
-	::gpk::error_t	listFilesProfile	(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames);
+	::gpk::error_t	listFilesSavegame	(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames);
+	::gpk::error_t	listFilesProfile	(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames);
 
 }

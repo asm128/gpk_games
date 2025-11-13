@@ -129,19 +129,19 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 		}
 		app.TunerPlayerCount->SetValue((uint8_t)app.Game.PlayState.Constants.Players);
 		for(uint32_t iPilot = 0; iPilot < app.Game.PlayState.Constants.Players; ++iPilot) {
-			const ::gpk::vcc namePilot	= app.Game.Pilots[iPilot].Name;
+			const ::gpk::vcsc_t namePilot	= app.Game.Pilots[iPilot].Name;
 			for(uint32_t iPlayer = 0; iPlayer < app.Game.PlayState.Constants.Players; ++iPlayer) {
 				if(iPlayer >= app.Players.size())
 					app.AddNewPlayer(namePilot);
 
-				const ::gpk::vcc namePlayer	= app.Players[iPlayer].Name;
+				const ::gpk::vcsc_t namePlayer	= app.Players[iPlayer].Name;
 				if(namePilot == namePlayer) {
 					::std::swap(app.Players[iPlayer], app.Players[iPilot]);
 					break;
 				}
 			}
 			for(uint32_t iPlayer = app.Game.PlayState.Constants.Players; iPlayer < app.Players.size(); ++iPlayer) {
-				const ::gpk::vcc namePlayer	= app.Players[iPlayer].Name;
+				const ::gpk::vcsc_t namePlayer	= app.Players[iPlayer].Name;
 				if(namePilot == namePlayer) {
 					::std::swap(app.Players[iPlayer], app.Players[iPilot]);
 					break;
@@ -205,7 +205,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 	return 0;
 }
 
-::gpk::error_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::n2u16 renderTargetSize) {
+::gpk::error_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::n2u1_t renderTargetSize) {
 	if(app.ActiveState < 2)
 		return 0;
 
@@ -239,19 +239,19 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 			break;
 
 		::gpk::g8bgra			cameraView			= sourceRT->Color.View;
-		::gpk::n2i16						cameraViewMetrics	= cameraView.metrics().s1_t();
+		::gpk::n2s1_t						cameraViewMetrics	= cameraView.metrics().s1_t();
 		::gpk::grid_copy(targetPixels, cameraView, ::gpk::n2<uint32_t>
 				{ (targetPixels.metrics().x >> 1) - (cameraView.metrics().x >> 1)
 				, (targetPixels.metrics().y >> 1) - (cameraView.metrics().y >> 1)
 				}
 			);
 
-		const ::gpk::n2i16		targetCenter		= targetPixels.metrics().s1_t() / 2;
-		const ::gpk::n2i16		cameraCenter		= cameraView.metrics().s1_t() / 2;
-		::gpk::n2i16				cornerTopLeft		= targetCenter + ::gpk::n2i16{int16_t(-cameraCenter.x), int16_t(-cameraCenter.y)};
-		::gpk::n2i16				cornerTopRight		= targetCenter + ::gpk::n2i16{int16_t( cameraCenter.x), int16_t(-cameraCenter.y)};
-		::gpk::n2i16				cornerBottomLeft	= targetCenter + ::gpk::n2i16{int16_t(-cameraCenter.x), int16_t( cameraCenter.y)};
-		::gpk::n2i16				cornerBottomRight	= targetCenter + ::gpk::n2i16{int16_t( cameraCenter.x), int16_t( cameraCenter.y)};
+		const ::gpk::n2s1_t		targetCenter		= targetPixels.metrics().s1_t() / 2;
+		const ::gpk::n2s1_t		cameraCenter		= cameraView.metrics().s1_t() / 2;
+		::gpk::n2s1_t				cornerTopLeft		= targetCenter + ::gpk::n2s1_t{int16_t(-cameraCenter.x), int16_t(-cameraCenter.y)};
+		::gpk::n2s1_t				cornerTopRight		= targetCenter + ::gpk::n2s1_t{int16_t( cameraCenter.x), int16_t(-cameraCenter.y)};
+		::gpk::n2s1_t				cornerBottomLeft	= targetCenter + ::gpk::n2s1_t{int16_t(-cameraCenter.x), int16_t( cameraCenter.y)};
+		::gpk::n2s1_t				cornerBottomRight	= targetCenter + ::gpk::n2s1_t{int16_t( cameraCenter.x), int16_t( cameraCenter.y)};
 
 		cornerTopLeft		.InPlaceClamp({}, {(int16_t)(targetPixels.metrics().x - 1), (int16_t)(targetPixels.metrics().y - 1)});
 		cornerTopRight		.InPlaceClamp({}, {(int16_t)(targetPixels.metrics().x - 1), (int16_t)(targetPixels.metrics().y - 1)});
@@ -290,17 +290,17 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 	return 0;
 }
 
-::gpk::error_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames) {
+::gpk::error_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames) {
 	::gpk::aobj<::gpk::apod<sc_t>>	fileNames;
 	ef_if(failed(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionSave)), "%s", saveGameFolder.begin());
 
-	::gpk::aobj<::gpk::vcc>				pathFileNames;
+	::gpk::aobj<::gpk::vcsc_t>				pathFileNames;
 	for(uint32_t iFile = 0; iFile < fileNames.size(); ++iFile)
 		pathFileNames.push_back(fileNames[iFile]);
 
-	::gpk::aobj<::gpk::vcc>				pathFileNamesSaveAuto;
-	::gpk::aobj<::gpk::vcc>				pathFileNamesSaveUser;
-	::gpk::aobj<::gpk::vcc>				pathFileNamesSaveStage;
+	::gpk::aobj<::gpk::vcsc_t>				pathFileNamesSaveAuto;
+	::gpk::aobj<::gpk::vcsc_t>				pathFileNamesSaveUser;
+	::gpk::aobj<::gpk::vcsc_t>				pathFileNamesSaveStage;
 	::gpk::filterPostfix(pathFileNames, app.ExtensionSaveAuto	, pathFileNamesSaveAuto);
 	::gpk::filterPostfix(pathFileNames, app.ExtensionSaveUser	, pathFileNamesSaveUser);
 	::gpk::filterPostfix(pathFileNames, app.ExtensionSaveStage	, pathFileNamesSaveStage);
@@ -311,12 +311,12 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 	return 0;
 }
 
-::gpk::error_t					ghg::listFilesProfile		(::ghg::SGalaxyHellApp & app, const ::gpk::vcc & saveGameFolder, ::gpk::aobj<::gpk::vcc> & savegameFilenames) {
+::gpk::error_t					ghg::listFilesProfile		(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames) {
 	::gpk::aobj<::gpk::apod<sc_t>>	fileNames;
 	ef_if(failed(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionProfile)), "%s", saveGameFolder.begin());
 
-	::gpk::aobj<::gpk::vcc>				pathFileNames;
+	::gpk::aobj<::gpk::vcsc_t>				pathFileNames;
 	for(uint32_t iFile = 0; iFile < fileNames.size(); ++iFile)
-		savegameFilenames.push_back(::gpk::label(::gpk::vcc{fileNames[iFile]}));
+		savegameFilenames.push_back(::gpk::label(::gpk::vcsc_t{fileNames[iFile]}));
 	return 0;
 }

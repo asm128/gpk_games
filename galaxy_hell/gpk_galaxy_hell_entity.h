@@ -18,12 +18,12 @@ namespace ghg
 
 	struct SEntitySystem {
 		::gpk::apod<::ghg::SGHEntity>	Entities				= {};
-		::gpk::aobj<::gpk::au32>		EntityChildren			= {};
+		::gpk::aobj<::gpk::au2_t>		EntityChildren			= {};
 
 		::gpk::error_t				Create					(const ::ghg::SGHEntity & newEntity, ::gpk::vcu32 entityChildren = {})	{ EntityChildren.push_back(entityChildren); return Entities.push_back(newEntity); }
 		::gpk::error_t				Create					()																		{ Create({}); }
 
-		::gpk::error_t				Save					(::gpk::au8 & output) const { 
+		::gpk::error_t				Save					(::gpk::au0_t & output) const { 
 			gpk_necs(::gpk::saveView(output, Entities));
 			for(uint32_t iEntity = 0; iEntity < Entities.size(); ++iEntity) 
 				gpk_necall(::gpk::saveView(output, ::gpk::vcu32{EntityChildren[iEntity]}), "iEntity: %i", iEntity);
@@ -31,7 +31,7 @@ namespace ghg
 			return 0; 
 		}
 
-		::gpk::error_t				Load					(::gpk::vcu8 & input) { 
+		::gpk::error_t				Load					(::gpk::vcu0_t & input) { 
 			gpk_necs(::gpk::loadView(input, Entities));
 			gpk_necall(EntityChildren.resize(Entities.size()), "size: %i", Entities.size());
 			for(uint32_t iEntity = 0; iEntity < Entities.size(); ++iEntity)

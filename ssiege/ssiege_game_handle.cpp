@@ -1,6 +1,9 @@
 #include "ssiege_game_handle.h"
 #include "ssiege_event_args.h"
 
+using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
+GPK_USING_TYPEINT();
+
 ::gpk::error_t	ssg::handleACTION_CHAR		(::ssg::SSiegeGame & world, const ::ssg::EViewMe & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	const ::ssg::SArgsEvent	& eventArgs		= *(const ::ssg::SArgsEvent*)gameEvent.Data.begin();
