@@ -12,6 +12,8 @@
 #include "gpk_bitmap_target.h"
 
 #include <DirectXColors.h>
+using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
+GPK_USING_TYPEINT();
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "D1");
 
@@ -31,7 +33,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "D1");
 
 static	::gpk::error_t	updateSizeDependentResources(::SApplication & app)											{
 	::gpk::SWindow				& mainWindow			= app.Framework.RootWindow;
-	const ::gpk::n2u16			newSize					= mainWindow.Size;
+	const ::gpk::n2u1_t			newSize					= mainWindow.Size;
 #if !defined(DISABLE_D3D11)
 	mainWindow.BackBuffer	= {};
 	gpk_necs(app.D3DApp.SetWindowSize(newSize));
@@ -144,7 +146,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 	const ::d1::SCamera			& cameraSelected		= app.D1.MainGame.CameraSelected();
 	const ::gpk::SEngineScene	& engineScene			= *app.D1.MainGame.Pool.Engine.Scene;
 	const ::gpk::rgbaf			clearColor				= app.D1.AppUI.ClearColor;
-	const ::gpk::n3f32			& lightPos				= app.D1.MainGame.LightPos;
+	const ::gpk::n3f2_t			& lightPos				= app.D1.MainGame.LightPos;
 
 	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, lightPos, cameraSelected.Position, cameraSelected.Target, {.01f, 100.f}));
 #else 
