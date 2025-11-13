@@ -71,7 +71,7 @@ namespace d1
 	GDEFINE_ENUM_VALUE(PLAYER_TYPE, Network	, 2);
 
 	struct SD1Player {
-		::gpk::vcc					Name				= {};
+		::gpk::vcsc_t					Name				= {};
 		::d1::SPlayerCameras		Cameras				= {};
 		::gpk::bgra					Color				= {};
 		PLAYER_TYPE					Type				= {};
@@ -84,7 +84,7 @@ namespace d1
 			return 0;
 		}
 
-		::gpk::error_t				Load				(::gpk::vcu8 & input) {
+		::gpk::error_t				Load				(::gpk::vcu0_t & input) {
 			gpk_necs(::gpk::loadPOD		(input, Cameras	));
 			gpk_necs(::gpk::loadPOD		(input, Color	));
 			gpk_necs(::gpk::loadPOD		(input, Type	));
@@ -93,7 +93,7 @@ namespace d1
 		}
 	};
 
-	stacxpr ::gpk::vcc			TEAM_TEXT[]			= {{6, "Team 1"}, {6, "Team 2"}};
+	stacxpr ::gpk::vcsc_t			TEAM_TEXT[]			= {{6, "Team 1"}, {6, "Team 2"}};
 
 	GDEFINE_ENUM_TYPE (UI_TEAM, uint8_t);
 	GDEFINE_ENUM_VALUE(UI_TEAM, Name		, 0);
@@ -144,7 +144,7 @@ namespace d1
 		::gpk::aobj<::d1::CAMERA_INPUT>		QueueCamera			= {};
 		::gpk::astatic<::d1::SD1Player
 			, ::d1p::MAX_PLAYERS>			Players				= {};
-		::gpk::n3f32							LightPos			= {5, 2, 0};
+		::gpk::n3f2_t						LightPos			= {5, 2, 0};
 
 
 		::gpk::error_t						Save				(::gpk::apod<uint8_t> & output) const {
@@ -154,7 +154,7 @@ namespace d1
 			return 0;
 		}
 
-		::gpk::error_t						Load				(::gpk::vcu8 & input) {
+		::gpk::error_t						Load				(::gpk::vcu0_t & input) {
 			gpk_necs(Pool.Load(input));
 			gpk_necs(::gpk::loadPOD(input, StartState));
 			gpk_necs(::gpk::loadPOD(input, TimeScale));
@@ -264,15 +264,15 @@ namespace d1
 	};
 
 	struct SD1FileStrings {
-		::gpk::vcc				SavegameFolder				= {1, "."};
-		::gpk::vcc				ExtensionImages				= {4, ".png"};
-		::gpk::vcc				ExtensionProfile			= {4, ".d1p"};
-		::gpk::vcc				ExtensionCredentials		= {4, ".d1c"};
-		::gpk::vcc				ExtensionSave				= {4, ".d1z"};
-		::gpk::vcc				ExtensionSaveUser			= {9, ".user.d1z"};
-		::gpk::vcc				ExtensionSaveAuto			= {9, ".auto.d1z"};
-		::gpk::vcc				ExtensionSaveStage			= {10, ".stage.d1z"};
-		::gpk::vcc				ExtensionSaveQuick			= {10, ".quick.d1z"};
+		::gpk::vcsc_t				SavegameFolder				= {1, "."};
+		::gpk::vcsc_t				ExtensionImages				= {4, ".png"};
+		::gpk::vcsc_t				ExtensionProfile			= {4, ".d1p"};
+		::gpk::vcsc_t				ExtensionCredentials		= {4, ".d1c"};
+		::gpk::vcsc_t				ExtensionSave				= {4, ".d1z"};
+		::gpk::vcsc_t				ExtensionSaveUser			= {9, ".user.d1z"};
+		::gpk::vcsc_t				ExtensionSaveAuto			= {9, ".auto.d1z"};
+		::gpk::vcsc_t				ExtensionSaveStage			= {10, ".stage.d1z"};
+		::gpk::vcsc_t				ExtensionSaveQuick			= {10, ".quick.d1z"};
 	};
 	
 	struct SD1 {
@@ -301,7 +301,7 @@ namespace d1
 		}
 
 		::gpk::error_t			Save			(SAVE_MODE autosaveMode)	const	{
-			::gpk::vcc					extension;
+			::gpk::vcsc_t					extension;
 			switch(autosaveMode) {
 			case SAVE_MODE_USER		: extension = FileStrings.ExtensionSaveUser		; break;
 			case SAVE_MODE_STAGE	: extension = FileStrings.ExtensionSaveStage	; break;
@@ -319,8 +319,8 @@ namespace d1
 			return 0;
 		}
 
-		::gpk::error_t			Save						(::gpk::vcc fileName)		const	{
-			::gpk::au8					serialized;
+		::gpk::error_t			Save						(::gpk::vcsc_t fileName)		const	{
+			::gpk::au0_t					serialized;
 			gpk_necs(MainGame.Save(serialized));
 			for(uint32_t iPlayer = 0; iPlayer < MainGame.Players.size(); ++iPlayer) {
 				const ::d1::SD1Player		& player					= MainGame.Players[iPlayer];
@@ -329,19 +329,19 @@ namespace d1
 			return ::gpk::deflateFromMemory(fileName, serialized);
 		}
 
-		::gpk::error_t			Load						(::gpk::vcc filename)				{
-			::gpk::au8					serialized;
+		::gpk::error_t			Load						(::gpk::vcsc_t filename)				{
+			::gpk::au0_t					serialized;
 			gpk_necs(::gpk::inflateToMemory(filename, serialized));
-			::gpk::vcu8					viewSerialized				= serialized;
-			if(errored(MainGame.Load(viewSerialized))) {
-				es_if(errored(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
+			::gpk::vcu0_t					viewSerialized				= serialized;
+			if(::gpk::failed(MainGame.Load(viewSerialized))) {
+				es_if(::gpk::failed(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
 				return -1;
 			}
 			for(uint32_t iPlayer = 0; iPlayer < MainGame.Players.size(); ++iPlayer) {
 				::d1::SD1Player				& player					= MainGame.Players[iPlayer];
-				if(errored(player.Load(viewSerialized))) {
+				if(::gpk::failed(player.Load(viewSerialized))) {
 					error_printf("Failed to load player %i.", iPlayer);
-					es_if(errored(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
+					es_if(::gpk::failed(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
 					return -1;
 				}
 			}

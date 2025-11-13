@@ -184,7 +184,7 @@ static	::gpk::error_t	parseCommand		(::gpk::apobj<::ssg::EventSSiege> & queue, :
 ::gpk::error_t			ssg::parseCommandLine	(::gpk::apobj<::ssg::EventSSiege> & queue, ::gpk::vcc inputLine) { 
 	::gpk::vcc					commandName, commandArgs;
 	gpk_necs(inputLine.slice(inputLine, 1));
-	if_if(errored(::gpk::split(::gpk::vcs{" "}, inputLine, commandName, commandArgs)), "No arguments provided for command %s.", ::gpk::toString(commandArgs).begin());
+	if_if(failed(::gpk::split(::gpk::vcs{" "}, inputLine, commandName, commandArgs)), "No arguments provided for command %s.", ::gpk::toString(commandArgs).begin());
 	bool						failed
 		=  -1 == ::parseCommand<::ssg::WORLD_ADMIN>(queue, commandName, commandArgs)
 		&& -1 == ::parseCommand<::ssg::WORLD_EVENT>(queue, commandName, commandArgs)

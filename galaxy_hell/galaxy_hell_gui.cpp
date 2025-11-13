@@ -4,6 +4,7 @@
 #include "gpk_grid_copy.h"
 #include "gpk_sphere.h"
 
+using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
 stxp	::gpk::GUI_COLOR_MODE	GHG_MENU_COLOR_MODE		= ::gpk::GUI_COLOR_MODE_3D;
@@ -309,21 +310,21 @@ static	::gpk::error_t	guiSetupAbout		(::ghg::SGalaxyHellApp & app, ::gpk::SDialo
 static	::gpk::error_t	guiSetupSettings	(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialog) { return ::gpk::guiCreateControlList<::ghg::UI_SETTINGS>(*dialog.GUI, -1, {160,20}, {}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, app.DialogControls[::ghg::APP_STATE_Settings]); }
 
 ::gpk::error_t			ghg::guiSetup		(::ghg::SGalaxyHellApp & app, const ::gpk::pobj<::gpk::SInput> & input) {
-	es_if(errored(::dialogCreateCommon(app.DialogDesktop, input, {})));
+	es_if(failed(::dialogCreateCommon(app.DialogDesktop, input, {})));
 
 	for(uint32_t iGUI = 0; iGUI < app.DialogPerState.size(); ++iGUI)
-		ef_if(errored(::dialogCreateCommon(app.DialogPerState[iGUI], input, {})), "iGUI: %i", iGUI);
+		ef_if(failed(::dialogCreateCommon(app.DialogPerState[iGUI], input, {})), "iGUI: %i", iGUI);
 
-	es_if(errored(::guiSetupWelcome	(app, app.DialogPerState[::ghg::APP_STATE_Welcome	])));
-	es_if(errored(::guiSetupHome	(app, app.DialogPerState[::ghg::APP_STATE_Home		])));
-	es_if(errored(::guiSetupPlay	(app, app.DialogPerState[::ghg::APP_STATE_Play		])));
-	es_if(errored(::guiSetupShop	(app, app.DialogPerState[::ghg::APP_STATE_Shop		])));
-	es_if(errored(::guiSetupProfile	(app, app.DialogPerState[::ghg::APP_STATE_Profile	])));
-	es_if(errored(::guiSetupSettings(app, app.DialogPerState[::ghg::APP_STATE_Settings	])));
-	es_if(errored(::guiSetupAbout	(app, app.DialogPerState[::ghg::APP_STATE_About		])));
-	es_if(errored(::guiSetupLoad	(app.DialogPerState[::ghg::APP_STATE_Load			])));
+	es_if(failed(::guiSetupWelcome	(app, app.DialogPerState[::ghg::APP_STATE_Welcome	])));
+	es_if(failed(::guiSetupHome	(app, app.DialogPerState[::ghg::APP_STATE_Home		])));
+	es_if(failed(::guiSetupPlay	(app, app.DialogPerState[::ghg::APP_STATE_Play		])));
+	es_if(failed(::guiSetupShop	(app, app.DialogPerState[::ghg::APP_STATE_Shop		])));
+	es_if(failed(::guiSetupProfile	(app, app.DialogPerState[::ghg::APP_STATE_Profile	])));
+	es_if(failed(::guiSetupSettings(app, app.DialogPerState[::ghg::APP_STATE_Settings	])));
+	es_if(failed(::guiSetupAbout	(app, app.DialogPerState[::ghg::APP_STATE_About		])));
+	es_if(failed(::guiSetupLoad	(app.DialogPerState[::ghg::APP_STATE_Load			])));
 
-	es_if(errored(::gpk::virtualKeyboardSetup437(*app.DialogDesktop.GUI, app.VirtualKeyboard)));;
+	es_if(failed(::gpk::virtualKeyboardSetup437(*app.DialogDesktop.GUI, app.VirtualKeyboard)));;
 	return 0;
 }
 

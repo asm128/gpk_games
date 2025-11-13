@@ -3,18 +3,18 @@
 GPK_USING_TYPEINT();
 
 stacxpr	bool			BACKGROUND_3D_ONLY			= true;
-stacxpr	::gpk::n2u16	SHOOT_SLIDER_SIZE			= {24, 320};
-stacxpr	::gpk::n2u16	MODULE_VIEWPORT_SIZE		= {128, 64};
-stacxpr	::gpk::n2u16	WEAPON_BAR_SIZE				= {184, 24};
+stacxpr	::gpk::n2u1_t	SHOOT_SLIDER_SIZE			= {24, 320};
+stacxpr	::gpk::n2u1_t	MODULE_VIEWPORT_SIZE		= {128, 64};
+stacxpr	::gpk::n2u1_t	WEAPON_BAR_SIZE				= {184, 24};
 
-static	::gpk::error_t	guiSetupCommon				(::gpk::SGUI & gui, const ::gpk::n2f32 & cursorPos) {
+static	::gpk::error_t	guiSetupCommon				(::gpk::SGUI & gui, const ::gpk::n2f2_t & cursorPos) {
 	gui.ThemeDefault		= ::gpk::ASCII_COLOR_DARKRED * 16 + 10;
 	gui.SelectedFont		= 7;
 	gui.CursorPos			= cursorPos;
 	return 0;
 }
 
-static	::gpk::error_t	dialogCreateCommon			(::gpk::SDialog & dialog, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2f32 & cursorPos) { 
+static	::gpk::error_t	dialogCreateCommon			(::gpk::SDialog & dialog, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2f2_t & cursorPos) { 
 	//dialog				= {};
 	dialog.Input			= inputState;
 	gpk_necs(::guiSetupCommon(*dialog.GUI, cursorPos));
@@ -43,8 +43,8 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	cnstxpr	uint16_t			BUTTON_WIDTH_SMALL			= 160;
 	cnstxpr	uint16_t			BUTTON_WIDTH_LARGE			= 184;
 	::gpk::SGUI					& gui						= *dialog.GUI;
-	cnstxpr	::gpk::n2u16		buttonSize					= {BUTTON_WIDTH_SMALL, BUTTON_HEIGHT};
-	const ::gpk::n2i16			buttonOffset				= {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::d1::UI_HOME>() / 2)};
+	cnstxpr	::gpk::n2u1_t		buttonSize					= {BUTTON_WIDTH_SMALL, BUTTON_HEIGHT};
+	const ::gpk::n2s1_t			buttonOffset				= {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::d1::UI_HOME>() / 2)};
 	::gpk::cid_t				firstControlHome			= appUI.FirstControl[::d1::APP_STATE_Home] = ::gpk::guiCreateControlList<::d1::UI_HOME>(gui, appUI.DialogPerState[::d1::APP_STATE_Home], buttonSize, buttonOffset, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Home]);
 	gpk_necs(firstControlHome); 
 	for(uint32_t iButton = firstControlHome; iButton < firstControlHome + ::gpk::get_value_count<::d1::UI_HOME>(); ++iButton) {
@@ -63,12 +63,12 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 		gpk_necs(::gpk::controlSetParent(gui, appUI.TunerTableSize->IdGUIControl, appUI.DialogPerState[::d1::APP_STATE_Home]));
 		appUI.TunerTableSize->ValueLimits.Min	= 0;
 		appUI.TunerTableSize->ValueLimits.Max	= uint8_t(::gpk::get_value_count<::d1p::TABLE_SIZE>() - 1);
-		appUI.TunerTableSize->FuncValueFormat	= [&appGame, &appUI](::gpk::vcc & string, uint8_t value, const ::gpk::minmax<uint8_t> &)			mutable { 
+		appUI.TunerTableSize->FuncValueFormat	= [&appGame, &appUI](::gpk::vcsc_t & string, uint8_t value, const ::gpk::minmax<uint8_t> &)			mutable { 
 			appGame.StartState.StandardTableSize	= (::d1p::TABLE_SIZE)value;
 			string					= ::gpk::get_value_descv(appGame.StartState.StandardTableSize); 
 			return 0; 
 		};
-		appUI.TunerTableSize->FuncGetString		= [&appGame, &appUI](::gpk::vcc & string, uint8_t, const ::gpk::minmax<uint8_t> &)	mutable { 
+		appUI.TunerTableSize->FuncGetString		= [&appGame, &appUI](::gpk::vcsc_t & string, uint8_t, const ::gpk::minmax<uint8_t> &)	mutable { 
 			string		= {appUI.TunerTableSize->ValueString, (uint32_t)snprintf(appUI.TunerTableSize->ValueString, ::gpk::size(appUI.TunerTableSize->ValueString) - 2, "%s Table", ::gpk::toString(string).begin())}; 
 			return 0; 
 		};
@@ -146,14 +146,14 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	gui.Controls.Images[appUI.ForceSlider->IdGUIControl].Image = appUI.ForceSliderRenderTarget.Color;
 
 	static sc_t					velocityString[32]			= {};
-	appUI.ForceSlider->FuncValueFormat	= [&appGame](::gpk::vcc & string, int64_t value, const ::gpk::minmax<int64_t> & limits) mutable { 
+	appUI.ForceSlider->FuncValueFormat	= [&appGame](::gpk::vcsc_t & string, int64_t value, const ::gpk::minmax<int64_t> & limits) mutable { 
 		const float					newVelocity					= ::d1p::MAX_SHOOT_VELOCITY / limits.Max * (limits.Max - value);
 		const float					currentVelocity				= appGame.Pool.ActiveStick().Velocity;
 		if(newVelocity != currentVelocity) { // only generate the event if the value actually changed. this is because this may be called randomly to ensure the right value is in sync with the server.
 			const ::d1p::SArgsPlayerInput	eventData					= {newVelocity, ::gpk::AXIS_ORIGIN};
-			appGame.QueueStick.push_back({::d1p::PLAYER_INPUT_Force, ::gpk::vcu8{(const uint8_t*)&eventData, sizeof(eventData)}});
+			appGame.QueueStick.push_back({::d1p::PLAYER_INPUT_Force, ::gpk::vcu0_t{(const uint8_t*)&eventData, sizeof(eventData)}});
 		}
-		string					= ::gpk::vcc{(uint32_t)sprintf_s(velocityString, "%.02f m/s", newVelocity), velocityString}; 
+		string					= ::gpk::vcsc_t{(uint32_t)sprintf_s(velocityString, "%.02f m/s", newVelocity), velocityString}; 
 		return 0; 
 	};
 	gpk_necs(::gpk::sliderSetValue(*appUI.ForceSlider, int64_t(appUI.ForceSlider->ValueLimits.Max - appGame.Pool.ActiveStick().Velocity * (appUI.ForceSlider->ValueLimits.Max / ::d1p::MAX_SHOOT_VELOCITY))));

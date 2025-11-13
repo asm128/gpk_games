@@ -10,6 +10,9 @@
 #include <windows.h>
 #include <mmsystem.h>
 
+using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
+GPK_USING_TYPEINT();
+
 ::gpk::error_t			ghg::solarSystemSave	(const ::ghg::SGalaxyHell & game, ::gpk::vcc fileName) {
 	::gpk::au8					serialized;
 	gpk_necs(game.Save(serialized));
@@ -22,7 +25,7 @@
 	gpk_necs(::gpk::inflateToMemory(filename, serialized));
 
 	::gpk::vcu8					viewSerialized			= serialized;
-	if (errored(world.Load(viewSerialized))) {
+	if (failed(world.Load(viewSerialized))) {
 		gpk_necs(::ghg::solarSystemReset(world));
 		return -1;
 	}

@@ -9,23 +9,24 @@
 #include "gpk_file.h"
 #include "gpk_voxel.h"
 
+using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
 
-::gpk::error_t			d1p::poolGameSave		(const ::d1p::SPoolGame & game, ::gpk::vcc fileName) {
-	::gpk::au8					serialized;
+::gpk::error_t			d1p::poolGameSave		(const ::d1p::SPoolGame & game, ::gpk::vcsc_t fileName) {
+	::gpk::au0_t					serialized;
 	gpk_necs(game.Save(serialized));
 	gpk_necs(::gpk::deflateFromMemory(fileName, serialized));
 	return 0;
 }
 
-::gpk::error_t			d1p::poolGameLoad		(::d1p::SPoolGame & world,::gpk::vcc filename) {
-	::gpk::au8					inflated;
+::gpk::error_t			d1p::poolGameLoad		(::d1p::SPoolGame & world,::gpk::vcsc_t filename) {
+	::gpk::au0_t					inflated;
 	gpk_necs(::gpk::inflateToMemory(filename, inflated));
 
-	::gpk::vcu8					viewSerialized			= {(const uint8_t*)inflated.begin(), inflated.size()};
-	if (errored(world.Load(viewSerialized))) {
-		es_if(errored(::d1p::poolGameReset(world)));
+	::gpk::vcu0_t					viewSerialized			= {(const uint8_t*)inflated.begin(), inflated.size()};
+	if (failed(world.Load(viewSerialized))) {
+		es_if(failed(::d1p::poolGameReset(world)));
 		return -1;
 	}
 	return 0;
@@ -44,7 +45,7 @@ static	::gpk::error_t	poolGameResetTest2Balls	(::d1p::SPoolGame & pool, ::d1p::S
 		engine.SetCollides		(iEntity, true);
 		engine.SetHidden		(iEntity, false);
 	}
-	//::gpk::n3f32				velocity					= {0, 0, -1.f - rand() % 30};
+	//::gpk::n3f2_t				velocity					= {0, 0, -1.f - rand() % 30};
 	//velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 20 * ((rand() % 2) ? -1 : 1));
 	//engine.SetVelocity(pool.StartState.Balls[1].Entity, velocity);
 	return 0;
@@ -57,10 +58,10 @@ static	::gpk::error_t	textureBallNumber		(::gpk::g8bgra view, uint32_t number, c
 		{ {int16_t(view.metrics().x / 2 - (font.CharSize.x * strlen(strNumber)) / 2), int16_t(view.metrics().y / 2 - font.CharSize.y / 2)}
 		, font.CharSize.s1_t()
 		};
-	::gpk::apod<::gpk::n2u16>	coords;
+	::gpk::apod<::gpk::n2u1_t>	coords;
 	::gpk::textLineRaster(view.metrics(), font.CharSize, targetRect, font.Texture, strNumber, coords);
 	for(uint32_t iCoord = 0; iCoord < coords.size(); ++iCoord) {
-		const ::gpk::n2u16			coord					= coords[iCoord];
+		const ::gpk::n2u1_t			coord					= coords[iCoord];
 		view[coord.y][coord.x]	= ::gpk::BLACK;
 	}
 	return 0; 
@@ -74,7 +75,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	const ::gpk::SRasterFont	& font					= *engine.Scene->Graphics->Fonts.Fonts[8];
 	for(uint32_t iBall = 0; iBall < startState.CountBalls; ++iBall) {
 		::gpk::TFuncPixelShader		& ps					= (0 == iBall) ? ::d1p::psBallCue			: (8 >= iBall) ? ::d1p::psBallSolid		: ::d1p::psBallStripped;
-		const ::gpk::vcc			psName					= (0 == iBall) ? ::gpk::vcs{"psBallCue"}	: (8 >= iBall) ? ::gpk::vcs{"psBallSolid"}	: ::gpk::vcs{"psBallStripped"};
+		const ::gpk::vcsc_t			psName					= (0 == iBall) ? ::gpk::vcst_t{"psBallCue"}	: (8 >= iBall) ? ::gpk::vcst_t{"psBallSolid"}	: ::gpk::vcs{"psBallStripped"};
 
 		const uint32_t				iEntity					= pool.Entities.Balls[iBall];
 
@@ -108,7 +109,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 
 	const uint8_t				ball1					= uint8_t(1 + ::gpk::noise1DBase(startState.Seed + 1) % 7);
 	const uint8_t				ball5					= uint8_t(9 + ::gpk::noise1DBase(startState.Seed + 5) % 7);
-	gpk::astu8<d1p::MAX_BALLS>	ballOrder				= {};
+	gpk::astu0_t<d1p::MAX_BALLS>	ballOrder				= {};
 
 	ballOrder[0]			= 0;
 	ballOrder[1]			= ball1;
@@ -116,7 +117,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	ballOrder[11]			= 8;
 
 	constexpr sc_t				ballsToSet	[12]		= {2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15};
-	::gpk::au8					ballPool				= {};
+	::gpk::au0_t					ballPool				= {};
 	for(uint8_t iBall = 0; ballPool.size() < ::gpk::size(ballsToSet); ++iBall) {
 		if(iBall == 8)
 			continue;
@@ -142,25 +143,25 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 
 	uint8_t						rowLen					= 5;
 	float						ballDiameter			= board.BallRadius * 2;
-	::gpk::n3f32					diagonal				= {1, 0, 1};
+	::gpk::n3f2_t					diagonal				= {1, 0, 1};
 	diagonal				= diagonal.Normalize() * 1.25f * ballDiameter; 
 	for(uint32_t iRow = 0, iBall = 1; iRow < 5; ++iRow, --rowLen) {
 		float						offsetZ					= -(rowLen / 2.0f) * ballDiameter + board.BallRadius;
 		for(uint32_t iColumn = 0; iColumn < rowLen; ++iColumn) {
-			::gpk::n3f32					position				= ::gpk::n3f32{(distanceFromCenter + diagonal.x * 5) - iRow * diagonal.x, board.BallRadius, offsetZ + (float)iColumn * ballDiameter};
+			::gpk::n3f2_t					position				= ::gpk::n3f2_t{(distanceFromCenter + diagonal.x * 5) - iRow * diagonal.x, board.BallRadius, offsetZ + (float)iColumn * ballDiameter};
 			uint32_t					iEntity					= pool.Entities.Balls[ballOrder[iBall++]];
 			gpk_necs(engine.SetPosition(iEntity, position));
 		}
 	}
 
 	cnstxpr double				piPerPocket				= (::gpk::math_pi / 3);
-	const ::gpk::n2f32			tableCenter				= {board.Table.Slate.x * .5f, board.Table.Slate.y * .5f};
+	const ::gpk::n2f2_t			tableCenter				= {board.Table.Slate.x * .5f, board.Table.Slate.y * .5f};
 	for(uint32_t iPocket = 0; iPocket < 6; ++iPocket) {
 		const uint32_t				iEntity					= pool.Entities.Pockets[iPocket];
 
 		const uint32_t				row						= iPocket / 3;
 		const uint32_t				column					= iPocket % 3;
-		const ::gpk::n3f32			pocketPosition			= {tableCenter.x * column - tableCenter.x, -board.Table.PocketRadius, board.Table.Slate.y * row - tableCenter.y};
+		const ::gpk::n3f2_t			pocketPosition			= {tableCenter.x * column - tableCenter.x, -board.Table.PocketRadius, board.Table.Slate.y * row - tableCenter.y};
 		const double				orientationAngle		= (iPocket < 3) ? piPerPocket - piPerPocket * iPocket : (::gpk::math_pi - piPerPocket) + piPerPocket * (iPocket % 3);
 		const ::gpk::quatf32		pocketOrientation		= ::gpk::quatf32{}.CreateFromAxisAngle({0, 1, 0}, orientationAngle).Normalize();
 		{ // Set up rigid body
@@ -169,7 +170,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 			engine.Integrator.Centers			[iRigidBody]				= {pocketPosition, pocketOrientation};
 			engine.Integrator.Masses			[iRigidBody].InverseMass	= 1.0f / 9999;
 		}
-		::gpk::n3f32				pocketScale				= {};
+		::gpk::n3f2_t				pocketScale				= {};
 		pocketScale.y = pocketScale.x = pocketScale.z = board.Table.PocketRadius * 2;
 		gpk_necs(engine.SetMeshScale(iEntity, pocketScale, true));
 		gpk_necs(engine.SetHidden	(iEntity, false));
@@ -177,10 +178,10 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 
 	//for(uint32_t iCushion = 0; iCushion < 6; ++iCushion) {
 	//	const uint32_t								iEntity						= pool.Entities.Cushions[iCushion];
-	//	::gpk::n3f32								cushionScale				= {};
+	//	::gpk::n3f2_t								cushionScale				= {};
 	//	cushionScale.x = board.Table.PlayingSurface.x / 2 - board.Table.PocketRadius * 4;
 	//	cushionScale.z = board.Table.PlayingSurface.y / 2 - board.Table.PocketRadius * 2;
-	//	::gpk::n3f32								cushionPosition				= {};
+	//	::gpk::n3f2_t								cushionPosition				= {};
 	//	gpk_necs(engine.SetMeshScale(iEntity, cushionScale));
 	//	if(0 == (iCushion % 3)) {
 	//		//cushionPosition.x	= board.Table.PlayingSurface.x * .5 * (iCushion ? 1 : -1);
@@ -335,17 +336,17 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 }
 
 static	::gpk::error_t	geometryBuildTableCushion	(::gpk::SGeometryBuffers & output) {
-	stacxpr	::gpk::n3f32		TABLE_CUSHION_POSITIONS	[8]		= 
+	stacxpr	::gpk::n3f2_t		TABLE_CUSHION_POSITIONS	[8]		= 
 		{ {0, 1, 0}, {1, 1, 0}, {0, 1, 1}, {1, 1, 1}	// top face
 		, {0, 0, 0}, {1, 0, 0}, {0, 1, 1}, {1, 1, 1}	// diagonal face
 		};
 
-	stacxpr	::gpk::n2f32		TABLE_CUSHION_UV		[8]		= 
+	stacxpr	::gpk::n2f2_t		TABLE_CUSHION_UV		[8]		= 
 		{ {0, 0}, {1, 0}, {0, 1}, {1, 1}
 		, {0, 0}, {1, 0}, {0, 1}, {1, 1}
 		};
 
-	stacxpr	::gpk::n3f32		TABLE_CUSHION_NORMALS	[8]		= 
+	stacxpr	::gpk::n3f2_t		TABLE_CUSHION_NORMALS	[8]		= 
 		{ {0, 1, 0}, {0, 1, 0}, {0, 1, 0}, {0, 1, 0}
 		, {0, -1, -1}, {0, -1, -1}, {0, -1, -1}, {0, -1, -1}
 		};

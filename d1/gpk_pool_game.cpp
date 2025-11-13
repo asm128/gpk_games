@@ -18,7 +18,7 @@
 	return ::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_TurnStart, argsMatch);	// Report turn start for player
 }
 
-::gpk::error_t		d1p::SPoolGame::Save						(::gpk::au8 & bytes)	const	{
+::gpk::error_t		d1p::SPoolGame::Save						(::gpk::au0_t & bytes)	const	{
 	gpk_necs(::gpk::savePOD (bytes, MatchState		));
 	gpk_necs(::gpk::saveView(bytes, ::gpk::view<const ::d1p::SPoolTeam	>{Teams		}));
 	gpk_necs(::gpk::saveView(bytes, ::gpk::view<const ::gpk::bgra		>{BallColors}));
@@ -28,7 +28,7 @@
 	return Engine.Save(bytes);
 }
 
-::gpk::error_t		d1p::SPoolGame::Load						(::gpk::vcu8 & bytes)			{
+::gpk::error_t		d1p::SPoolGame::Load						(::gpk::vcu0_t & bytes)			{
 	gpk_necs(::gpk::loadPOD (bytes, MatchState		));
 	gpk_necs(::gpk::loadView(bytes, Teams			));
 	gpk_necs(::gpk::loadView(bytes, BallColors		));
@@ -55,7 +55,7 @@ static	::gpk::error_t	poolGameUpdateShot		(::d1p::SPoolGame & pool, ::gpk::apobj
 			::gpk::line3f32			& delta					= pool.PositionDeltas[iBall][lastDelta];
 			pool.GetBallPosition(iBall, delta.B);
 			::gpk::SBodyForces		& forces				= engine.Integrator.Forces[engine.GetRigidBody(pool.BallToEntity(iBall))];
-			const ::gpk::n3f32		rotationResult			= (delta.B - delta.A) / diameter * ::gpk::math_2pi;
+			const ::gpk::n3f2_t		rotationResult			= (delta.B - delta.A) / diameter * ::gpk::math_2pi;
 			forces.Rotation		+= {rotationResult.z, 0, -rotationResult.x};
 		}
 		if(pool.PositionDeltas[iBall].size() > 10) {
@@ -79,7 +79,7 @@ static	::gpk::error_t	poolGameUpdateShot		(::d1p::SPoolGame & pool, ::gpk::apobj
 		pool.ActiveTurn().Time.SecondsActive	+= secondsElapsed;
 	}
 	else { // Set the stick origin to the position of the cue ball
-		::gpk::n3f32				ballPosition			= {};
+		::gpk::n3f2_t				ballPosition			= {};
 		pool.GetBallPosition(0, ballPosition);
 		engine.SetPosition(pool.ActiveStickEntity(), ballPosition);
 		gpk_necs(engine.Update(secondsElapsed));

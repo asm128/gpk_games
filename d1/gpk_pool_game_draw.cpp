@@ -6,13 +6,13 @@
 ::gpk::error_t			d1p::poolGameDraw				
 	( ::d1p::SPoolGame		& pool
 	, ::gpk::rtbgra8d32		& backBuffer
-	, const ::gpk::n3f32	& cameraPosition
-	, const ::gpk::n3f32	& cameraTarget
-	, const ::gpk::n3f32	& cameraUp
+	, const ::gpk::n3f2_t	& cameraPosition
+	, const ::gpk::n3f2_t	& cameraTarget
+	, const ::gpk::n3f2_t	& cameraUp
 	, double				totalSeconds
 	) {
 
-	const ::gpk::n2u16			offscreenMetrics	= backBuffer.Color.View.metrics16();
+	const ::gpk::n2u1_t			offscreenMetrics	= backBuffer.Color.View.metrics16();
 
 	::gpk::SEngineSceneConstants	constants		= {};
 	constants.CameraPosition	= cameraPosition;
@@ -45,21 +45,21 @@
 		}
 	}
 
-	const ::gpk::n2f32			halfDimensions		= pool.MatchState.Board.Table.Slate * .5;
+	const ::gpk::n2f2_t			halfDimensions		= pool.MatchState.Board.Table.Slate * .5;
 
 	wireframePixelCoords.clear();
-	const ::gpk::n3f32			limitsBottom	[4]	=
+	const ::gpk::n3f2_t			limitsBottom	[4]	=
 		{ { halfDimensions.x, .0f,  halfDimensions.y}
 		, {-halfDimensions.x, .0f,  halfDimensions.y}
 		, { halfDimensions.x, .0f, -halfDimensions.y}
 		, {-halfDimensions.x, .0f, -halfDimensions.y}
 		};
 
-	const	::gpk::n3f32		limitsTop		[4]	= 
-		{ limitsBottom[0] + ::gpk::n3f32{0, pool.MatchState.Board.Table.Height, 0}
-		, limitsBottom[1] + ::gpk::n3f32{0, pool.MatchState.Board.Table.Height, 0}
-		, limitsBottom[2] + ::gpk::n3f32{0, pool.MatchState.Board.Table.Height, 0}
-		, limitsBottom[3] + ::gpk::n3f32{0, pool.MatchState.Board.Table.Height, 0}
+	const	::gpk::n3f2_t		limitsTop		[4]	= 
+		{ limitsBottom[0] + ::gpk::n3f2_t{0, pool.MatchState.Board.Table.Height, 0}
+		, limitsBottom[1] + ::gpk::n3f2_t{0, pool.MatchState.Board.Table.Height, 0}
+		, limitsBottom[2] + ::gpk::n3f2_t{0, pool.MatchState.Board.Table.Height, 0}
+		, limitsBottom[3] + ::gpk::n3f2_t{0, pool.MatchState.Board.Table.Height, 0}
 		};
 
 	::gpk::drawLine(offscreenMetrics, ::gpk::line3<float>{limitsBottom[3], limitsBottom[2]}, constants.VPS, wireframePixelCoords, backBuffer.DepthStencil);
@@ -76,7 +76,7 @@
 	::gpk::drawLine(offscreenMetrics, ::gpk::line3<float>{limitsBottom[3], limitsTop[3]}, constants.VPS, wireframePixelCoords, backBuffer.DepthStencil);
 
 	for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
-		::gpk::n3i16				coord		= wireframePixelCoords[iCoord].s1_t();
+		::gpk::n3s1_t				coord		= wireframePixelCoords[iCoord].s1_t();
 		::gpk::rgbaf				color		= 
 			{ (float)(totalSeconds - iCoord / 1.0f / totalSeconds)
 			, (float)(totalSeconds - iCoord / 2.0f / totalSeconds)

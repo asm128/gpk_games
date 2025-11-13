@@ -1,5 +1,8 @@
 #include "gpk_pool_game_update.h"
 
+using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
+GPK_USING_TYPEINT();
+
 static	::gpk::error_t	handleContactBall		(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { 
 	const ::d1p::SArgsBall::SContactBall	& eventData = eventArgs.Event.ContactBall; 
 	info_printf("Ball: %i, Ball B : %i.", eventData.BallA, eventData.BallB); 

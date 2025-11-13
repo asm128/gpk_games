@@ -1,5 +1,6 @@
 #include "gpk_pool_game_update.h"
 
+using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
 static	::gpk::error_t	shootCueBall			(::d1p::SPoolGame & pool, const ::d1p::SStickControl & activeStick, uint16_t activeStickEntity)		{
@@ -9,7 +10,7 @@ static	::gpk::error_t	shootCueBall			(::d1p::SPoolGame & pool, const ::d1p::SSti
 	activeTurn.StickControl		= activeStick;
 	::gpk::quatf32					stickOrientation		= {0, 0, 0, 1}; 
 	pool.GetStickOrientation(stickOrientation);
-	::gpk::n3f32						velocity				= {activeStick.Velocity, 0, 0}; 
+	::gpk::n3f2_t						velocity				= {activeStick.Velocity, 0, 0}; 
 	velocity					= stickOrientation.RotateVector(velocity);
 	engine.SetVelocity(pool.Entities.Balls[0], velocity);
 	if(velocity.y)
@@ -132,9 +133,9 @@ static	::gpk::error_t	processEventBall	(::d1p::SPoolGame & pool, const ::d1p::SA
 	case ::gpk::AXIS_X_NEGATIVE	: 
 		directionMultiplier			= -1;
 	case ::gpk::AXIS_X_POSITIVE	: {
-		::gpk::n3f32					cueBallPosition			= {};
+		::gpk::n3f2_t					cueBallPosition			= {};
 		gpk_necs(pool.GetBallPosition(0, cueBallPosition));	// store the original position
-		const ::gpk::n3f32				targetPosition			= cueBallPosition + ::gpk::n3f32{moveEvent.Value * directionMultiplier};
+		const ::gpk::n3f2_t				targetPosition			= cueBallPosition + ::gpk::n3f2_t{moveEvent.Value * directionMultiplier};
 		if(targetPosition.x > d1p::headStringX(boardInfo) && 0 == matchState.Flags.InHandAnywhere)
 			break;
 
@@ -155,9 +156,9 @@ static	::gpk::error_t	processEventBall	(::d1p::SPoolGame & pool, const ::d1p::SA
 	case ::gpk::AXIS_Y_NEGATIVE	: 
 		directionMultiplier			= -1;
 	case ::gpk::AXIS_Y_POSITIVE	:  {
-		::gpk::n3f32					cueBallPosition			= {};
+		::gpk::n3f2_t					cueBallPosition			= {};
 		gpk_necs(pool.GetBallPosition(0, cueBallPosition));	// store the original position
-		const ::gpk::n3f32				targetPosition			= cueBallPosition + ::gpk::n3f32{0, 0, moveEvent.Value * directionMultiplier};
+		const ::gpk::n3f2_t				targetPosition			= cueBallPosition + ::gpk::n3f2_t{0, 0, moveEvent.Value * directionMultiplier};
 
 		const float						tableLimits				= boardInfo.Table.PlayingSurface.y * .5f - boardInfo.BallRadius;
 		if(targetPosition.z >= tableLimits || targetPosition.z <= -tableLimits)

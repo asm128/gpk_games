@@ -4,6 +4,7 @@
 #include "gpk_event_screen.h"
 
 GPK_USING_TYPEINT();
+using ::gpk::get_enum_namep, ::gpk::get_value_namep, ::gpk::failed;
 
 static	::gpk::error_t	d1Setup				(::d1::SD1UI & appUI, ::d1::SD1Game & game, const ::gpk::pobj<::gpk::SInput> & inputState) { 
 	gpk_necs(::d1p::poolGameSetup(game.Pool));
@@ -21,14 +22,14 @@ static	::gpk::error_t	d1Setup				(::d1::SD1UI & appUI, ::d1::SD1Game & game, con
 	return 0;
 }
 
-static	::gpk::error_t	stickUpdateRotation		(::d1::SD1Game & clientGame, float actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 mouseDeltas, ::gpk::vcu8 buttonStates) {
+static	::gpk::error_t	stickUpdateRotation		(::d1::SD1Game & clientGame, float actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t mouseDeltas, ::gpk::vcu0_t buttonStates) {
 	const bool						slow						= keyStates[VK_SHIFT];
 	// The following aim unit constants should be grabbed from a settings struct.
-	::gpk::n2f32					rotation					= {};
+	::gpk::n2f2_t					rotation					= {};
 	{
 		const double					aimUnit						= 2.5;
 		const double					aimScaled					= aimUnit * (slow ? .1 : 1);
-		const ::gpk::n2f32				rotationKeyValue			= {float(-1.0 / ::gpk::math_2pi * aimScaled), float(1.0 / ::gpk::math_2pi * aimScaled)};
+		const ::gpk::n2f2_t				rotationKeyValue			= {float(-1.0 / ::gpk::math_2pi * aimScaled), float(1.0 / ::gpk::math_2pi * aimScaled)};
 		// Define a rotation value depending on 
 			 if(keyStates[VK_UP		])	rotation.y	= actualSecondsElapsed * rotationKeyValue.y;
 		else if(keyStates[VK_DOWN	])	rotation.y	= actualSecondsElapsed * -rotationKeyValue.y;
@@ -40,7 +41,7 @@ static	::gpk::error_t	stickUpdateRotation		(::d1::SD1Game & clientGame, float ac
 	if(buttonStates[1] && (mouseDeltas.x || mouseDeltas.y)) {
 		const double					aimUnit						= 0.05;
 		const double					aimScaled					= aimUnit * (slow ? .1 : 1);
-		const ::gpk::n2f32				rotationMouseValue			= {float(-1.0 / ::gpk::math_2pi * aimScaled), float(-1.0 / ::gpk::math_2pi * aimScaled)};
+		const ::gpk::n2f2_t				rotationMouseValue			= {float(-1.0 / ::gpk::math_2pi * aimScaled), float(-1.0 / ::gpk::math_2pi * aimScaled)};
 		if(buttonStates[0]) {
 			if(mouseDeltas.y) 
 				rotation.y					+= mouseDeltas.y * rotationMouseValue.y;
@@ -53,26 +54,26 @@ static	::gpk::error_t	stickUpdateRotation		(::d1::SD1Game & clientGame, float ac
 		::d1p::SEventPlayer				newEvent						= {::d1p::PLAYER_INPUT_Turn};
 		if(rotation.y) {
 			const ::d1p::SArgsPlayerInput	turnInfo						= {rotation.y, ::gpk::AXIS_Y_POSITIVE};
-			newEvent.Data				= ::gpk::vcu8{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
+			newEvent.Data				= ::gpk::vcu0_t{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
 			clientGame.QueueStick.push_back(newEvent);
 		}
 		if(rotation.x) {
 			const ::d1p::SArgsPlayerInput	turnInfo						= {rotation.x, ::gpk::AXIS_X_POSITIVE};
-			newEvent.Data				= ::gpk::vcu8{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
+			newEvent.Data				= ::gpk::vcu0_t{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
 			clientGame.QueueStick.push_back(newEvent);
 		}
 	}
 	return 0;
 }
 
-static	::gpk::error_t	stickUpdateBallInHand	(::d1::SD1Game & clientGame, float actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 mouseDeltas, ::gpk::vcu8 buttonStates) {
+static	::gpk::error_t	stickUpdateBallInHand	(::d1::SD1Game & clientGame, float actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t mouseDeltas, ::gpk::vcu0_t buttonStates) {
 	const bool					slow					= keyStates[VK_SHIFT];
 	// The following aim unit constants should be grabbed from a settings struct.
-	::gpk::n2f32				displacement			= {};
+	::gpk::n2f2_t				displacement			= {};
 	{
 		const double				aimUnit					= 2.5;
 		const double				aimScaled				= aimUnit * (slow ? .01 : .1);
-		const ::gpk::n2f32			displacementKeyValue	= {float(-1.0 * aimScaled), float(1.0 * aimScaled)};
+		const ::gpk::n2f2_t			displacementKeyValue	= {float(-1.0 * aimScaled), float(1.0 * aimScaled)};
 		// Define a rotation value depending on 
 			 if(keyStates['D'])	displacement.x	= actualSecondsElapsed * displacementKeyValue.x;
 		else if(keyStates['A'])	displacement.x	= actualSecondsElapsed * -displacementKeyValue.x;
@@ -83,7 +84,7 @@ static	::gpk::error_t	stickUpdateBallInHand	(::d1::SD1Game & clientGame, float a
 	if(buttonStates[0] && (mouseDeltas.x || mouseDeltas.y) && 0 == buttonStates[1]) {
 		const double				aimUnit					= 0.05;
 		const double				aimScaled				= aimUnit * (slow ? .005 : .05);
-		const ::gpk::n2f32			displacementMouseValue	= {float(-1.0 * aimScaled), float(-1.0 * aimScaled)};
+		const ::gpk::n2f2_t			displacementMouseValue	= {float(-1.0 * aimScaled), float(-1.0 * aimScaled)};
 		if(mouseDeltas.y)
 			displacement.y			+= mouseDeltas.y * displacementMouseValue.y;
 		if(mouseDeltas.x)
@@ -94,24 +95,24 @@ static	::gpk::error_t	stickUpdateBallInHand	(::d1::SD1Game & clientGame, float a
 		::d1p::SEventPlayer			newEvent				= {::d1p::PLAYER_INPUT_Ball};
 		if(displacement.y) {
 			const d1p::SArgsPlayerInput	turnInfo				= {displacement.y, ::gpk::AXIS_X_POSITIVE};
-			newEvent.Data			= ::gpk::vcu8{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
+			newEvent.Data			= ::gpk::vcu0_t{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
 			clientGame.QueueStick.push_back(newEvent);
 		}
 		if(displacement.x) {
 			const d1p::SArgsPlayerInput	turnInfo				= {displacement.x, ::gpk::AXIS_Y_POSITIVE};
-			newEvent.Data			= ::gpk::vcu8{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
+			newEvent.Data			= ::gpk::vcu0_t{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
 			clientGame.QueueStick.push_back(newEvent);
 		}
 	}
 	return 0;
 }
 
-static	::gpk::error_t	stickCameraUpdate		(::d1::SD1UI & appUI, ::d1::SD1Game & clientGame, float actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 mouseDeltas, ::gpk::vcu8 buttonStates) {
+static	::gpk::error_t	stickCameraUpdate		(::d1::SD1UI & appUI, ::d1::SD1Game & clientGame, float actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t mouseDeltas, ::gpk::vcu0_t buttonStates) {
 	appUI, clientGame, actualSecondsElapsed, keyStates, mouseDeltas, buttonStates;
 	return 0;
 }
 
-static	::gpk::error_t	stickUpdate				(::d1::SD1UI & appUI, ::d1::SD1Game & clientGame, float actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 mouseDeltas, ::gpk::vcu8 buttonStates) {
+static	::gpk::error_t	stickUpdate				(::d1::SD1UI & appUI, ::d1::SD1Game & clientGame, float actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t mouseDeltas, ::gpk::vcu0_t buttonStates) {
 	const bool						slow					= keyStates[VK_SHIFT];
 	if(keyStates[VK_CONTROL]) {
 		gpk_necs(::stickCameraUpdate(appUI, clientGame, float(actualSecondsElapsed), keyStates, mouseDeltas, buttonStates));
@@ -135,7 +136,7 @@ static	::gpk::error_t	stickUpdate				(::d1::SD1UI & appUI, ::d1::SD1Game & clien
 }
 
 
-static	::gpk::error_t	cameraInputSelection	(::d1::SD1Game & clientGame, ::gpk::vcu8 keyStates) { 
+static	::gpk::error_t	cameraInputSelection	(::d1::SD1Game & clientGame, ::gpk::vcu0_t keyStates) { 
 	const bool					shift					= keyStates[VK_SHIFT];
 	::d1::SPlayerCameras		& playerCameras			= clientGame.ActiveCameras();
 	if(keyStates['0']) 
@@ -163,7 +164,7 @@ static	::gpk::error_t	cameraInputSelection	(::d1::SD1Game & clientGame, ::gpk::v
 	return 0; 
 }
 
-static	::gpk::error_t	cameraInputTransform	(::d1::SD1Game & clientGame, double actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 mouseDeltas) { 
+static	::gpk::error_t	cameraInputTransform	(::d1::SD1Game & clientGame, double actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t mouseDeltas) { 
 	const bool						slow					= keyStates[VK_SHIFT];
 	::d1::SCamera					& cameraSelected		= clientGame.CameraSelected();
 	{ // Update camera zoom
@@ -207,13 +208,13 @@ static	::gpk::error_t	cameraInputTransform	(::d1::SD1Game & clientGame, double a
 	return 0; 
 }
 
-static	::gpk::error_t	cameraInputUpdate		(::d1::SD1Game & clientGame, double actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 mouseDeltas) { 
+static	::gpk::error_t	cameraInputUpdate		(::d1::SD1Game & clientGame, double actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t mouseDeltas) { 
 	gpk_necs(::cameraInputSelection(clientGame, keyStates));
 	gpk_necs(::cameraInputTransform(clientGame, actualSecondsElapsed, keyStates, mouseDeltas));
 	return 0;
 }
 
-static	::gpk::error_t	updateInput				(::d1::SD1UI & appUI, ::d1::SD1Game & clientGame, double actualSecondsElapsed, ::gpk::vcu8 keyStates, const ::gpk::n3i16 mouseDeltas, ::gpk::vcu8 buttonStates) { 
+static	::gpk::error_t	updateInput				(::d1::SD1UI & appUI, ::d1::SD1Game & clientGame, double actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t mouseDeltas, ::gpk::vcu0_t buttonStates) { 
 	double						secondsElapsed			= actualSecondsElapsed * clientGame.TimeScale;
 
 	::d1p::SPoolGame			& poolGame				= clientGame.Pool;
@@ -254,8 +255,8 @@ static	::gpk::error_t	processScreenEvent		(::d1::SD1 & app, const ::gpk::SEventV
 		break;
 	case ::gpk::EVENT_SCREEN_Create:
 	case ::gpk::EVENT_SCREEN_Resize: {
-		::gpk::n2u16				newMetrics				= *(const ::gpk::n2u16*)screenEvent.Data.begin();
-		gpk_necs(::gpk::guiUpdateMetrics(*app.AppUI.Dialog.GUI, newMetrics, true));
+		::gpk::n2s1_t				newMetrics				= *(const ::gpk::n2s1_t*)screenEvent.Data.begin();
+		gpk_necs(::gpk::guiUpdateMetrics(*app.AppUI.Dialog.GUI, newMetrics.u1_t(), true));
 		break;
 		}
 	}
@@ -297,9 +298,9 @@ static	::gpk::error_t	processKeyboardEvent	(::d1::SD1 & app, const ::gpk::SEvent
 static	::gpk::error_t	processSystemEvent		(::d1::SD1 & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
-	case ::gpk::SYSTEM_EVENT_Screen		: es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN	>(sysEvent, [&app](auto ev) { return processScreenEvent		(app, ev); }))); break;
-	case ::gpk::SYSTEM_EVENT_Text		: es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_TEXT		>(sysEvent, [&app](auto ev) { return processTextEvent		(app, ev); }))); break;
-	case ::gpk::SYSTEM_EVENT_Keyboard	: es_if(errored(::gpk::eventExtractAndHandle<::gpk::EVENT_KEYBOARD	>(sysEvent, [&app](auto ev) { return processKeyboardEvent	(app, ev); }))); break;
+	case ::gpk::SYSTEM_EVENT_Screen		: es_if(::gpk::failed(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN	>(sysEvent, [&app](auto ev) { return processScreenEvent		(app, ev); }))); break;
+	case ::gpk::SYSTEM_EVENT_Text		: es_if(::gpk::failed(::gpk::eventExtractAndHandle<::gpk::EVENT_TEXT		>(sysEvent, [&app](auto ev) { return processTextEvent		(app, ev); }))); break;
+	case ::gpk::SYSTEM_EVENT_Keyboard	: es_if(::gpk::failed(::gpk::eventExtractAndHandle<::gpk::EVENT_KEYBOARD	>(sysEvent, [&app](auto ev) { return processKeyboardEvent	(app, ev); }))); break;
 	}
 	return 0;
 }
@@ -313,8 +314,8 @@ static	::gpk::error_t	resetCameraBallCue			(::d1p::SPoolGame & poolGame, ::d1::S
 static	::gpk::error_t	resetCameraBallRack			(::d1p::SPoolGame & poolGame, uint8_t iBall, ::d1::SCamera & cameraBall) {
 	poolGame.GetBallPosition(0, cameraBall.Position);
 	poolGame.GetBallPosition(iBall, cameraBall.Target);
-	::gpk::n3f32						distance				= cameraBall.Target - cameraBall.Position;
-	::gpk::n3f32						direction				= ::gpk::n3f32{distance}.Normalize();
+	::gpk::n3f2_t						distance				= cameraBall.Target - cameraBall.Position;
+	::gpk::n3f2_t						direction				= ::gpk::n3f2_t{distance}.Normalize();
 	cameraBall.Position			+= direction * -2.0f;
 	cameraBall.Position.y		= 1.75f * .35f;
 	return 0;
@@ -341,7 +342,7 @@ static	::gpk::error_t	refreshCameras			(::d1::SD1Game & clientGame, double secon
 		if(poolGame.MatchState.Flags.PhysicsActive) { 
 			cameraSelected.Target		*= .99;
 
-			::gpk::n3f32					direction				= cameraSelected.Position - cameraSelected.Target;
+			::gpk::n3f2_t					direction				= cameraSelected.Position - cameraSelected.Target;
 			double							distance				= direction.Length();
 			if(distance < poolGame.MatchState.Board.Table.Slate.x * 1.25f) 
 				cameraSelected.Position		= cameraSelected.Target + direction.Normalize() * (distance + secondsElapsed * poolGame.ActiveStick().Velocity);
@@ -505,7 +506,7 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 		::gpk::aobj<::gpk::apod<sc_t>>	fileNames				= {};
 		::gpk::pathList(app.FileStrings.SavegameFolder, fileNames, app.FileStrings.ExtensionSaveAuto);
 		if(fileNames.size()) {
-			//if errored(app.Load(fileNames[0])) 
+			//if failed(app.Load(fileNames[0])) 
 			//	gpk_necs(::d1p::poolGameSetup(poolGame));
 		}
 		app.StateSwitch(::d1::APP_STATE_Welcome);
