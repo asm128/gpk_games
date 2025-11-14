@@ -171,12 +171,12 @@ namespace d1
 		::gpk::error_t						ResetStickCamera	(uint8_t iStick)			{
 			::d1::SCamera							& stickCamera		= Players[iStick].Cameras.Stick;
 			::gpk::quatf32							stickOrientation	= {};
-			Pool.GetBallPosition(0, stickCamera.Target);
-			Pool.GetStickOrientation(iStick, stickOrientation);
+			if_fail_e(Pool.GetBallPosition(0, stickCamera.Target));
+			if_fail_ef(Pool.GetStickOrientation(iStick, stickOrientation), "iStick:%i", iStick);
 			stickCamera.Target.y				+=  Pool.MatchState.Board.BallRadius * 2;
 			stickCamera.Position				= {-Pool.MatchState.Board.BallRadius * 20 * stickCamera.Zoom, .2f, 0};
 			stickCamera.Position				= stickOrientation.RotateVector(stickCamera.Position);
-			stickCamera.Position				+= stickCamera.Target * 4;
+			stickCamera.Position				+= stickCamera.Target;
 			return 0;
 		}
 		inline	::gpk::error_t				ResetStickCamera	()			{ return ResetStickCamera(Pool.ActivePlayer()); }

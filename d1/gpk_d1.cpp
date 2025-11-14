@@ -339,7 +339,9 @@ static	::gpk::error_t	refreshCameras			(::d1::SD1Game & clientGame, double secon
 
 	::d1::SCamera					& cameraSelected		= clientGame.CameraSelected();
 	if(playerCameras.Selected > d1p::MAX_BALLS) {
-		if(poolGame.MatchState.Flags.PhysicsActive) { 
+		if(false == poolGame.MatchState.Flags.PhysicsActive)
+			if_fail_e(clientGame.ResetStickCamera());
+		else {
 			cameraSelected.Target		*= .99;
 
 			::gpk::n3f2_t					direction				= cameraSelected.Position - cameraSelected.Target;
@@ -350,8 +352,6 @@ static	::gpk::error_t	refreshCameras			(::d1::SD1Game & clientGame, double secon
 			if(cameraSelected.Position.y < 1.25f)
 				cameraSelected.Position.y	+= float(secondsElapsed);
 		} 
-		else
-			clientGame.ResetStickCamera();
 	}
 	return 0;
 }
@@ -544,7 +544,7 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 
 		clientGame.QueueStick.clear();
 
-		::refreshCameras(app.MainGame, secondsElapsed);
+		if_fail_e(::refreshCameras(app.MainGame, secondsElapsed));
 		clientGame.LightPos.RotateY(secondsElapsed);
 		break;
 	} // APP_STATE_Play
