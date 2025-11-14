@@ -12,45 +12,40 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-
 ::gpk::error_t			d1p::poolGameSave		(const ::d1p::SPoolGame & game, ::gpk::vcsc_t fileName) {
 	::gpk::au0_t					serialized;
 	gpk_necs(game.Save(serialized));
 	gpk_necs(::gpk::deflateFromMemory(fileName, serialized));
 	return 0;
 }
-
 ::gpk::error_t			d1p::poolGameLoad		(::d1p::SPoolGame & world,::gpk::vcsc_t filename) {
-	::gpk::au0_t					inflated;
+	::gpk::au0_t				inflated;
 	gpk_necs(::gpk::inflateToMemory(filename, inflated));
-
-	::gpk::vcu0_t					viewSerialized			= {(const uint8_t*)inflated.begin(), inflated.size()};
-	if (failed(world.Load(viewSerialized))) {
-		es_if(failed(::d1p::poolGameReset(world)));
+	::gpk::vcu0_t				viewSerialized			= {(const uint8_t*)inflated.begin(), inflated.size()};
+	if_true_block_logf(error_printf, ::gpk::failed(world.Load(viewSerialized)), {
+		if_fail_fe(::d1p::poolGameReset(world));
 		return -1;
-	}
+	}, "filenamee:'%s'", filename.begin());
 	return 0;
 }
-
 static	::gpk::error_t	poolGameResetTest2Balls	(::d1p::SPoolGame & pool, ::d1p::SMatchState & startState) { 
 	startState.CountBalls	= 2;
 	::d1p::SPoolBoard			& board					= startState.Board;
 	::gpk::SEngine				& engine				= pool.Engine;
-	engine.SetPosition(pool.Entities.Balls[0], {0, board.BallRadius,-.5});
-	engine.SetPosition(pool.Entities.Balls[1], {0, board.BallRadius, .5});
+	if_fail_fe(engine.SetPosition(pool.Entities.Balls[0], {0, board.BallRadius,-.5}));
+	if_fail_fe(engine.SetPosition(pool.Entities.Balls[1], {0, board.BallRadius, .5}));
 	for(uint32_t iBall = 0; iBall < startState.CountBalls; ++iBall) {
 		const uint32_t				iEntity					= pool.Entities.Balls[iBall];
-		engine.SetDampingLinear	(iEntity, startState.Physics.Damping.ClothDisplacement	* (1.0f / 255.0f));
-		engine.SetDampingAngular(iEntity, startState.Physics.Damping.ClothRotation		* (1.0f / 255.0f));
-		engine.SetCollides		(iEntity, true);
-		engine.SetHidden		(iEntity, false);
+		if_fail_fe(engine.SetDampingLinear	(iEntity, startState.Physics.Damping.ClothDisplacement	* (1.0f / 255.0f)));
+		if_fail_fe(engine.SetDampingAngular	(iEntity, startState.Physics.Damping.ClothRotation		* (1.0f / 255.0f)));
+		if_fail_fe(engine.SetCollides		(iEntity, true));
+		if_fail_fe(engine.SetHidden			(iEntity, false));
 	}
 	//::gpk::n3f2_t				velocity					= {0, 0, -1.f - rand() % 30};
 	//velocity.RotateY(::gpk::noiseNormal1D(pool.StartState.Seed + 2) / 20 * ((rand() % 2) ? -1 : 1));
 	//engine.SetVelocity(pool.StartState.Balls[1].Entity, velocity);
 	return 0;
 }
-
 static	::gpk::error_t	textureBallNumber		(::gpk::g8bgra view, uint32_t number, const ::gpk::SRasterFont & font) { 
 	sc_t						strNumber[4]			= {};
 	sprintf_s(strNumber, "%i", number);
