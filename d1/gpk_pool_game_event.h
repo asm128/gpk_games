@@ -71,8 +71,8 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(MATCH_RESULT, LOST_Eight_ball_off_the_table		, 3);	// c. Jumps the 8-ball off the table at any time.
 	GDEFINE_ENUM_VALUE(MATCH_RESULT, LOST_Eight_ball_wrong_pocket		, 4);	// d. Pockets the 8-ball in a pocket other than the one designated.
 	GDEFINE_ENUM_VALUE(MATCH_RESULT, LOST_Eight_ball_pocketed			, 5);	// e. Pockets the 8-ball when it is not the legal object ball.
-	GDEFINE_ENUM_VALUE(MATCH_RESULT, WON_Eight_ball_last_shot			, 1);	
-	GDEFINE_ENUM_VALUE(MATCH_RESULT, WON_Eight_ball_first_shot			, 2);	
+	GDEFINE_ENUM_VALUE(MATCH_RESULT, WON_Eight_ball_last_shot			, 6);	
+	GDEFINE_ENUM_VALUE(MATCH_RESULT, WON_Eight_ball_first_shot			, 7);	
 
 	GDEFINE_ENUM_TYPE(MATCH_EVENT, uint8_t);
 	GDEFINE_ENUM_VALUE(MATCH_EVENT, TurnEnd			, 0); // 

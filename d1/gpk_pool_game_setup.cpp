@@ -61,7 +61,6 @@ static	::gpk::error_t	textureBallNumber		(::gpk::g8bgra view, uint32_t number, c
 	}
 	return 0; 
 }
-
 static	::gpk::error_t	poolGameResetBall10		(::d1p::SPoolGame & pool, ::d1p::SMatchState & /*startState*/) { (void)pool; return 0; }
 static	::gpk::error_t	poolGameResetBall9		(::d1p::SPoolGame & pool, ::d1p::SMatchState & /*startState*/) { (void)pool; return 0; }
 static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatchState & startState) {
@@ -71,17 +70,15 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	for(uint32_t iBall = 0; iBall < startState.CountBalls; ++iBall) {
 		::gpk::TFuncPixelShader		& ps					= (0 == iBall) ? ::d1p::psBallCue			: (8 >= iBall) ? ::d1p::psBallSolid		: ::d1p::psBallStripped;
 		const ::gpk::vcsc_t			psName					= (0 == iBall) ? ::gpk::vcst_t{"psBallCue"}	: (8 >= iBall) ? ::gpk::vcst_t{"psBallSolid"}	: ::gpk::vcs{"psBallStripped"};
-
 		const uint32_t				iEntity					= pool.Entities.Balls[iBall];
+		if_fail_e(engine.SetOrientation		(iEntity, {0, 0, iBall ? 1.0f : 0.0f, -1}));
+		if_fail_e(engine.SetDampingLinear	(iEntity, startState.Physics.Damping.ClothDisplacement	* (1.0f / 255.0f)));
+		if_fail_e(engine.SetDampingAngular	(iEntity, startState.Physics.Damping.ClothRotation		* (1.0f / 255.0f)));
+		if_fail_e(engine.SetCollides		(iEntity, true));
+		if_fail_e(engine.SetHidden			(iEntity, false));
+		if_fail_e(engine.SetShader			(iEntity, ps, psName));
 
-		engine.SetOrientation	(iEntity, {0, 0, iBall ? 1.0f : 0.0f, -1});
-		engine.SetDampingLinear	(iEntity, startState.Physics.Damping.ClothDisplacement	* (1.0f / 255.0f));
-		engine.SetDampingAngular(iEntity, startState.Physics.Damping.ClothRotation		* (1.0f / 255.0f));
-		engine.SetCollides		(iEntity, true);
-		engine.SetHidden		(iEntity, false);
-		engine.SetShader		(iEntity, ps, psName);
-
-		const ::gpk::SEntity	& entity				= engine.Entities[iEntity];
+		const ::gpk::SEntity		& entity				= engine.Entities[iEntity];
 		const ::gpk::SRenderNode	& renderNode			= engine.Scene->RenderNodes[entity.RenderNode];
 		::gpk::SSkin				& skin					= *engine.Scene->Graphics->Skins[renderNode.Skin];
 		::gpk::SSurface				& surface				= *engine.Scene->Graphics->Surfaces[skin.Textures[0]];
@@ -91,8 +88,8 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		material.Color.Diffuse	= color;
   		material.Color.Ambient	= material.Color.Diffuse * .1f;
 		if(iBall) {
-			::gpk::g8bgra	view					= {(::gpk::bgra*)surface.Data.begin(), surface.Desc.Dimensions.u2_t()};
-			textureBallNumber(view, iBall, font);
+			::gpk::g8bgra				view					= {(::gpk::bgra*)surface.Data.begin(), surface.Desc.Dimensions.u2_t()};
+			if_fail_e(textureBallNumber(view, iBall, font));
 			//if(0 == iBall)
 			//	textureBallCue(view, ::gpk::RED);
 			//else if(stripped)
@@ -101,17 +98,16 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 			//	textureBallSolid(view, font, color, iBall);
 		}
 	}
-
-	const uint8_t				ball1					= uint8_t(1 + ::gpk::noise1DBase(startState.Seed + 1) % 7);
-	const uint8_t				ball5					= uint8_t(9 + ::gpk::noise1DBase(startState.Seed + 5) % 7);
+	const uint8_t					ball1					= uint8_t(1 + ::gpk::noise1DBase(startState.Seed + 1) % 7);
+	const uint8_t					ball5					= uint8_t(9 + ::gpk::noise1DBase(startState.Seed + 5) % 7);
 	gpk::astu0_t<d1p::MAX_BALLS>	ballOrder				= {};
 
-	ballOrder[0]			= 0;
-	ballOrder[1]			= ball1;
-	ballOrder[5]			= ball5;
-	ballOrder[11]			= 8;
+	ballOrder[0]				= 0;
+	ballOrder[1]				= ball1;
+	ballOrder[5]				= ball5;
+	ballOrder[11]				= 8;
 
-	constexpr sc_t				ballsToSet	[12]		= {2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15};
+	constexpr sc_t					ballsToSet	[12]		= {2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15};
 	::gpk::au0_t					ballPool				= {};
 	for(uint8_t iBall = 0; ballPool.size() < ::gpk::size(ballsToSet); ++iBall) {
 		if(iBall == 8)
@@ -122,15 +118,13 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 			continue;
 		if(iBall == ball5)
 			continue;
-		ballPool.push_back(iBall);
+		if_fail_fe(ballPool.push_back(iBall));
 	}
-
 	for(uint32_t iBallToSet = 0; iBallToSet < ::gpk::size(ballsToSet); ++iBallToSet) { 
 		uint8_t						index = uint8_t(::gpk::noise1DBase32((uint32_t)startState.Seed + iBallToSet) % ballPool.size()); 
 		ballOrder[ballsToSet[iBallToSet]]	= ballPool[index];
 		gpk_necs(ballPool.remove_unordered(index)); 
 	}
-
 	::d1p::SPoolBoard			& board					= startState.Board;
 	const float					distanceFromCenter		= ::d1p::rackOriginX(board);
 	gpk_necs(engine.SetPosition		(pool.BallToEntity(0), {-distanceFromCenter, board.BallRadius, 0}));
@@ -148,7 +142,6 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 			gpk_necs(engine.SetPosition(iEntity, position));
 		}
 	}
-
 	cnstxpr double				piPerPocket				= (::gpk::math_pi / 3);
 	const ::gpk::n2f2_t			tableCenter				= {board.Table.Slate.x * .5f, board.Table.Slate.y * .5f};
 	for(uint32_t iPocket = 0; iPocket < 6; ++iPocket) {
@@ -160,17 +153,16 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		const double				orientationAngle		= (iPocket < 3) ? piPerPocket - piPerPocket * iPocket : (::gpk::math_pi - piPerPocket) + piPerPocket * (iPocket % 3);
 		const ::gpk::quatf32		pocketOrientation		= ::gpk::quatf32{}.CreateFromAxisAngle({0, 1, 0}, orientationAngle).Normalize();
 		{ // Set up rigid body
-			const uint32_t				iRigidBody				= engine.GetRigidBody(iEntity);
-			engine.Integrator.Flags				[iRigidBody]				= {::gpk::BOUNDING_TYPE_Cylinder, true};
-			engine.Integrator.Centers			[iRigidBody]				= {pocketPosition, pocketOrientation};
-			engine.Integrator.Masses			[iRigidBody].InverseMass	= 1.0f / 9999;
+			const uint32_t				iRigidBody					= engine.GetRigidBody(iEntity);
+			engine.Integrator.Flags		[iRigidBody]				= {::gpk::BOUNDING_TYPE_Cylinder, true};
+			engine.Integrator.Centers	[iRigidBody]				= {pocketPosition, pocketOrientation};
+			engine.Integrator.Masses	[iRigidBody].InverseMass	= 1.0f / 9999;
 		}
 		::gpk::n3f2_t				pocketScale				= {};
 		pocketScale.y = pocketScale.x = pocketScale.z = board.Table.PocketRadius * 2;
 		gpk_necs(engine.SetMeshScale(iEntity, pocketScale, true));
 		gpk_necs(engine.SetHidden	(iEntity, false));
 	}
-
 	//for(uint32_t iCushion = 0; iCushion < 6; ++iCushion) {
 	//	const uint32_t								iEntity						= pool.Entities.Cushions[iCushion];
 	//	::gpk::n3f2_t								cushionScale				= {};
@@ -186,7 +178,12 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	//		engine.SetOrientation(iEntity, {0, 1, 0, 1});
 	//	}
 	//}
-
+	for(uint32_t iStick = 0; iStick < pool.Entities.Sticks.size(); ++iStick) {
+		const uint32_t			iEntity			= pool.Entities.Sticks[iStick];
+		::gpk::quatf32			orientation		= {0, 0, 1, 1};
+		orientation.Normalize();
+		pool.Engine.SetOrientation(iEntity, orientation);
+	}
 	return 0;
 }
 
@@ -213,7 +210,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		//gpk_necs(engine.SetOrientation	(iEntity, {0, 0, iBall ? 1.0f : 0.0f, -1}));
 		gpk_necs(engine.SetMass			(iEntity, startState.Physics.BallGrams / 1000.0f));
 		gpk_necs(engine.SetHidden		(iEntity, true));
-		gpk_necs(engine.SetCollides(iEntity, false));
+		gpk_necs(engine.SetCollides		(iEntity, false));
 	}
 
 	gpk_necs(engine.SetMeshScale(pool.Entities.Table, {board.Table.Slate.x, 1, board.Table.Slate.y}, true));

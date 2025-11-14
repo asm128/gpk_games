@@ -176,7 +176,7 @@ namespace d1
 			stickCamera.Target.y				+=  Pool.MatchState.Board.BallRadius * 2;
 			stickCamera.Position				= {-Pool.MatchState.Board.BallRadius * 20 * stickCamera.Zoom, .2f, 0};
 			stickCamera.Position				= stickOrientation.RotateVector(stickCamera.Position);
-			stickCamera.Position				+= stickCamera.Target;
+			stickCamera.Position				+= stickCamera.Target * 4;
 			return 0;
 		}
 		inline	::gpk::error_t				ResetStickCamera	()			{ return ResetStickCamera(Pool.ActivePlayer()); }
@@ -262,7 +262,6 @@ namespace d1
 			return 0;
 		}
 	};
-
 	struct SD1FileStrings {
 		::gpk::vcsc_t				SavegameFolder				= {1, "."};
 		::gpk::vcsc_t				ExtensionImages				= {4, ".png"};

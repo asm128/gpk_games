@@ -350,7 +350,7 @@ static	::gpk::error_t	refreshCameras			(::d1::SD1Game & clientGame, double secon
 			if(cameraSelected.Position.y < 1.25f)
 				cameraSelected.Position.y	+= float(secondsElapsed);
 		} 
-		else 
+		else
 			clientGame.ResetStickCamera();
 	}
 	return 0;
