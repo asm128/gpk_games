@@ -80,7 +80,7 @@ namespace ssg
 	GDEFINE_ENUM_VALUE(APP_STATE, Quit		, 13);
 
 	struct SPlayer {
-		ssiegeid_t				Id					= SSIEGEID_INVALID;
+		ssiegeid_t					Id					= SSIEGEID_INVALID;
 		::gpk::vcsc_t				User				= {};
 		::gpk::vcsc_t				Name				= {};
 	};

@@ -12,6 +12,7 @@
 #include "gpk_bitmap_target.h"
 
 #include <DirectXColors.h>
+
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
