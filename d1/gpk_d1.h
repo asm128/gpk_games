@@ -211,6 +211,11 @@ namespace d1
 	GDEFINE_ENUM_VALUE(UI_HELP, Ball			, 1);
 	GDEFINE_ENUM_VALUE(UI_HELP, Aim				, 2);
 
+	GDEFINE_ENUM_TYPE (UI_STICK, uint8_t);
+	GDEFINE_ENUM_VALUE(UI_STICK, Shift			, 0);
+	GDEFINE_ENUM_VALUE(UI_STICK, Angle			, 1);
+	GDEFINE_ENUM_VALUE(UI_STICK, Pitch			, 2);
+
 	struct SD1UI {
 		typedef ::gpk::rtbgra8d32			TRenderTarget;
 
