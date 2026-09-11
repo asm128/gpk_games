@@ -19,7 +19,7 @@ struct SApplication {
 
 	::ghg::SGalaxyHellApp	GalaxyHellApp;
 
-	HDC						DrawingContext		= {};
+	HDC						DrawingContext	= {};
 	HGLRC					GLRenderContext	= {}; 
  
 	//::gpk::SClient		Client;
