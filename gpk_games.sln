@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.3.32811.315
+# Visual Studio Version 18
+VisualStudioVersion = 18.10.12201.205 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "galaxy_hell_win32", "galaxy_hell_win32\galaxy_hell_win32.vcxproj", "{0716FFFD-C2C0-4B75-BC84-CCF18C2A1C5E}"
 	ProjectSection(ProjectDependencies) = postProject
