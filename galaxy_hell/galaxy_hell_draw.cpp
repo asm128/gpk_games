@@ -531,7 +531,6 @@ static	::gpk::error_t	drawExplosion
 			drawCache.PixelCoords			.clear();
 			drawCache.PixelVertexWeights	.clear();
 			const uint32_t						iActualTriangle		= sliceMesh.Offset + iTriangle;
-			::gpk::tri3f32						triangle			= mesh.Triangles	[iActualTriangle];
 			::gpk::tri3f32						triangleWorld		= mesh.Triangles	[iActualTriangle];
 			::gpk::n3f2_t						normal				= mesh.Normals		[iActualTriangle / 2];
 			::gpk::tri2f32						triangleTexCoords	= mesh.TextureCoords[iActualTriangle];
@@ -539,18 +538,20 @@ static	::gpk::error_t	drawExplosion
 			::gpk::transform(triangleScreen, matrixTransformView);
 			if(triangleScreen.ClipZ())
 				continue;
+			if(triangleScreen.A.z <= 0 || triangleScreen.B.z <= 0 || triangleScreen.C.z <= 0)
+				continue;
 
 			::gpk::transform(triangleWorld, matrixPart);
 			normal							= matrixPart.TransformDirection(normal).Normalize();
- 			::gpk::drawQuadTriangle(targetPixels.metrics(), triangle, matrixTransformView, drawCache.PixelCoords, drawCache.PixelVertexWeights, depthBuffer);
+			::gpk::drawQuadTriangle(targetPixels.metrics(), triangleScreen, drawCache.PixelCoords, drawCache.PixelVertexWeights, depthBuffer);
  			::gpk::drawPixels(targetPixels, triangleWorld, normal, triangleTexCoords, solarSystem.ShipState.Scene.Global.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel);
 			drawCache.PixelCoords			.clear();
 			drawCache.PixelVertexWeights	.clear();
-			triangle						= {triangle.A, triangle.C, triangle.B};
+			triangleScreen				= {triangleScreen.A, triangleScreen.C, triangleScreen.B};
 			triangleWorld					= {triangleWorld.A, triangleWorld.C, triangleWorld.B};
 			triangleTexCoords				= {triangleTexCoords.A, triangleTexCoords.C, triangleTexCoords.B};
 			normal							*= -1;
-			::gpk::drawQuadTriangle(targetPixels.metrics(), triangle, matrixTransformView, drawCache.PixelCoords, drawCache.PixelVertexWeights, depthBuffer);
+			::gpk::drawQuadTriangle(targetPixels.metrics(), triangleScreen, drawCache.PixelCoords, drawCache.PixelVertexWeights, depthBuffer);
   			::gpk::drawPixels(targetPixels, triangleWorld, normal, triangleTexCoords, solarSystem.ShipState.Scene.Global.LightVector, drawCache.PixelCoords, drawCache.PixelVertexWeights, image, drawCache.LightPointsModel, drawCache.LightColorsModel);
 		}
 	}

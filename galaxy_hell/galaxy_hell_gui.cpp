@@ -792,7 +792,8 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpob
 	const ::gpk::n2f2_t			center2							= {center3.x, center3.y};
 	const double				radiusLarge						= (center3 - gauge.Vertices[1]).Length();
 	const double				radiusSmall						= (center3 - gauge.Vertices[0]).Length();
-	const double				radiusCenter					= (radiusLarge - radiusSmall) / 2 + radiusSmall;
+	const double				radiusHalfWidth					= (radiusLarge - radiusSmall) / 2;
+	const double				radiusCenter					= radiusHalfWidth + radiusSmall;
 	dummyDepth.resize(target.metrics(), 0xFFFFFFFFU);
 	::gpk::apod<::gpk::n2s1_t>		pixelCoords;
 	::gpk::apod<::gpk::trif32>		triangleWeights;
@@ -811,6 +812,7 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpob
 				? ::gpk::interpolate_linear(colorMin, colorMid, (::gpk::min(1.0, iTriangle * 2.25 / (double)triangleCount)))
 				: ::gpk::interpolate_linear(colorMid, colorMax, (colorFactor - .5) * 2)
 				;
+		finalColor.Clamp();
 		pixelCoords.clear();
 		::gpk::drawTriangle(target.metrics(), triangleCoords, pixelCoords, triangleWeights, dummyDepth);
 		for(uint32_t iPixelCoords = 0; iPixelCoords < pixelCoords.size(); ++iPixelCoords) {
@@ -819,13 +821,12 @@ static	::gpk::error_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpob
 #ifndef GAUGE_NO_SHADING
 			const ::gpk::n2f2_t				floatCoord					= pixelCoord.f2_t();
 			const double					distanceFromCenter			= (floatCoord - center2).Length();
-			const double					distanceFromRadiusCenter	= fabs(distanceFromCenter - radiusCenter) / ((radiusLarge - radiusSmall) / 2);
+			const double					distanceFromRadiusCenter	= fabs(distanceFromCenter - radiusCenter) / radiusHalfWidth;
 			finalColor.a				= (float)(1.f - distanceFromRadiusCenter);
 #else
 			(void)radiusCenter;
 #endif		
 			::gpk::bgra						& targetPixel				= target[pixelCoord.y][pixelCoord.x];
-			finalColor.Clamp();
 			targetPixel					= ::gpk::interpolate_linear(::gpk::rgbaf{targetPixel}, finalColor, finalColor.a);
 			targetPixel.a				= uint8_t(finalColor.a * 255);
 		}

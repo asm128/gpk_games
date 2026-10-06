@@ -252,14 +252,13 @@ static	::gpk::error_t	shipCreate			(::ssg::SSiegeGame & world) {
 			return bool(result == 1);
 		};
 
-	inputEvents.for_each([&outputEvents, &funcHandleEvent](::gpk::pobj<::ssg::EventSSiege> & _eventToProcess){ 
+	if_fail_fe(inputEvents.for_each([&outputEvents, &funcHandleEvent](::gpk::pobj<::ssg::EventSSiege> & _eventToProcess){ 
 		if(funcHandleEvent(_eventToProcess, outputEvents))
 			_eventToProcess.clear();
-	});
+		return 0;
+	}));
 
-	gpk_necs(world.Engine.Update(secondsElapsed));
-
-
+	if_fail_fe(world.Engine.Update(secondsElapsed));
 	return 0;
 }
 
