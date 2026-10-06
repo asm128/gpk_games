@@ -133,14 +133,15 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 	gpk_necs(clientResult = ::gpk::clientUpdate(app.Client, gui));
 	rvi_if(::gpk::APPLICATION_STATE_EXIT, clientResult > 0, "User requested close (%i). Terminating execution.", clientResult);
 
-	app.Client.QueueReceived.for_each([&app](::gpk::pobj<::gpk::SUDPMessage> & udp){ 
+	if_fail_e(app.Client.QueueReceived.for_each([&app](::gpk::pobj<::gpk::SUDPMessage> & udp){ 
 		if(udp && udp->Payload.size()) {
 			::gpk::pobj<::ssg::EventSSiege>	eventReceived;
 			::gpk::vcu0_t							inputBytes			= udp->Payload;
 			es_if_failed(eventReceived->Load(inputBytes)); 
-			app.SSiegeApp.EventsReceived.push_back(eventReceived);
+			if_fail_fe(app.SSiegeApp.EventsReceived.push_back(eventReceived));
 		}
-	});
+		return 0;
+	}));
 
 #if !defined(DISABLE_D3D11)
 	if(app.SSiegeApp.ActiveState >= ::ssg::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.Game.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {

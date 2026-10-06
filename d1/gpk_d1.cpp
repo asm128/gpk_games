@@ -504,14 +504,14 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 			const ::d1p::SEventPool & eventToProcess = *_eventToProcess;
 			info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));
 			switch(eventToProcess.Type) {
-			case ::d1p::POOL_EVENT_PLAYER_INPUT  : {	::d1p::eventExtractAndHandle<::d1p::PLAYER_INPUT >(eventToProcess, [&app, &outputEvents](auto ev){ gpk_necs(handlePLAYER_INPUT (app, ev, outputEvents)); return 0; }); return; }
-			case ::d1p::POOL_EVENT_MATCH_CONTROL : {	::d1p::eventExtractAndHandle<::d1p::MATCH_CONTROL>(eventToProcess, [&app, &outputEvents](auto ev){ gpk_necs(handleMATCH_CONTROL(app, ev, outputEvents)); return 0; }); return; }
-			case ::d1p::POOL_EVENT_MATCH_EVENT   : {	::d1p::eventExtractAndHandle<::d1p::MATCH_EVENT  >(eventToProcess, [&app, &outputEvents](auto ev){ gpk_necs(handleMATCH_EVENT  (app, ev, outputEvents)); return 0; }); return; }
-			case ::d1p::POOL_EVENT_BALL_EVENT    : {	::d1p::eventExtractAndHandle<::d1p::BALL_EVENT   >(eventToProcess, [&app, &outputEvents](auto ev){ gpk_necs(handleBALL_EVENT   (app, ev, outputEvents)); return 0; }); return; }
-			case ::d1p::POOL_EVENT_FOUL          : {	::d1p::eventExtractAndHandle<::d1p::FOUL         >(eventToProcess, [&app, &outputEvents](auto ev){ gpk_necs(handleFOUL         (app, ev, outputEvents)); return 0; }); return; }
+			case ::d1p::POOL_EVENT_PLAYER_INPUT  : if_fail_fe(::d1p::eventExtractAndHandle<::d1p::PLAYER_INPUT >(eventToProcess, [&app, &outputEvents](auto ev){ return handlePLAYER_INPUT (app, ev, outputEvents); })); 
+			case ::d1p::POOL_EVENT_MATCH_CONTROL : if_fail_fe(::d1p::eventExtractAndHandle<::d1p::MATCH_CONTROL>(eventToProcess, [&app, &outputEvents](auto ev){ return handleMATCH_CONTROL(app, ev, outputEvents); })); 
+			case ::d1p::POOL_EVENT_MATCH_EVENT   : if_fail_fe(::d1p::eventExtractAndHandle<::d1p::MATCH_EVENT  >(eventToProcess, [&app, &outputEvents](auto ev){ return handleMATCH_EVENT  (app, ev, outputEvents); })); 
+			case ::d1p::POOL_EVENT_BALL_EVENT    : if_fail_fe(::d1p::eventExtractAndHandle<::d1p::BALL_EVENT   >(eventToProcess, [&app, &outputEvents](auto ev){ return handleBALL_EVENT   (app, ev, outputEvents); })); 
+			case ::d1p::POOL_EVENT_FOUL          : if_fail_fe(::d1p::eventExtractAndHandle<::d1p::FOUL         >(eventToProcess, [&app, &outputEvents](auto ev){ return handleFOUL         (app, ev, outputEvents); })); 
 			default: 
 				gpk_warning_unhandled_event(eventToProcess); 
-				return;
+				return 0;
 			}
 		});
 

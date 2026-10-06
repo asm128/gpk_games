@@ -125,20 +125,20 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 	es_if_failed(serverResult = ::gpk::serverUpdate(*app.Server, gui));
 	rvi_if(::gpk::APPLICATION_STATE_EXIT, serverResult == 1, "User requested close. Terminating execution.");
 
-	app.Server->QueueReceived.for_each([&app](::gpk::TUDPQueue & messages) {
+	if_fail_e(app.Server->QueueReceived.for_each([&app](::gpk::TUDPQueue & messages) {
 		messages.enumerate([&app](uint32_t & index, ::gpk::pobj<::gpk::SUDPMessage> & message) {
 			if(!message)
 				return 0;
 
 			::gpk::vcu0_t						input					= message->Payload;
 			gpk::pobj<ssg::EventSSiege>	newEvent;
-			gpk_necs(newEvent->Load(input));
+			if_fail_fe(newEvent->Load(input));
 			info_printf("Received '%s' from client %i: %s.", ::gpk::get_enum_namep(newEvent->Type), index, ::gpk::get_value_namep(newEvent->Type));
-			gpk_necs(app.SSiegeApp.EventsReceived.push_back(newEvent));
+			if_fail_fe(app.SSiegeApp.EventsReceived.push_back(newEvent));
 			return 0;
 		});
-		messages.clear();
-	});
+		return messages.clear();
+	}));
 
 #if !defined(DISABLE_D3D11)
 	if(app.SSiegeApp.ActiveState >= ::ssg::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.Game.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
