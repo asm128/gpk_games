@@ -90,6 +90,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk_engine;</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -114,6 +115,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk_engine;</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -138,6 +140,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk_engine;</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -162,6 +165,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../gpk/llc; ../../gpk/gpk_engine;</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>

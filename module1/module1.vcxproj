@@ -28,28 +28,24 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Label="PythonConfiguration">
     <RegistryView>RegistryView.Registry32</RegistryView>
@@ -97,7 +93,7 @@
     <TargetName>module1$(PythonDebugSuffix)</TargetName>
     <TargetExt>.pyd</TargetExt>
     <LocalDebuggerCommand>$(PythonDExe)</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>-i -c "print('>>> import module1'); import module1"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i -c "print('&gt;&gt;&gt; import module1'); import module1"</LocalDebuggerCommandArguments>
     <LocalDebuggerEnvironment>PYTHONPATH=$(OutDir)</LocalDebuggerEnvironment>
     <DebuggerFlavor>$(DefaultDebuggerFlavor)</DebuggerFlavor>
   </PropertyGroup>
@@ -105,7 +101,7 @@
     <TargetName>module1</TargetName>
     <TargetExt>.pyd</TargetExt>
     <LocalDebuggerCommand>$(PythonExe)</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>-i -c "print('>>> import module1'); import module1"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i -c "print('&gt;&gt;&gt; import module1'); import module1"</LocalDebuggerCommandArguments>
     <LocalDebuggerEnvironment>PYTHONPATH=$(OutDir)</LocalDebuggerEnvironment>
     <DebuggerFlavor>$(DefaultDebuggerFlavor)</DebuggerFlavor>
   </PropertyGroup>
@@ -113,7 +109,7 @@
     <TargetName>module1$(PythonDebugSuffix)</TargetName>
     <TargetExt>.pyd</TargetExt>
     <LocalDebuggerCommand>$(PythonDExe)</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>-i -c "print('>>> import module1'); import module1"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i -c "print('&gt;&gt;&gt; import module1'); import module1"</LocalDebuggerCommandArguments>
     <LocalDebuggerEnvironment>PYTHONPATH=$(OutDir)</LocalDebuggerEnvironment>
     <DebuggerFlavor>$(DefaultDebuggerFlavor)</DebuggerFlavor>
   </PropertyGroup>
@@ -121,7 +117,7 @@
     <TargetName>module1</TargetName>
     <TargetExt>.pyd</TargetExt>
     <LocalDebuggerCommand>$(PythonExe)</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>-i -c "print('>>> import module1'); import module1"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i -c "print('&gt;&gt;&gt; import module1'); import module1"</LocalDebuggerCommandArguments>
     <LocalDebuggerEnvironment>PYTHONPATH=$(OutDir)</LocalDebuggerEnvironment>
     <DebuggerFlavor>$(DefaultDebuggerFlavor)</DebuggerFlavor>
   </PropertyGroup>
