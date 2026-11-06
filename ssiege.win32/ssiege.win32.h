@@ -19,7 +19,7 @@
 struct SApplication {
 	::gpk::SFramework		Framework	;
 #ifndef DISABLE_D3D11
-	::gpk::SD3DApplication	D3DApp			= {};
+	::gpk::SD3DApplication	Renderer		= {};
 #endif
 #ifndef DISABLE_XAUDIO2
 	::gpk::AUDIO_STATE		AudioState		= {};

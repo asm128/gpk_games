@@ -24,7 +24,7 @@ gpk::err_t			cleanup					(::SApplication & app)											{
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::SWindow				& mainWindow			= framework.RootWindow;
 #if !defined(DISABLE_D3D11)
-	app.D3DApp.Shutdown();
+	app.Renderer.Shutdown();
 #endif
 
 	if_fail_fe(::gpk::mainWindowDestroy(mainWindow));
@@ -37,7 +37,7 @@ static	gpk::err_t	updateSizeDependentResources(::SApplication & app)											{
 	const ::gpk::n2u1_t			newSize					= mainWindow.Size;
 #if !defined(DISABLE_D3D11)
 	mainWindow.BackBuffer	= {};
-	if_fail_fe(app.D3DApp.SetWindowSize(newSize));
+	if_fail_fe(app.Renderer.SetWindowSize(newSize));
 #else
 	if_fail_fe(mainWindow.BackBuffer->resize(newSize, ::gpk::bgra{0, 0, 0, 0}, 0xFFFFFFFF));
 #endif
@@ -50,7 +50,7 @@ static	gpk::err_t	processScreenEvent		(::SApplication & app, const ::gpk::SEvent
 	default: break;
 	case ::gpk::EVENT_SCREEN_Create:
 #if !defined(DISABLE_D3D11)
-		if_fail_fe(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.SSiegeApp.Game.Engine.Scene->Graphics));
+		if_fail_fe(app.Renderer.Initialize(app.Framework.RootWindow, app.SSiegeApp.Game.Engine.Scene->Graphics));
 #endif
 	case ::gpk::EVENT_SCREEN_Resize: 
 		if_fail_fe(::updateSizeDependentResources(app));
@@ -120,10 +120,10 @@ gpk::err_t			update					(::SApplication& app, bool systemRequestedExit)					{
 	}
 
 #if !defined(DISABLE_D3D11)
-	if(app.SSiegeApp.ActiveState >= ::ssg::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.Game.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
-		if_fail_fe(app.D3DApp.CreateDeviceResources(*app.SSiegeApp.Game.Engine.Scene->Graphics));
+	if(app.SSiegeApp.ActiveState >= ::ssg::APP_STATE_Welcome && app.Renderer.Scene.IndexBuffer.size() < app.SSiegeApp.Game.Engine.Scene->Graphics->Meshes.size() || !app.Renderer.GUIStuff.IndexBuffer) {
+		if_fail_fe(app.Renderer.CreateDeviceResources(*app.SSiegeApp.Game.Engine.Scene->Graphics));
 	}
-	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (u2_t)frameInfo.FrameMeter.FramesPerSecond);
+	app.Renderer.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (u2_t)frameInfo.FrameMeter.FramesPerSecond);
 #endif
 
 	//-----------------------------
@@ -142,15 +142,15 @@ gpk::err_t			draw					(::SApplication& app)											{	// --- This function wil
 	const ::gpk::rgbaf			clearColor				= ::gpk::DARKBLUE * .0625;//::gpk::interpolate_linear(::gpk::DARKBLUE * .25, ::gpk::LIGHTBLUE * 1.1, sunlightFactor);
 
 #if !defined(DISABLE_D3D11) 
-	memset(app.D3DApp.GUIStuff.RenderTarget.begin(), 0, app.D3DApp.GUIStuff.RenderTarget.byte_count());
+	memset(app.Renderer.GUIStuff.RenderTarget.begin(), 0, app.Renderer.GUIStuff.RenderTarget.byte_count());
 	
-	if_fail_fe(::gpk::guiDraw(*app.SSiegeApp.GUI, app.D3DApp.GUIStuff.RenderTarget));
+	if_fail_fe(::gpk::guiDraw(*app.SSiegeApp.GUI, app.Renderer.GUIStuff.RenderTarget));
 
-	app.D3DApp.Scene.ConstantBufferScene.Time	= (float)app.Framework.FrameInfo.Seconds.Total;
+	app.Renderer.Scene.ConstantBufferScene.Time	= (float)app.Framework.FrameInfo.Seconds.Total;
 
 	const ::gpk::SCamera		& cameraSelected		= app.SSiegeApp.Game.Camera;
 	const ::gpk::SEngineScene	& engineScene			= *app.SSiegeApp.Game.Engine.Scene;
-	if_fail_fe(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, sunlightPos, cameraSelected.Position, cameraSelected.Target, cameraSelected.NearFar));
+	if_fail_fe(::gpk::d3dAppDraw(app.Renderer, engineScene, clearColor, sunlightPos, cameraSelected.Position, cameraSelected.Target, cameraSelected.NearFar));
 #else 
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::prtbgra8d32			backBuffer				= framework.RootWindow.BackBuffer;

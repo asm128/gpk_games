@@ -44,7 +44,7 @@ namespace ssg
 		}
 
 		gpk::err_t			GetPlayerFilePath			(const u3_t time, ::gpk::vcst_t playerName, ::gpk::asc_t & playerFilePath)	const	{
-			::gpk::asc_t			b64PlayerName				= {};
+			::gpk::string			b64PlayerName				= {};
 			if_fail_fe(::gpk::base64Encode(playerName, b64PlayerName));
 			if_fail_fe(::gpk::append_strings(b64PlayerName, time, ExtensionProfile));
 			if_fail_fe(::gpk::pathNameCompose(SavegameFolder, b64PlayerName, playerFilePath));
