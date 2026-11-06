@@ -56,6 +56,6 @@
 		, eventArgs.Value.AsFloat	
 		, eventArgs.Id	
 		);
-	gpk_necs(output.append_string(temp));
+	{ if_fail_fe(output.append_string(temp)); }
 	return 0;
 }

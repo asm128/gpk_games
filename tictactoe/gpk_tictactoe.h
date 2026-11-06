@@ -22,12 +22,12 @@ namespace gpkg
 	struct Coord2D {
 		_tNumeric			x, y;
 	};
-	typedef	Coord2D<uint32_t>	Coord2Du32;
+	typedef	Coord2D<u2_t >	Coord2Du32;
 
 	// For representing the board cell positions we use this compact structure that works well with grids up to 16x16 cells. For everything else, such as screen coordinates, we use the Coord2D template structure.
 	struct CellCoord {
-		uint8_t				Row				: 4;
-		uint8_t				Column			: 4;
+		u0_t 				Row				: 4;
+		u0_t 				Column			: 4;
 	};	// struct
 
 	// This structure is only suitable for boards of up to 3x3 cells. It represents the position of a picked cell and the player.
@@ -40,7 +40,7 @@ namespace gpkg
 		uint16_t					IndexPlayer		: 1;
 		// ----------------------------------------------------	  Methods	-------------------------------------------------------------------------
 		inline constexpr			CellPick		()																	noexcept	: Value(CELL_VALUE_EMPTY)	, IndexCell(0)		, Row(0)		, Column(0)			, IndexPlayer(0)		{}
-		inline constexpr			CellPick		(const CELL_VALUE value, const uint8_t cell, const uint8_t player)	noexcept	: Value(value)				, IndexCell(cell)	, Row(cell % 3)	, Column(cell / 3)	, IndexPlayer(player)	{}
+		inline constexpr			CellPick		(const CELL_VALUE value, const u0_t  cell, const u0_t  player)	noexcept	: Value(value)				, IndexCell(cell)	, Row(cell % 3)	, Column(cell / 3)	, IndexPlayer(player)	{}
 	};	// struct
 
 	// This structure represents a boolean layout of the board. It's used to determine the cells occupied by a given player.
@@ -61,7 +61,7 @@ namespace gpkg
 			static constexpr	uint16_t	maskVertical		= 0x49;	// bits representing a column	(001001001)
 			static constexpr	uint16_t	cellMaskRows	[3]	= {(maskHorizontal	<< (0 * 3)), (maskHorizontal	<< (1 * 3)), (maskHorizontal	<< (2 * 3)),};
 			static constexpr	uint16_t	cellMaskColumns	[3]	= {(maskVertical	<< (0 * 1)), (maskVertical		<< (1 * 1)), (maskVertical		<< (2 * 1)),};
-			for(int32_t rowOrCol = 0; rowOrCol < 3; ++rowOrCol) {
+			for(s2_t rowOrCol = 0; rowOrCol < 3; ++rowOrCol) {
 				if(((cellMaskRows		[rowOrCol]) & Cells) == cellMaskRows	[rowOrCol]) return true;
 				if(((cellMaskColumns	[rowOrCol]) & Cells) == cellMaskColumns	[rowOrCol]) return true;
 			}	//
@@ -75,7 +75,7 @@ namespace gpkg
 	};	// struct
 
 	// Allows us to define the type of player
-	enum PLAYER_CONTROL : uint8_t
+	enum PLAYER_CONTROL : u0_t 
 		{	PLAYER_CONTROL_AI		= 0
 		,	PLAYER_CONTROL_HUMAN	= 1
 		};
@@ -83,12 +83,12 @@ namespace gpkg
 	// This structure contains the whole game state.
 	struct TicTacToeBoard32 {
 		// ----------------------------------------------------  Variables	-------------------------------------------------------------------------
-		uint32_t							Cells					: 18;
-		uint32_t							MovesConsumed			: 4;
-		uint32_t							PlayerIndex				: 1;
-		uint32_t							Winner					: 2;
-		uint32_t							PlayerControls			: 2;
-		uint32_t							Padding					: 5;
+		u2_t 							Cells					: 18;
+		u2_t 							MovesConsumed			: 4;
+		u2_t 							PlayerIndex				: 1;
+		u2_t 							Winner					: 2;
+		u2_t 							PlayerControls			: 2;
+		u2_t 							Padding					: 5;
 
 		// ----------------------------------------------------	  Methods	-------------------------------------------------------------------------
 		inline constexpr					TicTacToeBoard32		()															noexcept	: Cells(0), MovesConsumed(0), PlayerIndex(0), Winner(CELL_VALUE_EMPTY), PlayerControls(0x1), Padding(0)	{}
@@ -100,13 +100,13 @@ namespace gpkg
 		inline	void						SetCellValue			(const int row, const int column, const CELL_VALUE value)	noexcept	{ SetCellValue			(column * 3 + row, value); }
 
 		inline constexpr	CELL_VALUE		GetCellValue			(const int index)									const	noexcept	{ return CELL_VALUE((Cells & (CELL_VALUE_MASK << (index * 2))) >> index * 2); }
-		inline	void						SetCellValue			(const int index, const CELL_VALUE value)					noexcept	{ Cells |= uint32_t(value & CELL_VALUE_MASK) << (index * 2); }
+		inline	void						SetCellValue			(const int index, const CELL_VALUE value)					noexcept	{ Cells |= u2_t (value & CELL_VALUE_MASK) << (index * 2); }
 
 		TicTacToeBoard16					GetCells				(const CELL_VALUE value)							const	noexcept	{
 			TicTacToeBoard16						result					= {};
 			for(int y = 0; y < 3; ++y)
 			for(int x = 0; x < 3; ++x) {
-				const int32_t							indexLinear				= y * 3 + x;
+				const s2_t							indexLinear				= y * 3 + x;
 				const CELL_VALUE						currentValue			= GetCellValue(indexLinear);
 				if(currentValue == value) {
 					result.SetCell(indexLinear, true);
@@ -136,16 +136,16 @@ namespace gpkg
 		// ----------------------------------------------------  Variables	-------------------------------------------------------------------------
 		TicTacToeBoard32				Board			= {};
 		// ----------------------------------------------------	  Methods	-------------------------------------------------------------------------
-		inline	uint8_t					TurnChange		()					noexcept	{ return (++Board.PlayerIndex) %= 2;	}
+		inline	u0_t 					TurnChange		()					noexcept	{ return (++Board.PlayerIndex) %= 2;	}
 		inline	void					Restart			()					noexcept	{
 			const int							playerIndex		= Board.PlayerIndex;
 			Board							= {};
 			Board.PlayerIndex				= playerIndex;
 		}
 		// --- Returns useful information about the move
-		CellPick						TurnPlay		(uint8_t cellIndex)	noexcept	{
+		CellPick						TurnPlay		(u0_t  cellIndex)	noexcept	{
 			CELL_VALUE							result_value	= CELL_VALUE_EMPTY;
-			const uint8_t						playerIndex		= Board.PlayerIndex;
+			const u0_t 						playerIndex		= Board.PlayerIndex;
 
 			// --- Handle turn depending on the player type. Currently there is no AI system other than random behavior which from time to time makes it look like it knows what she's doing.
 			switch(Board.GetPlayerControl(playerIndex)) {
@@ -176,7 +176,7 @@ namespace gpkg
 			return CELL_VALUE_EMPTY;
 		}
 		// --- Play turn and evaluate board. If the turn has to be played by the AI, cellIndex isn't used. Otherwise it determines the cell chosen by the player.
-		inline	CellPick				Tick			(const uint8_t cellIndex)	noexcept	{
+		inline	CellPick				Tick			(const u0_t  cellIndex)	noexcept	{
 			const CellPick						result			= TurnPlay(cellIndex);
 			Board.Winner					= EvaluateBoard();
 			return result;
@@ -184,10 +184,10 @@ namespace gpkg
 		// --- Execute loop. This isn't really working but serves as example of what your application should do more or less depending on user input.
 		CELL_VALUE						Run				()							noexcept	{
 			ScreenASCII<SCREEN_WIDTH + 1, SCREEN_HEIGHT>	targetScreenTTT;
-			constexpr uint32_t					halfWidth		= targetScreenTTT.Width  >> 1;
-			constexpr uint32_t					halfHeight		= targetScreenTTT.Height >> 1;
+			constexpr u2_t 					halfWidth		= targetScreenTTT.Width  >> 1;
+			constexpr u2_t 					halfHeight		= targetScreenTTT.Height >> 1;
 			Board.PlayerControls			= (PLAYER_CONTROL_AI << 1) | PLAYER_CONTROL_AI;
-			static	const uint32_t				cellIndex						= 0;	// When the player is a human player, cellIndex should contain the index of the cell played.
+			static	const u2_t 				cellIndex						= 0;	// When the player is a human player, cellIndex should contain the index of the cell played.
 			while(CELL_VALUE_EMPTY == Board.Winner) {
 				Tick(cellIndex);
 				DrawBoard({halfWidth - 1, halfHeight - 1}, targetScreenTTT.Cells);
@@ -201,14 +201,14 @@ namespace gpkg
 		template <size_t _nWidth, size_t _nHeight>
 		inline	void					DrawResults		(const CELL_VALUE winner, const Coord2Du32 & textCenter, char (&screen)[_nHeight][_nWidth])	const	noexcept	{
 			sc_t								text[25]		= {};
-			const int32_t						len				= (int32_t)(winner ? ::sprintf_s(text, "Player %u won the match!", (uint32_t)winner) : ::sprintf_s(text, "Tie!"));
+			const s2_t						len				= (s2_t)(winner ? ::sprintf_s(text, "Player %u won the match!", (u2_t )winner) : ::sprintf_s(text, "Tie!"));
 			memcpy(&screen[textCenter.y][textCenter.x - (len >> 1)], text, len);
 		}
 		// --- Display the board
 		template <size_t _nWidth, size_t _nHeight>
 		void							DrawBoard		(const Coord2Du32& offset, char (&screen)[_nHeight][_nWidth])									const	noexcept	{
-			for(uint8_t y = 0, yMax = (_nHeight < 3) ? _nHeight : 3; y < yMax; ++y) {
-				for(uint8_t x = 0, xMax = (_nWidth < 3) ? _nWidth : 3; x < xMax; ++x)
+			for(u0_t  y = 0, yMax = (_nHeight < 3) ? _nHeight : 3; y < yMax; ++y) {
+				for(u0_t  x = 0, xMax = (_nWidth < 3) ? _nWidth : 3; x < xMax; ++x)
 					screen[offset.y + y][offset.x + x]		= Symbols[Board.GetCellValue(x, y)];
 				screen[offset.y + y][_nWidth - 1]	= '\n';
 			}
@@ -218,8 +218,8 @@ namespace gpkg
 		template <size_t _nWidth, size_t _nHeight>
 		void							DrawBoard		(const CELL_VALUE cellValue, const Coord2Du32 & offset, char (&screen)[_nHeight][_nWidth])		const	noexcept	{
 			const TicTacToeBoard16				board			= Board.GetCells(cellValue);
-			for(uint8_t y = 0, yMax = (_nHeight < 3) ? _nHeight : 3; y < yMax; ++y) {
-				for(uint8_t x = 0, xMax = (_nWidth < 3) ? _nWidth : 3; x < xMax; ++x)
+			for(u0_t  y = 0, yMax = (_nHeight < 3) ? _nHeight : 3; y < yMax; ++y) {
+				for(u0_t  x = 0, xMax = (_nWidth < 3) ? _nWidth : 3; x < xMax; ++x)
 					screen[offset.y + y][offset.x + x]		= Symbols[board.GetCell({x, y}) ? cellValue : 0];
 				screen[offset.y + y][_nWidth - 1]	= '\n';
 			}

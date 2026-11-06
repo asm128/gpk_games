@@ -1,5 +1,6 @@
 #include "gpk_cyoa.h"
 #include "gpk_io.h"
+#include "gpk_string_compose.h"
 
 #define superp(format, ...) printf(format "\n", __VA_ARGS__)
 
@@ -29,7 +30,7 @@ static	gpk::err_t	splitLines		(const ::gpk::string & pageBytes, ::gpk::aobj<::gp
 		pageBytes.slice(vline, lastOffset, lastOffset + 1);
 
 		::gpk::string				lineToPush		= vline;
-		lineToPush.append_string("\n");
+		::gpk::append_strings(lineToPush, "\n");
 		pageLines.push_back(lineToPush);
 	}
 	return 0;

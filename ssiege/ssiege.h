@@ -7,9 +7,12 @@
 #include "gpk_deflate.h"
 #include "gpk_array_ptr.h"
 #include "gpk_noise.h"
+#include "gpk_string_compose.h"
 
 #include "gpk_file_pack.h"
+#include "gpk_path.h"
 #include <ctime>
+
 
 #ifndef SSIEGE_H_23701
 #define SSIEGE_H_23701
@@ -40,16 +43,12 @@ namespace ssg
 			return 0;
 		}
 
-		gpk::err_t			GetPlayerFilePath			(const u3_t time, const ::gpk::vcsc_t & playerName, ::gpk::asc_t & playerFilePath)	const	{
-			::gpk::au0_t			b64PlayerName				= {};
+		gpk::err_t			GetPlayerFilePath			(const u3_t time, ::gpk::vcst_t playerName, ::gpk::asc_t & playerFilePath)	const	{
+			::gpk::asc_t			b64PlayerName				= {};
 			if_fail_fe(::gpk::base64Encode(playerName, b64PlayerName));
-			if_fail_fe(playerFilePath.append(SavegameFolder));
-			if_fail_fe(playerFilePath.append_string("/"));
-			if_fail_fe(playerFilePath.append_string({(sc_c*)b64PlayerName.begin(), b64PlayerName.size()}));
-
-			sc_t					postfix[64]					= {};
-			::gpk::sprintf_s(postfix, "%" GPK_FMT_U3 "%.*s", time, GPK_VIEW_ARGS(ExtensionProfile));
-			return playerFilePath.append_string(postfix);
+			if_fail_fe(::gpk::append_strings(b64PlayerName, time, ExtensionProfile));
+			if_fail_fe(::gpk::pathNameCompose(SavegameFolder, b64PlayerName, playerFilePath));
+			return 0;
 		}
 	};
 

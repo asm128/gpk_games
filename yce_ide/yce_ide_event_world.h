@@ -7,7 +7,7 @@ namespace ssg
 {
 #pragma pack(push, 1)
 	// These events are sent for world contents manipulation
-	GDEFINE_ENUM_TYPE (ADMIN_GAME, uint8_t);
+	GDEFINE_ENUM_TYPE (ADMIN_GAME, u0_t );
 	GDEFINE_ENUM_VALUE(ADMIN_GAME, Show			, 0);
 	GDEFINE_ENUM_VALUE(ADMIN_GAME, Hide			, 1);
 	GDEFINE_ENUM_VALUE(ADMIN_GAME, Initialize	, 2); 
@@ -16,7 +16,7 @@ namespace ssg
 	typedef	::gpk::SEventView	<ADMIN_GAME>	EViewAdminGame;
 
 	// These events are sent for world contents manipulation
-	GDEFINE_ENUM_TYPE (WORLD_ADMIN, uint8_t);
+	GDEFINE_ENUM_TYPE (WORLD_ADMIN, u0_t );
 	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Create		, 0);
 	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Delete		, 1);
 	GDEFINE_ENUM_VALUE(WORLD_ADMIN, Rename		, 2);
@@ -32,7 +32,7 @@ namespace ssg
 	typedef	::gpk::SEvent		<WORLD_ADMIN>	EventAdminWorld;
 	typedef	::gpk::SEventView	<WORLD_ADMIN>	EViewAdminWorld;
 
-	GDEFINE_ENUM_TYPE (ADMIN_CHARS, uint8_t);
+	GDEFINE_ENUM_TYPE (ADMIN_CHARS, u0_t );
 	GDEFINE_ENUM_VALUE(ADMIN_CHARS, Spawn	, 12); // Used with an SArgsEvent structure.
 	GDEFINE_ENUM_VALUE(ADMIN_CHARS, Kill	, 13); // Used with an SArgsEvent structure.
 	GDEFINE_ENUM_VALUE(ADMIN_CHARS, Revive	, 14); // Used with an SArgsEvent structure.
@@ -40,7 +40,7 @@ namespace ssg
 	typedef	::gpk::SEvent		<ADMIN_CHARS>	EventAdminChar;
 	typedef	::gpk::SEventView	<ADMIN_CHARS>	EViewAdminChar;
 
-	GDEFINE_ENUM_TYPE (ADMIN_USERS, uint8_t);
+	GDEFINE_ENUM_TYPE (ADMIN_USERS, u0_t );
 	GDEFINE_ENUM_VALUE(ADMIN_USERS, Spawn	, 12); // Used with an SArgsEvent structure.
 	GDEFINE_ENUM_VALUE(ADMIN_USERS, Kill	, 13); // Used with an SArgsEvent structure.
 	GDEFINE_ENUM_VALUE(ADMIN_USERS, Revive	, 14); // Used with an SArgsEvent structure.
@@ -49,7 +49,7 @@ namespace ssg
 	typedef	::gpk::SEventView	<ADMIN_USERS>	EViewAdminUser;
 
 	// These events trigger or report effects that are spawned by the world 
-	GDEFINE_ENUM_TYPE (WORLD_EVENT, uint8_t);
+	GDEFINE_ENUM_TYPE (WORLD_EVENT, u0_t );
 	GDEFINE_ENUM_VALUE(WORLD_EVENT, Tick		, 0);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Start drizzle, 2: Start rain, 3: Start storm, 4: Start storm.
 	GDEFINE_ENUM_VALUE(WORLD_EVENT, Rain		, 1);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Start drizzle, 2: Start rain, 3: Start storm, 4: Start storm.
 	GDEFINE_ENUM_VALUE(WORLD_EVENT, Thunderstorm, 2);	// Takes an SArgsEvent structure. 0 + effect id: Stop, 1: Start intra-cloud, 2: Start cloud to cloud, 3: Start cloud to ground.
@@ -63,7 +63,7 @@ namespace ssg
 	typedef	::gpk::SEventView	<WORLD_EVENT>	EViewWorld;
 
 	// These events change or report the world configuration settings
-	GDEFINE_ENUM_TYPE (WORLD_SETUP, uint8_t); 
+	GDEFINE_ENUM_TYPE (WORLD_SETUP, u0_t ); 
 	GDEFINE_ENUM_VALUE(WORLD_SETUP, Seed		, 0); 
 	GDEFINE_ENUM_VALUE(WORLD_SETUP, MaxPlayers	, 1); 
 	GDEFINE_ENUM_VALUE(WORLD_SETUP, BlockSize	, 2); 
@@ -71,7 +71,7 @@ namespace ssg
 	typedef	::gpk::SEventView	<WORLD_SETUP>	EViewWorldSetup;
 	
 	// These events change or report the world current state values
-	GDEFINE_ENUM_TYPE (WORLD_VALUE, uint8_t); 
+	GDEFINE_ENUM_TYPE (WORLD_VALUE, u0_t ); 
 	GDEFINE_ENUM_VALUE(WORLD_VALUE, TimeCreated				, 0); 
 	GDEFINE_ENUM_VALUE(WORLD_VALUE, TimeOffset				, 1); 
 	GDEFINE_ENUM_VALUE(WORLD_VALUE, DaylightOffsetMinutes	, 2); 

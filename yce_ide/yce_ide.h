@@ -39,12 +39,12 @@ namespace ssg
 			return 0;
 		}
 
-		::gpk::error_t			GetPlayerFilePath			(const uint64_t time, const ::gpk::vcc & playerName, ::gpk::achar & playerFilePath)	const	{
+		::gpk::error_t			GetPlayerFilePath			(const u3_t  time, const ::gpk::vcc & playerName, ::gpk::achar & playerFilePath)	const	{
 			::gpk::au8					b64PlayerName				= {};
-			gpk_necs(::gpk::base64Encode(playerName, b64PlayerName));
-			gpk_necs(playerFilePath.append(SavegameFolder));
-			gpk_necs(playerFilePath.append_string("/"));
-			gpk_necs(playerFilePath.append(b64PlayerName.cc()));
+			{ if_fail_fe(::gpk::base64Encode(playerName, b64PlayerName)); }
+			{ if_fail_fe(playerFilePath.append(SavegameFolder)); }
+			{ if_fail_fe(playerFilePath.append_string("/")); }
+			{ if_fail_fe(playerFilePath.append(b64PlayerName.cc())); }
 
 			sc_t						postfix[64]					= {};
 			sprintf_s(postfix, "%llu%s", time, ExtensionProfile.begin());
@@ -63,7 +63,7 @@ namespace ssg
 	::gpk::error_t			setupSSiegeUI			(::gpk::SGUI & gui, ::ssg::SSiegeUI & ssiegeUI);
 
 
-	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
+	GDEFINE_ENUM_TYPE(APP_STATE, u0_t );
 	GDEFINE_ENUM_VALUE(APP_STATE, Init		,  0);
 	GDEFINE_ENUM_VALUE(APP_STATE, Welcome	,  1);
 	GDEFINE_ENUM_VALUE(APP_STATE, Home		,  2);
@@ -86,7 +86,7 @@ namespace ssg
 	};
 
 	struct SPlayerState {
-		uint32_t				Stage				= 0;
+		u2_t 				Stage				= 0;
 	};
 
 	struct SSiegeApp {
@@ -112,19 +112,19 @@ namespace ssg
 			rni_if(Game.Controlled >= Game.Engine.Entities.size(), "No active player character! %i >= %i", Game.Controlled, Game.Engine.Entities.size());
 				
 			::gpk::achar				playerPath;
-			gpk_necs(FileStrings.GetPlayerFilePath(::gpk::timeCurrent(), Game.Players[0].Name, playerPath));
+			{ if_fail_fe(FileStrings.GetPlayerFilePath(::gpk::timeCurrent(), Game.Players[0].Name, playerPath)); }
 			return Save(playerPath);
 		}
 
 		::gpk::error_t			Save				(::gpk::vcc fileName)	const	{
 			::gpk::au8					serialized;
-			gpk_necs(Game.World.Save(serialized));
+			{ if_fail_fe(Game.World.Save(serialized)); }
 			return ::gpk::deflateFromMemory(fileName, serialized);
 		}
 
 		::gpk::error_t			Load				(::gpk::vcc filename)			{
 			::gpk::au8					serialized;
-			gpk_necs(::gpk::inflateToMemory(filename, serialized));
+			{ if_fail_fe(::gpk::inflateToMemory(filename, serialized)); }
 			::gpk::vcu8					viewSerialized		= serialized;
 			return Game.World.Load(viewSerialized);
 		}

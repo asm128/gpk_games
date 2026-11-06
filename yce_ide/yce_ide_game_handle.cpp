@@ -43,7 +43,7 @@
 	case ::ssg::WORLD_ADMIN_Generate	: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssg::WORLD_ADMIN_Reset		: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssg::WORLD_ADMIN_Initialize	: 
-		gpk_necs(::ssg::ssiegeGameSetup(world));
+		{ if_fail_fe(::ssg::ssiegeGameSetup(world)); }
 		break; 
 	} 
 	return 0; 

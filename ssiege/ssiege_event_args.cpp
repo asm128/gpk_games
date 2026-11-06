@@ -1,4 +1,5 @@
 #include "ssiege_event_args.h"
+#include "gpk_string_compose.h"
 
 gpk::err_t			ssg::printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, bool debugOutput) {
 	if(debugOutput)
@@ -56,6 +57,6 @@ gpk::err_t			ssg::printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, ::gpk::a
 		, eventArgs.Value.AsFloat	
 		, eventArgs.Id	
 		);
-	if_fail_fe(output.append_string(temp));
+	if_fail_fe(::gpk::append_strings(output, temp));
 	return 0;
 }

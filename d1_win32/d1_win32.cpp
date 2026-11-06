@@ -22,13 +22,13 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "D1");
 ::gpk::error_t			cleanup					(::SApplication & app)											{
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::SWindow				& mainWindow			= framework.RootWindow;
-	gpk_necs(::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue));
+	{ if_fail_fe(::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue)); }
 #if !defined(DISABLE_D3D11)
 	app.D3DApp.Shutdown();
 #endif
 
-	gpk_necs(::gpk::mainWindowDestroy(mainWindow));
-	gpk_necs(::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue));
+	{ if_fail_fe(::gpk::mainWindowDestroy(mainWindow)); }
+	{ if_fail_fe(::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue)); }
 	return 0;
 }
 
@@ -37,9 +37,9 @@ static	::gpk::error_t	updateSizeDependentResources(::SApplication & app)								
 	const ::gpk::n2u1_t			newSize					= mainWindow.Size;
 #if !defined(DISABLE_D3D11)
 	mainWindow.BackBuffer	= {};
-	gpk_necs(app.D3DApp.SetWindowSize(newSize));
+	{ if_fail_fe(app.D3DApp.SetWindowSize(newSize)); }
 #else
-	gpk_necs(mainWindow.BackBuffer->resize(newSize, ::gpk::bgra{0, 0, 0, 0}, 0xFFFFFFFF));
+	{ if_fail_fe(mainWindow.BackBuffer->resize(newSize, ::gpk::bgra{0, 0, 0, 0}, 0xFFFFFFFF)); }
 #endif
 	mainWindow.Resized		= false;
 	return 0;
@@ -50,10 +50,10 @@ static	::gpk::error_t	processScreenEvent		(::SApplication & app, const ::gpk::SE
 	default: break;
 	case ::gpk::EVENT_SCREEN_Create:
 #if !defined(DISABLE_D3D11)
-		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.D1.MainGame.Pool.Engine.Scene->Graphics));
+		{ if_fail_fe(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.D1.MainGame.Pool.Engine.Scene->Graphics)); }
 #endif
 	case ::gpk::EVENT_SCREEN_Resize: 
-		gpk_necs(::updateSizeDependentResources(app));
+		{ if_fail_fe(::updateSizeDependentResources(app)); }
 		break;
 	}
 	return 0;
@@ -67,7 +67,7 @@ static	::gpk::error_t	processKeyboardEvent	(::SApplication & app, const ::gpk::S
 		switch(screenEvent.Data[0]) {
 		case VK_RETURN:
 			if(GetAsyncKeyState(VK_MENU) & 0xFFF0)
-				gpk_necs(::gpk::fullScreenToggle(app.Framework.RootWindow));
+				{ if_fail_fe(::gpk::fullScreenToggle(app.Framework.RootWindow)); }
 			break;
 		}
 		break;
@@ -78,8 +78,8 @@ static	::gpk::error_t	processKeyboardEvent	(::SApplication & app, const ::gpk::S
 static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
-	case ::gpk::SYSTEM_EVENT_Screen		: gpk_necs(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN  >(sysEvent, [&app](const ::gpk::SScreenEventView & screenEvent) { return ::processScreenEvent  (app, screenEvent); })); break;
-	case ::gpk::SYSTEM_EVENT_Keyboard	: gpk_necs(::gpk::eventExtractAndHandle<::gpk::EVENT_KEYBOARD>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { return ::processKeyboardEvent(app, screenEvent); })); break;
+	case ::gpk::SYSTEM_EVENT_Screen		: { if_fail_fe(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN  >(sysEvent, [&app](const ::gpk::SScreenEventView & screenEvent) { return ::processScreenEvent  (app, screenEvent); })); } break;
+	case ::gpk::SYSTEM_EVENT_Keyboard	: { if_fail_fe(::gpk::eventExtractAndHandle<::gpk::EVENT_KEYBOARD>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { return ::processKeyboardEvent(app, screenEvent); })); } break;
 	}
 	return 0;
 }
@@ -90,9 +90,9 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::SWindow				& mainWindow			= framework.RootWindow;
 	mainWindow.Size			= {1280, 720};
-	gpk_necs(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input));
+	{ if_fail_fe(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)); }
 
-	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
+	{ if_fail_fe(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); })); }
 
 	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue));
 
@@ -102,12 +102,12 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 ::gpk::error_t			update					(::SApplication& app, bool systemRequestedExit)					{
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::error_t				frameworkResult			= ::gpk::updateFramework(framework);
-	gpk_necs(frameworkResult);
+	{ if_fail_fe(frameworkResult); }
 	rvis_if(::gpk::APPLICATION_STATE_EXIT, frameworkResult == ::gpk::APPLICATION_STATE_EXIT);
 
 	::gpk::SWindow				& mainWindow			= app.Framework.RootWindow;
 
-	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
+	{ if_fail_fe(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); })); }
 
 	::gpk::SFrameInfo			& frameInfo				= framework.FrameInfo;
 	{
@@ -122,10 +122,10 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 
 #if !defined(DISABLE_D3D11)
 	if(app.D1.ActiveState >= ::d1::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.D1.MainGame.Pool.Engine.Scene->Graphics->Meshes.size()) {
-		//gpk_necs(app.D3DApp.CreateDeviceDependentEngineResources(app.D3DApp.DeviceResources->GetD3DDevice(), *app.D1.MainGame.Pool.Engine.Scene->Graphics));
-		gpk_necs(app.D3DApp.CreateDeviceResources(*app.D1.MainGame.Pool.Engine.Scene->Graphics));
+		//{ if_fail_fe(app.D3DApp.CreateDeviceDependentEngineResources(app.D3DApp.DeviceResources->GetD3DDevice(), *app.D1.MainGame.Pool.Engine.Scene->Graphics)); }
+		{ if_fail_fe(app.D3DApp.CreateDeviceResources(*app.D1.MainGame.Pool.Engine.Scene->Graphics)); }
 	}
-	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (uint32_t)frameInfo.FrameMeter.FramesPerSecond);
+	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (u2_t )frameInfo.FrameMeter.FramesPerSecond);
 #endif
 
 	//-----------------------------
@@ -142,19 +142,19 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 #if !defined(DISABLE_D3D11) 
 	memset(app.D3DApp.GUIStuff.RenderTarget.begin(), 0, app.D3DApp.GUIStuff.RenderTarget.byte_count());
 	
-	gpk_necs(::gpk::guiDraw(*app.D1.AppUI.Dialog.GUI, app.D3DApp.GUIStuff.RenderTarget));
+	{ if_fail_fe(::gpk::guiDraw(*app.D1.AppUI.Dialog.GUI, app.D3DApp.GUIStuff.RenderTarget)); }
 
 	const ::d1::SCamera			& cameraSelected		= app.D1.MainGame.CameraSelected();
 	const ::gpk::SEngineScene	& engineScene			= *app.D1.MainGame.Pool.Engine.Scene;
 	const ::gpk::rgbaf			clearColor				= app.D1.AppUI.ClearColor;
 	const ::gpk::n3f2_t			& lightPos				= app.D1.MainGame.LightPos;
 
-	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, lightPos, cameraSelected.Position, cameraSelected.Target, {.01f, 100.f}));
+	{ if_fail_fe(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, lightPos, cameraSelected.Position, cameraSelected.Target, {.01f, 100.f})); }
 #else 
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::prtbgra8d32			backBuffer				= framework.RootWindow.BackBuffer;
-	backBuffer->resize(backBuffer->Color.metrics(), 0xFF000030, (uint32_t)-1);
-	gpk_necs(::d1::d1Draw(app.D1.AppUI, app.D1.MainGame, *backBuffer, framework.FrameInfo.Seconds.Total));
+	backBuffer->resize(backBuffer->Color.metrics(), 0xFF000030, (u2_t )-1);
+	{ if_fail_fe(::d1::d1Draw(app.D1.AppUI, app.D1.MainGame, *backBuffer, framework.FrameInfo.Seconds.Total)); }
 	memcpy(backBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	//::gpk::grid_mirror_y(framework.RootWindow.BackBuffer->Color.View, backBuffer->Color.View);
 	//framework.RootWindow.BackBuffer		= backBuffer;

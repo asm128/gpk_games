@@ -29,7 +29,7 @@ static	::gpk::error_t	processEventShoot		(::d1p::SPoolGame & pool, ::gpk::apobj<
 		return 0;
 
 	uint16_t						activeStickEntity		= pool.ActiveStickEntity();
-	gpk_necs(::shootCueBall(pool, activeStick, activeStickEntity));
+	{ if_fail_fe(::shootCueBall(pool, activeStick, activeStickEntity)); }
 	return 1;
 }
 
@@ -84,8 +84,8 @@ static	::gpk::error_t	processEventTurn		(::d1p::SPoolGame & pool, const ::d1p::S
 		while(activeStick.Angle <= -::gpk::math_2pi)
 			activeStick.Angle += (float)::gpk::math_2pi;
 
-		const int32_t					activeStickEntity		= pool.ActiveStickEntity();
-		const uint32_t					stickRigidBodyId		= pool.Engine.Entities[activeStickEntity].RigidBody;
+		const s2_t					activeStickEntity		= pool.ActiveStickEntity();
+		const u2_t 					stickRigidBodyId		= pool.Engine.Entities[activeStickEntity].RigidBody;
 		::gpk::SBodyCenter				& stickRigidBody		= pool.Engine.Integrator.Centers[stickRigidBodyId];
 		stickRigidBody.Orientation.AddScaled({0, stickEvent.Value * directionMultiplier, 0}, 1).Normalize();
 		pool.Engine.Integrator.Flags[stickRigidBodyId].UpdatedTransform = false;
@@ -109,8 +109,8 @@ static	::gpk::error_t	processEventTurn		(::d1p::SPoolGame & pool, const ::d1p::S
 
 		activeStick.Pitch			+= angleY;
 
-		const int32_t					activeStickEntity		= pool.ActiveStickEntity();
-		const uint32_t					stickRigidBodyId		= pool.Engine.Entities[activeStickEntity].RigidBody;
+		const s2_t					activeStickEntity		= pool.ActiveStickEntity();
+		const u2_t 					stickRigidBodyId		= pool.Engine.Entities[activeStickEntity].RigidBody;
 		::gpk::SBodyCenter				& stickRigidBody		= pool.Engine.Integrator.Centers[stickRigidBodyId];
 		(stickRigidBody.Orientation *= ::gpk::quatf32{}.CreateFromAxisAngle({0, 0, 1}, -angleY).Normalize()).Normalize();
 		pool.Engine.Integrator.Flags[stickRigidBodyId].UpdatedTransform = false;
@@ -134,7 +134,7 @@ static	::gpk::error_t	processEventBall	(::d1p::SPoolGame & pool, const ::d1p::SA
 		directionMultiplier			= -1;
 	case ::gpk::AXIS_X_POSITIVE	: {
 		::gpk::n3f2_t					cueBallPosition			= {};
-		gpk_necs(pool.GetBallPosition(0, cueBallPosition));	// store the original position
+		{ if_fail_fe(pool.GetBallPosition(0, cueBallPosition)); }	// store the original position
 		const ::gpk::n3f2_t				targetPosition			= cueBallPosition + ::gpk::n3f2_t{moveEvent.Value * directionMultiplier};
 		if(targetPosition.x > d1p::headStringX(boardInfo) && 0 == matchState.Flags.InHandAnywhere)
 			break;
@@ -143,12 +143,12 @@ static	::gpk::error_t	processEventBall	(::d1p::SPoolGame & pool, const ::d1p::SA
 		if(targetPosition.x >= tableLimits || targetPosition.x <= -tableLimits)
 			break;
 
-		gpk_necs(pool.SetBallPosition(0, targetPosition));	// store the original position
+		{ if_fail_fe(pool.SetBallPosition(0, targetPosition)); }	// store the original position
 		::gpk::apod<::gpk::SContact>	contacts;
-		gpk_necs(::gpk::collisionDetect(pool.Engine, matchState.TotalSeconds, contacts));
-		uint32_t						cueBallEntity			= pool.EntityToBall(0);
-		if(contacts.size() > (uint32_t)contacts.find([cueBallEntity](const ::gpk::SContact & contact) { return contact.EntityA == cueBallEntity; }, 0)) {
-			gpk_necs(pool.SetBallPosition(0, cueBallPosition));	// store the original position
+		{ if_fail_fe(::gpk::collisionDetect(pool.Engine, matchState.TotalSeconds, contacts)); }
+		u2_t 						cueBallEntity			= pool.EntityToBall(0);
+		if(contacts.size() > (u2_t )contacts.find([cueBallEntity](const ::gpk::SContact & contact) { return contact.EntityA == cueBallEntity; }, 0)) {
+			{ if_fail_fe(pool.SetBallPosition(0, cueBallPosition)); }	// store the original position
 			break;
 		}
 		break;
@@ -157,19 +157,19 @@ static	::gpk::error_t	processEventBall	(::d1p::SPoolGame & pool, const ::d1p::SA
 		directionMultiplier			= -1;
 	case ::gpk::AXIS_Y_POSITIVE	:  {
 		::gpk::n3f2_t					cueBallPosition			= {};
-		gpk_necs(pool.GetBallPosition(0, cueBallPosition));	// store the original position
+		{ if_fail_fe(pool.GetBallPosition(0, cueBallPosition)); }	// store the original position
 		const ::gpk::n3f2_t				targetPosition			= cueBallPosition + ::gpk::n3f2_t{0, 0, moveEvent.Value * directionMultiplier};
 
 		const float						tableLimits				= boardInfo.Table.PlayingSurface.y * .5f - boardInfo.BallRadius;
 		if(targetPosition.z >= tableLimits || targetPosition.z <= -tableLimits)
 			break;
 
-		gpk_necs(pool.SetBallPosition(0, targetPosition));	// store the original position
+		{ if_fail_fe(pool.SetBallPosition(0, targetPosition)); }	// store the original position
 		::gpk::apod<::gpk::SContact>	contacts;
-		gpk_necs(::gpk::collisionDetect(pool.Engine, matchState.TotalSeconds, contacts));
-		uint32_t						cueBallEntity			= pool.EntityToBall(0);
-		if(contacts.size() > (uint32_t)contacts.find([cueBallEntity](const ::gpk::SContact & contact) { return contact.EntityA == cueBallEntity; }, 0)) {
-			gpk_necs(pool.SetBallPosition(0, cueBallPosition));	// store the original position
+		{ if_fail_fe(::gpk::collisionDetect(pool.Engine, matchState.TotalSeconds, contacts)); }
+		u2_t 						cueBallEntity			= pool.EntityToBall(0);
+		if(contacts.size() > (u2_t )contacts.find([cueBallEntity](const ::gpk::SContact & contact) { return contact.EntityA == cueBallEntity; }, 0)) {
+			{ if_fail_fe(pool.SetBallPosition(0, cueBallPosition)); }	// store the original position
 			break;
 		}
 		break;
@@ -196,8 +196,8 @@ static	::gpk::error_t	processInputEvent		(::d1p::SPoolGame & pool, const ::d1p::
 }
 
 ::gpk::error_t			d1p::processInputEvents		(::d1p::SPoolGame & pool, ::gpk::view<const ::d1p::SEventPlayer> inputEvents, ::gpk::apobj<::d1p::SEventPool> & outputEvents)		{ 
-	for(uint32_t iEvent = 0; iEvent < inputEvents.size(); ++iEvent) 
-		gpk_necs(::processInputEvent(pool, inputEvents[iEvent], outputEvents));
+	for(u2_t  iEvent = 0; iEvent < inputEvents.size(); ++iEvent) 
+		{ if_fail_fe(::processInputEvent(pool, inputEvents[iEvent], outputEvents)); }
 
 	return 0;
 }

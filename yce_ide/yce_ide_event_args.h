@@ -15,7 +15,7 @@ namespace ssg
 		::gpk::n3f32			CoordTarget			= {}; 
 
 		union UValue { 
-			int32_t		AsInt; 
+			s2_t		AsInt; 
 			float		AsFloat; 
 		}						Value				= {};
 

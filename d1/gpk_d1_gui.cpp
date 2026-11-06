@@ -2,10 +2,10 @@
 
 GPK_USING_TYPEINT();
 
-stacxpr	bool			BACKGROUND_3D_ONLY			= true;
-stacxpr	::gpk::n2u1_t	SHOOT_SLIDER_SIZE			= {24, 320};
-stacxpr	::gpk::n2u1_t	MODULE_VIEWPORT_SIZE		= {128, 64};
-stacxpr	::gpk::n2u1_t	WEAPON_BAR_SIZE				= {184, 24};
+stxp	bool			BACKGROUND_3D_ONLY			= true;
+stxp	::gpk::n2u1_t	SHOOT_SLIDER_SIZE			= {24, 320};
+stxp	::gpk::n2u1_t	MODULE_VIEWPORT_SIZE		= {128, 64};
+stxp	::gpk::n2u1_t	WEAPON_BAR_SIZE				= {184, 24};
 
 static	::gpk::error_t	guiSetupCommon				(::gpk::SGUI & gui, const ::gpk::n2f2_t & cursorPos) {
 	gui.ThemeDefault		= ::gpk::ASCII_COLOR_DARKRED * 16 + 10;
@@ -17,10 +17,10 @@ static	::gpk::error_t	guiSetupCommon				(::gpk::SGUI & gui, const ::gpk::n2f2_t 
 static	::gpk::error_t	dialogCreateCommon			(::gpk::SDialog & dialog, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2f2_t & cursorPos) { 
 	//dialog				= {};
 	dialog.Input			= inputState;
-	gpk_necs(::guiSetupCommon(*dialog.GUI, cursorPos));
+	{ if_fail_fe(::guiSetupCommon(*dialog.GUI, cursorPos)); }
 	dialog.GUI->Controls.Draw[0].NoBorder	= true;
 	dialog.GUI->Controls.Draw[0].NoClient	= true;
-	gpk_necs(dialog.Update());
+	{ if_fail_fe(dialog.Update()); }
 	return 0;
 }
 
@@ -32,7 +32,7 @@ static	::gpk::error_t	guiContainerSetupDefaults	(::gpk::SGUI & gui, ::gpk::cid_t
 	gui.Controls.Draw		[iControl].NoClient	= true;
 	gui.Controls.Placement	[iControl].Border	= {};
 	gui.Controls.Placement	[iControl].Margin	= {};
-	gpk_necs(::gpk::controlSetParent(gui, iControl, iParent));
+	{ if_fail_fe(::gpk::controlSetParent(gui, iControl, iParent)); }
 	return 0; 
 }
 
@@ -44,32 +44,32 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	cnstxpr	uint16_t			BUTTON_WIDTH_LARGE			= 184;
 	::gpk::SGUI					& gui						= *dialog.GUI;
 	cnstxpr	::gpk::n2u1_t		buttonSize					= {BUTTON_WIDTH_SMALL, BUTTON_HEIGHT};
-	const ::gpk::n2s1_t			buttonOffset				= {0, int16_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::d1::UI_HOME>() / 2)};
+	const ::gpk::n2s1_t			buttonOffset				= {0, s1_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::d1::UI_HOME>() / 2)};
 	::gpk::cid_t				firstControlHome			= appUI.FirstControl[::d1::APP_STATE_Home] = ::gpk::guiCreateControlList<::d1::UI_HOME>(gui, appUI.DialogPerState[::d1::APP_STATE_Home], buttonSize, buttonOffset, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Home]);
-	gpk_necs(firstControlHome); 
-	for(uint32_t iButton = firstControlHome; iButton < firstControlHome + ::gpk::get_value_count<::d1::UI_HOME>(); ++iButton) {
+	{ if_fail_fe(firstControlHome); } 
+	for(u2_t  iButton = firstControlHome; iButton < firstControlHome + ::gpk::get_value_count<::d1::UI_HOME>(); ++iButton) {
 		gui.Controls.Placement[iButton].Area.Offset.y	+= 0;
 	}
 
-	for(uint32_t iButton = firstControlHome + ::d1::UI_HOME_Start; iButton < firstControlHome + ::gpk::get_value_count<::d1::UI_HOME>(); ++iButton) {
+	for(u2_t  iButton = firstControlHome + ::d1::UI_HOME_Start; iButton < firstControlHome + ::gpk::get_value_count<::d1::UI_HOME>(); ++iButton) {
 		gui.Controls.Placement[iButton].Area.Offset.y	+= 36 * 3;
 		gui.Controls.Placement[iButton].Area.Size.x		= BUTTON_WIDTH_LARGE;
 	}
 
-	gpk_necs(::gpk::inputBoxCreate(appUI.NameEditBox, gui, firstControlHome));
-	gpk_necs(appUI.NameEditBox.Edit(gui, false));
+	{ if_fail_fe(::gpk::inputBoxCreate(appUI.NameEditBox, gui, firstControlHome)); }
+	{ if_fail_fe(appUI.NameEditBox.Edit(gui, false)); }
 	{
-		gpk_necs(::gpk::tunerCreate(dialog, appUI.TunerTableSize));
-		gpk_necs(::gpk::controlSetParent(gui, appUI.TunerTableSize->IdGUIControl, appUI.DialogPerState[::d1::APP_STATE_Home]));
+		{ if_fail_fe(::gpk::tunerCreate(dialog, appUI.TunerTableSize)); }
+		{ if_fail_fe(::gpk::controlSetParent(gui, appUI.TunerTableSize->IdGUIControl, appUI.DialogPerState[::d1::APP_STATE_Home])); }
 		appUI.TunerTableSize->ValueLimits.Min	= 0;
-		appUI.TunerTableSize->ValueLimits.Max	= uint8_t(::gpk::get_value_count<::d1p::TABLE_SIZE>() - 1);
-		appUI.TunerTableSize->FuncValueFormat	= [&appGame, &appUI](::gpk::vcsc_t & string, uint8_t value, const ::gpk::minmax<uint8_t> &)			mutable { 
+		appUI.TunerTableSize->ValueLimits.Max	= u0_t (::gpk::get_value_count<::d1p::TABLE_SIZE>() - 1);
+		appUI.TunerTableSize->FuncValueFormat	= [&appGame, &appUI](::gpk::vcsc_t & string, u0_t  value, const ::gpk::minmax<u0_t > &)			mutable { 
 			appGame.StartState.StandardTableSize	= (::d1p::TABLE_SIZE)value;
 			string					= ::gpk::get_value_descv(appGame.StartState.StandardTableSize); 
 			return 0; 
 		};
-		appUI.TunerTableSize->FuncGetString		= [&appGame, &appUI](::gpk::vcsc_t & string, uint8_t, const ::gpk::minmax<uint8_t> &)	mutable { 
-			string		= {appUI.TunerTableSize->ValueString, (uint32_t)snprintf(appUI.TunerTableSize->ValueString, ::gpk::size(appUI.TunerTableSize->ValueString) - 2, "%s Table", ::gpk::toString(string).begin())}; 
+		appUI.TunerTableSize->FuncGetString		= [&appGame, &appUI](::gpk::vcsc_t & string, u0_t , const ::gpk::minmax<u0_t > &)	mutable { 
+			string		= {appUI.TunerTableSize->ValueString, (u2_t )snprintf(appUI.TunerTableSize->ValueString, ::gpk::size(appUI.TunerTableSize->ValueString) - 2, "%s Table", ::gpk::toString(string).begin())}; 
 			return 0; 
 		};
 
@@ -78,16 +78,16 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 		::gpk::SControlPlacement	& control					= dialog.GUI->Controls.Placement[appUI.TunerTableSize->IdGUIControl];
 		control.Area.Size.x		= BUTTON_WIDTH_LARGE;
 		control.Area.Size.y		= 24;
-		control.Area.Offset.y	= int16_t(dialog.GUI->Controls.Placement[firstControlHome + ::d1::UI_HOME_Start].Area.Offset.y - (dialog.GUI->Controls.Placement[firstControlHome + ::d1::UI_HOME_Start].Area.Size.y >> 1) - (control.Area.Size.y >> 1));
+		control.Area.Offset.y	= s1_t(dialog.GUI->Controls.Placement[firstControlHome + ::d1::UI_HOME_Start].Area.Offset.y - (dialog.GUI->Controls.Placement[firstControlHome + ::d1::UI_HOME_Start].Area.Size.y >> 1) - (control.Area.Size.y >> 1));
 		control.Align			= ::gpk::ALIGN_CENTER;
 	}
 
-	for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam) {
+	for(u2_t  iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam) {
 		::gpk::cid_t					playerRoot					= appUI.TeamUI[iTeam].DialogPerState[::d1::APP_STATE_Home];
 		gui.Controls.Placement[playerRoot].Align	= iTeam ? ::gpk::ALIGN_LEFT : ::gpk::ALIGN_RIGHT;
 
 		::gpk::cid_t					firstControl				= appUI.TeamUI[iTeam].FirstControl[::d1::APP_STATE_Home] = ::gpk::guiCreateControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_RIGHT : ::gpk::ALIGN_TOP_LEFT, ::gpk::ALIGN_CENTER, appUI.TeamUI[iTeam].DialogControls[::d1::APP_STATE_Home]);
-		gpk_necs(firstControl);
+		{ if_fail_fe(firstControl); }
 		//gui.Controls.States[firstControl].Hidden		= true;
 		//gui.Controls.States[firstControl].Disabled	= true;
 	}
@@ -101,7 +101,7 @@ static	::gpk::error_t	guiSetupTeamUI				(::d1::SD1UI & appUI, u0_t iTeam) {
 	gui.Controls.SetHidden(playerRoot, true);
 
 	::gpk::cid_t				firstControlPlayer			= teamUI.FirstControl[::d1::APP_STATE_Play] = ::gpk::guiCreateControlList<::d1::UI_TEAM>(gui, playerRoot, WEAPON_BAR_SIZE, {0, 0}, iTeam ? ::gpk::ALIGN_TOP_LEFT : ::gpk::ALIGN_TOP_RIGHT, ::gpk::ALIGN_CENTER, teamUI.DialogControls[::d1::APP_STATE_Play]);
-	gpk_necs(firstControlPlayer); 
+	{ if_fail_fe(firstControlPlayer); } 
 	//gui.Controls.Modes [firstControlPlayer].FrameOut	= true;
 	//gui.Controls.States[firstControlPlayer].Disabled	= true;
 	//gui.Controls.Modes [firstControlPlayer + 1].FrameOut	= true;
@@ -118,7 +118,7 @@ static	::gpk::error_t	guiSetupStickUI				(::d1::SD1UI & appUI) {
 	::gpk::SGUI					& gui						= *appUI.Dialog.GUI;
 	const ::gpk::cid_t			iDialog						= appUI.DialogPerState[::d1::APP_STATE_Play];
 	::gpk::cid_t				firstControl				= ::gpk::guiCreateControlList<::d1::UI_STICK>(gui, iDialog, {160 + 128 , BUTTON_HEIGHT - 4}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Play]);
-	for(uint32_t iControl = 0; iControl < ::gpk::get_value_count<::d1::UI_STICK>(); ++iControl) {
+	for(u2_t  iControl = 0; iControl < ::gpk::get_value_count<::d1::UI_STICK>(); ++iControl) {
 		gui.Controls.Placement	[firstControl + iControl].Align = ::gpk::ALIGN_BOTTOM_LEFT;
 		gui.Controls.Text		[firstControl + iControl].Align = ::gpk::ALIGN_CENTER_LEFT;
 	}
@@ -132,7 +132,7 @@ static	::gpk::error_t	guiSetupHelpUI				(::d1::SD1UI & appUI) {
 	::gpk::SGUI					& gui						= *appUI.Dialog.GUI;
 	const ::gpk::cid_t			iDialog						= appUI.DialogPerState[::d1::APP_STATE_Play];
 	::gpk::cid_t firstControl			= ::gpk::guiCreateControlList<::d1::UI_HELP>(gui, iDialog, {160 + 128 , BUTTON_HEIGHT - 4}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Play]);
-	for(uint32_t iControl = 0; iControl < ::gpk::get_value_count<::d1::UI_HELP>(); ++iControl) {
+	for(u2_t  iControl = 0; iControl < ::gpk::get_value_count<::d1::UI_HELP>(); ++iControl) {
 		gui.Controls.Placement	[firstControl + iControl].Align = ::gpk::ALIGN_BOTTOM_RIGHT;
 		gui.Controls.Text		[firstControl + iControl].Align = ::gpk::ALIGN_CENTER_LEFT;
 	}
@@ -147,7 +147,7 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	::gpk::SGUI					& gui						= *dialog.GUI;
 	const ::gpk::cid_t			iDialog						= appUI.DialogPerState[::d1::APP_STATE_Play];
 	::gpk::cid_t				firstControl;
-	gpk_necs(firstControl = appUI.FirstControl[d1::APP_STATE_Play] = ::gpk::guiCreateControlList<::d1::UI_PLAY>(gui, iDialog, {160, BUTTON_HEIGHT}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Play]));
+	{ if_fail_fe(firstControl = appUI.FirstControl[d1::APP_STATE_Play] = ::gpk::guiCreateControlList<::d1::UI_PLAY>(gui, iDialog, {160, BUTTON_HEIGHT}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Play])); }
 
 	cnstxpr uint16_t			offsetX						= 8;
 	gui.Controls.Placement[firstControl + ::d1::UI_PLAY_Shoot].Align			= ::gpk::ALIGN_CENTER_RIGHT;
@@ -155,48 +155,48 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 	gui.Controls.Placement[firstControl + ::d1::UI_PLAY_Shoot].Area.Offset.y	= SHOOT_SLIDER_SIZE.y / 2 + 16;
 	gui.Controls.Placement[firstControl + ::d1::UI_PLAY_Shoot].Area.Size.x		= SHOOT_SLIDER_SIZE.x * 4;
 
-	gpk_necs(::gpk::sliderCreate(dialog, appUI.ForceSlider));
+	{ if_fail_fe(::gpk::sliderCreate(dialog, appUI.ForceSlider)); }
 	appUI.ForceSlider->Vertical		= true;
 	appUI.ForceSlider->ValueLimits	= {0, 1000};
-	gpk_necs(::gpk::controlSetParent(gui, appUI.ForceSlider->IdGUIControl, iDialog));
+	{ if_fail_fe(::gpk::controlSetParent(gui, appUI.ForceSlider->IdGUIControl, iDialog)); }
 
 	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Border			= {};
 	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Offset		= {offsetX + 36};
-	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Size		= SHOOT_SLIDER_SIZE.s1_t();
+	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Size		= SHOOT_SLIDER_SIZE.s1();
 	gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Align			= ::gpk::ALIGN_CENTER_RIGHT;
 	gui.Controls.Placement[appUI.ForceSlider->IdButton].Area.Size.y			= 8;
 	//gui.Controls.Modes[app.ForceSlider->IdGUIControl].NoBackgroundRect	= true;
 	//gui.Controls.States[appUI.ForceSlider->IdGUIControl].Mask				&= ~::gpk::GUI_CONTROL_FLAG_Hovered;
-	appUI.ForceSliderRenderTarget.resize(gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Size.u2_t()); 
+	appUI.ForceSliderRenderTarget.resize(gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Size.u2()); 
 
 	cnstxpr ::gpk::rgbaf		min							= ::gpk::GREEN;
 	cnstxpr ::gpk::rgbaf		mid							= ::gpk::YELLOW;
 	cnstxpr ::gpk::rgbaf		max							= ::gpk::RED;
 	float						colorScale					= 1.0f / (appUI.ForceSliderRenderTarget.metrics().y / 2);
-	const uint32_t				halfHeight					= appUI.ForceSliderRenderTarget.metrics().y / 2;
-	const uint32_t				lastRow						= appUI.ForceSliderRenderTarget.metrics().y - 1;
-	for(uint32_t y = 0; y < halfHeight; ++y)
-		for(uint32_t x = 0; x < appUI.ForceSliderRenderTarget.metrics().x; ++x)
+	const u2_t 				halfHeight					= appUI.ForceSliderRenderTarget.metrics().y / 2;
+	const u2_t 				lastRow						= appUI.ForceSliderRenderTarget.metrics().y - 1;
+	for(u2_t  y = 0; y < halfHeight; ++y)
+		for(u2_t  x = 0; x < appUI.ForceSliderRenderTarget.metrics().x; ++x)
 			appUI.ForceSliderRenderTarget.Color[lastRow - y][x] = ::gpk::interpolate_linear(min, mid, colorScale * y);
 
-	for(uint32_t y = 0; y < halfHeight; ++y)
-		for(uint32_t x = 0; x < appUI.ForceSliderRenderTarget.metrics().x; ++x)
+	for(u2_t  y = 0; y < halfHeight; ++y)
+		for(u2_t  x = 0; x < appUI.ForceSliderRenderTarget.metrics().x; ++x)
 			appUI.ForceSliderRenderTarget.Color[lastRow - (y + halfHeight)][x] = ::gpk::interpolate_linear(mid, max, colorScale * y);
 
 	gui.Controls.Images[appUI.ForceSlider->IdGUIControl].Image = appUI.ForceSliderRenderTarget.Color;
 
 	static sc_t					velocityString[32]			= {};
-	appUI.ForceSlider->FuncValueFormat	= [&appGame](::gpk::vcsc_t & string, int64_t value, const ::gpk::minmax<int64_t> & limits) mutable { 
+	appUI.ForceSlider->FuncValueFormat	= [&appGame](::gpk::vcsc_t & string, s3_t value, const ::gpk::minmax<s3_t> & limits) mutable { 
 		const float					newVelocity					= ::d1p::MAX_SHOOT_VELOCITY / limits.Max * (limits.Max - value);
 		const float					currentVelocity				= appGame.Pool.ActiveStick().Velocity;
 		if(newVelocity != currentVelocity) { // only generate the event if the value actually changed. this is because this may be called randomly to ensure the right value is in sync with the server.
 			const ::d1p::SArgsPlayerInput	eventData					= {newVelocity, ::gpk::AXIS_ORIGIN};
-			appGame.QueueStick.push_back({::d1p::PLAYER_INPUT_Force, ::gpk::vcu0_t{(const uint8_t*)&eventData, sizeof(eventData)}});
+			appGame.QueueStick.push_back({::d1p::PLAYER_INPUT_Force, ::gpk::vcu0_t{(const u0_t *)&eventData, sizeof(eventData)}});
 		}
-		string					= ::gpk::vcsc_t{(uint32_t)sprintf_s(velocityString, "%.02f m/s", newVelocity), velocityString}; 
+		string					= ::gpk::vcsc_t{(u2_t )sprintf_s(velocityString, "%.02f m/s", newVelocity), velocityString}; 
 		return 0; 
 	};
-	gpk_necs(::gpk::sliderSetValue(*appUI.ForceSlider, int64_t(appUI.ForceSlider->ValueLimits.Max - appGame.Pool.ActiveStick().Velocity * (appUI.ForceSlider->ValueLimits.Max / ::d1p::MAX_SHOOT_VELOCITY))));
+	{ if_fail_fe(::gpk::sliderSetValue(*appUI.ForceSlider, s3_t(appUI.ForceSlider->ValueLimits.Max - appGame.Pool.ActiveStick().Velocity * (appUI.ForceSlider->ValueLimits.Max / ::d1p::MAX_SHOOT_VELOCITY)))); }
 
 	if_fail_fe(::guiSetupStickUI(appUI));
 	if_fail_fe(::guiSetupHelpUI(appUI));
@@ -205,22 +205,22 @@ static	::gpk::error_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 }
 
 ::gpk::error_t			d1::guiSetup				(::d1::SD1UI & appUI, ::d1::SD1Game & appGame, const ::gpk::pobj<::gpk::SInput> & input) {
-	gpk_necs(::dialogCreateCommon(appUI.Dialog, input, appUI.Dialog.GUI->CursorPos));
-	gpk_necs(::guiContainerSetupDefaults(*appUI.Dialog.GUI, 0, (::gpk::cid_t)-1));
+	{ if_fail_fe(::dialogCreateCommon(appUI.Dialog, input, appUI.Dialog.GUI->CursorPos)); }
+	{ if_fail_fe(::guiContainerSetupDefaults(*appUI.Dialog.GUI, 0, (::gpk::cid_t)-1)); }
 
 	::gpk::SGUI					& gui						= *appUI.Dialog.GUI;
-	for(uint32_t iState = 0; iState < appUI.DialogPerState.size(); ++iState) {
+	for(u2_t  iState = 0; iState < appUI.DialogPerState.size(); ++iState) {
 		if(iState == ::d1::APP_STATE_Home || iState == ::d1::APP_STATE_Play) {
 			::gpk::cid_t					iControl;
-			gpk_necs(iControl = appUI.DialogPerState[iState] = ::gpk::controlCreate(gui));
-			gpk_necs(guiContainerSetupDefaults(gui, iControl, appUI.Dialog.Root));
+			{ if_fail_fe(iControl = appUI.DialogPerState[iState] = ::gpk::controlCreate(gui)); }
+			{ if_fail_fe(guiContainerSetupDefaults(gui, iControl, appUI.Dialog.Root)); }
 			gui.Controls.SetHidden(iControl, true);
-			for(uint32_t iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam)
-				gpk_necs(::guiContainerSetupDefaults(gui, appUI.TeamUI[iTeam].DialogPerState[iState] = ::gpk::controlCreate(gui), appUI.Dialog.Root));
+			for(u2_t  iTeam = 0; iTeam < appUI.TeamUI.size(); ++iTeam)
+				{ if_fail_fe(::guiContainerSetupDefaults(gui, appUI.TeamUI[iTeam].DialogPerState[iState] = ::gpk::controlCreate(gui), appUI.Dialog.Root)); }
 		}
 	}
-	gpk_necs(::guiSetupHome(appUI, appGame));
-	gpk_necs(::guiSetupPlay(appUI, appGame));
+	{ if_fail_fe(::guiSetupHome(appUI, appGame)); }
+	{ if_fail_fe(::guiSetupPlay(appUI, appGame)); }
 	return 0;
 }
 
@@ -239,15 +239,15 @@ static	::gpk::error_t	guiHandlePlay				(::d1::SD1 & app, ::gpk::SGUI & gui, ::gp
 	return appState; 
 }
 
-static	::gpk::error_t	guiHandleHome				(::d1::SD1 & app, ::gpk::SGUI & gui, uint32_t idControl, d1::APP_STATE appState) { 
-	uint32_t					idDialog					= app.AppUI.DialogPerState[appState];
+static	::gpk::error_t	guiHandleHome				(::d1::SD1 & app, ::gpk::SGUI & gui, u2_t  idControl, d1::APP_STATE appState) { 
+	u2_t 					idDialog					= app.AppUI.DialogPerState[appState];
 	const ::gpk::acid			& children					= gui.Controls.Children[idDialog];
 	idControl				= idControl - children[0];
 	switch((::d1::UI_HOME)idControl) {
 	case ::d1::UI_HOME_Start: 
 		if(app.AppUI.TunerTableSize->ValueCurrent)
 			app.MainGame.StartState.Board.Table = ::d1p::TABLE_SIZES[app.AppUI.TunerTableSize->ValueCurrent - app.AppUI.TunerTableSize->ValueLimits.Min - 1];
-		gpk_necs(::d1p::poolGameReset(app.MainGame.Pool, app.MainGame.StartState));
+		{ if_fail_fe(::d1p::poolGameReset(app.MainGame.Pool, app.MainGame.StartState)); }
 	case ::d1::UI_HOME_Continue: 
 		appState				= ::d1::APP_STATE_Play;
 		break;

@@ -7,7 +7,7 @@ namespace d1p
 {
 	::gpk::error_t	processInputEvents		(::d1p::SPoolGame & pool, ::gpk::view<const ::d1p::SEventPlayer> inputEvents, ::gpk::apobj<::d1p::SEventPool> & outputEvents);
 	::gpk::error_t	poolGamePhysicsUpdate	(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents, double secondsElapsed);
-	::gpk::error_t	evaluateTurnProgress	(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents, uint32_t eventOffset);
+	::gpk::error_t	evaluateTurnProgress	(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents, u2_t  eventOffset);
 
 	::gpk::error_t	debugPrintMatchState	(const ::d1p::SMatchState & matchState);
 	::gpk::error_t	debugPrintStickControl	(const ::d1p::SStickControl & stickControl);

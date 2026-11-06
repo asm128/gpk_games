@@ -1,13 +1,13 @@
-﻿#include "gpk_pool_shader.h"
+#include "gpk_pool_shader.h"
 #include "gpk_engine_shader.h"
 #include "gpk_raster_lh.h"
 
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-stacxpr	float						LIGHT_FACTOR_AMBIENT			= .025f;
-stacxpr	float						LIGHT_FACTOR_SPECULAR_POWER		= 30.0f;
-stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
+stxp	float						LIGHT_FACTOR_AMBIENT			= .025f;
+stxp	float						LIGHT_FACTOR_SPECULAR_POWER		= 30.0f;
+stxp	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 
 ::gpk::error_t							d1p::psTableCloth
 	( const ::gpk::SEngineSceneConstants	& constants
@@ -102,8 +102,8 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	}
 	else {
 		const ::gpk::n2u2_t							fetchCoord					= 
-			{ (uint32_t)(relativeToCenter.x * 2.f * surfaceSize.x + surfaceSize.x / 2)
-			, (uint32_t)(relativeToCenter.y * 4.f * surfaceSize.y + surfaceSize.y / 2)
+			{ (u2_t )(relativeToCenter.x * 2.f * surfaceSize.x + surfaceSize.x / 2)
+			, (u2_t )(relativeToCenter.y * 4.f * surfaceSize.y + surfaceSize.y / 2)
 			};
 		const ::gpk::bgra							surfacecolor				= inPS.Surface
 			[fetchCoord.y % surfaceSize.y]
@@ -160,8 +160,8 @@ stacxpr	::gpk::bgra8				PIXEL_BLACK_NUMBER				= ::gpk::bgra{0, 0, 0, 255};
 	}
 	else {
 		const ::gpk::n2u2_t							fetchCoord					= 
-			{ (uint32_t)(relativeToCenter.x * 2.f * surfaceSize.x + surfaceSize.x / 2)
-			, (uint32_t)(relativeToCenter.y * 4.f * surfaceSize.y + surfaceSize.y / 2)
+			{ (u2_t )(relativeToCenter.x * 2.f * surfaceSize.x + surfaceSize.x / 2)
+			, (u2_t )(relativeToCenter.y * 4.f * surfaceSize.y + surfaceSize.y / 2)
 			};
 		const ::gpk::bgra							surfacecolor				= inPS.Surface
 			[fetchCoord.y % surfaceSize.y]

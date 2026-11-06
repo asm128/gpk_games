@@ -13,21 +13,21 @@ static	::gpk::error_t	handleContactBall		(::d1p::SPoolGame & pool, const ::d1p::
 	::d1p::SArgsBall				firstContactEventArgs	= eventArgs;
 	turnInfo.FirstContact	= eventData.BallB;
 	firstContactEventArgs.Event.FirstContact.Ball	= eventData.BallB;
-	gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_BALL_EVENT, ::d1p::BALL_EVENT_FirstContact, firstContactEventArgs));	// Report first ball hit
+	{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_BALL_EVENT, ::d1p::BALL_EVENT_FirstContact, firstContactEventArgs)); }	// Report first ball hit
 
 	if(0 == eventArgs.Turn && pool.FirstTurn())
-		gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Break, firstContactEventArgs));	// Report break
+		{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Break, firstContactEventArgs)); }	// Report break
 	else if(pool.MatchState.Flags.StrippedChosen) {
 		const bool					isBallStripped		= eventData.BallB > 8;
 		const bool					isTeamStripped		= turnInfo.Team == pool.MatchState.Flags.TeamStripped;
 		if(8 == eventData.BallB) {
 			if(false == pool.MatchState.PocketedAll(turnInfo.Team)) {
-				gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_FOUL, turnInfo.Foul = ::d1p::FOUL_Wrong_ball_first, firstContactEventArgs));	// Report wrong ball
+				{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_FOUL, turnInfo.Foul = ::d1p::FOUL_Wrong_ball_first, firstContactEventArgs)); }	// Report wrong ball
 				turnInfo.Continues	= false;
 			}
 		}
 		else if(isBallStripped != isTeamStripped) {
-			gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_FOUL, turnInfo.Foul = ::d1p::FOUL_Wrong_ball_first, firstContactEventArgs));	// Report wrong ball
+			{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_FOUL, turnInfo.Foul = ::d1p::FOUL_Wrong_ball_first, firstContactEventArgs)); }	// Report wrong ball
 			turnInfo.Continues	= false;
 		}
 	}
@@ -50,7 +50,7 @@ static	::gpk::error_t	handlePocketed			(::d1p::SPoolGame & pool, const ::d1p::SA
 
 	switch(eventData.Ball) {
 	case 0: {
-		gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_FOUL, turnInfo.Foul = ::d1p::FOUL_Cue_ball_scratch, eventArgs));	// Report scratch
+		{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_FOUL, turnInfo.Foul = ::d1p::FOUL_Cue_ball_scratch, eventArgs)); }	// Report scratch
 		turnInfo.Continues		= false;
 		break;
 	}
@@ -66,12 +66,12 @@ static	::gpk::error_t	handlePocketed			(::d1p::SPoolGame & pool, const ::d1p::SA
 			else if(::d1p::pocketedAny(turnInfo.Pocketed, matchState.TeamToBallType(turnInfo.Team))) 
 				argsMatch.Reason		= ::d1p::MATCH_RESULT_LOST_Eight_ball_not_on_last_stroke;
 			else {
-				const uint8_t				lastPocket				= turnInfo.Team ? teamInfo.LastPocketTeam1 : teamInfo.LastPocketTeam0;
+				const u0_t 				lastPocket				= turnInfo.Team ? teamInfo.LastPocketTeam1 : teamInfo.LastPocketTeam0;
 				if(lastPocket != eventData.Pocket) 
 					argsMatch.Reason		= ::d1p::MATCH_RESULT_LOST_Eight_ball_wrong_pocket;
 			}
 			if(argsMatch.Reason) {
-				gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Lost, argsMatch));	// Report player won
+				{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Lost, argsMatch)); }	// Report player won
 				matchFlags.GameOver		= 1;
 			}
 		}
@@ -82,9 +82,9 @@ static	::gpk::error_t	handlePocketed			(::d1p::SPoolGame & pool, const ::d1p::SA
 		const bool					noFoul					= ::d1p::FOUL_None == turnInfo.Foul;
 		if(0 == matchFlags.StrippedChosen) {
 			matchFlags.StrippedChosen	= 1;
-			const uint8_t				teamStripped			= uint8_t(isStrippedBall ? turnInfo.Team : (turnInfo.Team ? 0 : 1));
+			const u0_t 				teamStripped			= u0_t (isStrippedBall ? turnInfo.Team : (turnInfo.Team ? 0 : 1));
 			matchFlags.TeamStripped	= teamStripped;
-			gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_StrippedAssigned, teamStripped));	// Report player won
+			{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_StrippedAssigned, teamStripped)); }	// Report player won
 			turnInfo.Continues		= noFoul;
 		}
 		else {
@@ -98,7 +98,7 @@ static	::gpk::error_t	handlePocketed			(::d1p::SPoolGame & pool, const ::d1p::SA
 		break;
 	}
 	turnInfo.SetPocketed(eventData.Ball);
-	gpk_necs(pool.BallEventHistory.push_back(eventArgs));
+	{ if_fail_fe(pool.BallEventHistory.push_back(eventArgs)); }
 	return 0; 
 }
 static	::gpk::error_t	handleFOUL				(::d1p::SPoolGame & pool, const ::gpk::SEventView<::d1p::FOUL> & foulEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/) { 
@@ -136,9 +136,9 @@ static	::gpk::error_t	handleMATCH_EVENT		(::d1p::SPoolGame & pool, const ::gpk::
 		pool.MatchState.Flags.GameOver	= true;
 		break;
 	case d1p::MATCH_EVENT_MatchStart		: {
-		const ::d1p::STurnInfo			newTurn					= {{(uint64_t)::gpk::timeCurrentInMs()}, 0, pool.ActivePlayer(), pool.ActiveTeam()};
+		const ::d1p::STurnInfo			newTurn					= {{(u3_t )::gpk::timeCurrentInMs()}, 0, pool.ActivePlayer(), pool.ActiveTeam()};
 		const ::d1p::SArgsMatchEvent	argsMatch				= {pool.MatchState.TotalSeconds, (uint16_t)pool.TurnHistory.push_back(newTurn)};
-		gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_TurnStart, argsMatch));
+		{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_TurnStart, argsMatch)); }
 		break;
 	}
 	case d1p::MATCH_EVENT_TurnStart			: 
@@ -151,18 +151,18 @@ static	::gpk::error_t	handleMATCH_EVENT		(::d1p::SPoolGame & pool, const ::gpk::
 		::d1p::debugPrintTurnInfo  (turnInfo);
 		::d1p::debugPrintMatchState(pool.MatchState);
 		if(pool.MatchState.Flags.GameOver)
-			gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_MatchEnd, pool.MatchState));	// Report match end
+			{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_MatchEnd, pool.MatchState)); }	// Report match end
 		else if(false == pool.MatchState.IsPocketed(8)) 
-			gpk_necs(pool.AdvanceTurn(outputEvents)); 
+			{ if_fail_fe(pool.AdvanceTurn(outputEvents)); } 
 		else {
 			::d1p::SArgsMatchEvent		argsMatchOut	= {pool.MatchState.TotalSeconds, argsMatchIn->ArgsBall.Turn};
 			if(turnInfo.Foul) {
 				argsMatchOut.Reason		= ::d1p::MATCH_RESULT_LOST_Eight_ball_foul;
-				gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Lost, argsMatchOut));	// Report player lost
+				{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Lost, argsMatchOut)); }	// Report player lost
 			}
 			else {
 				argsMatchOut.Reason		= argsMatchIn->ArgsBall.Turn ? ::d1p::MATCH_RESULT_WON_Eight_ball_last_shot : ::d1p::MATCH_RESULT_WON_Eight_ball_first_shot;
-				gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Won, argsMatchOut));	// Report player won
+				{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_Won, argsMatchOut)); }	// Report player won
 			}
 		}
 		break;
@@ -170,7 +170,7 @@ static	::gpk::error_t	handleMATCH_EVENT		(::d1p::SPoolGame & pool, const ::gpk::
 	case d1p::MATCH_EVENT_Lost				: 
 	case d1p::MATCH_EVENT_Won				: 
 		pool.MatchState.Flags.GameOver	= 1;
-		gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_MatchEnd, pool.MatchState));	// Report turn end for player
+		{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_MatchEnd, pool.MatchState)); }	// Report turn end for player
 		break;
 	default: 
 		gpk_warning_unhandled_event(childEvent); 
@@ -188,7 +188,7 @@ static	::gpk::error_t	endTurn					(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::
 		::d1p::STurnInfo			& activeTurn			= pool.ActiveTurn();
 		activeTurn.Time.Ended	= ::gpk::timeCurrentInMs();
 		const d1p::SArgsMatchEvent	argsMatch				= {pool.MatchState.TotalSeconds, uint16_t(pool.TurnHistory.size() - 1)};
-		gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_TurnEnd, argsMatch));	// Report turn end for player
+		{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_TurnEnd, argsMatch)); }	// Report turn end for player
 	}
 	return 1;
 }
@@ -197,7 +197,7 @@ static	::gpk::error_t	endTurn					(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::
 static	::gpk::error_t	endTurnIfNeeded			(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents) {
 	::d1p::SMatchState			& matchState			= pool.MatchState;
 	bool						playStillActive			= false;
-	for(uint32_t iBall = 0; iBall < matchState.CountBalls && false == playStillActive; ++iBall) 
+	for(u2_t  iBall = 0; iBall < matchState.CountBalls && false == playStillActive; ++iBall) 
 		playStillActive			= playStillActive || pool.Engine.IsPhysicsActive(pool.Entities.Balls[iBall]);
 
 	::d1p::SMatchFlags			& turnState				= matchState.Flags;
@@ -213,25 +213,25 @@ static	::gpk::error_t	endTurnIfNeeded			(::d1p::SPoolGame & pool, ::gpk::apobj<:
 }
 
 static	::gpk::error_t	matchStart				(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents) {
-	gpk_necs(::d1p::poolGamePhysicsUpdate(pool, outputEvents, 2));
+	{ if_fail_fe(::d1p::poolGamePhysicsUpdate(pool, outputEvents, 2)); }
 	outputEvents.clear();
 
 	::d1p::SMatchState		& matchState			= pool.MatchState;
 	matchState.TimeStart	= ::gpk::timeCurrentInMs();
 	matchState.TotalSeconds	= 0;
-	gpk_necs(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_MatchStart, matchState));	// This will likely trigger a TurnStart event.
+	{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_MatchStart, matchState)); }	// This will likely trigger a TurnStart event.
 	return 0;
 }
 
-::gpk::error_t			d1p::evaluateTurnProgress(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents, uint32_t eventOffset) { 
+::gpk::error_t			d1p::evaluateTurnProgress(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents, u2_t  eventOffset) { 
 	if(pool.MatchState.Flags.GameOver)
 		return 0;
 
 	bool						processEvents;
 	if(pool.TurnHistory.size())
-		gpk_necs(processEvents = ::endTurnIfNeeded(pool, outputEvents));
+		{ if_fail_fe(processEvents = ::endTurnIfNeeded(pool, outputEvents)); }
 	else {	// this means that we need to start the match as the game has just reset and there is no active turn record for the current player.
-		gpk_necs(::matchStart(pool, outputEvents));	// it is also a good opportunity to generate events reporting the start of the game.
+		{ if_fail_fe(::matchStart(pool, outputEvents)); }	// it is also a good opportunity to generate events reporting the start of the game.
 		processEvents			= true;
 	}
 
@@ -242,9 +242,9 @@ static	::gpk::error_t	matchStart				(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p
 		const ::d1p::SEventPool		& eventToProcess		= *_eventToProcess;
 		info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));
 		switch(eventToProcess.Type) {
-		case ::d1p::POOL_EVENT_FOUL       : return ::d1p::eventExtractAndHandle<::d1p::FOUL       >(eventToProcess, [&pool, &outputEvents](auto ev){ gpk_necs(::handleFOUL       (pool, ev, outputEvents)); return 0; } ); 
-		case ::d1p::POOL_EVENT_BALL_EVENT : return ::d1p::eventExtractAndHandle<::d1p::BALL_EVENT >(eventToProcess, [&pool, &outputEvents](auto ev){ gpk_necs(::handleBALL_EVENT (pool, ev, outputEvents)); return 0; } ); 
-		case ::d1p::POOL_EVENT_MATCH_EVENT: return ::d1p::eventExtractAndHandle<::d1p::MATCH_EVENT>(eventToProcess, [&pool, &outputEvents](auto ev){ gpk_necs(::handleMATCH_EVENT(pool, ev, outputEvents)); return 0; } ); 
+		case ::d1p::POOL_EVENT_FOUL       : return ::d1p::eventExtractAndHandle<::d1p::FOUL       >(eventToProcess, [&pool, &outputEvents](auto ev){ { if_fail_fe(::handleFOUL       (pool, ev, outputEvents)); return 0; } ); } 
+		case ::d1p::POOL_EVENT_BALL_EVENT : return ::d1p::eventExtractAndHandle<::d1p::BALL_EVENT >(eventToProcess, [&pool, &outputEvents](auto ev){ { if_fail_fe(::handleBALL_EVENT (pool, ev, outputEvents)); return 0; } ); } 
+		case ::d1p::POOL_EVENT_MATCH_EVENT: return ::d1p::eventExtractAndHandle<::d1p::MATCH_EVENT>(eventToProcess, [&pool, &outputEvents](auto ev){ { if_fail_fe(::handleMATCH_EVENT(pool, ev, outputEvents)); return 0; } ); } 
 		default: 
 			gpk_warning_unhandled_event(eventToProcess); 
 			return 0;

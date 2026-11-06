@@ -9,7 +9,7 @@
 namespace d1p
 {
 #pragma pack(push, 1)
-	GDEFINE_ENUM_TYPE(BALL_EVENT, uint8_t);
+	GDEFINE_ENUM_TYPE(BALL_EVENT, u0_t );
 	GDEFINE_ENUM_VALUE(BALL_EVENT, ContactBall		, 0);
 	GDEFINE_ENUM_VALUE(BALL_EVENT, ContactPocket	, 1);
 	GDEFINE_ENUM_VALUE(BALL_EVENT, ContactCushion	, 2);
@@ -21,13 +21,13 @@ namespace d1p
 	typedef ::gpk::SEvent<BALL_EVENT>		SEventBall;
 
 	struct SArgsBall {
-		struct SContactBall		{ uint8_t BallA = 0; uint8_t BallB		= 0; };
-		struct SContactPocket	{ uint8_t Ball  = 0; uint8_t Pocket		= 0; };
-		struct SContactCushion	{ uint8_t Ball  = 0; uint8_t Cushion	= 0; };
-		struct SPocketed		{ uint8_t Ball  = 0; uint8_t Pocket		= 0; };
-		struct SJump			{ uint8_t Ball  = 0; };
-		struct SFall			{ uint8_t Ball  = 0; };
-		struct SFirstContact	{ uint8_t Ball  = 0; };
+		struct SContactBall		{ u0_t  BallA = 0; u0_t  BallB		= 0; };
+		struct SContactPocket	{ u0_t  Ball  = 0; u0_t  Pocket		= 0; };
+		struct SContactCushion	{ u0_t  Ball  = 0; u0_t  Cushion	= 0; };
+		struct SPocketed		{ u0_t  Ball  = 0; u0_t  Pocket		= 0; };
+		struct SJump			{ u0_t  Ball  = 0; };
+		struct SFall			{ u0_t  Ball  = 0; };
+		struct SFirstContact	{ u0_t  Ball  = 0; };
 
 		double			Seconds				= 0;
 		uint16_t		Turn				;
@@ -42,7 +42,7 @@ namespace d1p
 		}				Event;
 	};
 
-	GDEFINE_ENUM_TYPE(PLAYER_INPUT, uint8_t);
+	GDEFINE_ENUM_TYPE(PLAYER_INPUT, u0_t );
 	GDEFINE_ENUM_VALUE(PLAYER_INPUT, Shoot		, 0);	
 	GDEFINE_ENUM_VALUE(PLAYER_INPUT, Move		, 1);	
 	GDEFINE_ENUM_VALUE(PLAYER_INPUT, Turn		, 2);	
@@ -52,7 +52,7 @@ namespace d1p
 
 	struct SArgsPlayerInput	{ float Value = 0; ::gpk::AXIS Direction = ::gpk::AXIS_ORIGIN; }; // I put the members in this order because of floating point variable alignment
 
-	GDEFINE_ENUM_TYPE(MATCH_CONTROL, uint8_t);
+	GDEFINE_ENUM_TYPE(MATCH_CONTROL, u0_t );
 	GDEFINE_ENUM_VALUE(MATCH_CONTROL, Start, 0); // SEvent::Data contains a ::d1p::SMatchState structure containing the start state of the match.
 	typedef	::gpk::SEvent<MATCH_CONTROL>	SEventMatchControl;
 
@@ -64,7 +64,7 @@ namespace d1p
 	// d. Pockets the 8-ball in a pocket other than the one designated.
 	// e. Pockets the 8-ball when it is not the legal object ball.
 	// Note: All infractions must be called before another shot is taken, or else it will be deemed that no infraction occurred. 
-	GDEFINE_ENUM_TYPE(MATCH_RESULT, uint8_t);
+	GDEFINE_ENUM_TYPE(MATCH_RESULT, u0_t );
 	GDEFINE_ENUM_VALUE(MATCH_RESULT, None								, 0);	// a. Fouls when pocketing the 8-ball (exception: see 8-Ball Pocketed On The Break).
 	GDEFINE_ENUM_VALUE(MATCH_RESULT, LOST_Eight_ball_foul				, 1);	// a. Fouls when pocketing the 8-ball (exception: see 8-Ball Pocketed On The Break).
 	GDEFINE_ENUM_VALUE(MATCH_RESULT, LOST_Eight_ball_not_on_last_stroke	, 2);	// b. Pockets the 8-ball on the same stroke as the last of his group of balls.
@@ -74,7 +74,7 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(MATCH_RESULT, WON_Eight_ball_last_shot			, 6);	
 	GDEFINE_ENUM_VALUE(MATCH_RESULT, WON_Eight_ball_first_shot			, 7);	
 
-	GDEFINE_ENUM_TYPE(MATCH_EVENT, uint8_t);
+	GDEFINE_ENUM_TYPE(MATCH_EVENT, u0_t );
 	GDEFINE_ENUM_VALUE(MATCH_EVENT, TurnEnd			, 0); // 
 	GDEFINE_ENUM_VALUE(MATCH_EVENT, TurnStart		, 1); // 
 	GDEFINE_ENUM_VALUE(MATCH_EVENT, MatchEnd		, 2); // 
@@ -99,7 +99,7 @@ namespace d1p
 	// (f) marking the table;
 	// (g) delay of the game; and
 	// (h) using equipment inappropriately.
-	GDEFINE_ENUM_TYPE(FOUL, uint8_t);
+	GDEFINE_ENUM_TYPE(FOUL, u0_t );
 	GDEFINE_ENUM_VALUE(FOUL, None									,  0);	// 
 	GDEFINE_ENUM_VALUE(FOUL, Cue_ball_scratch						,  1);	// If the cue ball is pocketed or driven off the table, the shot is a foul.
 	GDEFINE_ENUM_VALUE(FOUL, Cue_ball_off_the_table					,  2);	// If the cue ball is pocketed or driven off the table, the shot is a foul.
@@ -121,7 +121,7 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(FOUL, Eight_ball_scratch						, 18);	// The normal penalty for unsportsmanlike conduct is the same as for a serious foul, but the referee may impose a penalty depending on his judgment of the conduct. Among other penalties possible are a warning; a standard-foul penalty, which will count as part of a three-foul sequence if applicable; a serious-foul penalty; loss of a rack, set or match; ejection from the competition possibly with forfeiture of all prizes, trophies and standings points.
 	typedef	::gpk::SEvent<FOUL>				SEventFoul;
 
-	GDEFINE_ENUM_TYPE (POOL_EVENT, uint8_t);
+	GDEFINE_ENUM_TYPE (POOL_EVENT, u0_t );
 	GDEFINE_ENUM_VALUE(POOL_EVENT, PLAYER_INPUT	, 0);	// SEvent<>::Data contains a serialized SEvent<PLAYER_INPUT>   structure that requires to be loaded with SEvent<PLAYER_INPUT>  ::Load().
 	GDEFINE_ENUM_VALUE(POOL_EVENT, MATCH_CONTROL, 1);	// SEvent<>::Data contains a serialized SEvent<MATCH_CONTROL> structure that requires to be loaded with SEvent<MATCH_CONTROL>::Load().
 	GDEFINE_ENUM_VALUE(POOL_EVENT, MATCH_EVENT	, 2);	// SEvent<>::Data contains a serialized SEvent<MATCH_EVENT>   structure that requires to be loaded with SEvent<MATCH_EVENT>  ::Load().

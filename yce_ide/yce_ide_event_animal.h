@@ -6,7 +6,7 @@
 namespace ssg
 {
 #pragma pack(push, 1)
-	GDEFINE_ENUM_TYPE (ACTION_CHAR, uint8_t);
+	GDEFINE_ENUM_TYPE (ACTION_CHAR, u0_t );
 	GDEFINE_ENUM_VALUE(ACTION_CHAR, Walk	, 0); // Used with an SArgsEvent structure.
 	GDEFINE_ENUM_VALUE(ACTION_CHAR, Turn	, 1); // Used with an SArgsEvent structure.
 	GDEFINE_ENUM_VALUE(ACTION_CHAR, Hide	, 2); // Used with an SArgsEvent structure.

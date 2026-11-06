@@ -99,7 +99,7 @@
 	default: gpk_warning_unhandled_event(gameEvent); break; 
 	case ::ssg::CLIENT_ASKS_Join: 
 	case ::ssg::CLIENT_ASKS_Quit: 
-		gpk_necs(::gpk::eventEnqueueChild(app.EventsToSend, ::ssg::SSG_EVENT_CLIENT_ASKS, gameEvent.Type, gameEvent.Data));
+		{ if_fail_fe(::gpk::eventEnqueueChild(app.EventsToSend, ::ssg::SSG_EVENT_CLIENT_ASKS, gameEvent.Type, gameEvent.Data)); }
 		return 1; 
 	} 
 	return 0; 

@@ -7,12 +7,12 @@ GPK_USING_TYPEINT();
 using ::gpk::get_enum_namep, ::gpk::get_value_namep, ::gpk::failed;
 
 static	::gpk::error_t	d1Setup				(::d1::SD1UI & appUI, ::d1::SD1Game & game, const ::gpk::pobj<::gpk::SInput> & inputState) { 
-	gpk_necs(::d1p::poolGameSetup(game.Pool));
-	gpk_necs(::d1::guiSetup(appUI, game, inputState));
+	{ if_fail_fe(::d1p::poolGameSetup(game.Pool)); }
+	{ if_fail_fe(::d1::guiSetup(appUI, game, inputState)); }
 
-	for(uint32_t iPlayer = 0; iPlayer < game.Players.size(); ++iPlayer) {
+	for(u2_t  iPlayer = 0; iPlayer < game.Players.size(); ++iPlayer) {
 		::d1::SPlayerCameras			& playerCameras			= game.Players[iPlayer].Cameras;
-		for(uint8_t iBall = 0; iBall < game.Pool.MatchState.CountBalls; ++iBall) {
+		for(u0_t  iBall = 0; iBall < game.Pool.MatchState.CountBalls; ++iBall) {
 			playerCameras.Balls[iBall].Position					= playerCameras.Free.Position;
 			playerCameras.Balls[iBall].BallLockAtPosition		= true;
 			playerCameras.Balls[iBall].BallLockAtTarget			= true;
@@ -50,12 +50,12 @@ static	::gpk::error_t	stickUpdateRotation		(::d1::SD1Game & clientGame, float ac
 		::d1p::SEventPlayer				newEvent						= {::d1p::PLAYER_INPUT_Turn};
 		if(rotation.y) {
 			const ::d1p::SArgsPlayerInput	turnInfo						= {rotation.y, ::gpk::AXIS_Y_POSITIVE};
-			newEvent.Data				= ::gpk::vcu0_t{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
+			newEvent.Data				= ::gpk::vcu0_t{(const u0_t *)&turnInfo, sizeof(turnInfo)};
 			clientGame.QueueStick.push_back(newEvent);
 		}
 		if(rotation.x) {
 			const ::d1p::SArgsPlayerInput	turnInfo						= {rotation.x, ::gpk::AXIS_X_POSITIVE};
-			newEvent.Data				= ::gpk::vcu0_t{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
+			newEvent.Data				= ::gpk::vcu0_t{(const u0_t *)&turnInfo, sizeof(turnInfo)};
 			clientGame.QueueStick.push_back(newEvent);
 		}
 	}
@@ -90,12 +90,12 @@ static	::gpk::error_t	stickUpdateBallInHand	(::d1::SD1Game & clientGame, float a
 		::d1p::SEventPlayer			newEvent				= {::d1p::PLAYER_INPUT_Ball};
 		if(displacement.y) {
 			const d1p::SArgsPlayerInput	turnInfo				= {displacement.y, ::gpk::AXIS_X_POSITIVE};
-			newEvent.Data			= ::gpk::vcu0_t{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
+			newEvent.Data			= ::gpk::vcu0_t{(const u0_t *)&turnInfo, sizeof(turnInfo)};
 			clientGame.QueueStick.push_back(newEvent);
 		}
 		if(displacement.x) {
 			const d1p::SArgsPlayerInput	turnInfo				= {displacement.x, ::gpk::AXIS_Y_POSITIVE};
-			newEvent.Data			= ::gpk::vcu0_t{(const uint8_t*)&turnInfo, sizeof(turnInfo)};
+			newEvent.Data			= ::gpk::vcu0_t{(const u0_t *)&turnInfo, sizeof(turnInfo)};
 			clientGame.QueueStick.push_back(newEvent);
 		}
 	}
@@ -108,21 +108,21 @@ static	::gpk::error_t	stickCameraUpdate		(::d1::SD1UI & appUI, ::d1::SD1Game & c
 static	::gpk::error_t	stickUpdate				(::d1::SD1UI & appUI, ::d1::SD1Game & clientGame, float actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t mouseDeltas, ::gpk::vcu0_t buttonStates) {
 	const bool						slow					= keyStates[VK_SHIFT];
 	if(keyStates[VK_CONTROL]) {
-		gpk_necs(::stickCameraUpdate(appUI, clientGame, float(actualSecondsElapsed), keyStates, mouseDeltas, buttonStates));
+		{ if_fail_fe(::stickCameraUpdate(appUI, clientGame, float(actualSecondsElapsed), keyStates, mouseDeltas, buttonStates)); }
 		// Update force slider
 		if(keyStates[VK_UP])
-			::gpk::sliderSetValue(*appUI.ForceSlider, int64_t(appUI.ForceSlider->ValueCurrent - 1 * (slow ? 1.0f : 25.0f)));
+			::gpk::sliderSetValue(*appUI.ForceSlider, s3_t(appUI.ForceSlider->ValueCurrent - 1 * (slow ? 1.0f : 25.0f)));
 		if(keyStates[VK_DOWN])
-			::gpk::sliderSetValue(*appUI.ForceSlider, int64_t(appUI.ForceSlider->ValueCurrent + 1 * (slow ? 1.0f : 25.0f)));
+			::gpk::sliderSetValue(*appUI.ForceSlider, s3_t(appUI.ForceSlider->ValueCurrent + 1 * (slow ? 1.0f : 25.0f)));
 	}
 	else {
-		gpk_necs(::stickUpdateRotation(clientGame, actualSecondsElapsed, keyStates, mouseDeltas, buttonStates));
+		{ if_fail_fe(::stickUpdateRotation(clientGame, actualSecondsElapsed, keyStates, mouseDeltas, buttonStates)); }
 		if(mouseDeltas.z) {	// Update force slider
 			double							forceDelta				= mouseDeltas.z / double(WHEEL_DELTA) * (slow ? 1.0f : 25.0f);
-			::gpk::sliderSetValue(*appUI.ForceSlider, int64_t(appUI.ForceSlider->ValueCurrent - forceDelta));
+			::gpk::sliderSetValue(*appUI.ForceSlider, s3_t(appUI.ForceSlider->ValueCurrent - forceDelta));
 		}
 		if(0 == clientGame.Pool.MatchState.Flags.NotInHand) {
-			gpk_necs(::stickUpdateBallInHand(clientGame, actualSecondsElapsed, keyStates, mouseDeltas, buttonStates));
+			{ if_fail_fe(::stickUpdateBallInHand(clientGame, actualSecondsElapsed, keyStates, mouseDeltas, buttonStates)); }
 		}
 	}
 	return 0;
@@ -136,16 +136,16 @@ static	::gpk::error_t	cameraInputSelection	(::d1::SD1Game & clientGame, ::gpk::v
 		playerCameras.Selected	= 1;	// Cue ball
 	else {
 		::d1p::SPoolGame			& poolGame				= clientGame.Pool;
-		const uint32_t				offset					= poolGame.MatchState.CountBalls / 2U;
+		const u2_t 				offset					= poolGame.MatchState.CountBalls / 2U;
 		if(shift) {	// stripped balls
-			for(uint32_t iBall = offset; iBall < poolGame.MatchState.CountBalls; ++iBall) 
+			for(u2_t  iBall = offset; iBall < poolGame.MatchState.CountBalls; ++iBall) 
 				if(keyStates['1' + iBall - offset]) {
 					playerCameras.Selected		= iBall + 2;
 					break;
 				}
 		}
 		else {
-			for(uint32_t iBall = 0; iBall < offset; ++iBall) 
+			for(u2_t  iBall = 0; iBall < offset; ++iBall) 
 				if(keyStates['1' + iBall]) {
 					playerCameras.Selected		= iBall + 2;
 					break;
@@ -198,8 +198,8 @@ static	::gpk::error_t	cameraInputTransform	(::d1::SD1Game & clientGame, double a
 	return 0; 
 }
 static	::gpk::error_t	cameraInputUpdate		(::d1::SD1Game & clientGame, double actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t mouseDeltas) { 
-	gpk_necs(::cameraInputSelection(clientGame, keyStates));
-	gpk_necs(::cameraInputTransform(clientGame, actualSecondsElapsed, keyStates, mouseDeltas));
+	{ if_fail_fe(::cameraInputSelection(clientGame, keyStates)); }
+	{ if_fail_fe(::cameraInputTransform(clientGame, actualSecondsElapsed, keyStates, mouseDeltas)); }
 	return 0;
 }
 static	::gpk::error_t	updateInput				(::d1::SD1UI & appUI, ::d1::SD1Game & clientGame, double actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t mouseDeltas, ::gpk::vcu0_t buttonStates) { 
@@ -215,7 +215,7 @@ static	::gpk::error_t	updateInput				(::d1::SD1UI & appUI, ::d1::SD1Game & clien
 		else if(keyStates['T']) 
 			clientGame.TimeScale		= 1;
 		else if(keyStates['R']) {
-			gpk_necs(::d1p::poolGameReset(poolGame));
+			{ if_fail_fe(::d1p::poolGameReset(poolGame)); }
 		}
 		else if(keyStates[VK_MENU]) {
 				 if(keyStates['8']) { clientGame.StartState.Mode = ::d1p::POOL_GAME_MODE_8Ball		; ::d1p::poolGameReset(poolGame, clientGame.StartState);	}
@@ -225,10 +225,10 @@ static	::gpk::error_t	updateInput				(::d1::SD1UI & appUI, ::d1::SD1Game & clien
 		}
 	}
 
-	gpk_necs(::cameraInputUpdate(clientGame, float(actualSecondsElapsed), keyStates, mouseDeltas));
+	{ if_fail_fe(::cameraInputUpdate(clientGame, float(actualSecondsElapsed), keyStates, mouseDeltas)); }
 
 	if(false == poolGame.MatchState.Flags.PhysicsActive) // Update stick from user input controls only if the play is not active.
-		gpk_necs(::stickUpdate(appUI, clientGame, float(actualSecondsElapsed), keyStates, mouseDeltas, buttonStates));
+		{ if_fail_fe(::stickUpdate(appUI, clientGame, float(actualSecondsElapsed), keyStates, mouseDeltas, buttonStates)); }
 
 	return 0;
 }
@@ -243,7 +243,7 @@ static	::gpk::error_t	processScreenEvent		(::d1::SD1 & app, const ::gpk::SEventV
 	case ::gpk::EVENT_SCREEN_Create:
 	case ::gpk::EVENT_SCREEN_Resize: {
 		::gpk::n2s1_t				newMetrics				= *(const ::gpk::n2s1_t*)screenEvent.Data.begin();
-		gpk_necs(::gpk::guiUpdateMetrics(*app.AppUI.Dialog.GUI, newMetrics.u1_t(), true));
+		{ if_fail_fe(::gpk::guiUpdateMetrics(*app.AppUI.Dialog.GUI, newMetrics.u1(), true)); }
 		break;
 		}
 	}
@@ -293,7 +293,7 @@ static	::gpk::error_t	resetCameraBallCue			(::d1p::SPoolGame & poolGame, ::d1::S
 	cameraBall.Target			/= 2;
 	return 0;
 }
-static	::gpk::error_t	resetCameraBallRack			(::d1p::SPoolGame & poolGame, uint8_t iBall, ::d1::SCamera & cameraBall) {
+static	::gpk::error_t	resetCameraBallRack			(::d1p::SPoolGame & poolGame, u0_t  iBall, ::d1::SCamera & cameraBall) {
 	poolGame.GetBallPosition(0, cameraBall.Position);
 	poolGame.GetBallPosition(iBall, cameraBall.Target);
 	::gpk::n3f2_t						distance				= cameraBall.Target - cameraBall.Position;
@@ -302,7 +302,7 @@ static	::gpk::error_t	resetCameraBallRack			(::d1p::SPoolGame & poolGame, uint8_
 	cameraBall.Position.y		= 1.75f * .35f;
 	return 0;
 }
-static	::gpk::error_t	resetBallCamera			(::d1::SD1Game & clientGame, uint8_t iBall, ::d1::SCamera & cameraBall) { 
+static	::gpk::error_t	resetBallCamera			(::d1::SD1Game & clientGame, u0_t  iBall, ::d1::SCamera & cameraBall) { 
 	::d1p::SPoolGame					& poolGame				= clientGame.Pool;
 	return iBall 
 		? ::resetCameraBallRack(poolGame, iBall, cameraBall)
@@ -312,7 +312,7 @@ static	::gpk::error_t	resetBallCamera			(::d1::SD1Game & clientGame, uint8_t iBa
 static	::gpk::error_t	refreshCameras			(::d1::SD1Game & clientGame, double secondsElapsed) { 
 	::d1p::SPoolGame					& poolGame				= clientGame.Pool;
 	::d1::SPlayerCameras			& playerCameras			= clientGame.ActiveCameras();
-	for(uint8_t iBall = 0; iBall < poolGame.MatchState.CountBalls; ++iBall) { // update ball cameras
+	for(u0_t  iBall = 0; iBall < poolGame.MatchState.CountBalls; ++iBall) { // update ball cameras
 		::d1::SCamera					& cameraBall			= playerCameras.Balls[iBall];
 		::resetBallCamera(clientGame, iBall, cameraBall);
 	}
@@ -365,7 +365,7 @@ static	::gpk::error_t	handleMATCH_EVENT		(::d1::SD1 & app, const ::gpk::SEventVi
 	case d1p::MATCH_EVENT_Break				: info_printf(""); break;
 	case d1p::MATCH_EVENT_StrippedAssigned	: {
 		info_printf("Team: %i.", childEvent.Data[0]); 
-		const uint8_t					iTeam					= childEvent.Data[0];
+		const u0_t 					iTeam					= childEvent.Data[0];
 		app.AppUI.RefreshTeamStrings(iTeam);
 		app.AppUI.RefreshTeamUI();
 		app.AppUI.RefreshPlayUI(pool.ActivePlayer(), pool.ActiveTeam());
@@ -398,8 +398,8 @@ static	::gpk::error_t	handleMATCH_EVENT		(::d1::SD1 & app, const ::gpk::SEventVi
 		break;
 	case d1p::MATCH_EVENT_Lost				: info_printf("Reason: %s", ::gpk::get_value_namep(argsMatch->Reason));
 	case d1p::MATCH_EVENT_Won				: {
-		const uint8_t				iTeam		= app.MainGame.Pool.TurnHistory[argsMatch->ArgsBall.Turn].Team;
-		stacxpr const sc_t*			strwin[]	= {"Lost", "Won"};
+		const u0_t 				iTeam		= app.MainGame.Pool.TurnHistory[argsMatch->ArgsBall.Turn].Team;
+		stxp const sc_t*			strwin[]	= {"Lost", "Won"};
 		sprintf_s(app.AppUI.scorebuffer[0].Storage, "%s - %s", app.AppUI.scorebuffer[0].Storage, strwin[(one_if(childEvent.Type == d1p::MATCH_EVENT_Lost) + one_if(0 == iTeam)) % 2]);
 		sprintf_s(app.AppUI.scorebuffer[1].Storage, "%s - %s", app.AppUI.scorebuffer[1].Storage, strwin[(one_if(childEvent.Type == d1p::MATCH_EVENT_Lost) + one_if(1 == iTeam)) % 2]);
 		app.AppUI.RefreshTeamUI();
@@ -422,7 +422,7 @@ static	::gpk::error_t	handleBALL_EVENT		(::d1::SD1 & app, const ::gpk::SEventVie
 		const ::d1p::SArgsBall::SPocketed	& eventData = argsBall.Event.Pocketed; 
 		info_printf("Ball: %i, Pocket : %i.", eventData.Ball, eventData.Pocket); 
 		if(eventData.Ball && 8 != eventData.Ball) {
-			const uint8_t				iBallTeam		= pool.MatchState.BallToTeam(eventData.Ball);
+			const u0_t 				iBallTeam		= pool.MatchState.BallToTeam(eventData.Ball);
 			sprintf_s(app.AppUI.scorebuffer[iBallTeam].Storage, "Score: %i", pool.MatchState.PocketedCount(iBallTeam));
 			app.AppUI.RefreshTeamUI();
 		}
@@ -456,7 +456,7 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 	} 
 	if(handled) {
 		::gpk::SGUI					& gui		= *app.AppUI.Dialog.GUI;
-		const uint8_t				iTeam		= app.MainGame.Pool.TurnHistory[argsBall->Turn].Team;
+		const u0_t 				iTeam		= app.MainGame.Pool.TurnHistory[argsBall->Turn].Team;
 		const ::d1::STeamUI			& teamUI	= app.AppUI.TeamUI[iTeam];
 		sprintf_s(app.AppUI.foulsbuffer[iTeam].Storage, "Fouls: %i", atoi(&gui.Controls.Text[teamUI.FirstControl[::d1::APP_STATE_Play] + 2].Text[7]) + 1);
 	}
@@ -466,7 +466,7 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 ::gpk::error_t				d1::d1Update		(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEventsNew) { 
 	::d1::SD1Game					& clientGame		= app.MainGame;
 
-	gpk_necs(systemEventsNew.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
+	{ if_fail_fe(systemEventsNew.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); })); }
 
 	::d1p::SPoolGame				& poolGame			= clientGame.Pool;
 
@@ -474,13 +474,13 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 	case ::d1::APP_STATE_Quit		: return 1;
 	case ::d1::APP_STATE_Welcome	: app.StateSwitch(::d1::APP_STATE_Home); break;	// APP_STATE_Welcome comes right after APP_STATE_Init.
 	case ::d1::APP_STATE_Init		: {
-		gpk_necs(::d1Setup(app.AppUI, clientGame, inputState));
+		{ if_fail_fe(::d1Setup(app.AppUI, clientGame, inputState)); }
 
 		::gpk::aobj<::gpk::apod<sc_t>>	fileNames				= {};
 		::gpk::pathList(app.FileStrings.SavegameFolder, fileNames, app.FileStrings.ExtensionSaveAuto);
 		if(fileNames.size()) {
 			//if failed(app.Load(fileNames[0])) 
-			//	gpk_necs(::d1p::poolGameSetup(poolGame));
+			//	{ if_fail_fe(::d1p::poolGameSetup(poolGame)); }
 		}
 		app.StateSwitch(::d1::APP_STATE_Welcome);
 		app.AppUI.RefreshTeamStrings(poolGame.MatchState.Flags.TeamStripped);
@@ -493,9 +493,9 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 		break;
 	} // APP_STATE_Init
 	case ::d1::APP_STATE_Play		: {
-		gpk_necs(::updateInput(app.AppUI, clientGame, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.s1_t(), inputState->MouseCurrent.ButtonState));
+		{ if_fail_fe(::updateInput(app.AppUI, clientGame, secondsElapsed, inputState->KeyboardCurrent.KeyState, inputState->MouseCurrent.Deltas.s1(), inputState->MouseCurrent.ButtonState)); }
 		if(false == poolGame.MatchState.Flags.PhysicsActive)
-			::gpk::sliderSetValue(*app.AppUI.ForceSlider, int64_t(app.AppUI.ForceSlider->ValueLimits.Max - poolGame.ActiveStick().Velocity * (app.AppUI.ForceSlider->ValueLimits.Max / ::d1p::MAX_SHOOT_VELOCITY)));
+			::gpk::sliderSetValue(*app.AppUI.ForceSlider, s3_t(app.AppUI.ForceSlider->ValueLimits.Max - poolGame.ActiveStick().Velocity * (app.AppUI.ForceSlider->ValueLimits.Max / ::d1p::MAX_SHOOT_VELOCITY)));
 
 		::gpk::apobj<::d1p::SEventPool>	outputEvents;
 		::d1p::poolGameUpdate(poolGame, clientGame.QueueStick, outputEvents, secondsElapsed * clientGame.TimeScale);
@@ -526,11 +526,11 @@ static	::gpk::error_t	handleFOUL				(::d1::SD1 & app, const ::gpk::SEventView<::
 	const ::d1::APP_STATE			newState			= ::d1::guiUpdate(app, systemEventsNew);
 	return app.StateSwitch(newState); 
 }
-::gpk::error_t				d1::d1Draw		(::d1::SD1UI & appUI, ::d1::SD1Game & clientGame, ::gpk::rt<::gpk::bgra, uint32_t> & backBuffer, double totalSeconds, bool onlyGUI) { 
+::gpk::error_t				d1::d1Draw		(::d1::SD1UI & appUI, ::d1::SD1Game & clientGame, ::gpk::rt<::gpk::bgra, u2_t > & backBuffer, double totalSeconds, bool onlyGUI) { 
 	if(false == onlyGUI) {
 		const ::d1::SCamera				& cameraSelected	= clientGame.CameraSelected();
-		gpk_necs(::d1p::poolGameDraw(clientGame.Pool, backBuffer, cameraSelected.Position, cameraSelected.Target, {0, 1, 0}, totalSeconds));
+		{ if_fail_fe(::d1p::poolGameDraw(clientGame.Pool, backBuffer, cameraSelected.Position, cameraSelected.Target, {0, 1, 0}, totalSeconds)); }
 	}
-	gpk_necs(::gpk::guiDraw(*appUI.Dialog.GUI, backBuffer.Color.View));
+	{ if_fail_fe(::gpk::guiDraw(*appUI.Dialog.GUI, backBuffer.Color.View)); }
 	return 0; 
 }

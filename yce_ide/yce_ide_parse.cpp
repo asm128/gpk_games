@@ -162,7 +162,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::ssg::EventSSiege> 
 	switch(command) {
 	case ::ssg::CLIENT_ASKS_Join: 
 	case ::ssg::CLIENT_ASKS_Quit: 
-		gpk_necs(::gpk::eventEnqueueChild<::ssg::SSG_EVENT>(queue, ::ssg::SSG_EVENT_CLIENT_ASKS, command, commandArgs)); 
+		{ if_fail_fe(::gpk::eventEnqueueChild<::ssg::SSG_EVENT>(queue, ::ssg::SSG_EVENT_CLIENT_ASKS, command, commandArgs)); } 
 		break;
 	default: 
 		warning_unhandled_command(command, commandArgs);
@@ -177,14 +177,14 @@ static	::gpk::error_t	parseCommand		(::gpk::apobj<::ssg::EventSSiege> & queue, :
 	if(::gpk::get_value_count<_tEnum>() <= command)
 		return -1;  /// having an error message here makes it too verbose
 	info_printf("Command matched for %s: %s(args:%s).", ::gpk::get_enum_namep(command), ::gpk::get_value_namep(command), ::gpk::toString(commandArgs).begin());
-	gpk_necs(::interpretArgsAndEnqueue(queue, command, commandArgs));
+	{ if_fail_fe(::interpretArgsAndEnqueue(queue, command, commandArgs)); }
 	return command;
 }
 
 ::gpk::error_t			ssg::parseCommandLine	(::gpk::apobj<::ssg::EventSSiege> & queue, ::gpk::vcc inputLine) { 
 	::gpk::vcc					commandName, commandArgs;
-	gpk_necs(inputLine.slice(inputLine, 1));
-	if_if(errored(::gpk::split(::gpk::vcs{" "}, inputLine, commandName, commandArgs)), "No arguments provided for command %s.", ::gpk::toString(commandArgs).begin());
+	{ if_fail_fe(inputLine.slice(inputLine, 1)); }
+	if_if(errored(::gpk::split(::gpk::vcst_t{" "}, inputLine, commandName, commandArgs)), "No arguments provided for command %s.", ::gpk::toString(commandArgs).begin());
 	bool						failed
 		=  -1 == ::parseCommand<::ssg::WORLD_ADMIN>(queue, commandName, commandArgs)
 		&& -1 == ::parseCommand<::ssg::WORLD_EVENT>(queue, commandName, commandArgs)

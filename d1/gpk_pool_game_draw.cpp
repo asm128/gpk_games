@@ -32,14 +32,14 @@
 	::gpk::SEngine				& engine			= pool.Engine;
 
 	::gpk::an3f32				& wireframePixelCoords	= engine.Scene->RenderCache.VertexShaderCache.WireframePixelCoords;
-	for(uint32_t iBall = 0; iBall < pool.MatchState.CountBalls; ++iBall) {
-		for(uint32_t iDelta = ::gpk::max(0, (int32_t)pool.PositionDeltas[iBall].size() - 20); iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {
+	for(u2_t  iBall = 0; iBall < pool.MatchState.CountBalls; ++iBall) {
+		for(u2_t  iDelta = ::gpk::max(0, (s2_t)pool.PositionDeltas[iBall].size() - 20); iDelta < pool.PositionDeltas[iBall].size(); ++iDelta) {
 			::gpk::line3<float>			screenDelta			= pool.PositionDeltas[iBall][iDelta];
 			wireframePixelCoords.clear();
 			screenDelta.A.y = screenDelta.B.y = 0;
 			::gpk::drawLine(offscreenMetrics, screenDelta, constants.VPS, wireframePixelCoords, backBuffer.DepthStencil);
-			for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
-				::gpk::n3<int16_t>								coord					= wireframePixelCoords[iCoord].s1_t();
+			for(u2_t  iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+				::gpk::n3<s1_t>								coord					= wireframePixelCoords[iCoord].s1();
 				backBuffer.Color.View[coord.y][coord.x]		= pool.BallColors[iBall];
 			}
 		}
@@ -75,8 +75,8 @@
 	::gpk::drawLine(offscreenMetrics, ::gpk::line3<float>{limitsBottom[2], limitsTop[2]}, constants.VPS, wireframePixelCoords, backBuffer.DepthStencil);
 	::gpk::drawLine(offscreenMetrics, ::gpk::line3<float>{limitsBottom[3], limitsTop[3]}, constants.VPS, wireframePixelCoords, backBuffer.DepthStencil);
 
-	for(uint32_t iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
-		::gpk::n3s1_t				coord		= wireframePixelCoords[iCoord].s1_t();
+	for(u2_t  iCoord = 0; iCoord < wireframePixelCoords.size(); ++iCoord) {
+		::gpk::n3s1_t				coord		= wireframePixelCoords[iCoord].s1();
 		::gpk::rgbaf				color		= 
 			{ (float)(totalSeconds - iCoord / 1.0f / totalSeconds)
 			, (float)(totalSeconds - iCoord / 2.0f / totalSeconds)
@@ -85,7 +85,7 @@
 		backBuffer.Color.View[coord.y][coord.x]	= color;
 	}
 
-	gpk_necs(::gpk::drawScene(backBuffer.Color.View, backBuffer.DepthStencil.View, engine.Scene->RenderCache, *engine.Scene, cameraPosition, cameraTarget, cameraUp, nearFar));
+	{ if_fail_fe(::gpk::drawScene(backBuffer.Color.View, backBuffer.DepthStencil.View, engine.Scene->RenderCache, *engine.Scene, cameraPosition, cameraTarget, cameraUp, nearFar)); }
 	timer.Frame();
 	info_printf("Render scene in %f seconds", timer.LastTimeSeconds);
 	return 0;
