@@ -12,6 +12,8 @@
 //#define GPK_AVOID_LOCAL_APPLICATION_MODULE_MODEL_EXECUTABLE_RUNTIME
 #include "gpk_app_impl.h"
 
+GPK_USING_TYPEINT();
+
 //#define USE_STEAM_CLIENT
 //#define STEAM_CEG
 #if defined(USE_STEAM_CLIENT)
@@ -34,21 +36,21 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Galaxy Hell v0.4");
 
-static	::gpk::error_t	processScreenEvent		(::SApplication & /*app*/, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
+static	gpk::err_t	processScreenEvent		(::SApplication & /*app*/, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_SCREEN_Create:
 //#if !defined(DISABLE_D3D11)
-//		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.Engine.Scene->Graphics));
+//		if_fail_fe(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.Engine.Scene->Graphics));
 //#endif
 	case ::gpk::EVENT_SCREEN_Resize: 
-		//gpk_necs(::updateSizeDependentResources(app));
+		//if_fail_fe(::updateSizeDependentResources(app));
 		break;
 	}
 	return 0;
 }
 
-static	::gpk::error_t	processKeyboardEvent	(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
+static	gpk::err_t	processKeyboardEvent	(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_KEYBOARD_Down:
@@ -56,7 +58,7 @@ static	::gpk::error_t	processKeyboardEvent	(::SApplication & app, const ::gpk::S
 		switch(screenEvent.Data[0]) {
 		case VK_RETURN:
 			if(GetAsyncKeyState(VK_MENU) & 0xFFF0)
-				gpk_necs(::gpk::fullScreenToggle(app.Framework.RootWindow));
+				if_fail_fe(::gpk::fullScreenToggle(app.Framework.RootWindow));
 			break;
 		}
 		break;
@@ -64,16 +66,16 @@ static	::gpk::error_t	processKeyboardEvent	(::SApplication & app, const ::gpk::S
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEventSystem & sysEvent) { 
+static	gpk::err_t	processSystemEvent	(::SApplication & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
-	case ::gpk::SYSTEM_EVENT_Screen		: gpk_necs(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN  >(sysEvent, [&app](const ::gpk::SScreenEventView & screenEvent) { return ::processScreenEvent  (app, screenEvent); })); break;
-	case ::gpk::SYSTEM_EVENT_Keyboard	: gpk_necs(::gpk::eventExtractAndHandle<::gpk::EVENT_KEYBOARD>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { return ::processKeyboardEvent(app, screenEvent); })); break;
+	case ::gpk::SYSTEM_EVENT_Screen		: if_fail_fe(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN  >(sysEvent, [&app](const ::gpk::SScreenEventView & screenEvent) { return ::processScreenEvent  (app, screenEvent); })); break;
+	case ::gpk::SYSTEM_EVENT_Keyboard	: if_fail_fe(::gpk::eventExtractAndHandle<::gpk::EVENT_KEYBOARD>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { return ::processKeyboardEvent(app, screenEvent); })); break;
 	}
 	return 0;
 }
 
-::gpk::error_t			cleanup				(::SApplication & app)						{ 
+gpk::err_t			cleanup				(::SApplication & app)						{ 
 	::gpk::SFramework			& framework			= app.Framework;
 	::gpk::SWindow				& mainWindow		= framework.RootWindow;
 	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, mainWindow.EventQueue);
@@ -128,19 +130,19 @@ bool ParseCommandLine( const sc_t *pchCmdLine, const sc_t **ppchServerAddress, c
 }
 #endif
 
-::gpk::error_t			setup				(::SApplication & app)						{
+gpk::err_t			setup				(::SApplication & app)						{
 #ifdef USE_STEAM_CLIENT
 	// if Steam is not running or the game wasn't started through Steam, SteamAPI_RestartAppIfNecessary starts the local Steam client and also launches this game again.
 	// Once you get a public Steam AppID assigned for this game, you need to replace k_uAppIdInvalid with it and removed steam_appid.txt from the game depot.
-	ree_if(SteamAPI_RestartAppIfNecessary( k_uAppIdInvalid ), "%s", "");
-	ree_if(!Steamworks_InitCEGLibrary(), "%s", "Steamworks_InitCEGLibrary() failed\n" );	// Init Steam CEG
+	if_true_fef(SteamAPI_RestartAppIfNecessary( k_uAppIdInvalid ), "%s", "");
+	if_true_fef(!Steamworks_InitCEGLibrary(), "%s", "Steamworks_InitCEGLibrary() failed\n" );	// Init Steam CEG
 
 	// Initialize SteamAPI, if this fails we bail out since we depend on Steam for lots of stuff.
 	// You don't necessarily have to if you write your code to check whether all the Steam interfaces are NULL before using them and provide alternate paths when they are unavailable.
 	// This will also load the in-game steam overlay dll into your process. That dll is normally injected by steam when it launches games, but by calling this you cause it to always load, even when not launched via steam.
-	ree_if(!SteamAPI_Init(), "%s", "SteamAPI_Init() failed\n");
+	if_true_fef(!SteamAPI_Init(), "%s", "SteamAPI_Init() failed\n");
 	SteamClient()->SetWarningMessageHook( &SteamAPIDebugTextHook );	// set our debug handler
-	ree_if(!SteamUser()->BLoggedOn(), "%s", "Steam user is not logged in\n");	// Ensure that the user has logged into Steam. This will always return true if the game is launched from Steam, but if Steam is at the login prompt when you run your game from the debugger, it will return false.
+	if_true_fef(!SteamUser()->BLoggedOn(), "%s", "Steam user is not logged in\n");	// Ensure that the user has logged into Steam. This will always return true if the game is launched from Steam, but if Steam is at the login prompt when you run your game from the debugger, it will return false.
 
 	const sc_t *pchServerAddress = 0, *pchLobbyID = 0;
 	if ( !ParseCommandLine( app.Framework.RuntimeValues.PlatformDetail.EntryPointArgsWin.lpCmdLine, &pchServerAddress, &pchLobbyID ) ) {
@@ -152,7 +154,7 @@ bool ParseCommandLine( const sc_t *pchCmdLine, const sc_t **ppchServerAddress, c
 	}
 
 	Steamworks_SelfCheck();	// do a DRM self check
-	ree_if(!SteamInput()->Init( false ), "%s", "SteamInput()->Init failed.\n" );
+	if_true_fef(!SteamInput()->Init( false ), "%s", "SteamInput()->Init failed.\n" );
 
 	sc_t rgchCWD[1024] = {};
 	if (!_getcwd(rgchCWD, sizeof(rgchCWD)))
@@ -170,17 +172,17 @@ bool ParseCommandLine( const sc_t *pchCmdLine, const sc_t **ppchServerAddress, c
 
 #endif // USE_STEAM_CLIENT
 
-	//gpk_necall(::gpk::tcpipInitialize(), "Failed to initialize network subsystem: '%s'.", "Unknown error");
+	//if_fail_fef(::gpk::tcpipInitialize(), "Failed to initialize network subsystem: '%s'.", "Unknown error");
 
 	::gpk::SFramework			& framework			= app.Framework;
 	::gpk::SWindow				& mainWindow		= framework.RootWindow;
 
 	mainWindow.Size			= {1280, 720};
 
-	es_if(::gpk::failed(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input)));
-	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
+	if_fail_fe(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input));
+	if_fail_fe(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
 
-	srand((uint32_t)time(0));
+	srand((u2_t)time(0));
 
 	::ghg::SGalaxyHellDrawCache	& drawCache			= app.GalaxyHellApp.Game.DrawCache;
 	::gpk::resize(4096 * 1024, drawCache.PixelCoords, drawCache.PixelVertexWeights, drawCache.LightColorsModel, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightPointsWorld);
@@ -202,7 +204,7 @@ bool ParseCommandLine( const sc_t *pchCmdLine, const sc_t **ppchServerAddress, c
 	//joySetCapture(framework.RootWindow.PlatformDetail.WindowHandle, JOYSTICKID2, 10, 0);
 
 	framework.RootWindow.Input->JoystickCurrent.resize(4, {});
-	//for(uint32_t i = 0; i < 4; ++i) 
+	//for(u2_t i = 0; i < 4; ++i) 
 	//	app.GamePad.Resume();
 
 
@@ -219,16 +221,16 @@ bool ParseCommandLine( const sc_t *pchCmdLine, const sc_t **ppchServerAddress, c
 	return 0;
 }
 
-::gpk::error_t			update				(SApplication & app, bool exitSignal)	{
-	rvis_if(::gpk::APPLICATION_STATE_EXIT, exitSignal);
+gpk::err_t			update				(SApplication & app, bool exitSignal)	{
+	if_true_vi(::gpk::APPLICATION_STATE_EXIT, exitSignal);
 
 	::gpk::SFramework			& framework			= app.Framework;
 	::gpk::SWindow				& mainWindow		= framework.RootWindow;
 	//::gpk::STimer				timer;
 
-	gpk_necs(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
+	if_fail_fe(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
 
-	rvis_if(::gpk::APPLICATION_STATE_EXIT, 1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue));
+	if_true_vi(::gpk::APPLICATION_STATE_EXIT, 1 == ::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue));
 
 	{
 		::std::lock_guard			lockRTQueue	(app.GalaxyHellApp.RenderTargetLockQueue);
@@ -238,7 +240,7 @@ bool ParseCommandLine( const sc_t *pchCmdLine, const sc_t **ppchServerAddress, c
 			app.GalaxyHellApp.RenderTargetPool.push_back(app.Framework.RootWindow.BackBuffer);
 			app.Framework.RootWindow.BackBuffer		= app.GalaxyHellApp.RenderTargetQueue[app.GalaxyHellApp.RenderTargetQueue.size() - 1];
 			app.GalaxyHellApp.RenderTargetQueue.pop_back();
-			for(uint32_t iRT = 0; iRT < app.GalaxyHellApp.RenderTargetQueue.size(); ++iRT) {
+			for(u2_t iRT = 0; iRT < app.GalaxyHellApp.RenderTargetQueue.size(); ++iRT) {
 				app.GalaxyHellApp.RenderTargetPool.push_back(app.GalaxyHellApp.RenderTargetQueue[iRT]);
 			}
 			app.GalaxyHellApp.RenderTargetQueue.clear();
@@ -275,9 +277,9 @@ bool ParseCommandLine( const sc_t *pchCmdLine, const sc_t **ppchServerAddress, c
 	SteamAPI_RunCallbacks();
 #endif
 
-	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework));
+	if_true_vi(::gpk::APPLICATION_STATE_EXIT, ::gpk::APPLICATION_STATE_EXIT == ::gpk::updateFramework(app.Framework));
 
-	//for(uint32_t i = 0; i < 4; ++i) {
+	//for(u2_t i = 0; i < 4; ++i) {
 	//	DirectX::GamePad::State padState = app.GamePad.GetState(i);
 	//	if(false == padState.IsConnected())
 	//		warning_printf("Pad %i not connected", i);
@@ -295,7 +297,7 @@ bool ParseCommandLine( const sc_t *pchCmdLine, const sc_t **ppchServerAddress, c
 	return 0;
 }
 
-::gpk::error_t			draw					(SApplication & app) {
+gpk::err_t			draw					(SApplication & app) {
     /* rotate a triangle around */
     //glClear(GL_COLOR_BUFFER_BIT);
     //glBegin(GL_TRIANGLES);
@@ -307,7 +309,7 @@ bool ParseCommandLine( const sc_t *pchCmdLine, const sc_t **ppchServerAddress, c
     //glVertex2i(1, -1);
     //glEnd();
     //glFlush();
-	return ::ghg::galaxyHellDraw(app.GalaxyHellApp, app.Framework.RootWindow.Size.u1_t());
+	return ::ghg::galaxyHellDraw(app.GalaxyHellApp, app.Framework.RootWindow.Size.u1());
 }
 
 

@@ -6,7 +6,7 @@
 namespace ssg
 {
 #pragma pack(push, 1)
-	GDEFINE_ENUM_TYPE (ADMIN_GAME, uint8_t);
+	GDEFINE_ENUM_TYPE (ADMIN_GAME, u0_t);
 	GDEFINE_ENUM_VALUE(ADMIN_GAME, Initialize	, 0);
 	GDEFINE_ENUM_VALUE(ADMIN_GAME, Hide			, 1);
 	GDEFINE_ENUM_VALUE(ADMIN_GAME, Initialize	, 2); 

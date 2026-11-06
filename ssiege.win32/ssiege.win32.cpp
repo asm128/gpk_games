@@ -20,46 +20,46 @@ GPK_USING_TYPEINT();
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Solar Siege v0.1");
 
 // --- Cleanup application resources.
-::gpk::error_t			cleanup					(::SApplication & app)											{
+gpk::err_t			cleanup					(::SApplication & app)											{
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::SWindow				& mainWindow			= framework.RootWindow;
 #if !defined(DISABLE_D3D11)
 	app.D3DApp.Shutdown();
 #endif
 
-	gpk_necs(::gpk::mainWindowDestroy(mainWindow));
-	gpk_necs(::ssg::ssiegeUpdate(app.SSiegeApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
+	if_fail_fe(::gpk::mainWindowDestroy(mainWindow));
+	if_fail_fe(::ssg::ssiegeUpdate(app.SSiegeApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
 	return 0;
 }
 
-static	::gpk::error_t	updateSizeDependentResources(::SApplication & app)											{
+static	gpk::err_t	updateSizeDependentResources(::SApplication & app)											{
 	::gpk::SWindow				& mainWindow			= app.Framework.RootWindow;
 	const ::gpk::n2u1_t			newSize					= mainWindow.Size;
 #if !defined(DISABLE_D3D11)
 	mainWindow.BackBuffer	= {};
-	gpk_necs(app.D3DApp.SetWindowSize(newSize));
+	if_fail_fe(app.D3DApp.SetWindowSize(newSize));
 #else
-	gpk_necs(mainWindow.BackBuffer->resize(newSize, ::gpk::bgra{0, 0, 0, 0}, 0xFFFFFFFF));
+	if_fail_fe(mainWindow.BackBuffer->resize(newSize, ::gpk::bgra{0, 0, 0, 0}, 0xFFFFFFFF));
 #endif
 	mainWindow.Resized		= false;
 	return 0;
 }
 
-static	::gpk::error_t	processScreenEvent		(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
+static	gpk::err_t	processScreenEvent		(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_SCREEN_Create:
 #if !defined(DISABLE_D3D11)
-		gpk_necs(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.SSiegeApp.Game.Engine.Scene->Graphics));
+		if_fail_fe(app.D3DApp.Initialize(app.Framework.RootWindow.PlatformDetail.WindowHandle, app.SSiegeApp.Game.Engine.Scene->Graphics));
 #endif
 	case ::gpk::EVENT_SCREEN_Resize: 
-		gpk_necs(::updateSizeDependentResources(app));
+		if_fail_fe(::updateSizeDependentResources(app));
 		break;
 	}
 	return 0;
 }
 
-static	::gpk::error_t	processGUIEvent			(::SApplication & /*app*/, const ::gpk::SEventView<::gpk::EVENT_GUI_CONTROL> & screenEvent) { 
+static	gpk::err_t	processGUIEvent			(::SApplication & /*app*/, const ::gpk::SEventView<::gpk::EVENT_GUI_CONTROL> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_GUI_CONTROL_StateChange: {
@@ -71,7 +71,7 @@ static	::gpk::error_t	processGUIEvent			(::SApplication & /*app*/, const ::gpk::
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SEventSystem & sysEvent) { 
+static	gpk::err_t	processSystemEvent		(::SApplication & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen	: return ::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN		>(sysEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_SCREEN		> & screenEvent) { return processScreenEvent(app, screenEvent); }); 
@@ -80,19 +80,19 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 	return 0;
 }
 
-::gpk::error_t			setup					(::SApplication& app)											{
+gpk::err_t			setup					(::SApplication& app)											{
 #if !defined(DISABLE_D3D11)
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 #endif
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::SWindow				& mainWindow			= framework.RootWindow;
 	mainWindow.Size			= {1280, 720};
-	gpk_necs(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input));
+	if_fail_fe(::gpk::mainWindowCreate(mainWindow, framework.RuntimeValues.PlatformDetail, mainWindow.Input));
 
 	return 0;
 }
 
-::gpk::error_t			update					(::SApplication& app, bool systemRequestedExit)					{
+gpk::err_t			update					(::SApplication& app, bool systemRequestedExit)					{
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::SWindow				& mainWindow			= app.Framework.RootWindow;
 	::gpk::SGUI					& gui					= *framework.GUI;
@@ -100,30 +100,30 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 	bool						systemExit				= false;
 
 	::gpk::apobj<::gpk::SEventSystem>	eventsToProcess	= mainWindow.EventQueue;
-	gpk_necs(eventsToProcess.append(gui.Controls.EventQueue));
-	gpk_necs(eventsToProcess.for_each([&app, &systemExit](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { 
-		::gpk::error_t				result; 
-		gpk_necs(result = ::processSystemEvent(app, *sysEvent)); 
+	if_fail_fe(eventsToProcess.append(gui.Controls.EventQueue));
+	if_fail_fe(eventsToProcess.for_each([&app, &systemExit](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { 
+		gpk::err_t				result; 
+		if_fail_fe(result = ::processSystemEvent(app, *sysEvent)); 
 		if(result == 1) 
 			systemExit				= true; 
 		return result;
 	}));
 
-	rvi_if(::gpk::APPLICATION_STATE_EXIT, systemExit || systemRequestedExit, "%s || %s", ::gpk::bool2char(systemExit), ::gpk::bool2char(systemRequestedExit));
+	if_true_vif(::gpk::APPLICATION_STATE_EXIT, systemExit || systemRequestedExit, "%u || %u", systemExit, systemRequestedExit);
 
 	::gpk::SFrameInfo			& frameInfo				= framework.FrameInfo;
 	{
 		::gpk::STimer				timer					= {};
-		rvis_if(::gpk::APPLICATION_STATE_EXIT, ::ssg::APP_STATE_Quit == ::ssg::ssiegeUpdate(app.SSiegeApp, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue, {}))
+		if_true_vi(::gpk::APPLICATION_STATE_EXIT, ::ssg::APP_STATE_Quit == ::ssg::ssiegeUpdate(app.SSiegeApp, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue, {}));
 		timer.Frame();
 		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
 
 #if !defined(DISABLE_D3D11)
 	if(app.SSiegeApp.ActiveState >= ::ssg::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.SSiegeApp.Game.Engine.Scene->Graphics->Meshes.size() || !app.D3DApp.GUIStuff.IndexBuffer) {
-		gpk_necs(app.D3DApp.CreateDeviceResources(*app.SSiegeApp.Game.Engine.Scene->Graphics));
+		if_fail_fe(app.D3DApp.CreateDeviceResources(*app.SSiegeApp.Game.Engine.Scene->Graphics));
 	}
-	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (uint32_t)frameInfo.FrameMeter.FramesPerSecond);
+	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (u2_t)frameInfo.FrameMeter.FramesPerSecond);
 #endif
 
 	//-----------------------------
@@ -136,7 +136,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 	return ::gpk::updateFramework(framework);
 }
 
-::gpk::error_t			draw					(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+gpk::err_t			draw					(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 	const ::gpk::n3f2_t			sunlightPos				= {}; //::gpk::calcSunPosition();
 	//const double				sunlightFactor			= .1;//:::gpk::calcSunlightFactor(app.SSiegeApp.World.WorldState.DaylightRatioExtra, app.SSiegeApp.World.WorldState.DaylightOffsetMinutes);
 	const ::gpk::rgbaf			clearColor				= ::gpk::DARKBLUE * .0625;//::gpk::interpolate_linear(::gpk::DARKBLUE * .25, ::gpk::LIGHTBLUE * 1.1, sunlightFactor);
@@ -144,18 +144,18 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 #if !defined(DISABLE_D3D11) 
 	memset(app.D3DApp.GUIStuff.RenderTarget.begin(), 0, app.D3DApp.GUIStuff.RenderTarget.byte_count());
 	
-	gpk_necs(::gpk::guiDraw(*app.SSiegeApp.GUI, app.D3DApp.GUIStuff.RenderTarget));
+	if_fail_fe(::gpk::guiDraw(*app.SSiegeApp.GUI, app.D3DApp.GUIStuff.RenderTarget));
 
 	app.D3DApp.Scene.ConstantBufferScene.Time	= (float)app.Framework.FrameInfo.Seconds.Total;
 
 	const ::gpk::SCamera		& cameraSelected		= app.SSiegeApp.Game.Camera;
 	const ::gpk::SEngineScene	& engineScene			= *app.SSiegeApp.Game.Engine.Scene;
-	gpk_necs(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, sunlightPos, cameraSelected.Position, cameraSelected.Target, cameraSelected.NearFar));
+	if_fail_fe(::gpk::d3dAppDraw(app.D3DApp, engineScene, clearColor, sunlightPos, cameraSelected.Position, cameraSelected.Target, cameraSelected.NearFar));
 #else 
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::prtbgra8d32			backBuffer				= framework.RootWindow.BackBuffer;
-	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), clearColor, (uint32_t)-1);
-	gpk_necs(::ssg::ssiegeDraw(app.SSiegeApp, *backBuffer, false));
+	backBuffer->resize(framework.RootWindow.BackBuffer->Color.metrics(), clearColor, (u2_t)-1);
+	if_fail_fe(::ssg::ssiegeDraw(app.SSiegeApp, *backBuffer, false));
 	memcpy(framework.RootWindow.BackBuffer->Color.View.begin(), backBuffer->Color.View.begin(), backBuffer->Color.View.byte_count());
 	//::gpk::grid_mirror_y(framework.RootWindow.BackBuffer->Color.View, backBuffer->Color.View);
 	//framework.RootWindow.BackBuffer		= backBuffer;

@@ -6,27 +6,26 @@
 
 namespace gpkg 
 {
-	GPK_USING_TYPEINT();
+	usns gpk;
 
 	struct SJump {
-		::gpk::asc_t				Text;
-		uint32_t					Jump;
+		string			Text;
+		u2_t			Jump;
 	};
 
 	struct SPage {
-		::gpk::aachar				TextLines;
-		::gpk::aobj<::gpkg::SJump>	PageJumps;
+		aobj<string>	TextLines;
+		aobj<SJump>		PageJumps;
 	};
-
 	struct SGame {
-		::gpk::aobj<::gpkg::SPage>	Pages				= {};
-		uint32_t					CurrentPage			= 0;
+		aobj<SPage>			Pages				= {};
+		u2_t				CurrentPage			= 0;
 
-		::gpk::astatic<sc_t, 4096>	StoryFolder			= "test_story";
+		vcst_t				StoryFolder			= "test_story";
 	};
 
-	::gpk::error_t				loadPage			(sc_c * folderName, ::gpkg::SPage & page, uint32_t pageIndex);
-	::gpk::error_t				validJump			(const ::gpk::aobj<::gpkg::SJump> & jumps, uint32_t indexToTest);
+	gpk::err_t				loadPage			(sc_c * folderName, SPage & page, u2_t pageIndex);
+	gpk::err_t				validJump			(const aobj<SJump> & jumps, u2_t indexToTest);
 } 
 
 #endif

@@ -9,7 +9,7 @@
 namespace ssg
 {
 #pragma pack(push, 1)
-	GDEFINE_ENUM_TYPE (SSG_EVENT, uint8_t);
+	GDEFINE_ENUM_TYPE (SSG_EVENT, u0_t);
 	GDEFINE_ENUM_VALUE(SSG_EVENT, WORLD_EVENT, 0);
 	GDEFINE_ENUM_VALUE(SSG_EVENT, WORLD_ADMIN, 1);
 	GDEFINE_ENUM_VALUE(SSG_EVENT, ACTION_CHAR, 2);
@@ -24,12 +24,12 @@ namespace ssg
 	typedef	::gpk::SEventView	<SSG_EVENT>	EViewSSiege;
 
 	tplt<tpnm _tChildEvent>
-	stainli	::gpk::error_t	eventExtractAndHandle		(const EventSSiege & parentEvent, const ::std::function<::gpk::error_t(const ::gpk::SEventView<_tChildEvent>&)> & funcHandleChild) {
+	stin	gpk::err_t	eventExtractAndHandle		(const EventSSiege & parentEvent, const ::std::function<gpk::err_t(const ::gpk::SEventView<_tChildEvent>&)> & funcHandleChild) {
 		return ::gpk::eventExtractAndHandle<_tChildEvent, SSG_EVENT>(parentEvent, funcHandleChild);
 	}
 
 #define HANDLE_SSG_EVENT(_result, _state, _ssgEventName, _outputEvents) \
-	es_if_failed(_result = ::ssg::eventExtractAndHandle<::ssg::_ssgEventName>(eventToProcess, [&_state, &_outputEvents, &eventToProcess](auto ev){ \
+	if_fail_e(_result = ::ssg::eventExtractAndHandle<::ssg::_ssgEventName>(eventToProcess, [&_state, &_outputEvents, &eventToProcess](auto ev){ \
 		return ::ssg::handle##_ssgEventName(_state, ev, _outputEvents); \
 	}))
 

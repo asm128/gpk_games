@@ -22,11 +22,11 @@ namespace ghg
 {
 	GPK_USING_TYPEINT();
 	
-	stacxpr uint16_t	MAX_PLAYERS				= 4;
-	stacxpr uint32_t	MAX_ORBITER_COUNT		= 6;
+	stxp u1_t	MAX_PLAYERS				= 4;
+	stxp u2_t	MAX_ORBITER_COUNT		= 6;
 
 #pragma pack(push, 1)
-	stacxpr ::gpk::astatic<::gpk::bgra, 16>	PLAYER_COLORS	= 
+	stxp ::gpk::astatic<::gpk::bgra, 16>	PLAYER_COLORS	= 
 		{ 0xFF00FF00U	// GREEN
 		, ::gpk::PURPLE
 		, 0xFF0000FFU	// BLUE
@@ -36,7 +36,7 @@ namespace ghg
 		, 0xFFFF0000U	// RED
 		};
 
-	GDEFINE_ENUM_TYPE(PLAY_TYPE, uint8_t);
+	GDEFINE_ENUM_TYPE(PLAY_TYPE, u0_t);
 	GDEFINE_ENUM_VALUE(PLAY_TYPE, FreeRoam		, 0);
 	GDEFINE_ENUM_VALUE(PLAY_TYPE, Campaign		, 1);
 	GDEFINE_ENUM_VALUE(PLAY_TYPE, Deathmatch	, 2);
@@ -87,16 +87,16 @@ namespace ghg
 		::gpk::SRelativeSpeed	BackgroundSpeed;
 		::gpk::SRelativeTime	SimulatedTime;
 
-		stacxpr	float			Slowing					= -.35f;
-		stacxpr	float			Fasting					= .45f;
+		stxp	float			Slowing					= -.35f;
+		stxp	float			Fasting					= .45f;
 	};
 	 
 	struct SShipController {
-		uint8_t				Forward					: 1;
-		uint8_t				Back					: 1;
-		uint8_t				Left					: 1;
-		uint8_t				Right					: 1;
-		uint8_t				Turbo					: 1;
+		u0_t				Forward					: 1;
+		u0_t				Back					: 1;
+		u0_t				Left					: 1;
+		u0_t				Right					: 1;
+		u0_t				Turbo					: 1;
 	};
 #pragma pack(pop)
 
@@ -112,87 +112,87 @@ namespace ghg
 		::ghg::SGalaxyHellDrawCache			DrawCache;
 		::std::mutex						LockUpdate;
 
-		::gpk::error_t						PilotCreate				(const ::ghg::SShipPilot & shipPilot)			{
-			gpk_necs(Pilots.push_back(shipPilot));
+		gpk::err_t						PilotCreate				(const ::ghg::SShipPilot & shipPilot)			{
+			if_fail_fe(Pilots.push_back(shipPilot));
 			return ShipControllers.push_back({});
 		}
 
-		::gpk::error_t						PilotsReset				()			{
+		gpk::err_t						PilotsReset				()			{
 			while(Pilots.size() < PlayState.Constants.Players) {
 				sc_t									text [64]				= {};
-				sprintf_s(text, "Player %i", Pilots.size() + 1);
-				gpk_necs(Pilots.push_back({::gpk::label(text), PLAYER_COLORS[Pilots.size() % ::gpk::size(PLAYER_COLORS)]}));
+				::sprintf_s(text, "Player %i", Pilots.size() + 1);
+				if_fail_fe(Pilots.push_back({::gpk::label(text), PLAYER_COLORS[Pilots.size() % ::gpk::size(PLAYER_COLORS)]}));
 			}
 			return ShipControllers.resize(PlayState.Constants.Players);
 		}
 
-		::gpk::error_t						Save					(::gpk::au0_t & output)		const	{
-			gpk_necs(::gpk::savePOD(output, PlayState));
-			for(uint32_t iPlayer = 0; iPlayer < PlayState.Constants.Players; ++iPlayer) {
-				gpk_necs(::gpk::saveView(output, Pilots[iPlayer].Name));
-				gpk_necs(::gpk::savePOD(output, Pilots[iPlayer].Color));
+		gpk::err_t						Save					(::gpk::au0_t & output)		const	{
+			if_fail_fe(::gpk::savePOD(output, PlayState));
+			for(u2_t iPlayer = 0; iPlayer < PlayState.Constants.Players; ++iPlayer) {
+				if_fail_fe(::gpk::saveView(output, Pilots[iPlayer].Name));
+				if_fail_fe(::gpk::savePOD(output, Pilots[iPlayer].Color));
 			}
-			gpk_necs(::gpk::saveView(output, ShipControllers));
-			gpk_necs(ShipState.Save(output));
+			if_fail_fe(::gpk::saveView(output, ShipControllers));
+			if_fail_fe(ShipState.Save(output));
 			return 0;
 		}
 
-		::gpk::error_t						Load					(::gpk::vcu0_t & input) {
+		gpk::err_t						Load					(::gpk::vcu0_t & input) {
 			::std::lock_guard						lock(LockUpdate);
 			::gpk::view<const ::ghg::SPlayState>	readPlayState			= {};
-			gpk_necs(::gpk::loadPOD(input, PlayState));
-			gpk_necs(Pilots.resize(PlayState.Constants.Players));
-			for(uint32_t iPlayer = 0; iPlayer < Pilots.size(); ++iPlayer) {
-				gpk_necall(::gpk::loadLabel(input, Pilots[iPlayer].Name), "iPlayer %i", iPlayer);
-				gpk_necall(::gpk::loadPOD(input, Pilots[iPlayer].Color), "iPlayer %i", iPlayer);
+			if_fail_fe(::gpk::loadPOD(input, PlayState));
+			if_fail_fe(Pilots.resize(PlayState.Constants.Players));
+			for(u2_t iPlayer = 0; iPlayer < Pilots.size(); ++iPlayer) {
+				if_fail_fef(::gpk::loadLabel(input, Pilots[iPlayer].Name), "iPlayer %i", iPlayer);
+				if_fail_fef(::gpk::loadPOD(input, Pilots[iPlayer].Color), "iPlayer %i", iPlayer);
 			}
 			ShipControllers.clear();
-			gpk_necs(::gpk::loadView(input, ShipControllers));
-			gpk_necs(ShipState.Load(input));
+			if_fail_fe(::gpk::loadView(input, ShipControllers));
+			if_fail_fe(ShipState.Load(input));
 			return 0;
 		}
 	};
 
-	::gpk::error_t		stageSetup				(::ghg::SGalaxyHell & solarSystem);
-	::gpk::error_t		solarSystemSetup		(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2u1_t & windowSize);
-	::gpk::error_t		solarSystemReset		(::ghg::SGalaxyHell & solarSystem); 
-	::gpk::error_t		solarSystemDraw			(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
-	::gpk::error_t		solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SEventSystem> frameEvents);
-	::gpk::error_t		solarSystemLoad			(::ghg::SGalaxyHell & world,::gpk::vcsc_t filename);
-	::gpk::error_t		solarSystemSave			(const ::ghg::SGalaxyHell & world,::gpk::vcsc_t filename);
+	gpk::err_t		stageSetup				(::ghg::SGalaxyHell & solarSystem);
+	gpk::err_t		solarSystemSetup		(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2u1_t & windowSize);
+	gpk::err_t		solarSystemReset		(::ghg::SGalaxyHell & solarSystem); 
+	gpk::err_t		solarSystemDraw			(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
+	gpk::err_t		solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SEventSystem> frameEvents);
+	gpk::err_t		solarSystemLoad			(::ghg::SGalaxyHell & world,::gpk::vcsc_t filename);
+	gpk::err_t		solarSystemSave			(const ::ghg::SGalaxyHell & world,::gpk::vcsc_t filename);
 	
-	::gpk::error_t		getLightArraysFromDebris
+	gpk::err_t		getLightArraysFromDebris
 		( const ::ghg::SDecoState	& decoState
-		, ::gpk::an3f32				& lightPoints
+		, ::gpk::a3f2_t				& lightPoints
 		, ::gpk::a8bgra				& lightColors
 		, const ::gpk::vc8bgra		& debrisColors
 		);
 
-	::gpk::error_t		getLightArraysFromShips
+	gpk::err_t		getLightArraysFromShips
 		( const ::ghg::SShipManager	& shipState
-		, ::gpk::an3f32				& lightPoints
+		, ::gpk::a3f2_t				& lightPoints
 		, ::gpk::a8bgra				& lightColors
 		);
 
-	::gpk::error_t		getLightArrays
+	gpk::err_t		getLightArrays
 		( const ::ghg::SShipManager	& shipState
 		, const ::ghg::SDecoState	& decoState
-		, ::gpk::an3f32				& lightPoints
+		, ::gpk::a3f2_t				& lightPoints
 		, ::gpk::a8bgra				& lightColors
 		, const ::gpk::vc8bgra		& debrisColors
 		);
 
-	::gpk::error_t		drawOrbiter
+	gpk::err_t		drawOrbiter
 		( const ::ghg::SShipManager		& shipState
-		, const uint32_t				iPartEntity
+		, const u2_t				iPartEntity
 		, const ::gpk::rgbaf			& shipColor	
 		, const float					animationTime
-		, const ::gpk::m4f32			& matrixVP
+		, const ::gpk::m4f2_t			& matrixVP
 		, ::gpk::g8bgra					& targetPixels
-		, ::gpk::gu32					depthBuffer
+		, ::gpk::gu2_t					depthBuffer
 		, ::ghg::SGalaxyHellDrawCache	& drawCache
 		);
 }
 
 #endif // GPK_GALAXY_HELL_H_293874239874
-		  
+

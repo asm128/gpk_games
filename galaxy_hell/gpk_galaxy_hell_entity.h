@@ -6,13 +6,14 @@
 
 namespace ghg 
 {
+	usns gpk;
 #pragma pack(push, 1)
 	struct SGHEntity {
-		int32_t						Parent					= -1;
-		int32_t						Geometry				= -1;
-		int32_t						Transform				= -1;
-		int32_t						Image					= -1;
-		int32_t						Body					= -1;
+		s2_t						Parent					= -1;
+		s2_t						Geometry				= -1;
+		s2_t						Transform				= -1;
+		s2_t						Image					= -1;
+		s2_t						Body					= -1;
 	};
 #pragma pack(pop)
 
@@ -20,22 +21,22 @@ namespace ghg
 		::gpk::apod<::ghg::SGHEntity>	Entities				= {};
 		::gpk::aobj<::gpk::au2_t>		EntityChildren			= {};
 
-		::gpk::error_t				Create					(const ::ghg::SGHEntity & newEntity, ::gpk::vcu32 entityChildren = {})	{ EntityChildren.push_back(entityChildren); return Entities.push_back(newEntity); }
-		::gpk::error_t				Create					()																		{ Create({}); }
+		gpk::err_t				Create					(const ::ghg::SGHEntity & newEntity, ::gpk::vcu2_t entityChildren = {})	{ EntityChildren.push_back(entityChildren); return Entities.push_back(newEntity); }
+		gpk::err_t				Create					()																		{ Create({}); }
 
-		::gpk::error_t				Save					(::gpk::au0_t & output) const { 
-			gpk_necs(::gpk::saveView(output, Entities));
-			for(uint32_t iEntity = 0; iEntity < Entities.size(); ++iEntity) 
-				gpk_necall(::gpk::saveView(output, ::gpk::vcu32{EntityChildren[iEntity]}), "iEntity: %i", iEntity);
+		gpk::err_t				Save					(::gpk::au0_t & output) const { 
+			if_fail_fe(::gpk::saveView(output, Entities));
+			for(u2_t iEntity = 0; iEntity < Entities.size(); ++iEntity) 
+				if_fail_fef(::gpk::saveView(output, ::gpk::vcu2_t{EntityChildren[iEntity]}), "iEntity: %i", iEntity);
 			info_printf("Saved %s, %i", "Entities"					, EntityChildren.size());
 			return 0; 
 		}
 
-		::gpk::error_t				Load					(::gpk::vcu0_t & input) { 
-			gpk_necs(::gpk::loadView(input, Entities));
-			gpk_necall(EntityChildren.resize(Entities.size()), "size: %i", Entities.size());
-			for(uint32_t iEntity = 0; iEntity < Entities.size(); ++iEntity)
-				gpk_necall(::gpk::loadView(input, EntityChildren[iEntity]), "iEntity: %i", iEntity);
+		gpk::err_t				Load					(::gpk::vcu0_t & input) { 
+			if_fail_fe(::gpk::loadView(input, Entities));
+			if_fail_fef(EntityChildren.resize(Entities.size()), "size: %i", Entities.size());
+			for(u2_t iEntity = 0; iEntity < Entities.size(); ++iEntity)
+				if_fail_fef(::gpk::loadView(input, EntityChildren[iEntity]), "iEntity: %i", iEntity);
 
 			return 0; 
 		}		

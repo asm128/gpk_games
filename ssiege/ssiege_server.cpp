@@ -4,15 +4,15 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-::gpk::error_t	ssg::ssiegeServerUpdate		(::ssg::SSiegeServer & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents) { 
-	gpk_necs(::ssg::ssiegeUpdate(app, lastTimeSeconds, inputState, systemEvents, [&app](::gpk::pobj<::ssg::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) {
+gpk::err_t	ssg::ssiegeServerUpdate		(::ssg::SSiegeServer & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents) { 
+	if_fail_fe(::ssg::ssiegeUpdate(app, lastTimeSeconds, inputState, systemEvents, [&app](::gpk::pobj<::ssg::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) {
 		if(!_eventToProcess)
 			return false;
 
 		const ::ssg::EventSSiege	& eventToProcess		= *_eventToProcess;
 		info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));
 
-		::gpk::error_t			result			= 0; 
+		gpk::err_t			result			= 0; 
 		switch(eventToProcess.Type) {
 		CASE_SSG_EVENT(result, app, WORLD_EVENT, outputEvents); 
 		CASE_SSG_EVENT(result, app, WORLD_ADMIN, outputEvents); 
@@ -32,7 +32,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	ssg::handleACTION_CHAR		(::ssg::SSiegeServer & app, const ::ssg::EViewMe & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+gpk::err_t	ssg::handleACTION_CHAR		(::ssg::SSiegeServer & app, const ::ssg::EViewMe & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	const ::ssg::SArgsEvent	& eventArgs		= *(const ::ssg::SArgsEvent*)gameEvent.Data.begin();
 	::ssg::printArgsEvent(eventArgs);
@@ -58,7 +58,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	ssg::handleWORLD_ADMIN		(::ssg::SSiegeServer & app, const ::ssg::EViewAdminWorld & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+gpk::err_t	ssg::handleWORLD_ADMIN		(::ssg::SSiegeServer & app, const ::ssg::EViewAdminWorld & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	const ::ssg::SArgsEvent	& eventArgs		= *(const ::ssg::SArgsEvent*)gameEvent.Data.begin();
 	::ssg::printArgsEvent(eventArgs);
@@ -77,7 +77,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	ssg::handleWORLD_EVENT		(::ssg::SSiegeServer & app, const ::ssg::EViewWorld & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+gpk::err_t	ssg::handleWORLD_EVENT		(::ssg::SSiegeServer & app, const ::ssg::EViewWorld & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	const ::ssg::SArgsEvent	& eventArgs		= *(const ::ssg::SArgsEvent*)gameEvent.Data.begin();
 	::ssg::printArgsEvent(eventArgs);
@@ -95,7 +95,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	ssg::handleCLIENT_ASKS		(::ssg::SSiegeServer & app, const ::ssg::EViewClient & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+gpk::err_t	ssg::handleCLIENT_ASKS		(::ssg::SSiegeServer & app, const ::ssg::EViewClient & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
@@ -105,7 +105,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	ssg::handleWORLD_SETUP		(::ssg::SSiegeServer & world, const ::ssg::EViewWorldSetup & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+gpk::err_t	ssg::handleWORLD_SETUP		(::ssg::SSiegeServer & world, const ::ssg::EViewWorldSetup & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
@@ -116,7 +116,7 @@ GPK_USING_TYPEINT();
 	return 0;
 }
 
-::gpk::error_t	ssg::handleWORLD_VALUE		(::ssg::SSiegeServer & world, const ::ssg::EViewWorldValue & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+gpk::err_t	ssg::handleWORLD_VALUE		(::ssg::SSiegeServer & world, const ::ssg::EViewWorldValue & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 

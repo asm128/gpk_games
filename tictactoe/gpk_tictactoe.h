@@ -18,13 +18,13 @@ namespace gpkg
 		,	CELL_VALUE_MASK		= 3
 		};	// enum
 
-	tplt<tpnm _tNumeric>
+	template<typename _tNumeric>
 	struct Coord2D {
 		_tNumeric			x, y;
 	};
 	typedef	Coord2D<uint32_t>	Coord2Du32;
 
-	// For representing the board cell positions we use this compact structure that works well with grids up to 16x16 cells. For everything else, such as screen coordinates, we use the Coord2D tplt structure.
+	// For representing the board cell positions we use this compact structure that works well with grids up to 16x16 cells. For everything else, such as screen coordinates, we use the Coord2D template structure.
 	struct CellCoord {
 		uint8_t				Row				: 4;
 		uint8_t				Column			: 4;
@@ -118,12 +118,12 @@ namespace gpkg
 	};	// struct
 
 	//
-	tplt <size_t _nWidth, size_t _nHeight>
+	template <size_t _nWidth, size_t _nHeight>
 	struct ScreenASCII {
 		// ----------------------------------------------------  Constants	-------------------------------------------------------------------------
 		static constexpr	int			Width			= (int)_nWidth;
 		static constexpr	int			Height			= (int)_nHeight;
-		sc_t							Cells[_nHeight][_nWidth]	= {};
+		char							Cells[_nHeight][_nWidth]	= {};
 		// ------------------------------------------------	  Methods	-------------------------------------------------------------------------
 		inline constexpr				ScreenASCII		()	noexcept	= default;
 	};
@@ -132,7 +132,7 @@ namespace gpkg
 		// ----------------------------------------------------  Constants	-------------------------------------------------------------------------
 		static constexpr	uint16_t	SCREEN_WIDTH	= 40;
 		static constexpr	uint16_t	SCREEN_HEIGHT	= 12;
-		static constexpr	const sc_t	Symbols[]		= {'-', 'X', 'O'};
+		static constexpr	const char	Symbols[]		= {'-', 'X', 'O'};
 		// ----------------------------------------------------  Variables	-------------------------------------------------------------------------
 		TicTacToeBoard32				Board			= {};
 		// ----------------------------------------------------	  Methods	-------------------------------------------------------------------------
@@ -198,15 +198,15 @@ namespace gpkg
 			return Board.GetWinner();
 		}
 		// --- Display match results text
-		tplt <size_t _nWidth, size_t _nHeight>
-		inline	void					DrawResults		(const CELL_VALUE winner, const Coord2Du32 & textCenter, sc_t (&screen)[_nHeight][_nWidth])	const	noexcept	{
+		template <size_t _nWidth, size_t _nHeight>
+		inline	void					DrawResults		(const CELL_VALUE winner, const Coord2Du32 & textCenter, char (&screen)[_nHeight][_nWidth])	const	noexcept	{
 			sc_t								text[25]		= {};
 			const int32_t						len				= (int32_t)(winner ? ::sprintf_s(text, "Player %u won the match!", (uint32_t)winner) : ::sprintf_s(text, "Tie!"));
 			memcpy(&screen[textCenter.y][textCenter.x - (len >> 1)], text, len);
 		}
 		// --- Display the board
-		tplt <size_t _nWidth, size_t _nHeight>
-		void							DrawBoard		(const Coord2Du32& offset, sc_t (&screen)[_nHeight][_nWidth])									const	noexcept	{
+		template <size_t _nWidth, size_t _nHeight>
+		void							DrawBoard		(const Coord2Du32& offset, char (&screen)[_nHeight][_nWidth])									const	noexcept	{
 			for(uint8_t y = 0, yMax = (_nHeight < 3) ? _nHeight : 3; y < yMax; ++y) {
 				for(uint8_t x = 0, xMax = (_nWidth < 3) ? _nWidth : 3; x < xMax; ++x)
 					screen[offset.y + y][offset.x + x]		= Symbols[Board.GetCellValue(x, y)];
@@ -215,8 +215,8 @@ namespace gpkg
 			screen[_nHeight - 1][_nWidth - 1]	= 0;
 		}
 		// --- Display the board for a given team
-		tplt <size_t _nWidth, size_t _nHeight>
-		void							DrawBoard		(const CELL_VALUE cellValue, const Coord2Du32 & offset, sc_t (&screen)[_nHeight][_nWidth])		const	noexcept	{
+		template <size_t _nWidth, size_t _nHeight>
+		void							DrawBoard		(const CELL_VALUE cellValue, const Coord2Du32 & offset, char (&screen)[_nHeight][_nWidth])		const	noexcept	{
 			const TicTacToeBoard16				board			= Board.GetCells(cellValue);
 			for(uint8_t y = 0, yMax = (_nHeight < 3) ? _nHeight : 3; y < yMax; ++y) {
 				for(uint8_t x = 0, xMax = (_nWidth < 3) ? _nWidth : 3; x < xMax; ++x)

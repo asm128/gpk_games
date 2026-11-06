@@ -9,18 +9,20 @@
 
 namespace ghg 
 {
+	GPK_USING_TYPEINT();
+
 	struct SStars	{
-		::gpk::an2f32		Position			= {};
+		::gpk::a2f2_t		Position			= {};
 		::gpk::af2_t		Speed				= {};
 		::gpk::af2_t		Brightness			= {};
 
-		int					Reset				(::gpk::n2u1_t targetSize, uint16_t starCount = 128)	{
+		int					Reset				(::gpk::n2u1_t targetSize, u1_t starCount = 128)	{
 			if(0 == targetSize.y || 0 == targetSize.x) 
 				return 0;
 			Speed		.resize(starCount);
 			Brightness	.resize(starCount);
 			Position	.resize(starCount);
-			for(uint32_t iStar = 0; iStar < Brightness.size(); ++iStar) {
+			for(u2_t iStar = 0; iStar < Brightness.size(); ++iStar) {
 				Speed		[iStar]		= float(16 + (rand() % 64));
 				Brightness	[iStar]		= float(1.0 / RAND_MAX * rand());
 				Position	[iStar].y	= float(rand() % targetSize.y);
@@ -30,8 +32,8 @@ namespace ghg
 		}
 
 		int					Update				(::gpk::n2u1_t targetSize, float secondsLastFrame)	{
-			stacxpr	double			randUnit			= 1.0 / RAND_MAX;
-			for(uint32_t iStar = 0; iStar < Brightness.size(); ++iStar) {
+			stxp	double			randUnit			= 1.0 / RAND_MAX;
+			for(u2_t iStar = 0; iStar < Brightness.size(); ++iStar) {
 				::gpk::n2f2_t			& starPos			= Position[iStar];
 				float					& starSpeed			= Speed[iStar];
 				starPos.y			+= starSpeed * secondsLastFrame;
@@ -53,7 +55,7 @@ namespace ghg
 		::gpk::af2_t		Brightness			= {};
 		::gpk::SParticles3	Particles			= {};
 		
-		int					Remove				(int32_t iParticle)	{
+		int					Remove				(s2_t iParticle)	{
 			Brightness.remove_unordered(iParticle);
 			return Particles.Remove(iParticle);
 		}
@@ -63,9 +65,9 @@ namespace ghg
 			return Brightness.push_back(brightness);
 		}
 
-		int					SpawnSpherical		(uint32_t countDebris, const ::gpk::n3f2_t & position, float speedDebris, float brightness)	{
-			stacxpr	double			randUnit			= ::gpk::math_2pi / RAND_MAX;
-			for(uint32_t iDebris = 0; iDebris < countDebris; ++iDebris) {
+		int					SpawnSpherical		(u2_t countDebris, const ::gpk::n3f2_t & position, float speedDebris, float brightness)	{
+			stxp	double			randUnit			= ::gpk::math_2pi / RAND_MAX;
+			for(u2_t iDebris = 0; iDebris < countDebris; ++iDebris) {
 				::gpk::n3f2_t									direction			= {0, 1, 0};
 				direction.RotateX(rand() * randUnit);
 				direction.RotateY(rand() * randUnit);
@@ -75,9 +77,9 @@ namespace ghg
 			return 0;
 		}
 
-		int					SpawnDirected		(uint32_t countDebris, double noiseFactor, const ::gpk::n3f2_t & direction, const ::gpk::n3f2_t & position, float speedDebris, float brightness)	{
-			stacxpr	double			randUnit			= ::gpk::math_2pi / RAND_MAX;
-			for(uint32_t iDebris = 0; iDebris < countDebris; ++iDebris) {
+		int					SpawnDirected		(u2_t countDebris, double noiseFactor, const ::gpk::n3f2_t & direction, const ::gpk::n3f2_t & position, float speedDebris, float brightness)	{
+			stxp	double			randUnit			= ::gpk::math_2pi / RAND_MAX;
+			for(u2_t iDebris = 0; iDebris < countDebris; ++iDebris) {
 				::gpk::n3f2_t									finalDirection		= {0, 1, 0};
 				finalDirection.RotateX(rand() * randUnit);
 				finalDirection.RotateY(rand() * randUnit);
@@ -89,7 +91,7 @@ namespace ghg
 
 		int					Update				(float secondsLastFrame)	{
 			Particles.IntegrateSpeed(secondsLastFrame);
-			for(uint32_t iShot = 0; iShot < Particles.Position.size(); ++iShot) {
+			for(u2_t iShot = 0; iShot < Particles.Position.size(); ++iShot) {
 				float					& speed				= Particles.Speed		[iShot];
 				float					& brightness 		= Brightness			[iShot];
 				brightness			-= secondsLastFrame;
@@ -105,14 +107,14 @@ namespace ghg
 
 #pragma pack(push, 1)
 	struct STriColor {
-		uint32_t			Min;
-		uint32_t			Mid;
-		uint32_t			Max;
+		u2_t			Min;
+		u2_t			Mid;
+		u2_t			Max;
 	};
 	struct SScoreParticle {
-		int32_t				Score;
+		s2_t				Score;
 		float				Brightness;
-		uint8_t				IndexColor;
+		u0_t				IndexColor;
 	};
 #pragma pack(pop)
 
@@ -121,7 +123,7 @@ namespace ghg
 		::gpk::SParticles3							Particles	= {};
 		::gpk::array_static<::ghg::STriColor, 256>	Palette		= {{0xFF00FF00, 0xFFFFEE11, 0xFFFF0000}, };
 
-		int								Remove				(int32_t iParticle)	{
+		int								Remove				(s2_t iParticle)	{
 			Scores.remove_unordered(iParticle);
 			return Particles.Remove(iParticle);
 		}
@@ -133,7 +135,7 @@ namespace ghg
 
 		int								Update				(float secondsLastFrame)	{
 			Particles.IntegrateSpeed(secondsLastFrame);
-			for(uint32_t iShot = 0; iShot < Particles.Position.size(); ++iShot) {
+			for(u2_t iShot = 0; iShot < Particles.Position.size(); ++iShot) {
 				::ghg::SScoreParticle		& particle			= Scores[iShot];
 				float						& brightness 		= particle.Brightness;
 				brightness				-= secondsLastFrame;
@@ -152,18 +154,18 @@ namespace ghg
 	};
 
 	struct SExplosion {
-		int32_t							IndexMesh;
-		int32_t							IndexImage;
-		::gpk::arangeu16				Slices;
+		s2_t							IndexMesh;
+		s2_t							IndexImage;
+		::gpk::arangeu1_t				Slices;
 		::gpk::SParticles3				Particles;
 
-		int								Remove				(uint32_t iSlice)			{
+		int								Remove				(u2_t iSlice)			{
 			Particles.Remove(iSlice);
 			return Slices.remove_unordered(iSlice);
 		}
 		int								Update				(float secondsLastFrame)	{
 			Particles.IntegrateSpeed(secondsLastFrame);
-			for(uint32_t iSlice = 0; iSlice < Particles.Speed.size(); ++iSlice) {
+			for(u2_t iSlice = 0; iSlice < Particles.Speed.size(); ++iSlice) {
 				float								& speed				= Particles.Speed[iSlice];
 				//speed							-= secondsLastFrame * (rand() % 16);
 				speed							-= secondsLastFrame * ((0 > speed) ? (rand() % 16) * 5 : (rand() % 16));
@@ -186,8 +188,8 @@ namespace ghg
 		::gpk::SRasterFontManager		FontManager						= {};
 	};
 
-	::gpk::error_t					decoExplosionAdd	(::gpk::aobj<::ghg::SExplosion> & explosions, int32_t indexMesh, int32_t indexImage, uint32_t triangleCount, const ::gpk::n3f2_t &collisionPoint, double debrisSpeed);
-	::gpk::error_t					decoUpdate			(::ghg::SDecoState & decoState, double secondsLastFrame, double relativeSpeed, const ::gpk::n2u1_t & screenMetrics);
+	gpk::err_t					decoExplosionAdd	(::gpk::aobj<::ghg::SExplosion> & explosions, s2_t indexMesh, s2_t indexImage, u2_t triangleCount, const ::gpk::n3f2_t &collisionPoint, double debrisSpeed);
+	gpk::err_t					decoUpdate			(::ghg::SDecoState & decoState, double secondsLastFrame, double relativeSpeed, const ::gpk::n2u1_t & screenMetrics);
 }
 
 #endif // GPK_GALAXY_HELL_DECO_H_293874239874

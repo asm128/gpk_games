@@ -14,20 +14,24 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-::gpk::error_t			ghg::solarSystemSave	(const ::ghg::SGalaxyHell & game, ::gpk::vcsc_t fileName) {
+gpk::err_t			ghg::solarSystemSave	(const ::ghg::SGalaxyHell & game, ::gpk::vcsc_t fileName) {
 	::gpk::au0_t					serialized;
-	gpk_necs(game.Save(serialized));
-	gpk_necs(::gpk::deflateFromMemory(fileName, serialized));
+	if_fail_fe(game.Save(serialized));
+	::gpk::au0_t					deflated;
+	if_fail_fe(::gpk::arrayDeflate(serialized, deflated));
+	if_fail_fe(::gpk::fileFromMemory({fileName}, deflated));
 	return 0;
 }
 
-::gpk::error_t			ghg::solarSystemLoad	(::ghg::SGalaxyHell & world,::gpk::vcsc_t filename) {
+gpk::err_t			ghg::solarSystemLoad	(::ghg::SGalaxyHell & world,::gpk::vcsc_t filename) {
+	::gpk::au0_t					deflated;
+	if_fail_fe(::gpk::fileToMemory({filename}, deflated));
 	::gpk::au0_t					serialized;
-	gpk_necs(::gpk::inflateToMemory(filename, serialized));
+	if_fail_fe(::gpk::arrayInflate(deflated, serialized));
 
 	::gpk::vcu0_t					viewSerialized			= serialized;
 	if (failed(world.Load(viewSerialized))) {
-		gpk_necs(::ghg::solarSystemReset(world));
+		if_fail_fe(::ghg::solarSystemReset(world));
 		return -1;
 	}
 
@@ -36,14 +40,14 @@ GPK_USING_TYPEINT();
 	return 0;
 }
 
-static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t teamId, int32_t iGeometry, int32_t iImage)	{
+static	gpk::err_t	shipCreate				(::ghg::SShipManager & shipState, s2_t teamId, s2_t iGeometry, s2_t iImage)	{
 	::ghg::SShipScene			& scene					= shipState.Scene;
-	const uint32_t				countParts				= 6;
+	const u2_t				countParts				= 6;
 
 	::gpk::SSpaceshipCore		ship					= {};
 	//shipState.Engine.CreateSphere();
 
-	int32_t						iEntityMain;
+	s2_t						iEntityMain;
 	{	// Create main ship entity
 		::ghg::SGHEntity			entity					= {-1};
 		entity					= {-1};
@@ -51,18 +55,18 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 		entity.Transform		= scene.Transforms.push_back(shipState.Engine.Integrator.MatrixIdentity4);
 		entity.Image			= -1;	//iImage % 5;
 		entity.Body				= shipState.Engine.Integrator.Create();
-		gpk_necs(shipState.ShipCoreEntity.push_back(iEntityMain = shipState.EntitySystem.Create(entity, {})));
+		if_fail_fe(shipState.ShipCoreEntity.push_back(iEntityMain = shipState.EntitySystem.Create(entity, {})));
 		ship.Team				= teamId;
-		//const int32_t				indexBody				= shipState.ShipPhysics.Create(); 
+		//const s2_t				indexBody				= shipState.ShipPhysics.Create(); 
 		//(void)indexBody;
 	}
-	const int32_t				indexShip				= shipState.SpaceshipManager.ShipCores.push_back(ship);
+	const s2_t				indexShip				= shipState.SpaceshipManager.ShipCores.push_back(ship);
 	shipState.SpaceshipManager.ShipParts.push_back({});
 	shipState.SpaceshipManager.ShipScores.push_back({});
 
 	//ship.Parts.reserve(countParts);
 	::ghg::SGHEntity			entityOrbit				= {};
-	for(uint32_t iPart = 0; iPart < countParts; ++iPart) {	// Create child parts
+	for(u2_t iPart = 0; iPart < countParts; ++iPart) {	// Create child parts
 		::ghg::SGHEntity			entityPart				= {-1};
 		entityOrbit.Parent		= iEntityMain;
 		entityOrbit.Geometry	= -1;
@@ -87,14 +91,14 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 		entityPart.Transform	= scene.Transforms.push_back(shipState.Engine.Integrator.MatrixIdentity4);
 		entityPart.Image		= iImage % shipState.Scene.Image.size();
 		entityPart.Body			= entityOrbit.Body + 1;
-		int32_t						indexEntityPart			= shipState.EntitySystem.Create(entityPart, {});
+		s2_t						indexEntityPart			= shipState.EntitySystem.Create(entityPart, {});
 		shipState.EntitySystem.EntityChildren[entityPart.Parent].push_back(indexEntityPart);
 		//solarSystem.ShipPhysics.Transforms[entityOrbit.Body].Orientation.Normalize();
 		shipState.Engine.Integrator.SetActive(entityPart.Body, true);
 
 		::gpk::SSpaceshipOrbiter				shipPart				= {};
 		shipState.ShipPartEntity.push_back(entityPart.Parent);
-		shipState.SpaceshipManager.ShipParts[indexShip].push_back((uint16_t)shipState.SpaceshipManager.Orbiters.push_back(shipPart));
+		shipState.SpaceshipManager.ShipParts[indexShip].push_back((u1_t)shipState.SpaceshipManager.Orbiters.push_back(shipPart));
 		shipState.SpaceshipManager.ShipOrbiterActionQueue.push_back({});
 
 		::gpk::au2_t					& parentEntityChildren	= shipState.EntitySystem.EntityChildren[iEntityMain];
@@ -103,11 +107,11 @@ static	::gpk::error_t	shipCreate				(::ghg::SShipManager & shipState, int32_t te
 	return indexShip;
 }
 
-//static	int			engineCreate		(::ghg::SGalaxyHell & solarSystem, int32_t iImage)	{
+//static	int			engineCreate		(::ghg::SGalaxyHell & solarSystem, s2_t iImage)	{
 //	return 0;
 //}
 
-static	::gpk::error_t	shipGeometryBuildEngine			(::gpk::SGeometryQuads & geometry)			{
+static	gpk::err_t	shipGeometryBuildEngine			(::gpk::SGeometryQuads & geometry)			{
 	::gpk::geometryBuildHelix(geometry, 8U, 8U, 0.15f, {0, 1.1f, 0}, {1, 1, 1});
 	//::gpk::geometryBuildCylinder(geometry, 1U, 6U, .05f, .05f, {0, 1, 0}, {1, 1, 1});
 	::gpk::geometryBuildCylinder(geometry, 1U, 8U, .35f, .25f, {0, 1, 0}, {1, 1, 1});
@@ -115,7 +119,7 @@ static	::gpk::error_t	shipGeometryBuildEngine			(::gpk::SGeometryQuads & geometr
 	return 0;
 }
 
-static	::gpk::error_t	shipGeometryBuildWafer			(::gpk::SGeometryQuads & geometry)			{
+static	gpk::err_t	shipGeometryBuildWafer			(::gpk::SGeometryQuads & geometry)			{
 	::shipGeometryBuildEngine(geometry);
 	::gpk::geometryBuildCube(geometry, {1.2f, 0.5f, 1.2f});
 	::gpk::geometryBuildGrid(geometry, {1U, 1U}, { 0.75f, .75f}, { 1.5, 1, 1.5});
@@ -123,7 +127,7 @@ static	::gpk::error_t	shipGeometryBuildWafer			(::gpk::SGeometryQuads & geometry
 	return 0;
 }
 
-static	::gpk::error_t	shipGeometryBuildWaferShotgun	(::gpk::SGeometryQuads & geometry)			{
+static	gpk::err_t	shipGeometryBuildWaferShotgun	(::gpk::SGeometryQuads & geometry)			{
 	::shipGeometryBuildEngine(geometry);
 	::gpk::geometryBuildCube(geometry, {.3f, 1.5f, .3f}, {-.25f, 0, -.25f});
 	::gpk::geometryBuildCube(geometry, {.3f, 1.5f, .3f}, {-.25f, 0, .25f});
@@ -134,7 +138,7 @@ static	::gpk::error_t	shipGeometryBuildWaferShotgun	(::gpk::SGeometryQuads & geo
 	return 0;
 }
 
-static	::gpk::error_t	shipGeometryBuildGun		(::gpk::SGeometryQuads & geometry)						{
+static	gpk::err_t	shipGeometryBuildGun		(::gpk::SGeometryQuads & geometry)						{
 	::shipGeometryBuildEngine(geometry);
 	::gpk::geometryBuildSphere	(geometry, 8U, 5U, .7f, {0, 0});
 	::gpk::geometryBuildFigure0	(geometry, 2U, 8U, 1, {});
@@ -143,7 +147,7 @@ static	::gpk::error_t	shipGeometryBuildGun		(::gpk::SGeometryQuads & geometry)		
 	return 0;
 }
 
-static	::gpk::error_t	shipGeometryBuildShotgun	(::gpk::SGeometryQuads & geometry)						{
+static	gpk::err_t	shipGeometryBuildShotgun	(::gpk::SGeometryQuads & geometry)						{
 	::shipGeometryBuildEngine(geometry);
 	::gpk::geometryBuildSphere	(geometry, 8U, 5U, .35f, {0, 0});
 	::gpk::geometryBuildFigure0	(geometry, 2U, 8U, 1, {});
@@ -154,7 +158,7 @@ static	::gpk::error_t	shipGeometryBuildShotgun	(::gpk::SGeometryQuads & geometry
 	return 0;
 }
 
-static	::gpk::error_t	shipGeometryBuildCannon		(::gpk::SGeometryQuads & geometry)			{
+static	gpk::err_t	shipGeometryBuildCannon		(::gpk::SGeometryQuads & geometry)			{
 	::shipGeometryBuildEngine(geometry);
 	::gpk::geometryBuildSphere	(geometry, 8U, 5U, .8f, {0, 0});
 	::gpk::geometryBuildTender	(geometry, 8U, 8U, .75f, {0, -.5, 0}, { .25, .8f, .25});
@@ -162,36 +166,36 @@ static	::gpk::error_t	shipGeometryBuildCannon		(::gpk::SGeometryQuads & geometry
 	return 0;
 }
 
-static	::gpk::error_t	shipGeometryBuildCannonball	(::gpk::SGeometryQuads & geometry)			{
+static	gpk::err_t	shipGeometryBuildCannonball	(::gpk::SGeometryQuads & geometry)			{
 	::gpk::geometryBuildSphere		(geometry, 6U, 4U, .5f, {0, 0});
 	return 0;
 }
 
-static	::gpk::error_t	shipGeometryBuildRocket		(::gpk::SGeometryQuads & geometry)			{
+static	gpk::err_t	shipGeometryBuildRocket		(::gpk::SGeometryQuads & geometry)			{
 	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .125f, {}, {1, 1, 1});
 	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .125f, {}, {-1, 1, 1});
 	return 0;
 }
 
-static	::gpk::error_t	shipGeometryBuildMissile	(::gpk::SGeometryQuads & geometry)			{
+static	gpk::err_t	shipGeometryBuildMissile	(::gpk::SGeometryQuads & geometry)			{
 	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .125f, {}, {1, 1, 1});
 	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .125f, {}, {-1, 1, 1});
 	return 0;
 }
 
-static	::gpk::error_t	shipGeometryBuildBullet		(::gpk::SGeometryQuads & geometry)			{
+static	gpk::err_t	shipGeometryBuildBullet		(::gpk::SGeometryQuads & geometry)			{
 	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .125f, {}, {1, 1, 1});
 	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .001f, {}, {-1, 1, 1});
 	return 0;
 }
 
-static	::gpk::error_t	shipGeometryBuildShred		(::gpk::SGeometryQuads & geometry)			{
+static	gpk::err_t	shipGeometryBuildShred		(::gpk::SGeometryQuads & geometry)			{
 	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .125f, {}, {1, 1, 1});
 	::gpk::geometryBuildCylinder(geometry, 2U, 8U, .125f, .001f, {}, {-1, 1, 1});
 	return 0;
 }
 
-static	::gpk::error_t	modelsSetupOld			(::ghg::SShipScene & scene)			{
+static	gpk::err_t	modelsSetupOld			(::ghg::SShipScene & scene)			{
 	scene.Geometry.resize(::gpk::get_value_count<gpk::SHIP_GEOMETRY>() * 1024);
 
 	::shipGeometryBuildEngine		(scene.Geometry[::gpk::SHIP_GEOMETRY_Engine			]);
@@ -212,19 +216,19 @@ static	::gpk::error_t	modelsSetupOld			(::ghg::SShipScene & scene)			{
 	{
 
 		::gpk::apod<::gpk::rgbaf>	baseColors;
-		for(uint32_t i = 0; i < 4096; ++i)
+		for(u2_t i = 0; i < 4096; ++i)
 			baseColors.push_back({(float)::gpk::noiseNormal1D(rand()), (float)::gpk::noiseNormal1D(rand()), (float)::gpk::noiseNormal1D(rand()), 1});
 
 		scene.Image.resize(256);
-		for(uint32_t iImage = 0; iImage < scene.Image.size(); ++iImage) {
+		for(u2_t iImage = 0; iImage < scene.Image.size(); ++iImage) {
 			::gpk::img<::gpk::bgra>		& image					= scene.Image[iImage];
 			if(image.Texels.size())
 				continue;
 			image.resize(::gpk::n2u2_t{32, 5});
-			for(uint32_t y = 0; y < image.metrics().y; ++y) {// Generate noise color for planet texture
+			for(u2_t y = 0; y < image.metrics().y; ++y) {// Generate noise color for planet texture
 				bool						xAffect					= (y % 2);
 				::gpk::rgbaf				lineColor				= baseColors[(iImage + (rand() % 4)) % (baseColors.size() - 4)];
-				for(uint32_t x = 0; x < image.metrics().x; ++x) {
+				for(u2_t x = 0; x < image.metrics().x; ++x) {
 					image.Texels[y * image.metrics().x + x]				= (lineColor * (xAffect ? ::gpk::max(.25, ::gpk::sin(x * (1.0 / image.metrics().x * ::gpk::math_pi))) : 1)).Clamp();
 				}
 			}
@@ -233,29 +237,29 @@ static	::gpk::error_t	modelsSetupOld			(::ghg::SShipScene & scene)			{
 	return 0;
 }
 
-static	::gpk::error_t	shipNodeCreateRoot	(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) {
+static	gpk::err_t	shipNodeCreateRoot	(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) {
 	gpk::SMeshManager			& meshes			= graphics.Meshes;
-	const uint32_t				rootNode			= (uint32_t)nodes.Create();
-	nodes[rootNode].Mesh	= (uint32_t)meshes.Create();
+	const u2_t				rootNode			= (u2_t)nodes.Create();
+	nodes[rootNode].Mesh	= (u2_t)meshes.Create();
 	meshes[nodes[rootNode].Mesh]->ConstantBuffers.clear();
 	meshes[nodes[rootNode].Mesh]->Desc.Type			= ::gpk::GEOMETRY_TYPE_Triangle;
 	meshes[nodes[rootNode].Mesh]->Desc.Mode			= ::gpk::MESH_MODE_List;
 	return rootNode;
 }
 
-static	::gpk::error_t	shipNodeBuildEngine			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildWafer			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildWaferShotgun	(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildGun			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildShotgun		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildCannon			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildCannonball		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildRocket			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildMissile		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildBullet			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
-static	::gpk::error_t	shipNodeBuildShred			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const uint32_t rootNode = (uint32_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	gpk::err_t	shipNodeBuildEngine			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const u2_t rootNode = (u2_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	gpk::err_t	shipNodeBuildWafer			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const u2_t rootNode = (u2_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	gpk::err_t	shipNodeBuildWaferShotgun	(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const u2_t rootNode = (u2_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	gpk::err_t	shipNodeBuildGun			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const u2_t rootNode = (u2_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	gpk::err_t	shipNodeBuildShotgun		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const u2_t rootNode = (u2_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	gpk::err_t	shipNodeBuildCannon			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const u2_t rootNode = (u2_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	gpk::err_t	shipNodeBuildCannonball		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const u2_t rootNode = (u2_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	gpk::err_t	shipNodeBuildRocket			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const u2_t rootNode = (u2_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	gpk::err_t	shipNodeBuildMissile		(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const u2_t rootNode = (u2_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	gpk::err_t	shipNodeBuildBullet			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const u2_t rootNode = (u2_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
+static	gpk::err_t	shipNodeBuildShred			(::gpk::SRenderNodeManager & nodes, ::gpk::SEngineGraphics & graphics) { const u2_t rootNode = (u2_t)shipNodeCreateRoot(nodes, graphics); return rootNode; }
 
-static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
+static	gpk::err_t	modelsSetup			(::gpk::SEngine & engine)			{
 	gpk::pobj<gpk::SEngineScene>	scene			= engine.Scene;
 
 	gpk::SRenderNodeManager		& nodes				= scene->RenderNodes;
@@ -282,7 +286,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 	return 0;
 }
 
-::gpk::error_t			ghg::solarSystemReset	(::ghg::SGalaxyHell & solarSystem)	{	// Set up enemy ships
+gpk::err_t			ghg::solarSystemReset	(::ghg::SGalaxyHell & solarSystem)	{	// Set up enemy ships
 	::std::lock_guard			lock					(solarSystem.LockUpdate);
 	solarSystem.ShipControllers.clear();
 	solarSystem.ShipState.Clear();
@@ -294,8 +298,8 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 }
 
 
-::gpk::error_t			ghg::stageSetup			(::ghg::SGalaxyHell & solarSystem)	{	// Set up enemy ships
-	stacxpr	uint32_t			partHealth				= 100;
+gpk::err_t			ghg::stageSetup			(::ghg::SGalaxyHell & solarSystem)	{	// Set up enemy ships
+	stxp	u2_t			partHealth				= 100;
 
 	solarSystem.PlayState.TimeStage		= 0;
 	solarSystem.PlayState.TimeRealStage	= 0;
@@ -307,7 +311,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		memset(solarSystem.ShipState.SpaceshipManager.ShipScores.begin(), 0, solarSystem.ShipState.SpaceshipManager.ShipScores.byte_count());
 		while(solarSystem.Pilots.size() < solarSystem.PlayState.Constants.Players) {
 			sc_t						text [64]				= {};
-			sprintf_s(text, "Player %i", solarSystem.Pilots.size() + 1);
+			::sprintf_s(text, "Player %i", solarSystem.Pilots.size() + 1);
 			solarSystem.Pilots.push_back({::gpk::label(text), PLAYER_COLORS[solarSystem.Pilots.size() % ::gpk::size(PLAYER_COLORS)]});
 		}
 		solarSystem.ShipControllers.resize(solarSystem.PlayState.Constants.Players);
@@ -316,14 +320,14 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 #pragma pack(push, 1)
 	struct SShipOrbiterSetup {
 		::gpk::SHIP_PART_TYPE	Type			;
-		uint32_t				MaxHealth		;
+		u2_t				MaxHealth		;
 		::gpk::WEAPON_TYPE		Weapon			;
 		double					MaxDelay		;
 		double					Stability		;
 		::gpk::WEAPON_LOAD		Munition		;
 		float					Speed			;
-		int32_t					Damage			;
-		uint8_t					ParticleCount	;
+		s2_t					Damage			;
+		u0_t					ParticleCount	;
 		double					Cooldown		;
 		double					OverheatPerShot	;
 		double					ShotLifetime	;
@@ -334,7 +338,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 
 	::gpk::SJSONFile			stageFile					= {};
 	sc_t						stageFileName		[256]	= "./%s.json";
-	stacxpr SShipOrbiterSetup	weaponDefinitions	[]		=
+	stxp SShipOrbiterSetup	weaponDefinitions	[]		=
 		{ {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .08, 0.975, ::gpk::WEAPON_LOAD_Bullet		,  256,    20, 1,   0,0.00,  1.5, ::gpk::DAMAGE_TYPE_Pierce	}
 		, {::gpk::SHIP_PART_TYPE_Shotgun		, 128, ::gpk::WEAPON_TYPE_Shotgun	, .16, 0.925, ::gpk::WEAPON_LOAD_Bullet		,  160,    10, 6,   0,0.00,  1.5, ::gpk::DAMAGE_TYPE_Impact	}
 		, {::gpk::SHIP_PART_TYPE_Wafer			, 128, ::gpk::WEAPON_TYPE_Gun		, .24, 0.99, ::gpk::WEAPON_LOAD_Ray			,  480,    30, 1,   1,0.50,  1, ::gpk::DAMAGE_TYPE_Pierce	| ::gpk::DAMAGE_TYPE_Burn	}
@@ -350,10 +354,10 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		, {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .12, 0.50, ::gpk::WEAPON_LOAD_Missile		,  160,   112, 1,   1,0.25,  5, ::gpk::DAMAGE_TYPE_Burn | ::gpk::DAMAGE_TYPE_Wave }
 		};
 
-	sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.GlobalState.Stage + solarSystem.PlayState.PlaySetup.OffsetStage);
+	::sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.GlobalState.Stage + solarSystem.PlayState.PlaySetup.OffsetStage);
 	if(0 <= ::gpk::fileToMemory(stageFileName, stageFile.Bytes) && stageFile.Bytes.size()) {
 		::std::lock_guard			lock	(solarSystem.LockUpdate);
-		gpk_necall(-1 == ::gpk::jsonParse(stageFile.Reader, stageFile.Bytes), "%s", stageFileName);
+		if_fail_fef(::gpk::jsonParse(stageFile.Reader, stageFile.Bytes), "%s", stageFileName);
 	} 
 	else {
 		::std::lock_guard			lock	(solarSystem.LockUpdate);
@@ -374,8 +378,8 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 			solarSystem.PlayState.GlobalState.CameraSwitchDelay	= 0;
 			solarSystem.ShipState.Scene.Global.CameraReset();
 
-			for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.Constants.Players; ++iPlayer) {
-				const int32_t				indexShip			= ::shipCreate(solarSystem.ShipState, 0, 0, iPlayer);
+			for(u2_t iPlayer = 0; iPlayer < solarSystem.PlayState.Constants.Players; ++iPlayer) {
+				const s2_t				indexShip			= ::shipCreate(solarSystem.ShipState, 0, 0, iPlayer);
 				::gpk::SBodyCenter			& shipPivot			= solarSystem.ShipState.GetShipPivot(indexShip);
 				shipPivot.Orientation.MakeFromEuler({0, 0, (float)(-::gpk::math_pi_2)});
 				shipPivot.Position		= {-30};
@@ -384,35 +388,35 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 		}
 		// Set up enemy ships
 		while(((int)solarSystem.ShipState.SpaceshipManager.ShipCores.size() - (int)solarSystem.PlayState.Constants.Players - 1) < (int)(solarSystem.PlayState.GlobalState.Stage + solarSystem.PlayState.PlaySetup.OffsetStage)) {	// Create enemy ships depending on stage.
-			int32_t						indexShip				= ::shipCreate(solarSystem.ShipState, 1, -1, solarSystem.PlayState.GlobalState.Stage + solarSystem.ShipState.SpaceshipManager.ShipCores.size());
+			s2_t						indexShip				= ::shipCreate(solarSystem.ShipState, 1, -1, solarSystem.PlayState.GlobalState.Stage + solarSystem.ShipState.SpaceshipManager.ShipCores.size());
 			::gpk::SBodyCenter			& shipPivot				= solarSystem.ShipState.GetShipPivot(indexShip);
 			shipPivot.Orientation.MakeFromEuler({0, 0, (float)(::gpk::math_pi_2)});
 			shipPivot.Position		= {5.0f + 5 * solarSystem.ShipState.SpaceshipManager.ShipCores.size()};
 
 			::gpk::au1_t					& enemyShipOrbiters		= solarSystem.ShipState.SpaceshipManager.ShipParts[indexShip];
-			for(uint32_t iPart = 0; iPart < enemyShipOrbiters.size(); ++iPart) {
+			for(u2_t iPart = 0; iPart < enemyShipOrbiters.size(); ++iPart) {
 				solarSystem.ShipState.Engine.Integrator.Forces[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[enemyShipOrbiters[iPart]]].Body].Rotation.y *= float(1 + indexShip * .35);
 			}
 		}
 
 
-		cnstxpr int32_t				DEFAULT_NITRO					= 1;
+		stxp f2_t				DEFAULT_NITRO					= 1;
 		// set up weapons
-		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShip) {
+		for(u2_t iShip = 0; iShip < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShip) {
 			::gpk::SSpaceshipCore		& ship							= solarSystem.ShipState.SpaceshipManager.ShipCores[iShip];
 			::gpk::au1_t					& shipParts						= solarSystem.ShipState.SpaceshipManager.ShipParts[iShip];
 			ship.Health				= 0;
 			ship.Nitro				= {DEFAULT_NITRO, DEFAULT_NITRO};
 
-			for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
+			for(u2_t iPart = 0; iPart < shipParts.size(); ++iPart) {
 				::gpk::SSpaceshipOrbiter			& shipPart						= solarSystem.ShipState.SpaceshipManager.Orbiters[shipParts[iPart]];
 				//ship.Team			= iShip ? 1 : 0;
-				int32_t					weapon							= 0;
+				s2_t					weapon							= 0;
 				if(0 == ship.Team) {
-					uint32_t				minWeapon						= solarSystem.PlayState.GlobalState.Stage / 4;
-					uint32_t				maxWeapon						= ::gpk::min(solarSystem.PlayState.GlobalState.Stage, ::gpk::size(weaponDefinitions) - 1);
+					u2_t				minWeapon						= solarSystem.PlayState.GlobalState.Stage / 4;
+					u2_t				maxWeapon						= ::gpk::min(solarSystem.PlayState.GlobalState.Stage, ::gpk::size(weaponDefinitions) - 1);
 
-					weapon				= (int32_t)::gpk::clamped(minWeapon + iPart, minWeapon, maxWeapon);
+					weapon				= (s2_t)::gpk::clamped(minWeapon + iPart, minWeapon, maxWeapon);
 					solarSystem.ShipState.SpaceshipManager.ShipOrbiterActionQueue[shipParts[0]]->push_back(::gpk::SHIP_ACTION_Spawn);
 
 				}
@@ -427,7 +431,7 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 
 				SShipOrbiterSetup				partCreationData	= weaponDefinitions[weapon];
 				::gpk::SWeapon					newWeapon			= {};
-				shipPart.Health.Value		= (int32_t)(shipPart.Health.Limit = partCreationData.MaxHealth);
+				shipPart.Health.Value		= (s2_t)(shipPart.Health.Limit = partCreationData.MaxHealth);
 				shipPart.Type				= partCreationData.Type;
 				newWeapon.Trigger.Delay.Limit		= (float)partCreationData.MaxDelay;
 				if(0 != ship.Team)
@@ -453,9 +457,9 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
  				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_Cannon		) { solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Geometry = ::gpk::SHIP_GEOMETRY_Cannon;		}
  				else if(shipPart.Type == ::gpk::SHIP_PART_TYPE_ShotgunWafer	) { solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Geometry = ::gpk::SHIP_GEOMETRY_WaferShotgun;	}
 				ship.Health				+= shipPart.Health.Value;
-				const uint32_t				width		= ::gpk::get_value_count<::gpk::WEAPON_LOAD>();
-				const uint32_t				height		= ::gpk::get_value_count<::gpk::WEAPON_TYPE>();
-				const uint32_t				depth		= ::gpk::get_value_count<::gpk::SHIP_PART_TYPE>();
+				const u2_t				width		= ::gpk::get_value_count<::gpk::WEAPON_LOAD>();
+				const u2_t				height		= ::gpk::get_value_count<::gpk::WEAPON_TYPE>();
+				const u2_t				depth		= ::gpk::get_value_count<::gpk::SHIP_PART_TYPE>();
 				solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Image	= iShip * width * height * depth + shipPart.Type * width * height + newWeapon.Type * width + newWeapon.Shot.Type;
 				solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Image	%= solarSystem.ShipState.Scene.Image.size();
 				solarSystem.ShipState.Engine.Integrator.Centers[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[shipParts[iPart]] + 1].Body].Orientation = {0, 0, 0, 1};
@@ -472,20 +476,20 @@ static	::gpk::error_t	modelsSetup			(::gpk::SEngine & engine)			{
 	return 0;
 }
 
-::gpk::error_t			ghg::solarSystemSetup	(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2u1_t & windowSize)	{
-	gpk_necs(::modelsSetup(solarSystem.ShipState.Engine));
-	gpk_necs(::modelsSetupOld(solarSystem.ShipState.Scene));
+gpk::err_t			ghg::solarSystemSetup	(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2u1_t & windowSize)	{
+	if_fail_fe(::modelsSetup(solarSystem.ShipState.Engine));
+	if_fail_fe(::modelsSetupOld(solarSystem.ShipState.Scene));
 
 	solarSystem.DecoState.FontManager.Fonts.clear();
-	gpk_necs(::gpk::rasterFontDefaults(solarSystem.DecoState.FontManager));
+	if_fail_fe(::gpk::rasterFontDefaults(solarSystem.DecoState.FontManager));
 
-	gpk_necs(::ghg::stageSetup(solarSystem));
+	if_fail_fe(::ghg::stageSetup(solarSystem));
 
-	::gpk::m4f32				& matrixProjection		= solarSystem.ShipState.Scene.Global.MatrixProjection;
+	::gpk::m4f2_t				& matrixProjection		= solarSystem.ShipState.Scene.Global.MatrixProjection;
 	matrixProjection.FieldOfView(::gpk::math_pi * .25, windowSize.x / (double)windowSize.y, 0.01, 500.0);
 
-	::gpk::m4f32				matrixViewport			= {};
-	matrixViewport.ViewportLH(windowSize.u1_t());
+	::gpk::m4f2_t				matrixViewport			= {};
+	matrixViewport.ViewportLH(windowSize.u1());
 	matrixProjection		*= matrixViewport;
 	return 0;
 }

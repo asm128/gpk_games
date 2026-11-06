@@ -27,14 +27,14 @@ namespace ghg
 
 #pragma pack(push, 1)
 	struct SShipSceneGlobal	{
-		::gpk::m4f32			MatrixProjection	= {};
+		::gpk::m4f2_t			MatrixProjection	= {};
 		::gpk::n3f2_t			LightVector			= {0, -12, 0};
 		CAMERA_MODE				CameraMode			= CAMERA_MODE_PERSPECTIVE;
 
 		::gpk::astatic<::gpk::SCameraPoints, ::ghg::CAMERA_MODE_COUNT>	
 								Camera				= {};
 
-		::gpk::error_t			CameraReset			() {
+		gpk::err_t			CameraReset			() {
 			Camera[CAMERA_MODE_SKY].Target		= {};
 			Camera[CAMERA_MODE_SKY].Position	= {-0.000001f, 250, 0};
 			//Camera[CAMERA_MODE_SKY].Up			= {0, 1, 0};
@@ -56,27 +56,27 @@ namespace ghg
 		::ghg::SShipSceneGlobal				Global;
 		::gpk::aobj<::gpk::SGeometryQuads>	Geometry		= {};
 		::gpk::aobj<::gpk::img8bgra>		Image			= {};
-		::gpk::apod<::gpk::m4f32>			Transforms		= {}; // Ope per entity
+		::gpk::apod<::gpk::m4f2_t>			Transforms		= {}; // Ope per entity
 
-		::gpk::error_t						Save			(::gpk::au0_t & output) const { 
-			gpk_necs(::gpk::savePOD		(output, Global));
-			gpk_necs(::gpk::saveView	(output, Transforms));
+		gpk::err_t						Save			(::gpk::au0_t & output) const { 
+			if_fail_fe(::gpk::savePOD		(output, Global));
+			if_fail_fe(::gpk::saveView	(output, Transforms));
 			info_printf("Saved %s, %i", "Transforms"	, Transforms.size());
 			return 0; 
 		}
 
-		::gpk::error_t						Load			(::gpk::vcu0_t & input) { 
-			gpk_necs(::gpk::loadPOD	(input, Global		));
-			gpk_necs(::gpk::loadView(input, Transforms	));
+		gpk::err_t						Load			(::gpk::vcu0_t & input) { 
+			if_fail_fe(::gpk::loadPOD	(input, Global		));
+			if_fail_fe(::gpk::loadView(input, Transforms	));
 			return 0; 
 		}
 	};
 
-	::gpk::error_t			getLightArrays
+	gpk::err_t			getLightArrays
 		( const ::gpk::n3f2_t	& modelPosition
-		, const ::gpk::vn3f32	& lightPointsWorld
+		, const ::gpk::v3f2_t	& lightPointsWorld
 		, const ::gpk::a8bgra	& lightColorsWorld
-		, ::gpk::an3f32			& lightPointsModel
+		, ::gpk::a3f2_t			& lightPointsModel
 		, ::gpk::a8bgra			& lightColorsModel
 		);
 
@@ -92,7 +92,7 @@ namespace ghg
 		::ghg::SEntitySystem		EntitySystem		= {};
 		::ghg::SShipScene			Scene				= {};
 
-		int32_t						Clear				()	{
+		s2_t						Clear				()	{
 			SpaceshipManager.Clear();
 			WeaponManager.Clear();
 			::gpk::clear(Scene.Transforms, ShipCoreEntity, ShipPartEntity);
@@ -104,42 +104,42 @@ namespace ghg
 			return 0;
 		}
 
-		inline	::gpk::SBodyCenter&			GetShipPivot		(uint32_t indexShip)				{ return Engine.Integrator.Centers[EntitySystem.Entities[ShipCoreEntity[indexShip]].Body]; }
-		inline	const ::gpk::SBodyCenter&	GetShipPivot		(uint32_t indexShip)		const	{ return Engine.Integrator.Centers[EntitySystem.Entities[ShipCoreEntity[indexShip]].Body]; }
+		inline	::gpk::SBodyCenter&			GetShipPivot		(u2_t indexShip)				{ return Engine.Integrator.Centers[EntitySystem.Entities[ShipCoreEntity[indexShip]].Body]; }
+		inline	const ::gpk::SBodyCenter&	GetShipPivot		(u2_t indexShip)		const	{ return Engine.Integrator.Centers[EntitySystem.Entities[ShipCoreEntity[indexShip]].Body]; }
 
-		inline	::gpk::n3f2_t&				GetShipPosition		(uint32_t indexShip)				{ return GetShipPivot(indexShip).Position; }
-		inline	const ::gpk::n3f2_t&			GetShipPosition		(uint32_t indexShip)		const	{ return GetShipPivot(indexShip).Position; }
+		inline	::gpk::n3f2_t&				GetShipPosition		(u2_t indexShip)				{ return GetShipPivot(indexShip).Position; }
+		inline	const ::gpk::n3f2_t&			GetShipPosition		(u2_t indexShip)		const	{ return GetShipPivot(indexShip).Position; }
 
-		::gpk::error_t						GetShipPosition		(uint32_t iShip, ::gpk::n3f2_t & output) const { output = GetShipPosition(iShip); return 0; }
+		gpk::err_t						GetShipPosition		(u2_t iShip, ::gpk::n3f2_t & output) const { output = GetShipPosition(iShip); return 0; }
 		
-		::gpk::SBodyCenter&					GetOrbiterTransform	(uint32_t iPart)		{ return Engine.Integrator.Centers[EntitySystem.Entities[ShipPartEntity[iPart] + 1].Body]; }
-		::gpk::SBodyForces&					GetShipOrbiterForces(uint32_t iPart)		{ return Engine.Integrator.Forces [EntitySystem.Entities[ShipPartEntity[iPart] + 1].Body]; }
+		::gpk::SBodyCenter&					GetOrbiterTransform	(u2_t iPart)		{ return Engine.Integrator.Centers[EntitySystem.Entities[ShipPartEntity[iPart] + 1].Body]; }
+		::gpk::SBodyForces&					GetShipOrbiterForces(u2_t iPart)		{ return Engine.Integrator.Forces [EntitySystem.Entities[ShipPartEntity[iPart] + 1].Body]; }
 
 
-		::gpk::error_t				Save				(::gpk::au0_t & output)	const	{ 
-			gpk_necs(SpaceshipManager.Save(output));
-			gpk_necs(WeaponManager.Save(output));
+		gpk::err_t				Save				(::gpk::au0_t & output)	const	{ 
+			if_fail_fe(SpaceshipManager.Save(output));
+			if_fail_fe(WeaponManager.Save(output));
 
-			gpk_necs(::gpk::saveView(output, ShipCoreEntity));
-			gpk_necs(::gpk::saveView(output, ShipPartEntity));
+			if_fail_fe(::gpk::saveView(output, ShipCoreEntity));
+			if_fail_fe(::gpk::saveView(output, ShipPartEntity));
 		
-			gpk_necs(Engine.Save(output));
+			if_fail_fe(Engine.Save(output));
 
-			gpk_necs(EntitySystem	.Save(output));
-			gpk_necs(Scene			.Save(output));
+			if_fail_fe(EntitySystem	.Save(output));
+			if_fail_fe(Scene			.Save(output));
 			return 0; 
 		}
-		::gpk::error_t				Load				(::gpk::vcu0_t & input) { 
-			gpk_necs(SpaceshipManager.Load(input));
-			gpk_necs(WeaponManager.Load(input));
+		gpk::err_t				Load				(::gpk::vcu0_t & input) { 
+			if_fail_fe(SpaceshipManager.Load(input));
+			if_fail_fe(WeaponManager.Load(input));
 
-			gpk_necs(::gpk::loadView(input, ShipCoreEntity));
-			gpk_necs(::gpk::loadView(input, ShipPartEntity));
+			if_fail_fe(::gpk::loadView(input, ShipCoreEntity));
+			if_fail_fe(::gpk::loadView(input, ShipPartEntity));
 
-			gpk_necs(Engine.Load(input));
+			if_fail_fe(Engine.Load(input));
 
-			gpk_necs(EntitySystem	.Load(input));
-			gpk_necs(Scene			.Load(input));
+			if_fail_fe(EntitySystem	.Load(input));
+			if_fail_fe(Scene			.Load(input));
 			return 0; 
 		}
 	};

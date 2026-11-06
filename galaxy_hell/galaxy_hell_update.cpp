@@ -8,22 +8,24 @@
 #include <mmsystem.h>
 #include <gpk_noise.h>
 
-static	::gpk::error_t	applyDamage
-	( const int32_t	weaponDamage
-	, int32_t		& healthPart
-	, int32_t		& healthParent
+GPK_USING_TYPEINT();
+
+static	gpk::err_t	applyDamage
+	( const s2_t	weaponDamage
+	, s2_t		& healthPart
+	, s2_t		& healthParent
 	) {
-	const uint32_t				finalDamage			= ::gpk::min(weaponDamage, healthPart);
+	const u2_t				finalDamage			= ::gpk::min(weaponDamage, healthPart);
 	healthPart				-= finalDamage;
 	healthParent			-= finalDamage;
 	return 0 >= healthPart;
 }
 
-static	::gpk::error_t	collisionDetect		(::gpk::SShots & shots, const ::gpk::n3f2_t & modelPosition, ::gpk::apod<::gpk::n3f2_t> & collisionPoints)	{
+static	gpk::err_t	collisionDetect		(::gpk::SShots & shots, const ::gpk::n3f2_t & modelPosition, ::gpk::apod<::gpk::n3f2_t> & collisionPoints)	{
 	bool						detected			= false;
 	collisionPoints.clear();
-	for(uint32_t iShot = 0; iShot < shots.Particles.Position.size(); ++iShot) {
-		const ::gpk::line3f32		shotSegment			= {shots.PositionPrev[iShot], shots.Particles.Position[iShot]};
+	for(u2_t iShot = 0; iShot < shots.Particles.Position.size(); ++iShot) {
+		const ::gpk::line3f2_t		shotSegment			= {shots.PositionPrev[iShot], shots.Particles.Position[iShot]};
 		float						t					= 0;
 		::gpk::n3f2_t				collisionPoint		= {};
 		if( ::gpk::intersectRaySphere(shotSegment.A, (shotSegment.B - shotSegment.A).Normalize(), {1.2, modelPosition}, t, collisionPoint)
@@ -38,7 +40,7 @@ static	::gpk::error_t	collisionDetect		(::gpk::SShots & shots, const ::gpk::n3f2
 	return 0;
 }
 
-static	::gpk::error_t	handleCollisionPoint		(::ghg::SGalaxyHell & solarSystem, int32_t weaponDamage, ::gpk::SSpaceshipScore & attackerScore, ::gpk::SSpaceshipScore & damagedScore, ::gpk::SSpaceshipOrbiter & damagedPart, int32_t iAttackedPart, ::gpk::SSpaceshipCore & damagedShip, int32_t iAttackedShip, const ::gpk::n3f2_t & sphereCenter, const ::gpk::n3f2_t & collisionPoint)	{
+static	gpk::err_t	handleCollisionPoint		(::ghg::SGalaxyHell & solarSystem, s2_t weaponDamage, ::gpk::SSpaceshipScore & attackerScore, ::gpk::SSpaceshipScore & damagedScore, ::gpk::SSpaceshipOrbiter & damagedPart, s2_t iAttackedPart, ::gpk::SSpaceshipCore & damagedShip, s2_t iAttackedShip, const ::gpk::n3f2_t & sphereCenter, const ::gpk::n3f2_t & collisionPoint)	{
 	solarSystem.ShipState.SpaceshipManager.ShipOrbiterActionQueue[iAttackedShip]->push_back(::gpk::SHIP_ACTION_Hit);
 	const ::gpk::n3f2_t			bounceVector				= (collisionPoint - sphereCenter).Normalize();
 	solarSystem.DecoState.Debris.SpawnDirected(1 + weaponDamage / 10, 0.3, bounceVector, collisionPoint, 50, 1);
@@ -53,8 +55,8 @@ static	::gpk::error_t	handleCollisionPoint		(::ghg::SGalaxyHell & solarSystem, i
 		attackerScore.KilledOrbiters	+= 1;
 		damagedScore.OrbitersLost		+= 1;
 		const ::ghg::SGHEntity		& entityGeometry			= solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[iAttackedPart] + 1];
-		const int32_t				indexMesh					= entityGeometry.Geometry;
-		const uint32_t				countTriangles				= solarSystem.ShipState.Scene.Geometry[indexMesh].Triangles.size();
+		const s2_t				indexMesh					= entityGeometry.Geometry;
+		const u2_t				countTriangles				= solarSystem.ShipState.Scene.Geometry[indexMesh].Triangles.size();
 		::ghg::decoExplosionAdd(solarSystem.DecoState.Explosions, indexMesh, entityGeometry.Image, countTriangles, collisionPoint, 60);
 		solarSystem.DecoState.Debris.SpawnSpherical(20, collisionPoint, 60, 2);
 		if(0 >= damagedShip.Health) {
@@ -76,7 +78,7 @@ static	::gpk::error_t	handleCollisionPoint		(::ghg::SGalaxyHell & solarSystem, i
 	return 0;
 }
 
-static	::gpk::error_t	updateEntityTransforms		(uint32_t iEntity, const ::gpk::view<const ::ghg::SGHEntity> & entities, const ::gpk::view<const ::gpk::au2_t> & entitiesChildren, ::ghg::SShipScene & scene, ::gpk::SRigidBodyIntegrator & bodies)	{
+static	gpk::err_t	updateEntityTransforms		(u2_t iEntity, const ::gpk::view<const ::ghg::SGHEntity> & entities, const ::gpk::view<const ::gpk::au2_t> & entitiesChildren, ::ghg::SShipScene & scene, ::gpk::SRigidBodyIntegrator & bodies)	{
 	const ::ghg::SGHEntity		& entity					= entities[iEntity];
 	if(-1 == entity.Body) {
 		if(-1 == entity.Parent)
@@ -85,41 +87,41 @@ static	::gpk::error_t	updateEntityTransforms		(uint32_t iEntity, const ::gpk::vi
 			scene.Transforms[iEntity]	= scene.Transforms[entity.Parent];
 	}
 	else {
-		::gpk::m4f32				& matrixGlobal				= scene.Transforms[iEntity];
+	::gpk::m4f2_t				& matrixGlobal				= scene.Transforms[iEntity];
 		bodies.GetTransform(entity.Body, matrixGlobal);
 		if(-1 != entity.Parent)
 			matrixGlobal			*= scene.Transforms[entity.Parent];
 	}
 
 	const ::gpk::au2_t			& entityChildren			= entitiesChildren[iEntity];
-	for(uint32_t iChild = 0; iChild < entityChildren.size(); ++iChild) {
-		const uint32_t				iChildEntity				= entityChildren[iChild];
+	for(u2_t iChild = 0; iChild < entityChildren.size(); ++iChild) {
+		const u2_t				iChildEntity				= entityChildren[iChild];
 		::updateEntityTransforms(iChildEntity, entities, entitiesChildren, scene, bodies);
 	}
 	return 0;
 }
 
-static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame)	{
-	for(uint32_t iShip = 0; iShip < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShip) {
+static	gpk::err_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame)	{
+	for(u2_t iShip = 0; iShip < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShip) {
 		::gpk::au1_t					& shipParts				= solarSystem.ShipState.SpaceshipManager.ShipParts[iShip];
-		for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
+		for(u2_t iPart = 0; iPart < shipParts.size(); ++iPart) {
 			::std::lock_guard			lockUpdate			(solarSystem.LockUpdate);
 			solarSystem.ShipState.WeaponManager.Shots[solarSystem.ShipState.SpaceshipManager.Orbiters[shipParts[iPart]].Weapon].Update((float)secondsLastFrame);
 		}
 	}
 
 	::gpk::apod<::gpk::n3f2_t>	collisionPoints;
-	for(uint32_t iShipAttacker = 0; iShipAttacker < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShipAttacker) {
+	for(u2_t iShipAttacker = 0; iShipAttacker < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShipAttacker) {
 		::gpk::SSpaceshipScore		& shipAttackerScore		= solarSystem.ShipState.SpaceshipManager.ShipScores	[iShipAttacker];
 		::gpk::SSpaceshipCore		& shipAttacker			= solarSystem.ShipState.SpaceshipManager.ShipCores	[iShipAttacker];
 		::gpk::au1_t					& shipAttackerParts		= solarSystem.ShipState.SpaceshipManager.ShipParts	[iShipAttacker];
 		//::gpk::apod<::gpk::n3f2_t>	& shipDistancesToTarget	= solarSystem.ShipState.SpaceshipManager.ShipCoresDistanceToTargets	[iShipAttacker];
-		for(uint32_t iPartAttacker = 0; iPartAttacker < shipAttackerParts.size(); ++iPartAttacker) {
+		for(u2_t iPartAttacker = 0; iPartAttacker < shipAttackerParts.size(); ++iPartAttacker) {
 			::gpk::SSpaceshipOrbiter	& shipPartAttacker		= solarSystem.ShipState.SpaceshipManager.Orbiters[shipAttackerParts[iPartAttacker]];
 			const ::gpk::SWeapon		& weaponAttacker		= solarSystem.ShipState.WeaponManager.Weapons[shipPartAttacker.Weapon];
 			::gpk::SShots				& shotsAttacker			= solarSystem.ShipState.WeaponManager.Shots[shipPartAttacker.Weapon];
 
-			for(uint32_t iShipAttacked = 0; iShipAttacked < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShipAttacked) {
+			for(u2_t iShipAttacked = 0; iShipAttacked < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShipAttacked) {
 				::gpk::SSpaceshipCore		& shipAttacked			= solarSystem.ShipState.SpaceshipManager.ShipCores	[iShipAttacked];
 				if(shipAttacked.Health <= 0 || shipAttacker.Team == shipAttacked.Team) // avoid dead ships and ships of the same team
 					continue;
@@ -127,23 +129,23 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 				::gpk::au1_t					& shipAttackedParts		= solarSystem.ShipState.SpaceshipManager.ShipParts	[iShipAttacked];
 				::gpk::SSpaceshipScore		& shipAttackedScore		= solarSystem.ShipState.SpaceshipManager.ShipScores	[iShipAttacked];
 
-				for(uint32_t iPartAttacked = 0; iPartAttacked < shipAttackedParts.size(); ++iPartAttacked) {
-					const int32_t				attackedPart			= shipAttackedParts[iPartAttacked];
+				for(u2_t iPartAttacked = 0; iPartAttacked < shipAttackedParts.size(); ++iPartAttacked) {
+					const s2_t				attackedPart			= shipAttackedParts[iPartAttacked];
 					::gpk::SSpaceshipOrbiter	& shipPartAttacked		= solarSystem.ShipState.SpaceshipManager.Orbiters[attackedPart];
 					if(shipPartAttacked.Health.Value <= 0)
 						continue;
-					const int32_t				iAttackedPartEntity		= solarSystem.ShipState.ShipPartEntity[attackedPart];
+					const s2_t				iAttackedPartEntity		= solarSystem.ShipState.ShipPartEntity[attackedPart];
 					const ::ghg::SGHEntity		& entity				= solarSystem.ShipState.EntitySystem.Entities[iAttackedPartEntity];
 					if(-1 != entity.Geometry) {
 						const ::gpk::n3f2_t			attackedPosition		= solarSystem.ShipState.Scene.Transforms[iAttackedPartEntity].GetTranslation();
 						::std::lock_guard			lockUpdate				(solarSystem.LockUpdate);
 						::collisionDetect(shotsAttacker, attackedPosition, collisionPoints);
-						for(uint32_t iCollisionPoint = 0; iCollisionPoint < collisionPoints.size(); ++iCollisionPoint)
+						for(u2_t iCollisionPoint = 0; iCollisionPoint < collisionPoints.size(); ++iCollisionPoint)
 							if(::handleCollisionPoint(solarSystem, weaponAttacker.Shot.Damage, shipAttackerScore, shipAttackedScore, shipPartAttacked, attackedPart, shipAttacked, iShipAttacked, attackedPosition, collisionPoints[iCollisionPoint]))	// returns true if part health reaches zero.
 								break;
 					}
 					const ::gpk::au2_t			& entityChildren		= solarSystem.ShipState.EntitySystem.EntityChildren[iAttackedPartEntity];
-					for(uint32_t iEntity = 0; iEntity < entityChildren.size(); ++iEntity) {
+					for(u2_t iEntity = 0; iEntity < entityChildren.size(); ++iEntity) {
 						::ghg::SGHEntity			& entityChild			= solarSystem.ShipState.EntitySystem.Entities[entityChildren[iEntity]];
 						if(-1 == entityChild.Parent)
 							continue;
@@ -154,7 +156,7 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 						const ::gpk::n3f2_t			attackedPosition		= solarSystem.ShipState.Scene.Transforms[entityChildren[iEntity]].GetTranslation();
 						::std::lock_guard			lockUpdate				(solarSystem.LockUpdate);
 						::collisionDetect(shotsAttacker, attackedPosition, collisionPoints);
-						for(uint32_t iCollisionPoint = 0; iCollisionPoint < collisionPoints.size(); ++iCollisionPoint)
+						for(u2_t iCollisionPoint = 0; iCollisionPoint < collisionPoints.size(); ++iCollisionPoint)
 							if(::handleCollisionPoint(solarSystem, weaponAttacker.Shot.Damage, shipAttackerScore, shipAttackedScore, shipPartAttacked, attackedPart, shipAttacked, iShipAttacked, attackedPosition, collisionPoints[iCollisionPoint])) {	// returns true if part health reaches zero.
 								break;
 							}
@@ -164,7 +166,7 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 
 			//::gpk::SWeapon	& weaponAttacker	= solarSystem.ShipState.WeaponManager.Weapons[shipPartAttacker.Weapon];
 			if(weaponAttacker.Shot.Type == ::gpk::WEAPON_LOAD_Rocket) {
-				for(uint32_t iShot = 0; iShot < shotsAttacker.Particles.Position.size(); ++iShot) {
+				for(u2_t iShot = 0; iShot < shotsAttacker.Particles.Position.size(); ++iShot) {
 					const ::gpk::apod<::gpk::n3f2_t> & distances =  shotsAttacker.DistanceToTargets[iShot];
 					if(0 == distances.size())
 						continue;
@@ -172,11 +174,11 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 					if(2.5f > shotsAttacker.Lifetime[iShot])
 						continue;
 
-					for(uint32_t iTarget = 0; iTarget < distances.size(); ++iTarget) {
+					for(u2_t iTarget = 0; iTarget < distances.size(); ++iTarget) {
 						::gpk::n3f2_t			target		= distances[iTarget];
 						target.Normalize();
-						const uint64_t			targetSeed	= solarSystem.PlayState.Constants.Seed + iPartAttacker + iShot;
-						const ::gpk::n3f2_t		& distance	= distances[::gpk::noise1DBase32((uint32_t)targetSeed) % distances.size()];
+						const u3_t			targetSeed	= solarSystem.PlayState.Constants.Seed + iPartAttacker + iShot;
+						const ::gpk::n3f2_t		& distance	= distances[::gpk::noise1DBase32((u2_t)targetSeed) % distances.size()];
 						if(distance.LengthSquared() > 10000) 
 							continue;
 
@@ -188,7 +190,7 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 				}
 			}
 			else if(weaponAttacker.Shot.Type == ::gpk::WEAPON_LOAD_Missile) {
-				for(uint32_t iShot = 0; iShot < shotsAttacker.Particles.Position.size(); ++iShot) {
+				for(u2_t iShot = 0; iShot < shotsAttacker.Particles.Position.size(); ++iShot) {
 					const ::gpk::apod<::gpk::n3f2_t>	& distances =  shotsAttacker.DistanceToTargets[iShot];
 					if(0 == distances.size())
 						continue;
@@ -196,8 +198,8 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 					if(2.5f > shotsAttacker.Lifetime[iShot])
 						continue;
 
-					const uint64_t					targetSeed	= solarSystem.PlayState.Constants.Seed + iPartAttacker + iShot;
-					const ::gpk::n3f2_t				& distance	= distances[::gpk::noise1DBase32((uint32_t)targetSeed) % distances.size()];
+					const u3_t					targetSeed	= solarSystem.PlayState.Constants.Seed + iPartAttacker + iShot;
+					const ::gpk::n3f2_t				& distance	= distances[::gpk::noise1DBase32((u2_t)targetSeed) % distances.size()];
 					if(distance.LengthSquared() > 10000) 
 						continue;
 
@@ -210,11 +212,11 @@ static	::gpk::error_t	updateShots				(::ghg::SGalaxyHell & solarSystem, double s
 	return 0;
 }
 
-static	::gpk::error_t	updateDistancesToTargets	(::ghg::SGalaxyHell & solarSystem, int32_t team, int32_t iShipPart, ::gpk::papod<::gpk::n3f2_t> & orbiterDistancesToTargets, ::gpk::SShots & shots)	{
+static	gpk::err_t	updateDistancesToTargets	(::ghg::SGalaxyHell & solarSystem, s2_t team, s2_t iShipPart, ::gpk::papod<::gpk::n3f2_t> & orbiterDistancesToTargets, ::gpk::SShots & shots)	{
 	{
 		::std::lock_guard			lockUpdate					(solarSystem.LockUpdate);
 		orbiterDistancesToTargets.clear();
-		for(uint32_t iShot = 0; iShot < shots.Particles.Position.size(); ++iShot)
+		for(u2_t iShot = 0; iShot < shots.Particles.Position.size(); ++iShot)
 			shots.DistanceToTargets[iShot].clear();
 	}
 
@@ -222,12 +224,12 @@ static	::gpk::error_t	updateDistancesToTargets	(::ghg::SGalaxyHell & solarSystem
 	::gpk::apod<::gpk::SSpaceshipCore>	& shipCores				= solarSystem.ShipState.SpaceshipManager.ShipCores				;
 	::gpk::aobj<::gpk::au1_t>		& shipCoresParts		= solarSystem.ShipState.SpaceshipManager.ShipParts				;
 	const ::gpk::n3f2_t				weaponPosition			= solarSystem.ShipState.Scene.Transforms[solarSystem.ShipState.ShipPartEntity[iShipPart]].GetTranslation();
-	for(uint32_t iShip = 0; iShip < shipCores.size(); ++iShip) {
+	for(u2_t iShip = 0; iShip < shipCores.size(); ++iShip) {
 		::gpk::SSpaceshipCore				& ship					= shipCores[iShip];
 		if(ship.Team == team || ship.Health <= 0)
 			continue;
 
-		for(uint32_t iPart = 0; iPart < shipCoresParts[iShip].size(); ++iPart) {
+		for(u2_t iPart = 0; iPart < shipCoresParts[iShip].size(); ++iPart) {
 			::gpk::SSpaceshipOrbiter					& shipPartTarget		= orbiters[shipCoresParts[iShip][iPart]];
 			if(0 >= shipPartTarget.Health.Value)
 				continue;
@@ -236,7 +238,7 @@ static	::gpk::error_t	updateDistancesToTargets	(::ghg::SGalaxyHell & solarSystem
 			{
 				::std::lock_guard				lockUpdate				(solarSystem.LockUpdate);
 				orbiterDistancesToTargets->push_back(targetPosition - weaponPosition);
-				for(uint32_t iShot = 0; iShot < shots.Particles.Position.size(); ++iShot) {
+				for(u2_t iShot = 0; iShot < shots.Particles.Position.size(); ++iShot) {
 					shots.DistanceToTargets[iShot].push_back(targetPosition - shots.Particles.Position[iShot]);
 				}
 			}
@@ -245,10 +247,10 @@ static	::gpk::error_t	updateDistancesToTargets	(::ghg::SGalaxyHell & solarSystem
 	return 0;
 }
 
-static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int32_t team, ::gpk::SSpaceshipOrbiter & shipPart, int32_t iShip, int32_t iShipPart, ::gpk::papod<::gpk::n3f2_t> & shipPartDistancesToTargets, double secondsLastFrame)	{
+static	gpk::err_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, s2_t team, ::gpk::SSpaceshipOrbiter & shipPart, s2_t iShip, s2_t iShipPart, ::gpk::papod<::gpk::n3f2_t> & shipPartDistancesToTargets, double secondsLastFrame)	{
 	::gpk::SWeapon				& weapon					= solarSystem.ShipState.WeaponManager.Weapons	[shipPart.Weapon];
 	::gpk::SShots				& shots						= solarSystem.ShipState.WeaponManager.Shots	[shipPart.Weapon];
-	for(uint32_t iParticle = 0; iParticle < shots.Particles.Position.size(); ++iParticle)
+	for(u2_t iParticle = 0; iParticle < shots.Particles.Position.size(); ++iParticle)
 		shots.Particles.Position[iParticle].x				-= (float)(solarSystem.PlayState.BackgroundSpeed.Current * secondsLastFrame * .2);
 
 	;
@@ -262,9 +264,9 @@ static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int
 		solarSystem.ShipState.SpaceshipManager.ShipScores[iShip].Shots	+= 1;
 		solarSystem.ShipState.SpaceshipManager.ShipScores[iShip].Bullets	+= weapon.Shot.ParticleCount;
 
-		const ::gpk::m4f32			& shipModuleMatrix			= solarSystem.ShipState.Scene.Transforms[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[iShipPart] + 1].Transform];
+	const ::gpk::m4f2_t			& shipModuleMatrix			= solarSystem.ShipState.Scene.Transforms[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[iShipPart] + 1].Transform];
 		::gpk::n3f2_t				positionGlobal				= shipModuleMatrix.GetTranslation();
-		::gpk::n3f2_t				targetDistance				= (shipPartDistancesToTargets && shipPartDistancesToTargets->size()) ? (*shipPartDistancesToTargets)[::gpk::noise1DBase32((uint32_t)solarSystem.PlayState.Constants.Seed + iShip * ::ghg::MAX_ORBITER_COUNT + iShipPart) % shipPartDistancesToTargets->size()] : ::gpk::n3f2_t{};
+		::gpk::n3f2_t				targetDistance				= (shipPartDistancesToTargets && shipPartDistancesToTargets->size()) ? (*shipPartDistancesToTargets)[::gpk::noise1DBase32((u2_t)solarSystem.PlayState.Constants.Seed + iShip * ::ghg::MAX_ORBITER_COUNT + iShipPart) % shipPartDistancesToTargets->size()] : ::gpk::n3f2_t{};
 		::gpk::n3f2_t				targetPosition				= targetDistance + positionGlobal;
 		if(weapon.Type == ::gpk::WEAPON_TYPE_Cannon) {
 			if(1 < targetDistance.LengthSquared()) {
@@ -282,11 +284,11 @@ static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int
 
 				if(solarSystem.PlayState.TimeStage > 1) {
 					solarSystem.ShipState.Engine.Integrator.Forces[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipPartEntity[iShipPart] + 1].Body].Rotation	= {};
-					::gpk::m4f32			inverseTransform			= shipModuleMatrix.GetInverse();
+	::gpk::m4f2_t			inverseTransform			= shipModuleMatrix.GetInverse();
 					::gpk::SBodyCenter		& shipModuleTransform		= solarSystem.ShipState.GetOrbiterTransform(iShipPart);
 					::gpk::n3f2_t			up							= {1, 0, 0};
 					::gpk::n3f2_t			front						= {0, 1, 0};
-					//const ::gpk::m4f32	& shipMatrix				= solarSystem.Scene.Transforms[solarSystem.Entities[solarSystem.Entities[shipPart.Entity].Parent].Transform];
+	//const ::gpk::m4f2_t	& shipMatrix				= solarSystem.Scene.Transforms[solarSystem.Entities[solarSystem.Entities[shipPart.Entity].Parent].Transform];
 					targetPosition		= inverseTransform.Transform(targetPosition);
 					::gpk::quat<float>		q;
 					q.LookAt(shipModuleTransform.Position, targetPosition, up, front);
@@ -314,13 +316,13 @@ static	::gpk::error_t	updateShipOrbiter			(::ghg::SGalaxyHell & solarSystem, int
 	return 0;
 }
 
-//stacxpr const double						UPDATE_STEP_TIME		= 0.012;
+//stxp const double						UPDATE_STEP_TIME		= 0.012;
 
-static	::gpk::error_t	shipsUpdate				(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame)	{
+static	gpk::err_t	shipsUpdate				(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame)	{
 	::updateShots(solarSystem, secondsLastFrame);
 
 	bool						playing					= 0;
-	for(uint32_t iShip = 0; iShip < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShip) {
+	for(u2_t iShip = 0; iShip < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShip) {
 		::gpk::SSpaceshipCore			& ship					= solarSystem.ShipState.SpaceshipManager.ShipCores[iShip];
 		if(0 >= ship.Health)
 			continue;
@@ -361,7 +363,7 @@ static	::gpk::error_t	shipsUpdate				(::ghg::SGalaxyHell & solarSystem, double s
 			}
 			shipTransform.Position.x		+= float(sin(solarSystem.PlayState.SimulatedTime.Seconds * timeWaveVertical * ::gpk::math_2pi) * ((iShip % 2) ? -1 : 1));
 		}
-		for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
+		for(u2_t iPart = 0; iPart < shipParts.size(); ++iPart) {
 			::gpk::SSpaceshipOrbiter				& shipPart				= solarSystem.ShipState.SpaceshipManager.Orbiters[shipParts[iPart]];
 			if(0 >= shipPart.Health.Value)
 				continue;
@@ -371,7 +373,7 @@ static	::gpk::error_t	shipsUpdate				(::ghg::SGalaxyHell & solarSystem, double s
 	return playing;
 }
 
-static	::gpk::error_t	processInput			(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SEventSystem> frameEvents) {
+static	gpk::err_t	processInput			(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SEventSystem> frameEvents) {
 	(void)frameEvents;
 
 
@@ -392,7 +394,7 @@ static	::gpk::error_t	processInput			(::ghg::SGalaxyHell & solarSystem, double s
 
 	constexpr double			speed					= 40;
 	if(solarSystem.ShipState.EntitySystem.Entities.size()) {
-		for(uint32_t iPlayer = 0; iPlayer < solarSystem.PlayState.Constants.Players; ++iPlayer) {
+		for(u2_t iPlayer = 0; iPlayer < solarSystem.PlayState.Constants.Players; ++iPlayer) {
 			const ::ghg::SShipController	& shipController		= controllers[iPlayer];
 			::gpk::SBodyCenter				& playerBody			= solarSystem.ShipState.Engine.Integrator.Centers[solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCoreEntity[iPlayer]].Body];
 			::gpk::SSpaceshipCore			& ship					= solarSystem.ShipState.SpaceshipManager.ShipCores[iPlayer];
@@ -468,27 +470,27 @@ static	::gpk::error_t	processInput			(::ghg::SGalaxyHell & solarSystem, double s
 	return 0;
 }
 
-stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
+stxp	const double	UPDATE_STEP_TIME			= 0.012;
 
-::gpk::error_t			ghg::solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double actualSecondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SEventSystem> frameEvents)	{
+gpk::err_t			ghg::solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double actualSecondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SEventSystem> frameEvents)	{
 	if(solarSystem.PlayState.GlobalState.Paused) 
 		return 0;
 
 	{
 		::std::lock_guard			lockUpdate					(solarSystem.LockUpdate);
-		for(uint32_t iShip = 0; iShip < solarSystem.ShipState.SpaceshipManager.ShipOrbiterActionQueue.size(); ++iShip)
+		for(u2_t iShip = 0; iShip < solarSystem.ShipState.SpaceshipManager.ShipOrbiterActionQueue.size(); ++iShip)
 			solarSystem.ShipState.SpaceshipManager.ShipOrbiterActionQueue[iShip].clear();
 	}
 	::gpk::n2u1_t				targetMetrics				= {}; 
 	targetMetrics			= solarSystem.DrawCache.RenderTargetMetrics;
 
 	double						secondsToProcess			= ::gpk::min(actualSecondsLastFrame, 0.15);
-	for(uint32_t iShip = 0; iShip < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShip) {
+	for(u2_t iShip = 0; iShip < solarSystem.ShipState.SpaceshipManager.ShipCores.size(); ++iShip) {
 		::gpk::au1_t					& shipParts					= solarSystem.ShipState.SpaceshipManager.ShipParts[iShip];
-		const uint32_t				iBody						= solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCoreEntity[iShip]].Body;
+		const u2_t				iBody						= solarSystem.ShipState.EntitySystem.Entities[solarSystem.ShipState.ShipCoreEntity[iShip]].Body;
 		solarSystem.ShipState.Engine.Integrator.SetActive (iBody, true);
 		solarSystem.ShipState.Engine.Integrator.Flags[iBody].UpdatedTransform	= false;
-		for(uint32_t iPart = 0; iPart < shipParts.size(); ++iPart) {
+		for(u2_t iPart = 0; iPart < shipParts.size(); ++iPart) {
 			::gpk::SSpaceshipOrbiter	& shipPart					= solarSystem.ShipState.SpaceshipManager.Orbiters[shipParts[iPart]];
 			::std::lock_guard			lockUpdate					(solarSystem.LockUpdate);
 			memcpy(solarSystem.ShipState.WeaponManager.Shots[shipPart.Weapon].PositionDraw.begin(), solarSystem.ShipState.WeaponManager.Shots[shipPart.Weapon].Particles.Position.begin(), solarSystem.ShipState.WeaponManager.Shots[shipPart.Weapon].Particles.Position.size() * sizeof(::gpk::n3f2_t));
@@ -518,7 +520,7 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 		bool						playing				= shipsUpdate(solarSystem, secondsLastFrameSimulated);
 		if(false == playing) {
 			playing					= false;
-			for(uint32_t iExplosion = 0; iExplosion < solarSystem.DecoState.Explosions.size(); ++iExplosion) {
+			for(u2_t iExplosion = 0; iExplosion < solarSystem.DecoState.Explosions.size(); ++iExplosion) {
 				if(solarSystem.DecoState.Explosions[iExplosion].Slices.size()) {
 					playing					= true;
 					break;
@@ -531,7 +533,7 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 			}
 		}
 
-		for(uint32_t iEntity = 0; iEntity < solarSystem.ShipState.EntitySystem.Entities.size(); ++iEntity) {
+		for(u2_t iEntity = 0; iEntity < solarSystem.ShipState.EntitySystem.Entities.size(); ++iEntity) {
 			const ::ghg::SGHEntity		& entity			= solarSystem.ShipState.EntitySystem.Entities[iEntity];
 			if(-1 == entity.Parent)	// process root entities
 				::updateEntityTransforms(iEntity, solarSystem.ShipState.EntitySystem.Entities, solarSystem.ShipState.EntitySystem.EntityChildren, solarSystem.ShipState.Scene, solarSystem.ShipState.Engine.Integrator);
@@ -541,14 +543,14 @@ stacxpr	const double	UPDATE_STEP_TIME			= 0.012;
 	solarSystem.DecoState.AnimationTime	= solarSystem.PlayState.SimulatedTime.Seconds;
 	solarSystem.ShipState.Scene.Global.LightVector.Normalize();
 
-	::gpk::m4f32				& matrixProjection		= solarSystem.ShipState.Scene.Global.MatrixProjection;
+	::gpk::m4f2_t				& matrixProjection		= solarSystem.ShipState.Scene.Global.MatrixProjection;
 
 	//if(targetMetrics.x >= (double)targetMetrics.y)
 		matrixProjection.FieldOfView(::gpk::math_pi * .25, targetMetrics.x / (double)targetMetrics.y, 0.1, 5000.0);
 	//else
 	//	matrixProjection.FieldOfView(::gpk::math_pi * .25, targetMetrics.y / (double)targetMetrics.x, 0.1, 5000.0);
-	::gpk::m4f32				matrixViewport			= {};
-	matrixViewport.ViewportLH(targetMetrics.u1_t());
+	::gpk::m4f2_t				matrixViewport			= {};
+	matrixViewport.ViewportLH(targetMetrics.u1());
 	matrixProjection		*= matrixViewport;
 
 	//solarSystem.Scene.LightVector	= solarSystem.Scene.LightVector.RotateY(secondsLastFrame * 2);

@@ -11,15 +11,15 @@ namespace ssg
 {
 #pragma pack(push, 1)
 #pragma pack(pop)
-	//GDEFINE_ENUM_TYPE(SCENE_TYPE, uint8_t);Likely not needed
+	//GDEFINE_ENUM_TYPE(SCENE_TYPE, u0_t);Likely not needed
 	//GDEFINE_ENUM_VALUE(SCENE_TYPE, OuterSpace	, 0);
 	//GDEFINE_ENUM_VALUE(SCENE_TYPE, Planetary	, 1);
 	//GDEFINE_ENUM_VALUE(SCENE_TYPE, Submarine	, 2);
 	//struct SGameObject {
-	//	int16_t							Definition			=  0;
-	//	int16_t							Modifier			=  0;
-	//	int16_t							Level				=  1;
-	//	int16_t							Owner				= -1;
+	//	s1_t							Definition			=  0;
+	//	s1_t							Modifier			=  0;
+	//	s1_t							Level				=  1;
+	//	s1_t							Owner				= -1;
 	//};
 
 	struct SSiegeGame {
@@ -38,27 +38,27 @@ namespace ssg
 
 		::gpk::SEngine					Engine				= {};
 
-		::gpk::error_t					Save				(::gpk::au0_t & output)	const	{ 
-			gpk_necs(Global.Save(output));
-			gpk_necs(SolarSystem.Save(output));
-			gpk_necs(World.Save(output));
-			gpk_necs(Engine.Save(output));
+		gpk::err_t					Save				(::gpk::au0_t & output)	const	{ 
+			if_fail_fe(Global.Save(output));
+			if_fail_fe(SolarSystem.Save(output));
+			if_fail_fe(World.Save(output));
+			if_fail_fe(Engine.Save(output));
 			return 0;
 		}
 
-		::gpk::error_t					Load				(::gpk::vcu0_t & input)	{ 
-			gpk_necs(Global.Load(input));
-			gpk_necs(SolarSystem.Load(input));
-			gpk_necs(World.Load(input));
-			gpk_necs(Engine.Load(input));
+		gpk::err_t					Load				(::gpk::vcu0_t & input)	{ 
+			if_fail_fe(Global.Load(input));
+			if_fail_fe(SolarSystem.Load(input));
+			if_fail_fe(World.Load(input));
+			if_fail_fe(Engine.Load(input));
 			return 0;
 		}
 
 	};
 
-	::gpk::error_t					ssiegeGameSetup		(::ssg::SSiegeGame & world);
-	::gpk::error_t					ssiegeGameUpdate	(::ssg::SSiegeGame & world, ::gpk::vpobj<::ssg::EventSSiege> inputEvents, ::gpk::apobj<::ssg::EventSSiege> & outputEvents, double secondsElapsed);
-	::gpk::error_t					ssiegeGameDraw		(::ssg::SSiegeGame & world
+	gpk::err_t					ssiegeGameSetup		(::ssg::SSiegeGame & world);
+	gpk::err_t					ssiegeGameUpdate	(::ssg::SSiegeGame & world, ::gpk::vpobj<::ssg::EventSSiege> inputEvents, ::gpk::apobj<::ssg::EventSSiege> & outputEvents, double secondsElapsed);
+	gpk::err_t					ssiegeGameDraw		(::ssg::SSiegeGame & world
 		, ::gpk::rtbgra8d32			& backBuffer
 		, const ::gpk::n3f2_t		& cameraPosition
 		, const ::gpk::n3f2_t		& cameraTarget

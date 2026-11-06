@@ -15,7 +15,7 @@ namespace ssg
 		::gpk::n3f2_t			CoordTarget			= {}; 
 
 		union UValue { 
-			int32_t		AsInt; 
+			s2_t		AsInt; 
 			float		AsFloat; 
 		}						Value				= {};
 
@@ -23,8 +23,8 @@ namespace ssg
 	};
 #pragma pack(pop)
 
-	::gpk::error_t			printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, bool debugOutput = false);
-	::gpk::error_t			printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, ::gpk::asc_t & output);
+	gpk::err_t			printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, bool debugOutput = false);
+	gpk::err_t			printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, ::gpk::asc_t & output);
 } // namespace
 
 #endif // SSG_EVENT_ARGS_H_23701
