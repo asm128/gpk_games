@@ -120,7 +120,7 @@ gpk::err_t			ghg::galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTime
 
 		for(u2_t iPlayer = 0; iPlayer < fileNames.size(); ++iPlayer) {
 			try {
-				if_fail_fef(app.Players[iPlayer].Load(fileNames[iPlayer]), "fileNames[iPlayer]: %s", fileNames[iPlayer].begin());
+				if_fail_fef(app.Players[iPlayer].Load(fileNames[iPlayer]), "fileNames[iPlayer]: %.*s", GPK_VIEW_ARGS(fileNames[iPlayer]));
 			}
 			catch (const sc_t * ) {
 				app.Players[iPlayer] = {};
@@ -292,7 +292,7 @@ gpk::err_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::n2u1_
 
 gpk::err_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcst_t> & savegameFilenames) {
 	::gpk::aobj<::gpk::string>		fileNames;
-	if_fail_fef(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionSave), "%s", saveGameFolder.begin());
+	if_fail_fef(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionSave), "%.*s", GPK_VIEW_ARGS(saveGameFolder));
 
 	::gpk::aobj<::gpk::vcst_t>				pathFileNames;
 	for(u2_t iFile = 0; iFile < fileNames.size(); ++iFile)
@@ -313,7 +313,7 @@ gpk::err_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk
 
 gpk::err_t					ghg::listFilesProfile		(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcst_t> & savegameFilenames) {
 	::gpk::aobj<::gpk::string>		fileNames;
-	if_fail_fef(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionProfile), "%s", saveGameFolder.begin());
+	if_fail_fef(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionProfile), "%.*s", GPK_VIEW_ARGS(saveGameFolder));
 
 	::gpk::aobj<::gpk::vcsc_t>				pathFileNames;
 	for(u2_t iFile = 0; iFile < fileNames.size(); ++iFile)

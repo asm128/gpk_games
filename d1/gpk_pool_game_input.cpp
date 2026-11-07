@@ -3,7 +3,7 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-static	::gpk::error_t	shootCueBall			(::d1p::SPoolGame & pool, const ::d1p::SStickControl & activeStick, uint16_t activeStickEntity)		{
+static	::gpk::err_t	shootCueBall			(::d1p::SPoolGame & pool, const ::d1p::SStickControl & activeStick, u1_t activeStickEntity)		{
 	::gpk::SEngine					& engine				= pool.Engine;
 	::d1p::STurnInfo			& activeTurn			= pool.ActiveTurn();
 	activeTurn.Time.Shoot		= ::gpk::timeCurrentInMs();
@@ -23,17 +23,17 @@ static	::gpk::error_t	shootCueBall			(::d1p::SPoolGame & pool, const ::d1p::SSti
 }
 
 // This switches the turn state so the aiming mode gets disabled 
-static	::gpk::error_t	processEventShoot		(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)											{ 
+static	::gpk::err_t	processEventShoot		(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)											{ 
 	const d1p::SStickControl			& activeStick			= pool.ActiveStick();
 	if (activeStick.Velocity <= 0) 
 		return 0;
 
-	uint16_t						activeStickEntity		= pool.ActiveStickEntity();
+	u1_t						activeStickEntity		= pool.ActiveStickEntity();
 	{ if_fail_fe(::shootCueBall(pool, activeStick, activeStickEntity)); }
 	return 1;
 }
 
-static	::gpk::error_t	processEventForce		(::d1p::SPoolGame & pool, const ::d1p::SArgsPlayerInput & stickEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
+static	::gpk::err_t	processEventForce		(::d1p::SPoolGame & pool, const ::d1p::SArgsPlayerInput & stickEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
 	info_printf("%s", ::gpk::get_value_namep(stickEvent.Direction));
 	float							directionMultiplier		= 1;
 	switch(stickEvent.Direction) { 
@@ -50,7 +50,7 @@ static	::gpk::error_t	processEventForce		(::d1p::SPoolGame & pool, const ::d1p::
 	return 0;
 }
 
-static	::gpk::error_t	processEventMove		(::d1p::SPoolGame & /*pool*/, const ::d1p::SArgsPlayerInput & stickEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
+static	::gpk::err_t	processEventMove		(::d1p::SPoolGame & /*pool*/, const ::d1p::SArgsPlayerInput & stickEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
 	info_printf("%s", ::gpk::get_value_namep(stickEvent.Direction));
 	float							directionMultiplier		= 1;
 	switch(stickEvent.Direction) { 
@@ -68,7 +68,7 @@ static	::gpk::error_t	processEventMove		(::d1p::SPoolGame & /*pool*/, const ::d1
 	return 0;
 }
 
-static	::gpk::error_t	processEventTurn		(::d1p::SPoolGame & pool, const ::d1p::SArgsPlayerInput & stickEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
+static	::gpk::err_t	processEventTurn		(::d1p::SPoolGame & pool, const ::d1p::SArgsPlayerInput & stickEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
 	info_printf("%s", ::gpk::get_value_namep(stickEvent.Direction));
 	float							directionMultiplier		= 1;
 	switch(stickEvent.Direction) { 
@@ -120,7 +120,7 @@ static	::gpk::error_t	processEventTurn		(::d1p::SPoolGame & pool, const ::d1p::S
 	return 0;
 }
 
-static	::gpk::error_t	processEventBall	(::d1p::SPoolGame & pool, const ::d1p::SArgsPlayerInput & moveEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
+static	::gpk::err_t	processEventBall	(::d1p::SPoolGame & pool, const ::d1p::SArgsPlayerInput & moveEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/)	{ 
 	info_printf("%s", ::gpk::get_value_namep(moveEvent.Direction));
 	const ::d1p::SMatchState		& matchState		= pool.MatchState;
 	rwws_if(pool.MatchState.Flags.NotInHand);
@@ -178,7 +178,7 @@ static	::gpk::error_t	processEventBall	(::d1p::SPoolGame & pool, const ::d1p::SA
 	return 0;
 }
 
-static	::gpk::error_t	processInputEvent		(::d1p::SPoolGame & pool, const ::d1p::SEventPlayer & stickEvent, ::gpk::apobj<::d1p::SEventPool> & outputEvents)		{ 
+static	::gpk::err_t	processInputEvent		(::d1p::SPoolGame & pool, const ::d1p::SEventPlayer & stickEvent, ::gpk::apobj<::d1p::SEventPool> & outputEvents)		{ 
 	if(pool.MatchState.Flags.PhysicsActive)
 		return 0;
 
@@ -195,7 +195,7 @@ static	::gpk::error_t	processInputEvent		(::d1p::SPoolGame & pool, const ::d1p::
 	return 0;
 }
 
-::gpk::error_t			d1p::processInputEvents		(::d1p::SPoolGame & pool, ::gpk::view<const ::d1p::SEventPlayer> inputEvents, ::gpk::apobj<::d1p::SEventPool> & outputEvents)		{ 
+::gpk::err_t			d1p::processInputEvents		(::d1p::SPoolGame & pool, ::gpk::view<const ::d1p::SEventPlayer> inputEvents, ::gpk::apobj<::d1p::SEventPool> & outputEvents)		{ 
 	for(u2_t  iEvent = 0; iEvent < inputEvents.size(); ++iEvent) 
 		{ if_fail_fe(::processInputEvent(pool, inputEvents[iEvent], outputEvents)); }
 

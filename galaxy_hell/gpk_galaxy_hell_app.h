@@ -347,7 +347,7 @@ namespace ghg
 				b64PlayerName.clear();
 				const ::ghg::SPlayer				& player					= Players[iPlayer];
 				::gpk::base64Encode(player.Name, b64PlayerName);
-				::sprintf_s(fileName, "%s/%s.%llu%s", SavegameFolder.begin(), b64PlayerName.begin(), 0ULL, ExtensionProfile.begin());
+				::sprintf_s(fileName, "%.*s/%.*s.%llu%s", GPK_VIEW_ARGS(SavegameFolder), GPK_VIEW_ARGS(b64PlayerName), 0ULL, ExtensionProfile.begin());
 				if_fail_fef(player.Save(fileName), "iPlayer: %i", iPlayer);
 			}
 			::gpk::vcsc_t							extension;
@@ -360,7 +360,7 @@ namespace ghg
 
 			const u3_t						timeCurrent					= (SAVE_MODE_USER != autosaveMode) ? 0 : ::gpk::timeCurrent();
 			const u3_t						timeStart					= (SAVE_MODE_AUTO == autosaveMode) ? 0 : Game.PlayState.GlobalState.UserTime.Started;
-			::sprintf_s(fileName, "%s/%llu.%llu%s", SavegameFolder.begin(), timeStart, timeCurrent, extension.begin());
+			::sprintf_s(fileName, "%.*s/%llu.%llu%.*s", GPK_VIEW_ARGS(SavegameFolder), timeStart, timeCurrent, GPK_VIEW_ARGS(extension));
 
 			const s2_t						totalHealth					= Game.ShipState.SpaceshipManager.GetTeamHealth(0);
 			if(totalHealth > 0) // Save only if a player is alive

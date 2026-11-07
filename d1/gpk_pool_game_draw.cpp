@@ -3,7 +3,7 @@
 
 #include "gpk_timer.h"
 
-::gpk::error_t			d1p::poolGameDraw				
+::gpk::err_t			d1p::poolGameDraw				
 	( ::d1p::SPoolGame		& pool
 	, ::gpk::rtbgra8d32		& backBuffer
 	, const ::gpk::n3f2_t	& cameraPosition

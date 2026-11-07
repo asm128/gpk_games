@@ -11,7 +11,7 @@
 namespace gpkg
 {
 #pragma pack( push, 1 )
-	enum CELL_VALUE : uint16_t
+	enum CELL_VALUE : u1_t
 		{	CELL_VALUE_EMPTY	= 0
 		,	CELL_VALUE_X		= 1
 		,	CELL_VALUE_O		= 2
@@ -34,10 +34,10 @@ namespace gpkg
 	struct CellPick {
 		// ----------------------------------------------------	 Variables	-------------------------------------------------------------------------
 		CELL_VALUE					Value			: 2;
-		uint16_t					IndexCell		: 4;
-		uint16_t					Row				: 2;	// Row		= IndexCell % 3
-		uint16_t					Column			: 2;	// Column	= IndexCell / 3
-		uint16_t					IndexPlayer		: 1;
+		u1_t					IndexCell		: 4;
+		u1_t					Row				: 2;	// Row		= IndexCell % 3
+		u1_t					Column			: 2;	// Column	= IndexCell / 3
+		u1_t					IndexPlayer		: 1;
 		// ----------------------------------------------------	  Methods	-------------------------------------------------------------------------
 		inline constexpr			CellPick		()																	noexcept	: Value(CELL_VALUE_EMPTY)	, IndexCell(0)		, Row(0)		, Column(0)			, IndexPlayer(0)		{}
 		inline constexpr			CellPick		(const CELL_VALUE value, const u0_t  cell, const u0_t  player)	noexcept	: Value(value)				, IndexCell(cell)	, Row(cell % 3)	, Column(cell / 3)	, IndexPlayer(player)	{}
@@ -46,8 +46,8 @@ namespace gpkg
 	// This structure represents a boolean layout of the board. It's used to determine the cells occupied by a given player.
 	struct TicTacToeBoard16 {
 		// ----------------------------------------------------  Variables	-------------------------------------------------------------------------
-		uint16_t					Cells				: 9;
-		uint16_t					Used				: 4;	// Keep track of the amount of cells set to true.
+		u1_t					Cells				: 9;
+		u1_t					Used				: 4;	// Keep track of the amount of cells set to true.
 		// --------------------------------------------	  Methods	-------------------------------------------------------------------------
 		inline constexpr			TicTacToeBoard16	()												noexcept	: Cells(0), Used(0) {}
 		// ---
@@ -57,16 +57,16 @@ namespace gpkg
 		inline constexpr	bool	GetCell				(const int index)						const	noexcept	{ return (Cells & (1 << index)) ? true : false; }
 		inline	void				SetCell				(const int index, const bool value)				noexcept	{ Cells |= ((value ? 1 : 0) << index); }
 		bool						EvaluateLines		()										const	noexcept	{
-			static constexpr	uint16_t	maskHorizontal		= 0x7;	// bits representing a row		(111)
-			static constexpr	uint16_t	maskVertical		= 0x49;	// bits representing a column	(001001001)
-			static constexpr	uint16_t	cellMaskRows	[3]	= {(maskHorizontal	<< (0 * 3)), (maskHorizontal	<< (1 * 3)), (maskHorizontal	<< (2 * 3)),};
-			static constexpr	uint16_t	cellMaskColumns	[3]	= {(maskVertical	<< (0 * 1)), (maskVertical		<< (1 * 1)), (maskVertical		<< (2 * 1)),};
+			static constexpr	u1_t	maskHorizontal		= 0x7;	// bits representing a row		(111)
+			static constexpr	u1_t	maskVertical		= 0x49;	// bits representing a column	(001001001)
+			static constexpr	u1_t	cellMaskRows	[3]	= {(maskHorizontal	<< (0 * 3)), (maskHorizontal	<< (1 * 3)), (maskHorizontal	<< (2 * 3)),};
+			static constexpr	u1_t	cellMaskColumns	[3]	= {(maskVertical	<< (0 * 1)), (maskVertical		<< (1 * 1)), (maskVertical		<< (2 * 1)),};
 			for(s2_t rowOrCol = 0; rowOrCol < 3; ++rowOrCol) {
 				if(((cellMaskRows		[rowOrCol]) & Cells) == cellMaskRows	[rowOrCol]) return true;
 				if(((cellMaskColumns	[rowOrCol]) & Cells) == cellMaskColumns	[rowOrCol]) return true;
 			}	//
-			static constexpr	uint16_t	diagonalMask1		= 0x111;
-			static constexpr	uint16_t	diagonalMask2		= 0x54;
+			static constexpr	u1_t	diagonalMask1		= 0x111;
+			static constexpr	u1_t	diagonalMask2		= 0x54;
 			bool							diagonal1			= (diagonalMask1 & Cells) == diagonalMask1;
 			bool							diagonal2			= (diagonalMask2 & Cells) == diagonalMask2;
 
@@ -130,8 +130,8 @@ namespace gpkg
 
 	struct TicTacToe {
 		// ----------------------------------------------------  Constants	-------------------------------------------------------------------------
-		static constexpr	uint16_t	SCREEN_WIDTH	= 40;
-		static constexpr	uint16_t	SCREEN_HEIGHT	= 12;
+		static constexpr	u1_t	SCREEN_WIDTH	= 40;
+		static constexpr	u1_t	SCREEN_HEIGHT	= 12;
 		static constexpr	const char	Symbols[]		= {'-', 'X', 'O'};
 		// ----------------------------------------------------  Variables	-------------------------------------------------------------------------
 		TicTacToeBoard32				Board			= {};

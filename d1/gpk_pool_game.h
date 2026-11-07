@@ -40,7 +40,7 @@ namespace d1p
 		u0_t 					Continues			: 1;
 		u0_t 					Reverse				: 1;
 		u0_t 					Foul				: 5;
-		uint16_t				Pocketed			= 0;
+		u1_t				Pocketed			= 0;
 		::d1p::SStickControl	StickControl		= {};
 
 		inlcxpr	bool			IsPocketed			(u0_t  iBall)	const	{ return ::d1p::isPocketed	(Pocketed, iBall); }
@@ -56,7 +56,7 @@ namespace d1p
 		::gpk::astu16<MAX_CUSHIONS>	Cushions		= {};
 		::gpk::astu16<MAX_PLAYERS>	Sticks			= {};
 		::gpk::astu16<MAX_BALLS>	Balls			= {};
-		uint16_t					Table			= 0;
+		u1_t					Table			= 0;
 	};
 
 	stxp	u0_t 			TEAM_COUNT			= 2;
@@ -74,7 +74,7 @@ namespace d1p
 #pragma pack(pop)
 	// Extends the base engine to define pool-specific entity creation functions.
 	struct SPoolEngine : public ::gpk::SEngine {
-		::gpk::error_t						CreateTableCushion			();
+		::gpk::err_t						CreateTableCushion			();
 	};
 
 	struct SPoolGame {
@@ -93,10 +93,10 @@ namespace d1p
 		::gpk::astatic<::gpk::apod<::gpk::line3f32>	, MAX_BALLS  >	PositionDeltas	= {};
 		::gpk::astatic<::d1p::SPoolPlayer			, MAX_PLAYERS>	Players			= {};
 
-		::gpk::error_t						Save						(::gpk::au0_t & bytes)	const;
-		::gpk::error_t						Load						(::gpk::vcu0_t & bytes);
+		::gpk::err_t						Save						(::gpk::au0_t & bytes)	const;
+		::gpk::err_t						Load						(::gpk::vcu0_t & bytes);
 
-		::gpk::error_t						AdvanceTurn					(::gpk::apobj<::d1p::SEventPool> & outputEvents);
+		::gpk::err_t						AdvanceTurn					(::gpk::apobj<::d1p::SEventPool> & outputEvents);
 		inline	::d1p::STurnInfo&			Turn						(const SArgsBall & eventArgs)			{ return TurnHistory[eventArgs.Turn]; }
 		inline	const ::d1p::STurnInfo&		Turn						(const SArgsBall & eventArgs)	const	{ return TurnHistory[eventArgs.Turn]; }
 		inlcxpr	bool						FirstTurn					()	const	{ return TurnHistory.size() == 1; }
@@ -108,27 +108,27 @@ namespace d1p
 			const ::d1p::SPoolTeam					& team						= Teams[ActiveTeam()]; 
 			return team.Players[team.CurrentPlayer]; 
 		}
-		inline	uint16_t					ActiveStickEntity			()	const	{ return Entities.Sticks[ActivePlayer()]; }
+		inline	u1_t					ActiveStickEntity			()	const	{ return Entities.Sticks[ActivePlayer()]; }
 		inline	::d1p::SStickControl&		ActiveStick					()			{ return Players[ActivePlayer()].StickControl; }
 		inline	const ::d1p::SStickControl&	ActiveStick					()	const	{ return Players[ActivePlayer()].StickControl; }
 
-		inline	u0_t 						EntityToPocket				(uint16_t iEntity)									const	{ return (u0_t )::gpk::find(iEntity, ::gpk::vcu1_t{Entities.Pockets}); }
-		inline	u0_t 						EntityToBall				(uint16_t iEntity)									const	{ return (u0_t )::gpk::find(iEntity, ::gpk::vcu1_t{Entities.Balls  }); }
-		inline	::gpk::error_t				BallToEntity				(u0_t  iBall)										const	{ return Entities.Balls[iBall]; }
-		inline	::gpk::error_t				BallToRenderNode			(u0_t  iBall)										const	{ return Engine.Entities[Entities.Balls[iBall]].RenderNode; }
-		inline	::gpk::error_t				BallToBody					(u0_t  iBall)										const	{ return Engine.Entities[Entities.Balls[iBall]].RigidBody; }
+		inline	u0_t 						EntityToPocket				(u1_t iEntity)									const	{ return (u0_t )::gpk::find(iEntity, ::gpk::vcu1_t{Entities.Pockets}); }
+		inline	u0_t 						EntityToBall				(u1_t iEntity)									const	{ return (u0_t )::gpk::find(iEntity, ::gpk::vcu1_t{Entities.Balls  }); }
+		inline	::gpk::err_t				BallToEntity				(u0_t  iBall)										const	{ return Entities.Balls[iBall]; }
+		inline	::gpk::err_t				BallToRenderNode			(u0_t  iBall)										const	{ return Engine.Entities[Entities.Balls[iBall]].RenderNode; }
+		inline	::gpk::err_t				BallToBody					(u0_t  iBall)										const	{ return Engine.Entities[Entities.Balls[iBall]].RigidBody; }
 
-		inline	::gpk::error_t				GetPocketPosition			(u0_t  iPocket, ::gpk::n3f2_t & out_position)		const	{ return Engine.GetPosition(Entities.Pockets[iPocket], out_position); }
-		inline	::gpk::error_t				GetBallPosition				(u0_t  iBall  , ::gpk::n3f2_t & out_position)		const	{ return Engine.GetPosition(Entities.Balls[iBall], out_position); }
-		inline	::gpk::error_t				GetStickOrientation			(u0_t  iStick , ::gpk::quatf32 & out_orientation)	const	{ return Engine.GetOrientation(Entities.Sticks[iStick], out_orientation); }
-		inline	::gpk::error_t				GetStickOrientation			(::gpk::quatf32 & out_orientation)					const	{ return Engine.GetOrientation(Entities.Sticks[ActivePlayer()], out_orientation); }
-		inline	::gpk::error_t				SetBallPosition				(u0_t  iBall, const ::gpk::n3f2_t & in_position)			{ return Engine.SetPosition(Entities.Balls[iBall], in_position); }
-		inline	::gpk::error_t				SetStickVelocity			(float velocity)											{ return ::gpk::error_t((ActiveStick().Velocity = ::gpk::clamped(velocity, 0.0f, ::d1p::MAX_SHOOT_VELOCITY)) * 1000); }
-		inline	::gpk::error_t				AddStickVelocity			(float velocity)											{ 
+		inline	::gpk::err_t				GetPocketPosition			(u0_t  iPocket, ::gpk::n3f2_t & out_position)		const	{ return Engine.GetPosition(Entities.Pockets[iPocket], out_position); }
+		inline	::gpk::err_t				GetBallPosition				(u0_t  iBall  , ::gpk::n3f2_t & out_position)		const	{ return Engine.GetPosition(Entities.Balls[iBall], out_position); }
+		inline	::gpk::err_t				GetStickOrientation			(u0_t  iStick , ::gpk::quatf32 & out_orientation)	const	{ return Engine.GetOrientation(Entities.Sticks[iStick], out_orientation); }
+		inline	::gpk::err_t				GetStickOrientation			(::gpk::quatf32 & out_orientation)					const	{ return Engine.GetOrientation(Entities.Sticks[ActivePlayer()], out_orientation); }
+		inline	::gpk::err_t				SetBallPosition				(u0_t  iBall, const ::gpk::n3f2_t & in_position)			{ return Engine.SetPosition(Entities.Balls[iBall], in_position); }
+		inline	::gpk::err_t				SetStickVelocity			(float velocity)											{ return ::gpk::err_t((ActiveStick().Velocity = ::gpk::clamped(velocity, 0.0f, ::d1p::MAX_SHOOT_VELOCITY)) * 1000); }
+		inline	::gpk::err_t				AddStickVelocity			(float velocity)											{ 
 			::d1p::SStickControl					& activeStick				= ActiveStick(); 
-			return ::gpk::error_t((activeStick.Velocity = ::gpk::clamped(activeStick.Velocity + velocity, 0.0f, ::d1p::MAX_SHOOT_VELOCITY)) * 1000);
+			return ::gpk::err_t((activeStick.Velocity = ::gpk::clamped(activeStick.Velocity + velocity, 0.0f, ::d1p::MAX_SHOOT_VELOCITY)) * 1000);
 		}
-		::gpk::error_t						ResetCueBall				()			{ 
+		::gpk::err_t						ResetCueBall				()			{ 
 			::d1p::SPoolBoard						& board						= MatchState.Board;
 			const float								distanceFromCenter			= ::d1p::rackOriginX(board);
 			Engine.SetOrientation	(BallToEntity(0), {0, 0, 0, 1});
@@ -138,13 +138,13 @@ namespace d1p
 		}
 	};
 
-	::gpk::error_t						poolGameSave				(const ::d1p::SPoolGame & game, ::gpk::vcsc_t fileName);
-	::gpk::error_t						poolGameLoad				(::d1p::SPoolGame & world,::gpk::vcsc_t filename);
-	::gpk::error_t						poolGameReset				(::d1p::SPoolGame & pool);
-	::gpk::error_t						poolGameReset				(::d1p::SPoolGame & pool, ::d1p::SMatchState & startState);
-	::gpk::error_t						poolGameSetup				(::d1p::SPoolGame & pool);
-	::gpk::error_t						poolGameUpdate				(::d1p::SPoolGame & pool, ::gpk::view<const ::d1p::SEventPlayer> inputEvents, ::gpk::apobj<::d1p::SEventPool> & outputEvents, double secondsElapsed);
-	::gpk::error_t						poolGameDraw				(::d1p::SPoolGame & pool
+	::gpk::err_t						poolGameSave				(const ::d1p::SPoolGame & game, ::gpk::vcsc_t fileName);
+	::gpk::err_t						poolGameLoad				(::d1p::SPoolGame & world,::gpk::vcsc_t filename);
+	::gpk::err_t						poolGameReset				(::d1p::SPoolGame & pool);
+	::gpk::err_t						poolGameReset				(::d1p::SPoolGame & pool, ::d1p::SMatchState & startState);
+	::gpk::err_t						poolGameSetup				(::d1p::SPoolGame & pool);
+	::gpk::err_t						poolGameUpdate				(::d1p::SPoolGame & pool, ::gpk::view<const ::d1p::SEventPlayer> inputEvents, ::gpk::apobj<::d1p::SEventPool> & outputEvents, double secondsElapsed);
+	::gpk::err_t						poolGameDraw				(::d1p::SPoolGame & pool
 		, ::gpk::rtbgra8d32		& backBuffer
 		, const ::gpk::n3f2_t	& cameraPosition
 		, const ::gpk::n3f2_t	& cameraTarget

@@ -331,7 +331,7 @@ gpk::err_t			ghg::guiSetup		(::ghg::SGalaxyHellApp & app, const ::gpk::pobj<::gp
 static	gpk::err_t	guiHandleLoad		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & gui, u2_t idControl, ::ghg::SGalaxyHell & /*game*/) { 
 	if(idControl < (gui.Controls.Text.size() - 2)) {
 		try {
-			if_fail_fef(::ghg::solarSystemLoad(app.Game, gui.Controls.Text[idControl + 1].Text), "Failed to load file %i: '%s'", idControl + 1, gui.Controls.Text[idControl + 1].Text.begin());
+			if_fail_fef(::ghg::solarSystemLoad(app.Game, gui.Controls.Text[idControl + 1].Text), "Failed to load file %i: '%.*s'", idControl + 1, GPK_VIEW_ARGS(gui.Controls.Text[idControl + 1].Text));
 		}
 		catch (const sc_t * ) {
 			::ghg::solarSystemReset(app.Game);

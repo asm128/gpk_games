@@ -12,23 +12,23 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-::gpk::error_t			d1p::poolGameSave		(const ::d1p::SPoolGame & game, ::gpk::vcsc_t fileName) {
+::gpk::err_t			d1p::poolGameSave		(const ::d1p::SPoolGame & game, ::gpk::vcsc_t fileName) {
 	::gpk::au0_t					serialized;
 	{ if_fail_fe(game.Save(serialized)); }
 	{ if_fail_fe(::gpk::deflateFromMemory(fileName, serialized)); }
 	return 0;
 }
-::gpk::error_t			d1p::poolGameLoad		(::d1p::SPoolGame & world,::gpk::vcsc_t filename) {
+::gpk::err_t			d1p::poolGameLoad		(::d1p::SPoolGame & world,::gpk::vcsc_t filename) {
 	::gpk::au0_t				inflated;
 	{ if_fail_fe(::gpk::inflateToMemory(filename, inflated)); }
 	::gpk::vcu0_t				viewSerialized			= {(const u0_t *)inflated.begin(), inflated.size()};
 	if_true_block_logf(error_printf, ::gpk::failed(world.Load(viewSerialized)), {
 		if_fail_fe(::d1p::poolGameReset(world));
 		return -1;
-	}, "filenamee:'%s'", filename.begin());
+	}, "filenamee:'%.*s'", GPK_VIEW_ARGS(filename));
 	return 0;
 }
-static	::gpk::error_t	poolGameResetTest2Balls	(::d1p::SPoolGame & pool, ::d1p::SMatchState & startState) { 
+static	::gpk::err_t	poolGameResetTest2Balls	(::d1p::SPoolGame & pool, ::d1p::SMatchState & startState) { 
 	startState.CountBalls	= 2;
 	::d1p::SPoolBoard			& board					= startState.Board;
 	::gpk::SEngine				& engine				= pool.Engine;
@@ -46,7 +46,7 @@ static	::gpk::error_t	poolGameResetTest2Balls	(::d1p::SPoolGame & pool, ::d1p::S
 	//engine.SetVelocity(pool.StartState.Balls[1].Entity, velocity);
 	return 0;
 }
-static	::gpk::error_t	textureBallNumber		(::gpk::g8bgra view, u2_t  number, const ::gpk::SRasterFont & font) { 
+static	::gpk::err_t	textureBallNumber		(::gpk::g8bgra view, u2_t  number, const ::gpk::SRasterFont & font) { 
 	sc_t						strNumber[4]			= {};
 	sprintf_s(strNumber, "%i", number);
 	const ::gpk::rect2s1_t		targetRect				= 
@@ -61,9 +61,9 @@ static	::gpk::error_t	textureBallNumber		(::gpk::g8bgra view, u2_t  number, cons
 	}
 	return 0; 
 }
-static	::gpk::error_t	poolGameResetBall10		(::d1p::SPoolGame & pool, ::d1p::SMatchState & /*startState*/) { (void)pool; return 0; }
-static	::gpk::error_t	poolGameResetBall9		(::d1p::SPoolGame & pool, ::d1p::SMatchState & /*startState*/) { (void)pool; return 0; }
-static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatchState & startState) {
+static	::gpk::err_t	poolGameResetBall10		(::d1p::SPoolGame & pool, ::d1p::SMatchState & /*startState*/) { (void)pool; return 0; }
+static	::gpk::err_t	poolGameResetBall9		(::d1p::SPoolGame & pool, ::d1p::SMatchState & /*startState*/) { (void)pool; return 0; }
+static	::gpk::err_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatchState & startState) {
 	startState.CountBalls	= 16;
 	::gpk::SEngine				& engine				= pool.Engine;
 	const ::gpk::SRasterFont	& font					= *engine.Scene->Graphics->Fonts.Fonts[8];
@@ -187,12 +187,12 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	return 0;
 }
 
-::gpk::error_t		d1p::poolGameReset		(::d1p::SPoolGame & pool) {
+::gpk::err_t		d1p::poolGameReset		(::d1p::SPoolGame & pool) {
 	pool.MatchState.Reset();
 	return ::d1p::poolGameReset(pool, pool.MatchState);
 }
 
-::gpk::error_t		d1p::poolGameReset		(::d1p::SPoolGame & pool, ::d1p::SMatchState & startState) {
+::gpk::err_t		d1p::poolGameReset		(::d1p::SPoolGame & pool, ::d1p::SMatchState & startState) {
 	pool.Engine.Integrator.Reset();
 
 	::gpk::clear(pool.LastFrameContactsBall, pool.LastFrameContactsCushion, pool.TurnHistory, pool.BallEventHistory);
@@ -224,7 +224,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	}
 
 	for(u2_t  iCushion = 0; iCushion < pool.Entities.Cushions.size(); ++iCushion) {
-		const uint16_t			cushionEntity			= pool.Entities.Cushions[iCushion];
+		const u1_t			cushionEntity			= pool.Entities.Cushions[iCushion];
 		{ if_fail_fe(engine.SetHidden(cushionEntity, true)); }
 		for(u2_t  iFace = 0; iFace < 6; ++iFace) {
 			if(engine.Entities.Children[cushionEntity] && engine.Entities.Children[cushionEntity]->size() > iFace)
@@ -235,7 +235,7 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	::gpk::m4f32			mRotation;
 	mRotation.SetOrientation(::gpk::quatf32{0, 0, 1, 1}.Normalize());
 	for(u0_t  iStick = 0; iStick < pool.Entities.Sticks.size(); ++iStick) {
-		const uint16_t			stickEntity			= pool.Entities.Sticks[iStick];
+		const u1_t			stickEntity			= pool.Entities.Sticks[iStick];
 		{ if_fail_fe(engine.SetMeshScale	(stickEntity, {.01f, board.Table.Slate.y, .01f}, true)); }
 		engine.Scene->RenderNodes.BaseTransforms[engine.Entities[stickEntity].RenderNode].Model *= mRotation;
 		{ if_fail_fe(engine.SetMeshPosition	(stickEntity, {-board.BallRadius * 2, 0, 0})); }
@@ -262,14 +262,14 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 	return 0;
 }
 
-::gpk::error_t			d1p::poolGameSetup			(::d1p::SPoolGame & pool) {
+::gpk::err_t			d1p::poolGameSetup			(::d1p::SPoolGame & pool) {
 	::d1p::SPoolEngine			& engine					= pool.Engine;
 	{ if_fail_fe(::gpk::rasterFontDefaults(engine.Scene->Graphics->Fonts)); }
 
 	{	// table 
 		::gpk::SParamsGrid			argsGrid					= {};
 		//argsGrid.CellCount		= {4, 4};
-		{ if_fail_fe(pool.Entities.Table = (uint16_t)engine.CreateGrid(argsGrid)); }
+		{ if_fail_fe(pool.Entities.Table = (u1_t)engine.CreateGrid(argsGrid)); }
 		{ if_fail_fe(engine.SetShader(pool.Entities.Table, ::d1p::psTableCloth, "psTableCloth")); }
 		{ if_fail_fe(engine.SetColorDiffuse(pool.Entities.Table, ::gpk::DARKRED)); }
 		//for(u2_t  iFace = 0; iFace < 6; ++iFace)
@@ -283,10 +283,10 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		params.Origin		= {};
 		params.Reverse		= false;
 		params.Circumference	= 1.f;
-		{ if_fail_fe(pool.Entities.Balls[0]	= (uint16_t)engine.CreateSphere(params)); }
+		{ if_fail_fe(pool.Entities.Balls[0]	= (u1_t)engine.CreateSphere(params)); }
 		{ if_fail_fe(engine.SetShader(pool.Entities.Balls[0], ::d1p::psBallSolid, "psBallSolid")); }
 		for(u2_t  iBall = 1; iBall < ::d1p::MAX_BALLS; ++iBall) 
-			{ if_fail_fe(pool.Entities.Balls[iBall] = (uint16_t)engine.Clone(pool.Entities.Balls[0], true, true, true)); }
+			{ if_fail_fe(pool.Entities.Balls[iBall] = (u1_t)engine.Clone(pool.Entities.Balls[0], true, true, true)); }
 	}
 
 	//{ if_fail_fe(engine.SetShader((*engine.Entities.Children[pool.Entities.Table])[::gpk::VOXEL_FACE_Top], ::d1p::psTableCloth, "psTableCloth")); }
@@ -299,35 +299,35 @@ static	::gpk::error_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatc
 		params.Height			= 1;
 		params.Radius			= {.1f, .5f};
 
-		uint16_t					iPocketEntity			= (uint16_t)engine.CreateCylinderWall(params);
+		u1_t					iPocketEntity			= (u1_t)engine.CreateCylinderWall(params);
 		{ if_fail_fe(pool.Entities.Pockets[0] = iPocketEntity); }
 		{ if_fail_fe(engine.SetColorDiffuse(iPocketEntity, ::gpk::DARKGRAY * .5f)); }
 		{ if_fail_fe(engine.SetShader(iPocketEntity, ::d1p::psPocket, "psPocket")); }
 		for(u2_t  iPocket = 1; iPocket < ::d1p::MAX_POCKETS; ++iPocket) 
-			{ if_fail_fe(pool.Entities.Pockets[iPocket] = (uint16_t)engine.Clone(pool.Entities.Pockets[0], false, false, false)); }
+			{ if_fail_fe(pool.Entities.Pockets[iPocket] = (u1_t)engine.Clone(pool.Entities.Pockets[0], false, false, false)); }
 	}
 
 	{	// sticks
 		::gpk::SParamsCylinderWall	params				= {};
 		params.CellCount		= {8, 1};
-		{ if_fail_fe(pool.Entities.Sticks[0] = (uint16_t)engine.CreateCylinderWall(params)); }
+		{ if_fail_fe(pool.Entities.Sticks[0] = (u1_t)engine.CreateCylinderWall(params)); }
 		{ if_fail_fe(engine.SetShader(pool.Entities.Sticks[0], ::d1p::psStick, "psStick")); }
 		for(u2_t  iPlayer = 1; iPlayer < pool.Entities.Sticks.size(); ++iPlayer)
-			{ if_fail_fe(pool.Entities.Sticks[iPlayer]	= (uint16_t)engine.Clone(pool.Entities.Sticks[0], true, true, false)); }
+			{ if_fail_fe(pool.Entities.Sticks[iPlayer]	= (u1_t)engine.Clone(pool.Entities.Sticks[0], true, true, false)); }
 	}
 
-	//{ if_fail_fe(pool.Entities.Cushions[0] = (uint16_t)engine.CreateTableCushion()); }
+	//{ if_fail_fe(pool.Entities.Cushions[0] = (u1_t)engine.CreateTableCushion()); }
 	//for(u2_t  iFace = 1; iFace < 6; ++iFace)
 	//	{ if_fail_fe(engine.SetShader((*engine.Entities.Children[pool.Entities.Cushions[0]])[iFace], ::d1p::psTableCloth, "psTableCloth")); }
 	//
 	//for(u2_t  iCushion = 1; iCushion < pool.Entities.Cushions.size(); ++iCushion) 
-	//	{ if_fail_fe(pool.Entities.Cushions[iCushion] = (uint16_t)engine.Clone(pool.Entities.Cushions[0], false, false, false)); }	
+	//	{ if_fail_fe(pool.Entities.Cushions[iCushion] = (u1_t)engine.Clone(pool.Entities.Cushions[0], false, false, false)); }	
 
 	{ if_fail_fe(::d1p::poolGameReset(pool)); }
 	return 0;
 }
 
-static	::gpk::error_t	geometryBuildTableCushion	(::gpk::SGeometryBuffers & output) {
+static	::gpk::err_t	geometryBuildTableCushion	(::gpk::SGeometryBuffers & output) {
 	stxp	::gpk::n3f2_t		TABLE_CUSHION_POSITIONS	[8]		= 
 		{ {0, 1, 0}, {1, 1, 0}, {0, 1, 1}, {1, 1, 1}	// top face
 		, {0, 0, 0}, {1, 0, 0}, {0, 1, 1}, {1, 1, 1}	// diagonal face
@@ -359,7 +359,7 @@ static	::gpk::error_t	geometryBuildTableCushion	(::gpk::SGeometryBuffers & outpu
 	return 0;
 }
 
-::gpk::error_t		d1p::SPoolEngine::CreateTableCushion	()	{
+::gpk::err_t		d1p::SPoolEngine::CreateTableCushion	()	{
 	::gpk::SGeometryBuffers	geometry;
 	::geometryBuildTableCushion(geometry);
 
@@ -387,9 +387,9 @@ static	::gpk::error_t	geometryBuildTableCushion	(::gpk::SGeometryBuffers & outpu
 	pUV				->Desc.Usage	= ::gpk::BUFFER_USAGE_UV;
 
 	pIndicesVertex	->Data.resize(geometry.PositionIndices	.byte_count() / 2);
-	::gpk::vu16				viewIndices							= {(uint16_t*)pIndicesVertex->Data.begin(), geometry.PositionIndices.size()};
+	::gpk::vu16				viewIndices							= {(u1_t*)pIndicesVertex->Data.begin(), geometry.PositionIndices.size()};
 	for(u2_t  index = 0; index < geometry.PositionIndices.size(); ++index) {
-		viewIndices[index] = (uint16_t)geometry.PositionIndices[index];
+		viewIndices[index] = (u1_t)geometry.PositionIndices[index];
 	}
 	//memcpy(&pIndicesVertex	->Data[0], geometry.PositionIndices	.begin(), pIndicesVertex	->Data.size());
 
@@ -452,11 +452,11 @@ static	::gpk::error_t	geometryBuildTableCushion	(::gpk::SGeometryBuffers & outpu
 	return iEntity;
 }
 
-//static	::gpk::error_t	textureBallStripped		(::gpk::g8bgra view, const ::gpk::SRasterFont & font, ::gpk::bgra color, u2_t  number) { 
+//static	::gpk::err_t	textureBallStripped		(::gpk::g8bgra view, const ::gpk::SRasterFont & font, ::gpk::bgra color, u2_t  number) { 
 //	memset(view.begin(), 0xFF, view.byte_count());
 //
 //	::gpk::n2<u2_t >					viewCenter				= view.metrics() / 2;
-//	::gpk::SSlice<uint16_t>						colorBand				= {uint16_t(view.metrics().y / 3), uint16_t(view.metrics().y / 3 * 2)};
+//	::gpk::SSlice<u1_t>						colorBand				= {u1_t(view.metrics().y / 3), u1_t(view.metrics().y / 3 * 2)};
 //	for(u2_t  y = colorBand.Begin; y < colorBand.End; ++y)
 //	for(u2_t  x = 0; x < view.metrics().x; ++x) {
 //		if((viewCenter - ::gpk::n2<u2_t >{x, y}).Length() < view.metrics().y / 7)
@@ -469,7 +469,7 @@ static	::gpk::error_t	geometryBuildTableCushion	(::gpk::SGeometryBuffers & outpu
 //	return 0; 
 //}
 //
-//static	::gpk::error_t	textureBallSolid		(::gpk::g8bgra view, const ::gpk::SRasterFont & font, ::gpk::bgra color, u2_t  number) { 
+//static	::gpk::err_t	textureBallSolid		(::gpk::g8bgra view, const ::gpk::SRasterFont & font, ::gpk::bgra color, u2_t  number) { 
 //	::gpk::n2<u2_t >					viewCenter				= view.metrics() / 2;
 //
 //	for(u2_t  y = 0; y < view.metrics().y; ++y)
@@ -484,7 +484,7 @@ static	::gpk::error_t	geometryBuildTableCushion	(::gpk::SGeometryBuffers & outpu
 //	return 0; 
 //}
 //
-//static	::gpk::error_t	textureBallCue			(::gpk::g8bgra view, ::gpk::bgra color) {
+//static	::gpk::err_t	textureBallCue			(::gpk::g8bgra view, ::gpk::bgra color) {
 //	::gpk::n2f						viewCenter				= view.metrics().f2() / 2;
 //	::gpk::n2f						pointCenters[]			= 
 //		{ {0, viewCenter.y}

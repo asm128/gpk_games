@@ -30,7 +30,7 @@ namespace d1p
 		struct SFirstContact	{ u0_t  Ball  = 0; };
 
 		double			Seconds				= 0;
-		uint16_t		Turn				;
+		u1_t		Turn				;
 		union UEvent {
 			SContactBall	ContactBall		;
 			SContactPocket	ContactPocket	;
@@ -131,7 +131,7 @@ namespace d1p
 #pragma pack(pop)
 
 	tplt<tpnm _tChildEvent>
-	stainli	::gpk::error_t		eventExtractAndHandle		(const ::gpk::SEvent<::d1p::POOL_EVENT> & parentEvent, const ::std::function<::gpk::error_t (const ::gpk::SEventView<_tChildEvent> &)> & funcHandleChild) {
+	stainli	::gpk::err_t		eventExtractAndHandle		(const ::gpk::SEvent<::d1p::POOL_EVENT> & parentEvent, const ::std::function<::gpk::err_t (const ::gpk::SEventView<_tChildEvent> &)> & funcHandleChild) {
 		return ::gpk::eventExtractAndHandle<_tChildEvent>(parentEvent, funcHandleChild);
 	}
 

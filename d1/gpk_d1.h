@@ -76,7 +76,7 @@ namespace d1
 		::gpk::bgra					Color				= {};
 		PLAYER_TYPE					Type				= {};
 
-		::gpk::error_t				Save				(::gpk::apod<u0_t > & output) const {
+		::gpk::err_t				Save				(::gpk::apod<u0_t > & output) const {
 			{ if_fail_fe(::gpk::savePOD		(output, Cameras)); }
 			{ if_fail_fe(::gpk::savePOD		(output, Color)); }
 			{ if_fail_fe(::gpk::savePOD		(output, Type)); }
@@ -84,7 +84,7 @@ namespace d1
 			return 0;
 		}
 
-		::gpk::error_t				Load				(::gpk::vcu0_t & input) {
+		::gpk::err_t				Load				(::gpk::vcu0_t & input) {
 			{ if_fail_fe(::gpk::loadPOD		(input, Cameras	)); }
 			{ if_fail_fe(::gpk::loadPOD		(input, Color	)); }
 			{ if_fail_fe(::gpk::loadPOD		(input, Type	)); }
@@ -147,14 +147,14 @@ namespace d1
 		::gpk::n3f2_t						LightPos			= {5, 2, 0};
 
 
-		::gpk::error_t						Save				(::gpk::apod<u0_t > & output) const {
+		::gpk::err_t						Save				(::gpk::apod<u0_t > & output) const {
 			{ if_fail_fe(Pool.Save(output)); }
 			{ if_fail_fe(::gpk::savePOD(output, StartState)); }
 			{ if_fail_fe(::gpk::savePOD(output, TimeScale)); }
 			return 0;
 		}
 
-		::gpk::error_t						Load				(::gpk::vcu0_t & input) {
+		::gpk::err_t						Load				(::gpk::vcu0_t & input) {
 			{ if_fail_fe(Pool.Load(input)); }
 			{ if_fail_fe(::gpk::loadPOD(input, StartState)); }
 			{ if_fail_fe(::gpk::loadPOD(input, TimeScale)); }
@@ -168,7 +168,7 @@ namespace d1
 		inline	const ::d1::SPlayerCameras&	ActiveCameras		()					const	{ return Players[Pool.ActivePlayer()].Cameras; }
 		inline	const ::d1::SCamera&		CameraSelected		()					const	{ return ActiveCameras().GetSelected(); }
 		inline	const ::d1::SCamera&		GetActiveCamera		(u2_t  cameraId)	const	{ return ActiveCameras().GetCamera(cameraId); }
-		::gpk::error_t						ResetStickCamera	(u0_t  iStick)			{
+		::gpk::err_t						ResetStickCamera	(u0_t  iStick)			{
 			::d1::SCamera							& stickCamera		= Players[iStick].Cameras.Stick;
 			::gpk::quatf32							stickOrientation	= {};
 			if_fail_e(Pool.GetBallPosition(0, stickCamera.Target));
@@ -179,8 +179,8 @@ namespace d1
 			stickCamera.Position				+= stickCamera.Target;
 			return 0;
 		}
-		inline	::gpk::error_t				ResetStickCamera	()			{ return ResetStickCamera(Pool.ActivePlayer()); }
-		::gpk::error_t						ResetStickCameras	()			{
+		inline	::gpk::err_t				ResetStickCamera	()			{ return ResetStickCamera(Pool.ActivePlayer()); }
+		::gpk::err_t						ResetStickCameras	()			{
 			for(u0_t  iPlayer = 0; iPlayer < Players.size(); ++iPlayer) 
 				ResetStickCamera(iPlayer);
 			return 0;
@@ -242,13 +242,13 @@ namespace d1
 
 		float								ClearColor	[4]				= {.25f, .125f, .35f, 1.0f};
 
-		::gpk::error_t						RefreshTeamStrings			(u0_t  teamStripped)			{
+		::gpk::err_t						RefreshTeamStrings			(u0_t  teamStripped)			{
 			stxp const sc_t*						strteam[]					= {"Solid", "Stripped"};
 			sprintf_s(teamsbuffer[0].Storage, "Team 1 - %s", strteam[(teamStripped + 1) & 1]);
 			sprintf_s(teamsbuffer[1].Storage, "Team 2 - %s", strteam[teamStripped]);
 			return 0;
 		}
-		::gpk::error_t						RefreshTeamUI				() {
+		::gpk::err_t						RefreshTeamUI				() {
 			::gpk::SGUI								& gui						= *Dialog.GUI;
 			stxp	::d1::APP_STATE					states[]					= {::d1::APP_STATE_Home, ::d1::APP_STATE_Play};
 			for(u2_t  iTeam = 0; iTeam < TeamUI.size(); ++iTeam) {
@@ -261,7 +261,7 @@ namespace d1
 			}
 			return 0;
 		}
-		::gpk::error_t						RefreshPlayUI				(u0_t  iPlayer, u0_t  iTeam) {
+		::gpk::err_t						RefreshPlayUI				(u0_t  iPlayer, u0_t  iTeam) {
 			::gpk::controlTextSet(*Dialog.GUI, FirstControl[::d1::APP_STATE_Play] + ::d1::UI_PLAY_Player, playrbuffer[iPlayer].Storage);
 			::gpk::controlTextSet(*Dialog.GUI, FirstControl[::d1::APP_STATE_Play] + ::d1::UI_PLAY_Team	, teamsbuffer[iTeam].Storage);
 			return 0;
@@ -286,7 +286,7 @@ namespace d1
 
 		::d1::SD1FileStrings	FileStrings					= {};
 
-		::gpk::error_t			StateSwitch					(::d1::APP_STATE newState)			{
+		::gpk::err_t			StateSwitch					(::d1::APP_STATE newState)			{
 			::gpk::SControlTable		& table						= AppUI.Dialog.GUI->Controls;
 			if(newState != ActiveState) {
 				const ::gpk::cid_t iDialogNew = AppUI.DialogPerState[newState];
@@ -304,7 +304,7 @@ namespace d1
 			return ActiveState;
 		}
 
-		::gpk::error_t			Save			(SAVE_MODE autosaveMode)	const	{
+		::gpk::err_t			Save			(SAVE_MODE autosaveMode)	const	{
 			::gpk::vcsc_t					extension;
 			switch(autosaveMode) {
 			case SAVE_MODE_USER		: extension = FileStrings.ExtensionSaveUser		; break;
@@ -316,14 +316,14 @@ namespace d1
 			const u3_t 				timeCurrent		= (SAVE_MODE_USER != autosaveMode) ? 0 : ::gpk::timeCurrent();
 			const u3_t 				timeStart		= (SAVE_MODE_AUTO == autosaveMode) ? 0 : MainGame.Pool.MatchState.TimeStart;
 			sc_t						fileName[4096]	= {};
-			sprintf_s(fileName, "%s/%llu.%llu%s", FileStrings.SavegameFolder.begin(), timeStart, timeCurrent, extension.begin());
+			sprintf_s(fileName, "%.*s/%llu.%llu%.*s", GPK_VIEW_ARGS(FileStrings.SavegameFolder), timeStart, timeCurrent, GPK_VIEW_ARGS(extension));
 
 			if(false == MainGame.Pool.MatchState.Flags.GameOver) // Save only if a player is alive
 				return Save(fileName);
 			return 0;
 		}
 
-		::gpk::error_t			Save						(::gpk::vcsc_t fileName)		const	{
+		::gpk::err_t			Save						(::gpk::vcsc_t fileName)		const	{
 			::gpk::au0_t					serialized;
 			{ if_fail_fe(MainGame.Save(serialized)); }
 			for(u2_t  iPlayer = 0; iPlayer < MainGame.Players.size(); ++iPlayer) {
@@ -333,7 +333,7 @@ namespace d1
 			return ::gpk::deflateFromMemory(fileName, serialized);
 		}
 
-		::gpk::error_t			Load						(::gpk::vcsc_t filename)				{
+		::gpk::err_t			Load						(::gpk::vcsc_t filename)				{
 			::gpk::au0_t					serialized;
 			{ if_fail_fe(::gpk::inflateToMemory(filename, serialized)); }
 			::gpk::vcu0_t					viewSerialized				= serialized;
@@ -360,10 +360,10 @@ namespace d1
 
 	};
 
-	::gpk::error_t			d1Update				(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEventsNew);
-	::gpk::error_t			d1Draw					(::d1::SD1UI & appUI, ::d1::SD1Game & poolGame, ::gpk::rtbgra8d32 & backBuffer, double totalSeconds, bool onlyGUI = false);
+	::gpk::err_t			d1Update				(::d1::SD1 & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEventsNew);
+	::gpk::err_t			d1Draw					(::d1::SD1UI & appUI, ::d1::SD1Game & poolGame, ::gpk::rtbgra8d32 & backBuffer, double totalSeconds, bool onlyGUI = false);
 
-	::gpk::error_t			guiSetup				(::d1::SD1UI & appUI, ::d1::SD1Game & appGame, const ::gpk::pobj<::gpk::SInput> & input);
+	::gpk::err_t			guiSetup				(::d1::SD1UI & appUI, ::d1::SD1Game & appGame, const ::gpk::pobj<::gpk::SInput> & input);
 	::d1::APP_STATE			guiUpdate				(::d1::SD1 & app, ::gpk::vpobj<::gpk::SEventSystem> sysEvents);
 } // namespace
 

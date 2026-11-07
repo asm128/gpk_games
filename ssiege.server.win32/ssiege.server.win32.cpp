@@ -32,7 +32,7 @@ gpk::err_t			cleanup					(::SApplication & app)											{
 	app.D3DApp.Shutdown();
 #endif
 
-	if_fail_w(::gpk::serverStop(app.Server->UDP));
+	if_fail_w(::gpk::serverStop(app.Server->SocketServer));
 	if_fail_w(::gpk::mainWindowDestroy(mainWindow));
 	if_fail_w(::ssg::ssiegeUpdate(app.SSiegeApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
 	if_fail_w(::gpk::tcpipShutdown());
@@ -126,8 +126,8 @@ gpk::err_t			update					(::SApplication & app, bool systemRequestedExit) {
 	if_fail_e(serverResult = ::gpk::serverUpdate(*app.Server, gui));
 	if_true_vi(::gpk::APPLICATION_STATE_EXIT, serverResult == 1);
 
-	if_fail_e(app.Server->QueueReceived.for_each([&app](::gpk::TUDPQueue & messages) {
-		messages.enumerate([&app](u2_t & index, ::gpk::pobj<::gpk::SUDPMessage> & message) {
+	if_fail_e(app.Server->QueueReceived.for_each([&app](::gpk::TPacketQueue & messages) {
+		messages.enumerate([&app](u2_t & index, ::gpk::pobj<::gpk::SMessage> & message) {
 			if(!message)
 				return 0;
 

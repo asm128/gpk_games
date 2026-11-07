@@ -32,7 +32,7 @@ gpk::err_t			cleanup				(::SApplication & app)											{
 	app.D3DApp.Shutdown();
 #endif
 
-	if_fail_w(::gpk::clientDisconnect(app.Client.UDP));
+	if_fail_w(::gpk::clientDisconnect(app.Client.SocketClient));
 	if_fail_w(::gpk::mainWindowDestroy(mainWindow));
 	if_fail_w(::ssg::ssiegeUpdate(app.SSiegeApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
 	if_fail_w(::gpk::tcpipShutdown());
@@ -134,7 +134,7 @@ gpk::err_t			update				(::SApplication & app, bool systemRequestedExit)					{
 	if_fail_fe(clientResult = ::gpk::clientUpdate(app.Client, gui));
 	if_true_vif(::gpk::APPLICATION_STATE_EXIT, clientResult > 0, "User requested close (%i). Terminating execution.", clientResult);
 
-	if_fail_e(app.Client.QueueReceived.for_each([&app](::gpk::pobj<::gpk::SUDPMessage> & udp){ 
+	if_fail_e(app.Client.QueueReceived.for_each([&app](::gpk::pobj<::gpk::SMessage> & udp){ 
 		if(udp && udp->Payload.size()) {
 			::gpk::pobj<::ssg::EventSSiege>	eventReceived;
 			::gpk::vcu0_t							inputBytes			= udp->Payload;

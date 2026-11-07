@@ -1,6 +1,6 @@
 #include "gpk_pool_game_update.h"
 
-::gpk::error_t		d1p::SPoolGame::AdvanceTurn	(::gpk::apobj<::d1p::SEventPool> & outputEvents) { 
+::gpk::err_t		d1p::SPoolGame::AdvanceTurn	(::gpk::apobj<::d1p::SEventPool> & outputEvents) { 
 	::d1p::SMatchFlags		& matchFlags				= MatchState.Flags;
 	if(matchFlags.GameOver)
 		return 0;
@@ -14,11 +14,11 @@
 	}
 	{ if_fail_fe(Engine.SetHidden(ActiveStickEntity(), false)); }
 	::d1p::STurnInfo							newTurn					= {{(u3_t )::gpk::timeCurrentInMs()}, 0, ActivePlayer(), ActiveTeam()};
-	const ::d1p::SArgsMatchEvent				argsMatch				= {MatchState.TotalSeconds, (uint16_t)TurnHistory.push_back(newTurn)};
+	const ::d1p::SArgsMatchEvent				argsMatch				= {MatchState.TotalSeconds, (u1_t)TurnHistory.push_back(newTurn)};
 	return ::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_TurnStart, argsMatch);	// Report turn start for player
 }
 
-::gpk::error_t		d1p::SPoolGame::Save						(::gpk::au0_t & bytes)	const	{
+::gpk::err_t		d1p::SPoolGame::Save						(::gpk::au0_t & bytes)	const	{
 	{ if_fail_fe(::gpk::savePOD (bytes, MatchState		)); }
 	{ if_fail_fe(::gpk::saveView(bytes, ::gpk::view<const ::d1p::SPoolTeam	>{Teams		})); }
 	{ if_fail_fe(::gpk::saveView(bytes, ::gpk::view<const ::gpk::bgra		>{BallColors})); }
@@ -28,7 +28,7 @@
 	return Engine.Save(bytes);
 }
 
-::gpk::error_t		d1p::SPoolGame::Load						(::gpk::vcu0_t & bytes)			{
+::gpk::err_t		d1p::SPoolGame::Load						(::gpk::vcu0_t & bytes)			{
 	{ if_fail_fe(::gpk::loadPOD (bytes, MatchState		)); }
 	{ if_fail_fe(::gpk::loadView(bytes, Teams			)); }
 	{ if_fail_fe(::gpk::loadView(bytes, BallColors		)); }
@@ -38,7 +38,7 @@
 	return Engine.Load(bytes);
 }
 
-static	::gpk::error_t	poolGameUpdateShot		(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents, double secondsElapsed) {
+static	::gpk::err_t	poolGameUpdateShot		(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents, double secondsElapsed) {
 	for(u0_t  iBall = 0; iBall < pool.MatchState.CountBalls; ++iBall) {
 		const u2_t 			lastDelta				= pool.PositionDeltas[iBall].push_back({});
 		pool.GetBallPosition(iBall, pool.PositionDeltas[iBall][lastDelta].A);
@@ -67,7 +67,7 @@ static	::gpk::error_t	poolGameUpdateShot		(::d1p::SPoolGame & pool, ::gpk::apobj
 	}
 	return 0;
 }
-::gpk::error_t			d1p::poolGameUpdate		(::d1p::SPoolGame & pool, ::gpk::view<const ::d1p::SEventPlayer> inputEvents, ::gpk::apobj<::d1p::SEventPool> & outputEvents, double secondsElapsed) {
+::gpk::err_t			d1p::poolGameUpdate		(::d1p::SPoolGame & pool, ::gpk::view<const ::d1p::SEventPlayer> inputEvents, ::gpk::apobj<::d1p::SEventPool> & outputEvents, double secondsElapsed) {
 	pool.LastFrameContactsBall		.clear();
 	pool.LastFrameContactsCushion	.clear();
 
@@ -97,7 +97,7 @@ static	::gpk::error_t	poolGameUpdateShot		(::d1p::SPoolGame & pool, ::gpk::apobj
 }
 
 
-::gpk::error_t	debugPrintMatchFlags	(const ::d1p::SMatchFlags & matchFlags) { 
+::gpk::err_t	debugPrintMatchFlags	(const ::d1p::SMatchFlags & matchFlags) { 
 	info_printf("Match flags:"
 		"\nTeamActive    : %i"
 		"\nTeamStripped  : %i"
@@ -119,7 +119,7 @@ static	::gpk::error_t	poolGameUpdateShot		(::d1p::SPoolGame & pool, ::gpk::apobj
 	return 0;
 }
 
-::gpk::error_t	d1p::debugPrintMatchState	(const ::d1p::SMatchState & matchState) { 
+::gpk::err_t	d1p::debugPrintMatchState	(const ::d1p::SMatchState & matchState) { 
 	info_printf("Match state:"
 		"\nSeed         : %llu"
 		"\nTimeStart    : %llu"
@@ -140,7 +140,7 @@ static	::gpk::error_t	poolGameUpdateShot		(::d1p::SPoolGame & pool, ::gpk::apobj
 	return 0;
 }
 
-::gpk::error_t	d1p::debugPrintStickControl	(const ::d1p::SStickControl & stickControl) { 
+::gpk::err_t	d1p::debugPrintStickControl	(const ::d1p::SStickControl & stickControl) { 
 	info_printf("Stick control:"
 		"\nShift     : {%f, %f}"
 		"\nAngle     : %f"
@@ -154,7 +154,7 @@ static	::gpk::error_t	poolGameUpdateShot		(::d1p::SPoolGame & pool, ::gpk::apobj
 	return 0;
 }
 
-::gpk::error_t	d1p::debugPrintTurnInfo		(const ::d1p::STurnInfo & turnInfo) { 
+::gpk::err_t	d1p::debugPrintTurnInfo		(const ::d1p::STurnInfo & turnInfo) { 
 	info_printf("Turn info:"
 		"\nTimeStart   : %lli"
 		"\nTimeShoot   : %lli"

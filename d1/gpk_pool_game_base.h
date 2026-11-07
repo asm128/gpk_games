@@ -129,8 +129,8 @@ namespace d1p
 
 	struct SPoolPhysics {
 		SPoolDamping		Damping				= {};
-		uint16_t			Gravity				= 9800;	// mm/s
-		uint16_t			BallGrams			= 165;	// grams
+		u1_t			Gravity				= 9800;	// mm/s
+		u1_t			BallGrams			= 165;	// grams
 	};
 
 
@@ -162,7 +162,7 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(BALL_TYPE, Stripped	, 1);
 	GDEFINE_ENUM_VALUE(BALL_TYPE, Cue		, 2);
 	GDEFINE_ENUM_VALUE(BALL_TYPE, Black		, 3);
-	typedef uint16_t	TBallField;
+	typedef u1_t	TBallField;
 	inlcxpr	u0_t 		pocketedAny			(const TBallField pocketed, BALL_TYPE ballType)	{ return (pocketed >> (ballType * 8)) & 0xFE; }
 	inlcxpr	bool		pocketedAll			(const TBallField pocketed, BALL_TYPE ballType)	{ return 0xFE == pocketedAny(pocketed, ballType); }
 	inlcxpr	bool		isPocketed			(const TBallField pocketed, u0_t  iBall)		{ return pocketed & (1ULL << iBall); }
@@ -211,7 +211,7 @@ namespace d1p
 		inlcxpr	u0_t 		PocketedAny			(u0_t  iTeam)			const	{ return ::d1p::pocketedAny	(Pocketed, TeamToBallType(iTeam)); }
 		inlcxpr	BALL_TYPE 	TeamToBallType		(u0_t  iTeam)			const	{ return (iTeam == Flags.TeamStripped) ? ::d1p::BALL_TYPE_Stripped : ::d1p::BALL_TYPE_Solid; }
 
-		::gpk::error_t		Reset				(u0_t  firstTeam = 0, u3_t  seed = ::gpk::timeCurrentInUs() ^ ::gpk::noise1DBase(::gpk::timeCurrentInUs()))	{
+		::gpk::err_t		Reset				(u0_t  firstTeam = 0, u3_t  seed = ::gpk::timeCurrentInUs() ^ ::gpk::noise1DBase(::gpk::timeCurrentInUs()))	{
 			Seed				= seed;
 			TotalSeconds		= 0;
 			TeamInfo			= {};

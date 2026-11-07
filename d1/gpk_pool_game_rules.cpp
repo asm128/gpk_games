@@ -3,7 +3,7 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-static	::gpk::error_t	handleContactBall		(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { 
+static	::gpk::err_t	handleContactBall		(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { 
 	const ::d1p::SArgsBall::SContactBall	& eventData = eventArgs.Event.ContactBall; 
 	info_printf("Ball: %i, Ball B : %i.", eventData.BallA, eventData.BallB); 
 	::d1p::STurnInfo			& turnInfo				= pool.TurnHistory[eventArgs.Turn];
@@ -34,12 +34,12 @@ static	::gpk::error_t	handleContactBall		(::d1p::SPoolGame & pool, const ::d1p::
 	return 0;
 }
 
-static	::gpk::error_t	handleContactPocket		(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { const ::d1p::SArgsBall::SContactPocket	& eventData = eventArgs.Event.ContactPocket	; (void)pool; (void)eventArgs; (void)outputEvents; info_printf("Ball: %i, Pocket : %i.", eventData.Ball,  eventData.Pocket	); return 0; }
-static	::gpk::error_t	handleContactCushion	(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { const ::d1p::SArgsBall::SContactCushion	& eventData = eventArgs.Event.ContactCushion; (void)pool; (void)eventArgs; (void)outputEvents; info_printf("Ball: %i, Cushion: %i.", eventData.Ball,  eventData.Cushion); return 0; }
-static	::gpk::error_t	handleFall				(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { const ::d1p::SArgsBall::SFall				& eventData = eventArgs.Event.Fall			; (void)pool; (void)eventArgs; (void)outputEvents; info_printf("Ball: %i.", eventData.Ball); return 0; }
-static	::gpk::error_t	handleJump				(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { const ::d1p::SArgsBall::SJump				& eventData = eventArgs.Event.Jump			; (void)pool; (void)eventArgs; (void)outputEvents; info_printf("Ball: %i.", eventData.Ball); return 0; }
-static	::gpk::error_t	handleFirstContact		(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { const ::d1p::SArgsBall::SFirstContact		& eventData = eventArgs.Event.FirstContact	; (void)pool; (void)eventArgs; (void)outputEvents; info_printf("Ball: %i.", eventData.Ball); return 0; }
-static	::gpk::error_t	handlePocketed			(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { 
+static	::gpk::err_t	handleContactPocket		(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { const ::d1p::SArgsBall::SContactPocket	& eventData = eventArgs.Event.ContactPocket	; (void)pool; (void)eventArgs; (void)outputEvents; info_printf("Ball: %i, Pocket : %i.", eventData.Ball,  eventData.Pocket	); return 0; }
+static	::gpk::err_t	handleContactCushion	(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { const ::d1p::SArgsBall::SContactCushion	& eventData = eventArgs.Event.ContactCushion; (void)pool; (void)eventArgs; (void)outputEvents; info_printf("Ball: %i, Cushion: %i.", eventData.Ball,  eventData.Cushion); return 0; }
+static	::gpk::err_t	handleFall				(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { const ::d1p::SArgsBall::SFall				& eventData = eventArgs.Event.Fall			; (void)pool; (void)eventArgs; (void)outputEvents; info_printf("Ball: %i.", eventData.Ball); return 0; }
+static	::gpk::err_t	handleJump				(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { const ::d1p::SArgsBall::SJump				& eventData = eventArgs.Event.Jump			; (void)pool; (void)eventArgs; (void)outputEvents; info_printf("Ball: %i.", eventData.Ball); return 0; }
+static	::gpk::err_t	handleFirstContact		(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { const ::d1p::SArgsBall::SFirstContact		& eventData = eventArgs.Event.FirstContact	; (void)pool; (void)eventArgs; (void)outputEvents; info_printf("Ball: %i.", eventData.Ball); return 0; }
+static	::gpk::err_t	handlePocketed			(::d1p::SPoolGame & pool, const ::d1p::SArgsBall eventArgs, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { 
 	const ::d1p::SArgsBall::SPocketed	& eventData		= eventArgs.Event.Pocketed; 
 	info_printf("Ball: %i, Pocket : %i.", eventData.Ball,  eventData.Pocket); 
 
@@ -101,7 +101,7 @@ static	::gpk::error_t	handlePocketed			(::d1p::SPoolGame & pool, const ::d1p::SA
 	{ if_fail_fe(pool.BallEventHistory.push_back(eventArgs)); }
 	return 0; 
 }
-static	::gpk::error_t	handleFOUL				(::d1p::SPoolGame & pool, const ::gpk::SEventView<::d1p::FOUL> & foulEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/) { 
+static	::gpk::err_t	handleFOUL				(::d1p::SPoolGame & pool, const ::gpk::SEventView<::d1p::FOUL> & foulEvent, ::gpk::apobj<::d1p::SEventPool> & /*outputEvents*/) { 
 	info_printf("%s", ::gpk::get_value_namep(foulEvent.Type));
 	const ::d1p::SArgsBall			* argsBall				= (const ::d1p::SArgsBall*)foulEvent.Data.begin(); 
 	pool.MatchState.Flags.NotInHand			= 0;
@@ -109,7 +109,7 @@ static	::gpk::error_t	handleFOUL				(::d1p::SPoolGame & pool, const ::gpk::SEven
 	return 0;
 }
 
-static	::gpk::error_t	handleBALL_EVENT		(::d1p::SPoolGame & pool, const ::gpk::SEventView<::d1p::BALL_EVENT> & ballEvent, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { 
+static	::gpk::err_t	handleBALL_EVENT		(::d1p::SPoolGame & pool, const ::gpk::SEventView<::d1p::BALL_EVENT> & ballEvent, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { 
 	info_printf("%s", ::gpk::get_value_namep(ballEvent.Type));
 	const ::d1p::SArgsBall		& argsBall				= *(const ::d1p::SArgsBall*)ballEvent.Data.begin(); 
 	switch(ballEvent.Type) { 
@@ -127,7 +127,7 @@ static	::gpk::error_t	handleBALL_EVENT		(::d1p::SPoolGame & pool, const ::gpk::S
 	return 0; 
 }
 
-static	::gpk::error_t	handleMATCH_EVENT		(::d1p::SPoolGame & pool, const ::gpk::SEventView<::d1p::MATCH_EVENT> & childEvent, ::gpk::apobj<::gpk::SEvent<::d1p::POOL_EVENT>> & outputEvents) { 
+static	::gpk::err_t	handleMATCH_EVENT		(::d1p::SPoolGame & pool, const ::gpk::SEventView<::d1p::MATCH_EVENT> & childEvent, ::gpk::apobj<::gpk::SEvent<::d1p::POOL_EVENT>> & outputEvents) { 
 	info_printf("%s", ::gpk::get_value_namep(childEvent.Type));
 	switch(childEvent.Type) { 
 	case d1p::MATCH_EVENT_StrippedAssigned	: break;
@@ -137,7 +137,7 @@ static	::gpk::error_t	handleMATCH_EVENT		(::d1p::SPoolGame & pool, const ::gpk::
 		break;
 	case d1p::MATCH_EVENT_MatchStart		: {
 		const ::d1p::STurnInfo			newTurn					= {{(u3_t )::gpk::timeCurrentInMs()}, 0, pool.ActivePlayer(), pool.ActiveTeam()};
-		const ::d1p::SArgsMatchEvent	argsMatch				= {pool.MatchState.TotalSeconds, (uint16_t)pool.TurnHistory.push_back(newTurn)};
+		const ::d1p::SArgsMatchEvent	argsMatch				= {pool.MatchState.TotalSeconds, (u1_t)pool.TurnHistory.push_back(newTurn)};
 		{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_TurnStart, argsMatch)); }
 		break;
 	}
@@ -180,21 +180,21 @@ static	::gpk::error_t	handleMATCH_EVENT		(::d1p::SPoolGame & pool, const ::gpk::
 }
 
 
-static	::gpk::error_t	endTurn					(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { // we need to change the state to be inactive
+static	::gpk::err_t	endTurn					(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents) { // we need to change the state to be inactive
 	::d1p::SMatchState			& matchState			= pool.MatchState;
 	::d1p::SMatchFlags			& turnState				= matchState.Flags;
 	turnState.PhysicsActive	= false;
 	{
 		::d1p::STurnInfo			& activeTurn			= pool.ActiveTurn();
 		activeTurn.Time.Ended	= ::gpk::timeCurrentInMs();
-		const d1p::SArgsMatchEvent	argsMatch				= {pool.MatchState.TotalSeconds, uint16_t(pool.TurnHistory.size() - 1)};
+		const d1p::SArgsMatchEvent	argsMatch				= {pool.MatchState.TotalSeconds, u1_t(pool.TurnHistory.size() - 1)};
 		{ if_fail_fe(::gpk::eventEnqueueChild(outputEvents, ::d1p::POOL_EVENT_MATCH_EVENT, ::d1p::MATCH_EVENT_TurnEnd, argsMatch)); }	// Report turn end for player
 	}
 	return 1;
 }
 
 // Checks if the balls are still moving
-static	::gpk::error_t	endTurnIfNeeded			(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents) {
+static	::gpk::err_t	endTurnIfNeeded			(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents) {
 	::d1p::SMatchState			& matchState			= pool.MatchState;
 	bool						playStillActive			= false;
 	for(u2_t  iBall = 0; iBall < matchState.CountBalls && false == playStillActive; ++iBall) 
@@ -212,7 +212,7 @@ static	::gpk::error_t	endTurnIfNeeded			(::d1p::SPoolGame & pool, ::gpk::apobj<:
 	return 0;
 }
 
-static	::gpk::error_t	matchStart				(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents) {
+static	::gpk::err_t	matchStart				(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents) {
 	{ if_fail_fe(::d1p::poolGamePhysicsUpdate(pool, outputEvents, 2)); }
 	outputEvents.clear();
 
@@ -223,7 +223,7 @@ static	::gpk::error_t	matchStart				(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p
 	return 0;
 }
 
-::gpk::error_t			d1p::evaluateTurnProgress(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents, u2_t  eventOffset) { 
+::gpk::err_t			d1p::evaluateTurnProgress(::d1p::SPoolGame & pool, ::gpk::apobj<::d1p::SEventPool> & outputEvents, u2_t  eventOffset) { 
 	if(pool.MatchState.Flags.GameOver)
 		return 0;
 

@@ -1,5 +1,5 @@
 #include "ssiege_server.h"
-#include "gpk_udp_server_app.h"
+#include "gpk_server_app.h"
 #include "gpk_framework.h"
 
 //#define DISABLE_D3D11

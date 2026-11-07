@@ -19,7 +19,7 @@ GPK_USING_TYPEINT();
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "D1");
 
 // --- Cleanup application resources.
-::gpk::error_t			cleanup					(::SApplication & app)											{
+::gpk::err_t			cleanup					(::SApplication & app)											{
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::SWindow				& mainWindow			= framework.RootWindow;
 	{ if_fail_fe(::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue)); }
@@ -32,7 +32,7 @@ GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "D1");
 	return 0;
 }
 
-static	::gpk::error_t	updateSizeDependentResources(::SApplication & app)											{
+static	::gpk::err_t	updateSizeDependentResources(::SApplication & app)											{
 	::gpk::SWindow				& mainWindow			= app.Framework.RootWindow;
 	const ::gpk::n2u1_t			newSize					= mainWindow.Size;
 #if !defined(DISABLE_D3D11)
@@ -45,7 +45,7 @@ static	::gpk::error_t	updateSizeDependentResources(::SApplication & app)								
 	return 0;
 }
 
-static	::gpk::error_t	processScreenEvent		(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
+static	::gpk::err_t	processScreenEvent		(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_SCREEN_Create:
@@ -59,7 +59,7 @@ static	::gpk::error_t	processScreenEvent		(::SApplication & app, const ::gpk::SE
 	return 0;
 }
 
-static	::gpk::error_t	processKeyboardEvent	(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
+static	::gpk::err_t	processKeyboardEvent	(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_KEYBOARD_Down:
@@ -75,7 +75,7 @@ static	::gpk::error_t	processKeyboardEvent	(::SApplication & app, const ::gpk::S
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEventSystem & sysEvent) { 
+static	::gpk::err_t	processSystemEvent	(::SApplication & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen		: { if_fail_fe(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN  >(sysEvent, [&app](const ::gpk::SScreenEventView & screenEvent) { return ::processScreenEvent  (app, screenEvent); })); } break;
@@ -83,7 +83,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 	}
 	return 0;
 }
-::gpk::error_t			setup					(::SApplication& app)											{
+::gpk::err_t			setup					(::SApplication& app)											{
 #if !defined(DISABLE_D3D11)
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 #endif
@@ -99,9 +99,9 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 	return 0;
 }
 
-::gpk::error_t			update					(::SApplication& app, bool systemRequestedExit)					{
+::gpk::err_t			update					(::SApplication& app, bool systemRequestedExit)					{
 	::gpk::SFramework			& framework				= app.Framework;
-	::gpk::error_t				frameworkResult			= ::gpk::updateFramework(framework);
+	::gpk::err_t				frameworkResult			= ::gpk::updateFramework(framework);
 	{ if_fail_fe(frameworkResult); }
 	rvis_if(::gpk::APPLICATION_STATE_EXIT, frameworkResult == ::gpk::APPLICATION_STATE_EXIT);
 
@@ -138,7 +138,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 	return 0;
 }
 
-::gpk::error_t			draw					(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
+::gpk::err_t			draw					(::SApplication& app)											{	// --- This function will draw some coloured symbols in each cell of the ASCII screen.
 #if !defined(DISABLE_D3D11) 
 	memset(app.D3DApp.GUIStuff.RenderTarget.begin(), 0, app.D3DApp.GUIStuff.RenderTarget.byte_count());
 	
