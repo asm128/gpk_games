@@ -133,7 +133,7 @@ static	gpk::err_t	drawScoreParticles
 		::gpk::apod<::gpk::n2u1_t>	dstCoords;
 
 		sc_t						textToShow[64]		= {};
-		sprintf_s(textToShow, "%i", particle.Score);
+		::gpk::sprintf_s(textToShow, "%i", particle.Score);
 		const ::gpk::vcst_t			finalText			= textToShow;
 	::gpk::rect2s1_t			rectText			= {{}, {s1_t(font.CharSize.x * finalText.size()), font.CharSize.y}};
 		rectText.Offset = (pixelCoord - ::gpk::n2s1_t{s1_t(rectText.Size.x >> 1), s1_t(rectText.Size.y >> 1)});

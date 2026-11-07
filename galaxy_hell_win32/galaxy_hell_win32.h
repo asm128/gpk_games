@@ -15,12 +15,13 @@ struct SApplication {
 	::std::mutex			LockGUI;
 	::std::mutex			LockRender;
 
-	::gpk::AUDIO_STATE		AudioState;
-
 	::ghg::SGalaxyHellApp	GalaxyHellApp;
 
-	HDC						DrawingContext	= {};
-	HGLRC					GLRenderContext	= {}; 
+#ifdef GPK_WINDOWS
+	::gpk::AUDIO_STATE		AudioState;
+#elif defined(GPK_XCB)
+	// Your sound and linux bs apis here.
+#endif
  
 	//::gpk::SClient		Client;
 

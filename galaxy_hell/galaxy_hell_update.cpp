@@ -1,11 +1,10 @@
 #include "gpk_galaxy_hell.h"
 
 #include "gpk_collision.h"
+#include "gpk_system_key.h"
 
 #include "gpk_line3.h"
 
-#include <Windows.h>
-#include <mmsystem.h>
 #include <gpk_noise.h>
 
 GPK_USING_TYPEINT();
@@ -384,8 +383,8 @@ static	gpk::err_t	processInput			(::ghg::SGalaxyHell & solarSystem, double secon
 	//const bool				key_rotate_back			= input.KeyboardCurrent.KeyState[VK_NUMPAD4	];
 	//const bool				key_rotate_reset		= input.KeyboardCurrent.KeyState[VK_NUMPAD5	];
 	const bool					key_camera_switch		= input.KeyboardCurrent.KeyState['C'		];
-	const bool					key_camera_move_front	= input.KeyboardCurrent.KeyState[VK_HOME	];
-	const bool					key_camera_move_back	= input.KeyboardCurrent.KeyState[VK_END		];
+	const bool					key_camera_move_front	= input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_Home	];
+	const bool					key_camera_move_back	= input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_End		];
 	const bool					key_camera_move_up		= input.KeyboardCurrent.KeyState['E'		];
 	const bool					key_camera_move_down	= input.KeyboardCurrent.KeyState['Q'		];
 	const bool					key_camera_reset		= input.KeyboardCurrent.KeyState['R'		];

@@ -5,7 +5,9 @@
 #include "gpk_raster_lh.h"
 
 #include <time.h>
+#if defined(GPK_WINDOWS)
 #include <direct.h>
+#endif
 
 //#include <joystickapi.h>
 
@@ -53,12 +55,10 @@ static	gpk::err_t	processScreenEvent		(::SApplication & /*app*/, const ::gpk::SE
 static	gpk::err_t	processKeyboardEvent	(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
-	case ::gpk::EVENT_KEYBOARD_Down:
 	case ::gpk::EVENT_KEYBOARD_SysDown:
 		switch(screenEvent.Data[0]) {
-		case VK_RETURN:
-			if(GetAsyncKeyState(VK_MENU) & 0xFFF0)
-				if_fail_fe(::gpk::fullScreenToggle(app.Framework.RootWindow));
+		case '\r':
+			if_fail_fe(::gpk::fullScreenToggle(app.Framework.RootWindow));
 			break;
 		}
 		break;
@@ -79,14 +79,10 @@ gpk::err_t			cleanup				(::SApplication & app)						{
 	::gpk::SFramework			& framework			= app.Framework;
 	::gpk::SWindow				& mainWindow		= framework.RootWindow;
 	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, mainWindow.EventQueue);
+#if defined(GPK_WINDOWS)
 	app.AudioState.CleanupAudio(); 
+#endif
 
-	// --- when the rendering context is no longer needed ...   
- 	// make the rendering context not current  
-	if(app.GLRenderContext) {
-		wglMakeCurrent		(NULL, NULL) ; 
-		wglDeleteContext	(app.GLRenderContext);	// delete the rendering context  
-	}
 #ifdef USE_STEAM_CLIENT
 	SteamAPI_Shutdown();
 	Steamworks_TermCEGLibrary();
@@ -187,8 +183,10 @@ gpk::err_t			setup				(::SApplication & app)						{
 	::ghg::SGalaxyHellDrawCache	& drawCache			= app.GalaxyHellApp.Game.DrawCache;
 	::gpk::resize(4096 * 1024, drawCache.PixelCoords, drawCache.PixelVertexWeights, drawCache.LightColorsModel, drawCache.LightColorsWorld, drawCache.LightPointsModel, drawCache.LightPointsWorld);
 
+#if defined(GPK_WINDOWS)
 	app.AudioState.InitAudio();
 	app.AudioState.PrepareAudio("./../gpk_data/sounds/thrust.wav");
+#endif
 
 	//app.Client.AddressConnect	= {};
 	//::gpk::tcpipAddress(9898, 0, ::gpk::TRANSPORT_PROTOCOL_UDP, app.Client.AddressConnect);	// If loading the remote IP from the json fails, we fall back to the local address.
@@ -207,16 +205,6 @@ gpk::err_t			setup				(::SApplication & app)						{
 	//for(u2_t i = 0; i < 4; ++i) 
 	//	app.GamePad.Resume();
 
-
-	// create a rendering context  
-	app.DrawingContext		= GetDC(framework.RootWindow.PlatformDetail.WindowHandle);
-	app.GLRenderContext		= wglCreateContext(app.DrawingContext); 
- 
-	// make it the calling thread's current rendering context 
-	wglMakeCurrent (app.DrawingContext, app.GLRenderContext);
- 
-	// call OpenGL APIs as desired ... 
- 
 
 	return 0;
 }
@@ -246,6 +234,7 @@ gpk::err_t			update				(SApplication & app, bool exitSignal)	{
 			app.GalaxyHellApp.RenderTargetQueue.clear();
 		}
 	}
+#ifdef GPK_WINDOWS
 	app.AudioState.vListenerPos			= app.GalaxyHellApp.Game.ShipState.Scene.Global.Camera[app.GalaxyHellApp.Game.ShipState.Scene.Global.CameraMode].Position; 
 	app.AudioState.listener.OrientTop	= {0, 1, 0}; 
 	app.AudioState.listener.OrientFront	= {1, 0, 0};  
@@ -273,7 +262,8 @@ gpk::err_t			update				(SApplication & app, bool exitSignal)	{
 	}
 
 	app.AudioState.UpdateAudio(framework.FrameInfo.Seconds.LastFrame);// / (app.GalaxyHellApp.World.ShipState.Ships.size() - 1));
-#if defined(USE_STEAM_CLIENT)
+#endif
+#ifdef USE_STEAM_CLIENT
 	SteamAPI_RunCallbacks();
 #endif
 

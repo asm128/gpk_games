@@ -374,7 +374,7 @@ static	gpk::err_t	guiHandleHome		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & /*g
 		game.PlayState.Constants.Players = (u2_t)app.TunerPlayerCount->ValueCurrent;
 		for(u2_t iPlayer = app.Players.size(); iPlayer < app.Game.PlayState.Constants.Players; ++iPlayer) {
 			sc_t				text [64]			= {};
-			sprintf_s(text, "Player %i", app.Players.size() + 1);
+			::gpk::sprintf_s(text, "Player %i", app.Players.size() + 1);
 			app.AddNewPlayer(text);
 		}
 		for(u2_t iPlayer = 0; iPlayer < app.Players.size(); ++iPlayer) {
@@ -462,13 +462,13 @@ static	gpk::err_t	sprintfTime			(const sc_t *prefix, sc_t (&dest)[_nStorageSize]
 	u2_t					timeMinutes			= (int)seconds / 60 % 60;
 	u2_t					timeSeconds			= (int)seconds % 60;
 	u2_t					timeCents			= int (seconds * 10) % 10;
-	sprintf_s(dest, "%s%i:%.2i:%.2i.%.2i", prefix, timeHours, timeMinutes, timeSeconds, timeCents);
+	::gpk::sprintf_s(dest, "%s%i:%.2i:%.2i.%.2i", prefix, timeHours, timeMinutes, timeSeconds, timeCents);
 	return 0;
 }
 
 tplt<size_t _bufSize>
 static	gpk::err_t	sprintfScore		(sc_t (&buffer)[_bufSize], const ::gpk::SSpaceshipScore & shipScore, const double nitro) { 
-	return sprintf_s(buffer, "%c %llu  %c %llu  %c %llu  %c %llu  %c %.2f", 4, shipScore.Score, 94, shipScore.Shots, 1, (u3_t)shipScore.KilledShips, 2, (u3_t)shipScore.KilledOrbiters, 24, nitro);
+	return ::gpk::sprintf_s(buffer, "%c %llu  %c %llu  %c %llu  %c %llu  %c %.2f", 4, shipScore.Score, 94, shipScore.Shots, 1, (u3_t)shipScore.KilledShips, 2, (u3_t)shipScore.KilledOrbiters, 24, nitro);
 }
 
 static	gpk::err_t	uiPlayerUpdateHome	(::ghg::SUIPlayer & uiPlayer, u1_t iPlayer, const ::gpk::vcsc_t playerName, const ::gpk::bgra & shipColor, const ::gpk::SSpaceshipScore & shipScore, const double nitro) { 
@@ -607,7 +607,7 @@ static	gpk::err_t	guiUpdatePlay		(::ghg::SGalaxyHellApp & app) {
 	::gpk::SDialog				& dialog			= app.DialogPerState[::ghg::APP_STATE_Play];
 	::gpk::SGUI					& gui				= *dialog.GUI;
 
-	sprintf_s(app.UIPlay.TextLevel.Storage, "Level: %i", game.PlayState.GlobalState.Stage);
+	::gpk::sprintf_s(app.UIPlay.TextLevel.Storage, "Level: %i", game.PlayState.GlobalState.Stage);
 	sprintfTime("Total Time: "	, app.UIPlay.TextTimeReal	.Storage, game.PlayState.GlobalState.UserTime.Played);
 	sprintfTime("Stage Time: "	, app.UIPlay.TextTimeStage	.Storage, game.PlayState.TimeRealStage);
 	::gpk::controlTextSet(gui, 1 + ::ghg::UI_PLAY_Level		, ::gpk::vcst_t{app.UIPlay.TextLevel		.Storage});
@@ -649,7 +649,7 @@ static	gpk::err_t	guiUpdateHome				(::ghg::SGalaxyHellApp & app, ::gpk::vpobj<::
 		if(app.Players.size() <= iPlayer) {
 			::std::lock_guard			lock						(app.Game.LockUpdate);
 			sc_t text [64] = {};
-			sprintf_s(text, "Player %i", app.Players.size() + 1);
+			::gpk::sprintf_s(text, "Player %i", app.Players.size() + 1);
 			app.AddNewPlayer(text);
 		}
 

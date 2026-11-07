@@ -120,7 +120,7 @@ namespace ghg
 		gpk::err_t						PilotsReset				()			{
 			while(Pilots.size() < PlayState.Constants.Players) {
 				sc_t									text [64]				= {};
-				::sprintf_s(text, "Player %i", Pilots.size() + 1);
+				::gpk::sprintf_s(text, "Player %i", Pilots.size() + 1);
 				if_fail_fe(Pilots.push_back({::gpk::label(text), PLAYER_COLORS[Pilots.size() % ::gpk::size(PLAYER_COLORS)]}));
 			}
 			return ShipControllers.resize(PlayState.Constants.Players);

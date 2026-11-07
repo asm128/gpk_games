@@ -8,9 +8,6 @@
 #include "gpk_engine_orbit.h"
 #include "gpk_chrono.h"
 
-#include <windows.h>
-#include <mmsystem.h>
-
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
@@ -311,7 +308,7 @@ gpk::err_t			ghg::stageSetup			(::ghg::SGalaxyHell & solarSystem)	{	// Set up en
 		memset(solarSystem.ShipState.SpaceshipManager.ShipScores.begin(), 0, solarSystem.ShipState.SpaceshipManager.ShipScores.byte_count());
 		while(solarSystem.Pilots.size() < solarSystem.PlayState.Constants.Players) {
 			sc_t						text [64]				= {};
-			::sprintf_s(text, "Player %i", solarSystem.Pilots.size() + 1);
+			::gpk::sprintf_s(text, "Player %i", solarSystem.Pilots.size() + 1);
 			solarSystem.Pilots.push_back({::gpk::label(text), PLAYER_COLORS[solarSystem.Pilots.size() % ::gpk::size(PLAYER_COLORS)]});
 		}
 		solarSystem.ShipControllers.resize(solarSystem.PlayState.Constants.Players);
@@ -354,7 +351,7 @@ gpk::err_t			ghg::stageSetup			(::ghg::SGalaxyHell & solarSystem)	{	// Set up en
 		, {::gpk::SHIP_PART_TYPE_Gun			, 128, ::gpk::WEAPON_TYPE_Gun		, .12, 0.50, ::gpk::WEAPON_LOAD_Missile		,  160,   112, 1,   1,0.25,  5, ::gpk::DAMAGE_TYPE_Burn | ::gpk::DAMAGE_TYPE_Wave }
 		};
 
-	::sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.GlobalState.Stage + solarSystem.PlayState.PlaySetup.OffsetStage);
+	::gpk::sprintf_s(stageFileName, "./levels/%u.json", solarSystem.PlayState.GlobalState.Stage + solarSystem.PlayState.PlaySetup.OffsetStage);
 	if(0 <= ::gpk::fileToMemory(stageFileName, stageFile.Bytes) && stageFile.Bytes.size()) {
 		::std::lock_guard			lock	(solarSystem.LockUpdate);
 		if_fail_fef(::gpk::jsonParse(stageFile.Reader, stageFile.Bytes), "%s", stageFileName);

@@ -63,7 +63,7 @@ static	gpk::err_t	processKeyboardEvent	(::ghg::SGalaxyHellApp & app, const ::gpk
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_KEYBOARD_Down:
-		if(screenEvent.Data[0] == VK_ESCAPE) {
+		if(screenEvent.Data[0] == ::gpk::SYSTEM_KEY_Escape) {
 			if(app.ActiveState != ::ghg::APP_STATE_Home) {
 				app.Save(::ghg::SAVE_MODE_AUTO);
 				app.ActiveState				= ::ghg::APP_STATE_Home;
@@ -167,24 +167,24 @@ gpk::err_t			ghg::galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTime
 
 	const ::gpk::SInput								& input				= *app.DialogDesktop.Input;
 	if(controllerPlayer.size() && app.Game.PlayState.Constants.Players == 1) {
-		controllerPlayer[0].Forward					= input.KeyboardCurrent.KeyState[VK_UP		] || input.KeyboardCurrent.KeyState['W'];
-		controllerPlayer[0].Back					= input.KeyboardCurrent.KeyState[VK_DOWN	] || input.KeyboardCurrent.KeyState['S'];
-		controllerPlayer[0].Left					= input.KeyboardCurrent.KeyState[VK_LEFT	] || input.KeyboardCurrent.KeyState['A'];
-		controllerPlayer[0].Right					= input.KeyboardCurrent.KeyState[VK_RIGHT	] || input.KeyboardCurrent.KeyState['D'];
-		controllerPlayer[0].Turbo					= input.KeyboardCurrent.KeyState[VK_RCONTROL] || input.KeyboardCurrent.KeyState[VK_CONTROL] || input.KeyboardCurrent.KeyState[VK_LSHIFT] || input.KeyboardCurrent.KeyState[VK_SHIFT];
+		controllerPlayer[0].Forward					= input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_Up		] || input.KeyboardCurrent.KeyState['W'];
+		controllerPlayer[0].Back					= input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_Down	] || input.KeyboardCurrent.KeyState['S'];
+		controllerPlayer[0].Left					= input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_Left	] || input.KeyboardCurrent.KeyState['A'];
+		controllerPlayer[0].Right					= input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_Right	] || input.KeyboardCurrent.KeyState['D'];
+		controllerPlayer[0].Turbo					= input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_RControl] || input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_Control] || input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_LShift] || input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_Shift];
 	}
 	else if(controllerPlayer.size() > 1) {
 		controllerPlayer[0].Forward					= input.KeyboardCurrent.KeyState['W'];
 		controllerPlayer[0].Back					= input.KeyboardCurrent.KeyState['S'];
 		controllerPlayer[0].Left					= input.KeyboardCurrent.KeyState['A'];
 		controllerPlayer[0].Right					= input.KeyboardCurrent.KeyState['D'];
-		controllerPlayer[0].Turbo					= input.KeyboardCurrent.KeyState[VK_LSHIFT] || input.KeyboardCurrent.KeyState[VK_SHIFT];
+		controllerPlayer[0].Turbo					= input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_LShift] || input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_Shift];
 
-		controllerPlayer[1].Forward					= input.KeyboardCurrent.KeyState[VK_UP		];
-		controllerPlayer[1].Back					= input.KeyboardCurrent.KeyState[VK_DOWN	];
-		controllerPlayer[1].Left					= input.KeyboardCurrent.KeyState[VK_LEFT	];
-		controllerPlayer[1].Right					= input.KeyboardCurrent.KeyState[VK_RIGHT	];
-		controllerPlayer[1].Turbo					= input.KeyboardCurrent.KeyState[VK_RCONTROL] || input.KeyboardCurrent.KeyState[VK_CONTROL];
+		controllerPlayer[1].Forward					= input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_Up		];
+		controllerPlayer[1].Back					= input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_Down	];
+		controllerPlayer[1].Left					= input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_Left	];
+		controllerPlayer[1].Right					= input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_Right	];
+		controllerPlayer[1].Turbo					= input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_RControl] || input.KeyboardCurrent.KeyState[::gpk::SYSTEM_KEY_Control];
 	}
 
 	::ghg::solarSystemUpdate(app.Game, (false == inGame) ? 0 : lastTimeSeconds, *inputState, systemEventsNew);
