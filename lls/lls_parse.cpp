@@ -4,8 +4,8 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-#define warning_unhandled_command(command, commandArgs)	warning_printf("Unhandled command for '%s': '%s' (args:'%s').", ::gpk::get_enum_namep(command), ::gpk::get_value_namep(command), ::gpk::toString(commandArgs).begin())
-#define warning_not_implemented(command, commandArgs)	warning_printf("Implement for '%s'! '%s' (args:'%s').", ::gpk::get_enum_namep(command), ::gpk::get_value_namep(command), ::gpk::toString(commandArgs).begin())
+#define warning_unhandled_command(command, commandArgs)	warning_printf("Unhandled command for '%.*s': '%s' (args:'%s').", ::gpk::get_enum_namep(command), ::gpk::get_value_namep(command), GPK_VIEW_ARGS(commandArgs))
+#define warning_not_implemented(command, commandArgs)	warning_printf("Implement for '%.*s'! '%s' (args:'%s').", ::gpk::get_enum_namep(command), ::gpk::get_value_namep(command), GPK_VIEW_ARGS(commandArgs))
 
 static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::WORLD_ADMIN command, ::gpk::vcsc_t commandArgs) { 
 	switch(command) {
@@ -179,7 +179,7 @@ static	::gpk::error_t	parseCommand		(::gpk::apobj<::lls::EventLLS> & queue, ::gp
 	const _tEnum				command				= ::gpk::get_value<_tEnum>(commandName);
 	if(::gpk::get_value_count<_tEnum>() <= command)
 		return -1;  /// having an error message here makes it too verbose
-	info_printf("Command matched for %s: %s(args:%s).", ::gpk::get_enum_namep(command), ::gpk::get_value_namep(command), ::gpk::toString(commandArgs).begin());
+	info_printf("Command matched for %.*s: %s(args:%s).", ::gpk::get_enum_namep(command), ::gpk::get_value_namep(command), GPK_VIEW_ARGS(commandArgs));
 	gpk_necs(::interpretArgsAndEnqueue(queue, command, commandArgs));
 	return command;
 }
@@ -187,7 +187,7 @@ static	::gpk::error_t	parseCommand		(::gpk::apobj<::lls::EventLLS> & queue, ::gp
 ::gpk::error_t			lls::parseCommandLine	(::gpk::apobj<::lls::EventLLS> & queue, ::gpk::vcsc_t inputLine) { 
 	::gpk::vcsc_t					commandName, commandArgs;
 	gpk_necs(inputLine.slice(inputLine, 1));
-	if_if(failed(::gpk::split(::gpk::vcs{" "}, inputLine, commandName, commandArgs)), "No arguments provided for command %s.", ::gpk::toString(commandArgs).begin());
+	if_if(failed(::gpk::split(::gpk::vcs{" "}, inputLine, commandName, commandArgs)), "No arguments provided for command %.*s.", GPK_VIEW_ARGS(commandArgs));
 	bool						failed
 		=  -1 == ::parseCommand<::lls::WORLD_ADMIN>(queue, commandName, commandArgs)
 		&& -1 == ::parseCommand<::lls::WORLD_EVENT>(queue, commandName, commandArgs)

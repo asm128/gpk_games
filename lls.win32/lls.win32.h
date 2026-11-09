@@ -4,6 +4,7 @@
 #include "gpk_udp_client_app.h"
 #include "gpk_udp_server_app.h"
 #include "gpk_framework.h"
+#include "lls_process_broker.h"
 
 //#define DISABLE_D3D11
 #define DISABLE_XAUDIO2
@@ -38,13 +39,14 @@ struct SApplication {
 #endif
 	::SClientSystem			Client			= {};
 	::SServerSystem			Server			= {};
+	::llswin32::SProcessBroker	ProcessBroker		= {};
 
 							SApplication	(::gpk::SRuntimeValues & runtimeValues) noexcept
 	: Framework(runtimeValues) {
 		if(!Framework.GUI)
 			Framework.GUI.create();
 		Client.LLSApp.GUI		= Framework.GUI;
-		Server.LLSApp.GUI		= Framework.GUI;
+		Server.LLSApp.GUI.create();
 		es_if_failed(::gpk::rasterFontDefaults(Client.LLSApp.Game.Engine.Scene->Graphics->Fonts));
 		es_if_failed(::gpk::rasterFontDefaults(Server.LLSApp.Game.Engine.Scene->Graphics->Fonts));
 	}

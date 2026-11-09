@@ -69,7 +69,7 @@ static	::gpk::error_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appG
 			return 0; 
 		};
 		appUI.TunerTableSize->FuncGetString		= [&appGame, &appUI](::gpk::vcsc_t & string, uint8_t, const ::gpk::minmax<uint8_t> &)	mutable { 
-			string		= {appUI.TunerTableSize->ValueString, (uint32_t)snprintf(appUI.TunerTableSize->ValueString, ::gpk::size(appUI.TunerTableSize->ValueString) - 2, "%s Table", ::gpk::toString(string).begin())}; 
+			string		= {appUI.TunerTableSize->ValueString, (uint32_t)snprintf(appUI.TunerTableSize->ValueString, ::gpk::size(appUI.TunerTableSize->ValueString) - 2, "%.*s Table", GPK_VIEW_ARGS(string))}; 
 			return 0; 
 		};
 

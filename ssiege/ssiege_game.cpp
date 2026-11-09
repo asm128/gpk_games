@@ -102,7 +102,7 @@ static	::gpk::error_t	createShipCraneBar	(::gpk::SEngine & engine, ::gpk::vcs en
 	bar.Radius				= {::SHIP_ARM_RADIUS, ::SHIP_ARM_RADIUS};
 	bar.Height				= ::SHIP_ARM_LENGTH;
 	::gpk::eid_t				iBar;
-	gpk_necall(iBar = engine.CreateCylinder(bar, entityName), "entityName: '%s'", ::gpk::toString(entityName).begin());
+	gpk_necall(iBar = engine.CreateCylinder(bar, entityName), "entityName: '%.*s'", GPK_VIEW_ARGS(entityName));
 	engine.SetOrientation(iBar, ::gpk::quatf32{1, 0, 0, 1}.Normalize());
 	engine.SetPosition(iBar, {0, ::SHIP_CRANE_WHEEL_RADIUS * .5f, });
 	return iBar;
@@ -114,7 +114,7 @@ static	::gpk::error_t	createShipCraneWheel(::gpk::SEngine & engine, ::gpk::vcs e
 	wheel.Radius			= ::gpk::dim2<::gpk::minmaxf2_t>(::SHIP_CRANE_WHEEL_RADIUS);
 	wheel.Height			= ::SHIP_CRANE_WHEEL_HEIGHT;
 	::gpk::eid_t				iWheel;
-	gpk_necall(iWheel = engine.CreateCylinder(wheel, entityName), "entityName: '%s'", ::gpk::toString(entityName).begin());
+	gpk_necall(iWheel = engine.CreateCylinder(wheel, entityName), "entityName: '%.*s'", GPK_VIEW_ARGS(entityName));
 	engine.SetOrientation(iWheel, ::gpk::quatf32{1, 0, 0, 1}.Normalize());
 	return iWheel;
 }
