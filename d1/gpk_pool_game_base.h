@@ -134,8 +134,8 @@ namespace d1p
 	};
 
 
-	stincxp	float		rackOriginX			(const ::d1p::SPoolBoard & board)		{ return board.Table.PlayingSurface.x / 4; }
-	stincxp	float		headStringX			(const ::d1p::SPoolBoard & board)		{ return rackOriginX(board) * -1.0f; }
+	sinx	float		rackOriginX			(const ::d1p::SPoolBoard & board)		{ return board.Table.PlayingSurface.x / 4; }
+	sinx	float		headStringX			(const ::d1p::SPoolBoard & board)		{ return rackOriginX(board) * -1.0f; }
 
 	stxp	u0_t 		MAX_BALLS			= 64;
 	stxp	::gpk::astatic<::gpk::bgra, ::d1p::MAX_BALLS>	BALL_COLORS_8_BALL	=

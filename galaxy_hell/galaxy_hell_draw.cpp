@@ -429,7 +429,7 @@ gpk::err_t			ghg::drawOrbiter
 	) {
 	u2_t												pixelsDrawn				= 0;
 	const ::gpk::au2_t						& entityChildren		= shipState.EntitySystem.EntityChildren[iPartEntity];
-	double													absanim					= fabsf(sinf(animationTime * 3));
+	double													absanim					= ::gpk::fabsf(sinf(animationTime * 3));
 	const ::gpk::rgbaf								shadedColor				= (absanim < .5) ? ::gpk::rgbaf{} : shipColor * (absanim * .5);
 	for(u2_t iEntity = 0; iEntity < entityChildren.size(); ++iEntity) {
 		const ::ghg::SGHEntity									& entityChild				= shipState.EntitySystem.Entities[entityChildren[iEntity]];

@@ -41,7 +41,7 @@ gpk::err_t			ssg::printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, bool deb
 
 gpk::err_t			ssg::printArgsEvent		(const ::ssg::SArgsEvent & eventArgs, ::gpk::asc_t & output) {
 	sc_t						temp	[1024]				= {};
-	sprintf_s(temp, 
+	::gpk::sprintf_s(temp, 
 		"\nCoordSource  : " N3_F2
 		"\nCoordTarget  : " N3_F2
 		"\nIdSource     : %i"

@@ -110,7 +110,7 @@ static	gpk::err_t	processKeyboardEvent	(::ssg::SSiegeApp & app, const ::gpk::SEv
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_KEYBOARD_Down:
-		if(screenEvent.Data[0] == VK_ESCAPE) {
+		if(screenEvent.Data[0] == ::gpk::SYSTEM_KEY_Escape) {
 			if(false == app.UI.UserInput.Editing) {
 				if(app.ActiveState != ::ssg::APP_STATE_Home) {
 					if_fail_fe(app.StateSwitch(::ssg::APP_STATE_Home));
@@ -119,7 +119,7 @@ static	gpk::err_t	processKeyboardEvent	(::ssg::SSiegeApp & app, const ::gpk::SEv
 					if_fail_fe(app.StateSwitch(::ssg::APP_STATE_Play));
 			}
 		}
-		else if(screenEvent.Data[0] == VK_OEM_5) {
+		else if(screenEvent.Data[0] == ::gpk::SYSTEM_KEY_OEM_5) {
 			if_fail_fe(app.UI.UserInput.Edit(*app.GUI, true));
 		}
 		break;
@@ -140,10 +140,10 @@ static	gpk::err_t	processSystemEvent		(::ssg::SSiegeApp & app, const ::gpk::SEve
 static	gpk::err_t	updateInput				(::ssg::SSiegeUI & /*ui*/, ::ssg::SWorldView & world, double actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t /*mouseDeltas*/, ::gpk::vcu0_t /*buttonStates*/) { 
 	const double				secondsElapsed			= actualSecondsElapsed * world.WorldState.TimeScale;
 
-	if(keyStates[VK_CONTROL]) {
-		if(keyStates[VK_ADD]) 
+	if(keyStates[::gpk::SYSTEM_KEY_Control]) {
+		if(keyStates[::gpk::SYSTEM_KEY_Add]) 
 			world.WorldState.TimeScale	+= (float)secondsElapsed;
-		else if(keyStates[VK_SUBTRACT]) 
+		else if(keyStates[::gpk::SYSTEM_KEY_Subtract]) 
 			world.WorldState.TimeScale	= ::gpk::max(0.f, world.WorldState.TimeScale - (float)secondsElapsed);
 		else if(keyStates['T']) 
 			world.WorldState.TimeScale	= 1;

@@ -12,14 +12,16 @@
 #include "gpk_app_impl.h"
 #include "gpk_bitmap_target.h"
 
+#if !defined(DISABLE_D3D11)
 #include <DirectXColors.h>
+#endif
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "SSiege Client v0.1");
 GPK_USING_TYPEINT();
 
 static	gpk::err_t	loadNetworkConfig	(const ::gpk::SJSONReader & jsonConfig, ::gpk::vcst_t & remote_ip, ::gpk::vcst_t & remote_port) {
 	gpk::err_t				appNodeIndex;
-	if_fail_fe(appNodeIndex = ::gpk::jsonExpressionResolve(::gpk::vcst_t{"application.test_udp_client"}, jsonConfig, 0));
+	if_fail_fe(appNodeIndex = ::gpk::jsonExpressionResolve("application.test_udp_client", jsonConfig, 0));
 	return ::gpk::loadClientConfig(jsonConfig, appNodeIndex, remote_ip, remote_port);
 }
 
@@ -152,13 +154,6 @@ gpk::err_t			update				(::SApplication & app, bool systemRequestedExit)					{
 	app.D3DApp.Text.Update(frameInfo.Seconds.LastFrame, frameInfo.Seconds.Total, (u2_t)frameInfo.FrameMeter.FramesPerSecond);
 #endif
 
-	//-----------------------------
-	::gpk::STimer				& timer					= app.Framework.Timer;
-	sc_t						buffer	[256]			= {};
-	sprintf_s(buffer, "[%u x %u]. FPS: %g. Last frame seconds: %g.", mainWindow.Size.x, mainWindow.Size.y, 1 / timer.LastTimeSeconds, timer.LastTimeSeconds);
-	::HWND						windowHandle			= mainWindow.PlatformDetail.WindowHandle;
-	SetWindowTextA(windowHandle, buffer);
-	
 	return ::gpk::updateFramework(framework);
 }
 

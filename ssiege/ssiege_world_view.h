@@ -190,6 +190,11 @@ namespace ssg
 		}
 	};
 
+	static ::gpk::err_t	saveCharacter		(::gpk::au0_t & output, ::gpk::u2_t index, const SMiniMe & character) {
+		if_fail_fef(character.Save(output), "Failed to save character %i", index);
+		return 0;
+	}
+
 	struct SHangar {
 		::gpk::n2u1_t			Size;
 		assiegeid				Furniture;
@@ -206,6 +211,11 @@ namespace ssg
 			return 0;
 		}
 	};
+
+	static ::gpk::err_t	saveHangar			(::gpk::au0_t & output, ::gpk::u2_t index, const SHangar & hangar) {
+		if_fail_fef(hangar.Save(output), "Failed to save hangar %i", index);
+		return 0;
+	}
 
 	struct SWorldArea {
 		::gpk::n2u2_t			Offset;
@@ -227,18 +237,23 @@ namespace ssg
 		}
 	};
 
+	static ::gpk::err_t	saveTileMap			(::gpk::au0_t & output, ::gpk::u2_t index, const ::gpk::apimg8bgra::T & tileMap) {
+		if_fail_fef(::gpk::saveImage<::gpk::bgra>(output, tileMap->View), "Failed to load tile map %i", index);
+		return 0;
+	}
+
+	static ::gpk::err_t	saveWorldArea		(::gpk::au0_t & output, ::gpk::u2_t index, const ::gpk::apobj<SWorldArea>::T & block) {
+		if_fail_fef(block->Save(output), "Failed to load world area %i", index);
+		return 0;
+	}
+
 	struct SWorldTiles {
 		gpk::apimg8bgra			Values;
 		gpk::apobj<SWorldArea>	Blocks;
 
 		gpk::err_t			Save				(::gpk::au0_t & output)	const	{ 
-			if_fail_fe(::gpk::savePOD(output, Values.size())); 
-			for(u2_t iValueMap = 0; iValueMap < Values.size(); ++iValueMap)
-				if_fail_fef(::gpk::saveImage<::gpk::bgra>(output, Values[iValueMap]->View), "Failed to load tile map %i", iValueMap);
-
-			if_fail_fe(::gpk::savePOD(output, Blocks.size())); 
-			for(u2_t iBlock = 0; iBlock < Blocks.size(); ++iBlock)
-				if_fail_fef(Blocks[iBlock]->Save(output), "Failed to load world area %i", iBlock);
+			if_fail_fe(::gpk::saveMap(output, Values, saveTileMap));
+			if_fail_fe(::gpk::saveMap(output, Blocks, saveWorldArea));
 
 			return 0; 
 		}
@@ -284,17 +299,15 @@ namespace ssg
 	struct SWorldView {
 		SWorldState				WorldState;
 		SWorldConfig			WorldConfig;
-		::gpk::apod<SHangar>	Hangars;
+		::gpk::aobj<SHangar>	Hangars;
 		::gpk::aobj<SMiniMe>	Characters;
 		SWorldTiles				Tiles;
 
 		gpk::err_t			Save				(::gpk::au0_t & output)	const	{ 
 			if_fail_fe(::gpk::savePOD(output, WorldConfig)); 
 			if_fail_fe(::gpk::savePOD(output, WorldState)); 
-			if_fail_fe(::gpk::saveView(output, Hangars));
-			if_fail_fe(::gpk::savePOD(output, Characters.size())); 
-			for(u2_t iCharacter = 0; iCharacter < Characters.size(); ++iCharacter)
-				if_fail_fef(Characters[iCharacter].Save(output), "Failed to save character %i", iCharacter);
+			if_fail_fe(::gpk::saveMap(output, Hangars, saveHangar));
+			if_fail_fe(::gpk::saveMap(output, Characters, saveCharacter));
 
 			if_fail_fe(Tiles.Save(output));
 			return 0;
@@ -303,7 +316,11 @@ namespace ssg
 		gpk::err_t			Load				(::gpk::vcu0_t & input)	{ 
 			if_fail_fe(::gpk::loadPOD(input, WorldConfig)); 
 			if_fail_fe(::gpk::loadPOD(input, WorldState)); 
-			if_fail_fe(::gpk::loadView(input, Hangars));
+			u2_t					hangarCount;
+			if_fail_fe(::gpk::loadPOD(input, hangarCount));
+			if_fail_fe(Hangars.resize(hangarCount));
+			for(u2_t iHangar = 0; iHangar < hangarCount; ++iHangar)
+				if_fail_fef(Hangars[iHangar].Load(input), "Failed to load hangar %i", iHangar);
 			u2_t					characterCount;
 			if_fail_fe(::gpk::loadPOD(input, characterCount)); 
 			for(u2_t iMiniMes = 0; iMiniMes < characterCount; ++iMiniMes) { 
