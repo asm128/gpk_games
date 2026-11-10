@@ -20,9 +20,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lls.win32.h" />
+	<ClInclude Include="lls_process_broker.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lls.win32.cpp" />
+	<ClCompile Include="lls_process_broker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\lls\lls.vcxproj">

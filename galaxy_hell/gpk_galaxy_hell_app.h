@@ -221,13 +221,13 @@ namespace ghg
 			gpk_necs(::gpk::arrayDeflate(serialized, deflated));
 			info_printf("Player size in bytes: %u.", serialized.size());
 			info_printf("Player file size: %u.", deflated.size());
-			gpk_necall(::gpk::fileFromMemory({filename}, deflated), "fileName: %s", ::gpk::toString(filename).begin());
+			gpk_necall(::gpk::fileFromMemory({filename}, deflated), "fileName: %.*s", GPK_VIEW_ARGS(filename));
 			return 0;
 		}
 
 		gpk::err_t					Load			(const ::gpk::vcsc_t & filename) {
 			::gpk::au0_t							serialized;
-			gpk_necall(::gpk::fileToMemory({filename}, serialized), "fileName: %s", ::gpk::toString(filename).begin());
+			gpk_necall(::gpk::fileToMemory({filename}, serialized), "fileName: %.*s", GPK_VIEW_ARGS(filename));
 			::gpk::au0_t							inflated;
 			gpk_necs(::gpk::arrayInflate(serialized, inflated));
 			info_printf("Player file size: %u.", inflated.size());

@@ -9,6 +9,7 @@ namespace lls
 	struct LLSClient : ::lls::LLSApp {
 		::gpk::apobj<::lls::EventLLS>	EventsToSend;
 		::gpk::apobj<::lls::EventLLS>	EventsReceived;
+		::lls::SUIPlay					UIPlay;
 	};
 
 	gpk::err_t			handleWORLD_EVENT		(::lls::LLSClient & world, const ::gpk::SEventView<lls::WORLD_EVENT> & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents); // { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
@@ -23,6 +24,7 @@ namespace lls
 	gpk::err_t			handleWORLD_VALUE		(::lls::LLSClient & world, const ::gpk::SEventView<lls::WORLD_VALUE> & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents);// { (void)world, (void)gameEvent, (void)outputEvents; return 0; }
 
 	gpk::err_t		llsClientUpdate		(LLSClient & lls, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents);
+	gpk::err_t		llsClientUIDraw		(LLSClient & lls, ::gpk::g8bgra targetPixels);
 } // namespace 
 
 #endif // SSIEGE_CLIENT_H_23701

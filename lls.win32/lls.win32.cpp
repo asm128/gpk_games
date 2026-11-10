@@ -29,7 +29,7 @@ gpk::err_t			cleanup					(::SApplication & app) {
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::SWindow				& mainWindow			= framework.RootWindow;
 	ws_if_failed(::lls::llsUpdate(app.Client.LLSApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
-	ws_if_failed(::lls::llsUpdate(app.Server.LLSApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
+	ws_if_failed(::lls::llsUpdate(app.Server.LLSApp, 0, mainWindow.Input, {}, {}));
 
 #if !defined(DISABLE_D3D11)
 	app.D3DApp.Shutdown();
@@ -37,9 +37,10 @@ gpk::err_t			cleanup					(::SApplication & app) {
 
 	ws_if_failed(::gpk::clientDisconnect(app.Client.Network.UDP));
 	ws_if_failed(::gpk::serverStop(app.Server.Network->UDP));
+	ws_if_failed(::llswin32::processBrokerShutdown(app.ProcessBroker));
 	ws_if_failed(::gpk::mainWindowDestroy(mainWindow));
 	ws_if_failed(::lls::llsUpdate(app.Client.LLSApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
-	ws_if_failed(::lls::llsUpdate(app.Server.LLSApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
+	ws_if_failed(::lls::llsUpdate(app.Server.LLSApp, 0, mainWindow.Input, {}, {}));
 	ws_if_failed(::gpk::tcpipShutdown());
 	return 0;
 }
@@ -101,6 +102,7 @@ gpk::err_t			setup					(::SApplication & app) {
 	gpk_necs(::gpk::setupGUI(app.Server.Network->UI, *framework.GUI));
 
 	gpk_necs(::gpk::tcpipInitialize());
+	gpk_necs(::llswin32::processBrokerSetup(app.ProcessBroker, framework.JSONConfig.Reader));
 
 	ws_if_failed(::loadServerNetworkConfig(framework.JSONConfig.Reader, app.Server.Network->Port, app.Server.Network->Adapter));
 	es_if_failed(::gpk::serverStart(*app.Server.Network, *framework.GUI));
@@ -129,7 +131,7 @@ gpk::err_t			update					(::SApplication & app, bool systemRequestedExit) {
 	rvi_if(::gpk::APPLICATION_STATE_EXIT, systemExit || systemRequestedExit, "%s || %s", ::gpk::bool2char(systemExit), ::gpk::bool2char(systemRequestedExit));
 
 	::gpk::SFrameInfo			& frameInfo				= framework.FrameInfo;
-	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::lls::APP_STATE_Quit == ::lls::llsServerUpdate(app.Server.LLSApp, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue));
+	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::lls::APP_STATE_Quit == ::lls::llsServerUpdate(app.Server.LLSApp, frameInfo.Seconds.LastFrame, mainWindow.Input, {}));
 	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::lls::APP_STATE_Quit == ::lls::llsClientUpdate(app.Client.LLSApp, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue));
 
 	::gpk::pau8					payloadCache;
@@ -144,6 +146,7 @@ gpk::err_t			update					(::SApplication & app, bool systemRequestedExit) {
 	gpk::err_t				serverResult;
 	es_if_failed(serverResult = ::gpk::serverUpdate(*app.Server.Network, gui));
 	rvi_if(::gpk::APPLICATION_STATE_EXIT, serverResult == 1, "Server requested close. Terminating execution.");
+	es_if_failed(::llswin32::processBrokerUpdate(app.ProcessBroker));
 
 	gpk::err_t				clientResult;
 	gpk_necs(clientResult = ::gpk::clientUpdate(app.Client.Network, gui));
@@ -193,6 +196,7 @@ gpk::err_t			draw					(::SApplication & app) {
 #if !defined(DISABLE_D3D11)
 	memset(app.D3DApp.GUIStuff.RenderTarget.begin(), 0, app.D3DApp.GUIStuff.RenderTarget.byte_count());
 	gpk_necs(::gpk::guiDraw(*app.Framework.GUI, app.D3DApp.GUIStuff.RenderTarget));
+	gpk_necs(::lls::llsClientUIDraw(app.Client.LLSApp, app.D3DApp.GUIStuff.RenderTarget));
 	app.D3DApp.Scene.ConstantBufferScene.Time = (float)app.Framework.FrameInfo.Seconds.Total;
 
 	const ::gpk::SCamera		& cameraSelected		= app.Server.LLSApp.Game.Camera;
@@ -201,7 +205,10 @@ gpk::err_t			draw					(::SApplication & app) {
 #else
 	::gpk::prtbgra8d32			backBuffer				= app.Framework.RootWindow.BackBuffer;
 	backBuffer->resize(backBuffer->Color.metrics(), clearColor, (uint32_t)-1);
-	gpk_necs(::lls::llsDraw(app.Server.LLSApp, *backBuffer, false));
+	const ::gpk::SCamera		& cameraSelected		= app.Server.LLSApp.Game.Camera;
+	gpk_necs(::lls::llsGameDraw(app.Server.LLSApp.Game, *backBuffer, cameraSelected.Position, cameraSelected.Target, cameraSelected.Up, cameraSelected.NearFar));
+	gpk_necs(::gpk::guiDraw(*app.Framework.GUI, backBuffer->Color.View));
+	gpk_necs(::lls::llsClientUIDraw(app.Client.LLSApp, backBuffer->Color.View));
 #endif
 	return 0;
 }

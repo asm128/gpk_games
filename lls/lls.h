@@ -4,6 +4,7 @@
 #include "gpk_engine.h"
 #include "gpk_gui.h"
 #include "gpk_gui_inputbox.h"
+#include "gpk_dialog.h"
 #include "gpk_deflate.h"
 #include "gpk_array_ptr.h"
 #include "gpk_noise.h"
@@ -15,6 +16,20 @@
 
 namespace lls
 {
+	GDEFINE_ENUM_TYPE (UI_PROFILE, uint8_t);
+	GDEFINE_ENUM_VALUE(UI_PROFILE, Name , 0);
+	GDEFINE_ENUM_VALUE(UI_PROFILE, Score, 1);
+
+	struct SUIPlayer {
+		::gpk::SDialog			DialogHome			= {};
+		::gpk::acid				ControlsDialogHome	= {};
+		::gpk::SInputBox		InputBox			= {};
+		::gpk::astc<128>		TextScore			= {};
+	};
+
+	struct SUIPlay {
+		::gpk::aobj<::lls::SUIPlayer>	PlayerUI		= {};
+	};
 
 	enum SAVE_MODE { SAVE_MODE_AUTO, SAVE_MODE_QUICK, SAVE_MODE_STAGE, SAVE_MODE_USER };
 
