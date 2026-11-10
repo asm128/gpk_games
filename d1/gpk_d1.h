@@ -338,14 +338,14 @@ namespace d1
 			{ if_fail_fe(::gpk::inflateToMemory(filename, serialized)); }
 			::gpk::vcu0_t					viewSerialized				= serialized;
 			if(::gpk::failed(MainGame.Load(viewSerialized))) {
-				es_if(::gpk::failed(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
+				if_true_e(::gpk::failed(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
 				return -1;
 			}
 			for(u2_t  iPlayer = 0; iPlayer < MainGame.Players.size(); ++iPlayer) {
 				::d1::SD1Player				& player					= MainGame.Players[iPlayer];
 				if(::gpk::failed(player.Load(viewSerialized))) {
 					error_printf("Failed to load player %i.", iPlayer);
-					es_if(::gpk::failed(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
+					if_true_e(::gpk::failed(::d1p::poolGameReset(MainGame.Pool, MainGame.StartState)));
 					return -1;
 				}
 			}

@@ -43,7 +43,7 @@ namespace d1p
 		u1_t				Pocketed			= 0;
 		::d1p::SStickControl	StickControl		= {};
 
-		inlcxpr	bool			IsPocketed			(u0_t  iBall)	const	{ return ::d1p::isPocketed	(Pocketed, iBall); }
+		inxp	bool			IsPocketed			(u0_t  iBall)	const	{ return ::d1p::isPocketed	(Pocketed, iBall); }
 		inline	u3_t 		SetPocketed			(u0_t  iBall)			{ return ::d1p::setPocketed	(Pocketed, iBall); }
 	};
 
@@ -99,11 +99,11 @@ namespace d1p
 		::gpk::err_t						AdvanceTurn					(::gpk::apobj<::d1p::SEventPool> & outputEvents);
 		inline	::d1p::STurnInfo&			Turn						(const SArgsBall & eventArgs)			{ return TurnHistory[eventArgs.Turn]; }
 		inline	const ::d1p::STurnInfo&		Turn						(const SArgsBall & eventArgs)	const	{ return TurnHistory[eventArgs.Turn]; }
-		inlcxpr	bool						FirstTurn					()	const	{ return TurnHistory.size() == 1; }
+		inxp	bool						FirstTurn					()	const	{ return TurnHistory.size() == 1; }
 		inline	::d1p::STurnInfo&			ActiveTurn					()			{ return TurnHistory[TurnHistory.size() - 1]; }
 		inline	const ::d1p::STurnInfo&		ActiveTurn					()	const	{ return TurnHistory[TurnHistory.size() - 1]; }
 
-		inlcxpr	u0_t 						ActiveTeam					()	const	{ return MatchState.Flags.TeamActive; }
+		inxp	u0_t 						ActiveTeam					()	const	{ return MatchState.Flags.TeamActive; }
 		inline	u0_t 						ActivePlayer				()	const	{ 
 			const ::d1p::SPoolTeam					& team						= Teams[ActiveTeam()]; 
 			return team.Players[team.CurrentPlayer]; 

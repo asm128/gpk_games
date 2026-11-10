@@ -94,7 +94,7 @@ static	::gpk::err_t	processSystemEvent	(::SApplication & app, const ::gpk::SEven
 
 	{ if_fail_fe(mainWindow.EventQueue.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); })); }
 
-	rvis_if(::gpk::APPLICATION_STATE_EXIT, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue));
+	if_true_vi(::gpk::APPLICATION_STATE_EXIT, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, 0, mainWindow.Input, mainWindow.EventQueue));
 
 	return 0;
 }
@@ -103,7 +103,7 @@ static	::gpk::err_t	processSystemEvent	(::SApplication & app, const ::gpk::SEven
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::err_t				frameworkResult			= ::gpk::updateFramework(framework);
 	{ if_fail_fe(frameworkResult); }
-	rvis_if(::gpk::APPLICATION_STATE_EXIT, frameworkResult == ::gpk::APPLICATION_STATE_EXIT);
+	if_true_vi(::gpk::APPLICATION_STATE_EXIT, frameworkResult == ::gpk::APPLICATION_STATE_EXIT);
 
 	::gpk::SWindow				& mainWindow			= app.Framework.RootWindow;
 
@@ -112,13 +112,13 @@ static	::gpk::err_t	processSystemEvent	(::SApplication & app, const ::gpk::SEven
 	::gpk::SFrameInfo			& frameInfo				= framework.FrameInfo;
 	{
 		::gpk::STimer				timer					= {};
-		rvis_if(::gpk::APPLICATION_STATE_EXIT, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue))
+		if_true_vi(::gpk::APPLICATION_STATE_EXIT, ::d1::APP_STATE_Quit == ::d1::d1Update(app.D1, frameInfo.Seconds.LastFrame, mainWindow.Input, mainWindow.EventQueue))
 
 		timer.Frame();
 		//info_printf("Update engine in %f seconds", timer.LastTimeSeconds);
 	}
 
-	rvis_if(::gpk::APPLICATION_STATE_EXIT, systemRequestedExit);
+	if_true_vi(::gpk::APPLICATION_STATE_EXIT, systemRequestedExit);
 
 #if !defined(DISABLE_D3D11)
 	if(app.D1.ActiveState >= ::d1::APP_STATE_Welcome && app.D3DApp.Scene.IndexBuffer.size() < app.D1.MainGame.Pool.Engine.Scene->Graphics->Meshes.size()) {

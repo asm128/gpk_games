@@ -39,11 +39,11 @@ static	::gpk::err_t	guiContainerSetupDefaults	(::gpk::SGUI & gui, ::gpk::cid_t i
 static	::gpk::err_t	guiSetupHome				(::d1::SD1UI & appUI, ::d1::SD1Game & appGame) { 
 	::gpk::SDialog				& dialog					= appUI.Dialog; 
 
-	cnstxpr	u1_t			BUTTON_HEIGHT				= 24;
-	cnstxpr	u1_t			BUTTON_WIDTH_SMALL			= 160;
-	cnstxpr	u1_t			BUTTON_WIDTH_LARGE			= 184;
+	cxpr	u1_t			BUTTON_HEIGHT				= 24;
+	cxpr	u1_t			BUTTON_WIDTH_SMALL			= 160;
+	cxpr	u1_t			BUTTON_WIDTH_LARGE			= 184;
 	::gpk::SGUI					& gui						= *dialog.GUI;
-	cnstxpr	::gpk::n2u1_t		buttonSize					= {BUTTON_WIDTH_SMALL, BUTTON_HEIGHT};
+	cxpr	::gpk::n2u1_t		buttonSize					= {BUTTON_WIDTH_SMALL, BUTTON_HEIGHT};
 	const ::gpk::n2s1_t			buttonOffset				= {0, s1_t(-BUTTON_HEIGHT * ::gpk::get_value_count<::d1::UI_HOME>() / 2)};
 	::gpk::cid_t				firstControlHome			= appUI.FirstControl[::d1::APP_STATE_Home] = ::gpk::guiCreateControlList<::d1::UI_HOME>(gui, appUI.DialogPerState[::d1::APP_STATE_Home], buttonSize, buttonOffset, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Home]);
 	{ if_fail_fe(firstControlHome); } 
@@ -142,14 +142,14 @@ static	::gpk::err_t	guiSetupHelpUI				(::d1::SD1UI & appUI) {
 	return 0;
 }
 static	::gpk::err_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appGame) { 
-	cnstxpr int					BUTTON_HEIGHT				= 24;
+	cxpr int					BUTTON_HEIGHT				= 24;
 	::gpk::SDialog				& dialog					= appUI.Dialog; 
 	::gpk::SGUI					& gui						= *dialog.GUI;
 	const ::gpk::cid_t			iDialog						= appUI.DialogPerState[::d1::APP_STATE_Play];
 	::gpk::cid_t				firstControl;
 	{ if_fail_fe(firstControl = appUI.FirstControl[d1::APP_STATE_Play] = ::gpk::guiCreateControlList<::d1::UI_PLAY>(gui, iDialog, {160, BUTTON_HEIGHT}, {0, 0}, ::gpk::ALIGN_CENTER_BOTTOM, ::gpk::ALIGN_CENTER, appUI.DialogControls[::d1::APP_STATE_Play])); }
 
-	cnstxpr u1_t			offsetX						= 8;
+	cxpr u1_t			offsetX						= 8;
 	gui.Controls.Placement[firstControl + ::d1::UI_PLAY_Shoot].Align			= ::gpk::ALIGN_CENTER_RIGHT;
 	gui.Controls.Placement[firstControl + ::d1::UI_PLAY_Shoot].Area.Offset.x	= offsetX;
 	gui.Controls.Placement[firstControl + ::d1::UI_PLAY_Shoot].Area.Offset.y	= SHOOT_SLIDER_SIZE.y / 2 + 16;
@@ -169,9 +169,9 @@ static	::gpk::err_t	guiSetupPlay				(::d1::SD1UI & appUI, ::d1::SD1Game & appGam
 	//gui.Controls.States[appUI.ForceSlider->IdGUIControl].Mask				&= ~::gpk::GUI_CONTROL_FLAG_Hovered;
 	appUI.ForceSliderRenderTarget.resize(gui.Controls.Placement[appUI.ForceSlider->IdGUIControl].Area.Size.u2()); 
 
-	cnstxpr ::gpk::rgbaf		min							= ::gpk::GREEN;
-	cnstxpr ::gpk::rgbaf		mid							= ::gpk::YELLOW;
-	cnstxpr ::gpk::rgbaf		max							= ::gpk::RED;
+	cxpr ::gpk::rgbaf		min							= ::gpk::GREEN;
+	cxpr ::gpk::rgbaf		mid							= ::gpk::YELLOW;
+	cxpr ::gpk::rgbaf		max							= ::gpk::RED;
 	float						colorScale					= 1.0f / (appUI.ForceSliderRenderTarget.metrics().y / 2);
 	const u2_t 				halfHeight					= appUI.ForceSliderRenderTarget.metrics().y / 2;
 	const u2_t 				lastRow						= appUI.ForceSliderRenderTarget.metrics().y - 1;

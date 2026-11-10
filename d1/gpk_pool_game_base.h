@@ -163,18 +163,18 @@ namespace d1p
 	GDEFINE_ENUM_VALUE(BALL_TYPE, Cue		, 2);
 	GDEFINE_ENUM_VALUE(BALL_TYPE, Black		, 3);
 	typedef u1_t	TBallField;
-	inlcxpr	u0_t 		pocketedAny			(const TBallField pocketed, BALL_TYPE ballType)	{ return (pocketed >> (ballType * 8)) & 0xFE; }
-	inlcxpr	bool		pocketedAll			(const TBallField pocketed, BALL_TYPE ballType)	{ return 0xFE == pocketedAny(pocketed, ballType); }
-	inlcxpr	bool		isPocketed			(const TBallField pocketed, u0_t  iBall)		{ return pocketed & (1ULL << iBall); }
-	inlcxpr	TBallField	setPocketed			(TBallField & pocketed, u0_t  iBall)			{ return pocketed |= (1ULL << iBall); }
-	inlcxpr	BALL_TYPE 	ballToBallType		(u0_t  iBall)									{ 
+	inxp	u0_t 		pocketedAny			(const TBallField pocketed, BALL_TYPE ballType)	{ return (pocketed >> (ballType * 8)) & 0xFE; }
+	inxp	bool		pocketedAll			(const TBallField pocketed, BALL_TYPE ballType)	{ return 0xFE == pocketedAny(pocketed, ballType); }
+	inxp	bool		isPocketed			(const TBallField pocketed, u0_t  iBall)		{ return pocketed & (1ULL << iBall); }
+	inxp	TBallField	setPocketed			(TBallField & pocketed, u0_t  iBall)			{ return pocketed |= (1ULL << iBall); }
+	inxp	BALL_TYPE 	ballToBallType		(u0_t  iBall)									{ 
 		return (0 == iBall) ? BALL_TYPE_Cue 
 			 : (8 == iBall) ? BALL_TYPE_Black 
 			 : (7 >= iBall) ? BALL_TYPE_Solid 
 			 : BALL_TYPE_Stripped
 		;
 	}
-	inlcxpr	u0_t 		pocketedCount		(const TBallField pocketed, BALL_TYPE iBallType)	{ 
+	inxp	u0_t 		pocketedCount		(const TBallField pocketed, BALL_TYPE iBallType)	{ 
 		u0_t 					balls				= u0_t ((pocketed >> (iBallType * 8)) & 0xFE);
 		u0_t 					ballCount			= 0;
 		for(u2_t  iBall = 1; iBall < 8; ++iBall) {
@@ -203,13 +203,13 @@ namespace d1p
 		::d1p::STeamInfo	TeamInfo			= {};
 
 		inline	TBallField	SetPocketed			(u0_t  iBall)					{ return ::d1p::setPocketed	(Pocketed, iBall); }
-		inlcxpr	bool		IsPocketed			(u0_t  iBall)			const	{ return ::d1p::isPocketed	(Pocketed, iBall); }
-		inlcxpr	bool		BallTypeToTeam		(BALL_TYPE iBallType)	const	{ return (iBallType == ::d1p::BALL_TYPE_Stripped) ? Flags.TeamStripped : one_if(0 == Flags.TeamStripped); }
-		inlcxpr	u0_t 		BallToTeam			(u0_t  iBall)			const	{ return BallTypeToTeam(::d1p::ballToBallType(iBall)); }
-		inlcxpr	bool		PocketedAll			(u0_t  iTeam)			const	{ return ::d1p::pocketedAll	(Pocketed, TeamToBallType(iTeam)); }
+		inxp	bool		IsPocketed			(u0_t  iBall)			const	{ return ::d1p::isPocketed	(Pocketed, iBall); }
+		inxp	bool		BallTypeToTeam		(BALL_TYPE iBallType)	const	{ return (iBallType == ::d1p::BALL_TYPE_Stripped) ? Flags.TeamStripped : one_if(0 == Flags.TeamStripped); }
+		inxp	u0_t 		BallToTeam			(u0_t  iBall)			const	{ return BallTypeToTeam(::d1p::ballToBallType(iBall)); }
+		inxp	bool		PocketedAll			(u0_t  iTeam)			const	{ return ::d1p::pocketedAll	(Pocketed, TeamToBallType(iTeam)); }
 		inline	u0_t 		PocketedCount		(u0_t  iTeam)			const	{ return ::d1p::pocketedCount	(Pocketed, TeamToBallType(iTeam)); }
-		inlcxpr	u0_t 		PocketedAny			(u0_t  iTeam)			const	{ return ::d1p::pocketedAny	(Pocketed, TeamToBallType(iTeam)); }
-		inlcxpr	BALL_TYPE 	TeamToBallType		(u0_t  iTeam)			const	{ return (iTeam == Flags.TeamStripped) ? ::d1p::BALL_TYPE_Stripped : ::d1p::BALL_TYPE_Solid; }
+		inxp	u0_t 		PocketedAny			(u0_t  iTeam)			const	{ return ::d1p::pocketedAny	(Pocketed, TeamToBallType(iTeam)); }
+		inxp	BALL_TYPE 	TeamToBallType		(u0_t  iTeam)			const	{ return (iTeam == Flags.TeamStripped) ? ::d1p::BALL_TYPE_Stripped : ::d1p::BALL_TYPE_Solid; }
 
 		::gpk::err_t		Reset				(u0_t  firstTeam = 0, u3_t  seed = ::gpk::timeCurrentInUs() ^ ::gpk::noise1DBase(::gpk::timeCurrentInUs()))	{
 			Seed				= seed;
@@ -223,7 +223,7 @@ namespace d1p
 		}
 	};
 
-	cnstxpr	u2_t 	MATCH_STATE_SIZE	= sizeof(SMatchState);
+	cxpr	u2_t 	MATCH_STATE_SIZE	= sizeof(SMatchState);
 
 #pragma pack(pop)
 

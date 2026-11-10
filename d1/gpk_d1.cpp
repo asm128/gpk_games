@@ -282,9 +282,9 @@ static	::gpk::err_t	processKeyboardEvent	(::d1::SD1 & app, const ::gpk::SEventVi
 static	::gpk::err_t	processSystemEvent		(::d1::SD1 & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
-	case ::gpk::SYSTEM_EVENT_Screen		: es_if(::gpk::failed(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN	>(sysEvent, [&app](auto ev) { return processScreenEvent		(app, ev); }))); break;
-	case ::gpk::SYSTEM_EVENT_Text		: es_if(::gpk::failed(::gpk::eventExtractAndHandle<::gpk::EVENT_TEXT		>(sysEvent, [&app](auto ev) { return processTextEvent		(app, ev); }))); break;
-	case ::gpk::SYSTEM_EVENT_Keyboard	: es_if(::gpk::failed(::gpk::eventExtractAndHandle<::gpk::EVENT_KEYBOARD	>(sysEvent, [&app](auto ev) { return processKeyboardEvent	(app, ev); }))); break;
+	case ::gpk::SYSTEM_EVENT_Screen		: if_true_e(::gpk::failed(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN	>(sysEvent, [&app](auto ev) { return processScreenEvent		(app, ev); }))); break;
+	case ::gpk::SYSTEM_EVENT_Text		: if_true_e(::gpk::failed(::gpk::eventExtractAndHandle<::gpk::EVENT_TEXT		>(sysEvent, [&app](auto ev) { return processTextEvent		(app, ev); }))); break;
+	case ::gpk::SYSTEM_EVENT_Keyboard	: if_true_e(::gpk::failed(::gpk::eventExtractAndHandle<::gpk::EVENT_KEYBOARD	>(sysEvent, [&app](auto ev) { return processKeyboardEvent	(app, ev); }))); break;
 	}
 	return 0;
 }

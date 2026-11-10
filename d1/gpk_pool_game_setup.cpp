@@ -142,7 +142,7 @@ static	::gpk::err_t	poolGameResetBall8		(::d1p::SPoolGame & pool, ::d1p::SMatchS
 			{ if_fail_fe(engine.SetPosition(iEntity, position)); }
 		}
 	}
-	cnstxpr double				piPerPocket				= (::gpk::math_pi / 3);
+	cxpr double				piPerPocket				= (::gpk::math_pi / 3);
 	const ::gpk::n2f2_t			tableCenter				= {board.Table.Slate.x * .5f, board.Table.Slate.y * .5f};
 	for(u2_t  iPocket = 0; iPocket < 6; ++iPocket) {
 		const u2_t 				iEntity					= pool.Entities.Pockets[iPocket];
