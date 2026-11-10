@@ -34,7 +34,7 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "Galaxy Hell v0.4");
 
-static	::gpk::error_t	processScreenEvent		(::SApplication & /*app*/, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
+static	gpk::err_t	processScreenEvent		(::SApplication & /*app*/, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_SCREEN_Create:
@@ -48,7 +48,7 @@ static	::gpk::error_t	processScreenEvent		(::SApplication & /*app*/, const ::gpk
 	return 0;
 }
 
-static	::gpk::error_t	processKeyboardEvent	(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
+static	gpk::err_t	processKeyboardEvent	(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_KEYBOARD_Down:
@@ -64,7 +64,7 @@ static	::gpk::error_t	processKeyboardEvent	(::SApplication & app, const ::gpk::S
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEventSystem & sysEvent) { 
+static	gpk::err_t	processSystemEvent	(::SApplication & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen		: gpk_necs(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN  >(sysEvent, [&app](const ::gpk::SScreenEventView & screenEvent) { return ::processScreenEvent  (app, screenEvent); })); break;
@@ -73,7 +73,7 @@ static	::gpk::error_t	processSystemEvent	(::SApplication & app, const ::gpk::SEv
 	return 0;
 }
 
-::gpk::error_t			cleanup				(::SApplication & app)						{ 
+gpk::err_t			cleanup				(::SApplication & app)						{ 
 	::gpk::SFramework			& framework			= app.Framework;
 	::gpk::SWindow				& mainWindow		= framework.RootWindow;
 	::ghg::galaxyHellUpdate(app.GalaxyHellApp, framework.FrameInfo.Seconds.LastFrame, framework.RootWindow.Input, mainWindow.EventQueue);
@@ -128,7 +128,7 @@ bool ParseCommandLine( const sc_t *pchCmdLine, const sc_t **ppchServerAddress, c
 }
 #endif
 
-::gpk::error_t			setup				(::SApplication & app)						{
+gpk::err_t			setup				(::SApplication & app)						{
 #ifdef USE_STEAM_CLIENT
 	// if Steam is not running or the game wasn't started through Steam, SteamAPI_RestartAppIfNecessary starts the local Steam client and also launches this game again.
 	// Once you get a public Steam AppID assigned for this game, you need to replace k_uAppIdInvalid with it and removed steam_appid.txt from the game depot.
@@ -219,7 +219,7 @@ bool ParseCommandLine( const sc_t *pchCmdLine, const sc_t **ppchServerAddress, c
 	return 0;
 }
 
-::gpk::error_t			update				(SApplication & app, bool exitSignal)	{
+gpk::err_t			update				(SApplication & app, bool exitSignal)	{
 	rvis_if(::gpk::APPLICATION_STATE_EXIT, exitSignal);
 
 	::gpk::SFramework			& framework			= app.Framework;
@@ -295,7 +295,7 @@ bool ParseCommandLine( const sc_t *pchCmdLine, const sc_t **ppchServerAddress, c
 	return 0;
 }
 
-::gpk::error_t			draw					(SApplication & app) {
+gpk::err_t			draw					(SApplication & app) {
     /* rotate a triangle around */
     //glClear(GL_COLOR_BUFFER_BIT);
     //glBegin(GL_TRIANGLES);

@@ -4,7 +4,7 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-::gpk::error_t	lls::llsServerUpdate		(::lls::LLSServer & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents) { 
+gpk::err_t	lls::llsServerUpdate		(::lls::LLSServer & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents) { 
 	gpk_necs(::lls::llsUpdate(app, lastTimeSeconds, inputState, systemEvents, [&app](::gpk::pobj<::lls::EventLLS> & _eventToProcess, ::gpk::apobj<::lls::EventLLS> & outputEvents) {
 		if(!_eventToProcess)
 			return false;
@@ -12,7 +12,7 @@ GPK_USING_TYPEINT();
 		const ::lls::EventLLS	& eventToProcess		= *_eventToProcess;
 		info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));
 
-		::gpk::error_t			result			= 0; 
+		gpk::err_t			result			= 0; 
 		switch(eventToProcess.Type) {
 		CASE_LLS_EVENT(result, app, WORLD_EVENT, outputEvents); 
 		CASE_LLS_EVENT(result, app, WORLD_ADMIN, outputEvents); 
@@ -32,7 +32,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	lls::handleACTION_CHAR		(::lls::LLSServer & app, const ::lls::EViewMe & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
+gpk::err_t	lls::handleACTION_CHAR		(::lls::LLSServer & app, const ::lls::EViewMe & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	const ::lls::SArgsEvent	& eventArgs		= *(const ::lls::SArgsEvent*)gameEvent.Data.begin();
 	::lls::printArgsEvent(eventArgs);
@@ -58,7 +58,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	lls::handleWORLD_ADMIN		(::lls::LLSServer & app, const ::lls::EViewAdminWorld & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
+gpk::err_t	lls::handleWORLD_ADMIN		(::lls::LLSServer & app, const ::lls::EViewAdminWorld & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	const ::lls::SArgsEvent	& eventArgs		= *(const ::lls::SArgsEvent*)gameEvent.Data.begin();
 	::lls::printArgsEvent(eventArgs);
@@ -77,7 +77,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	lls::handleWORLD_EVENT		(::lls::LLSServer & app, const ::lls::EViewWorld & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
+gpk::err_t	lls::handleWORLD_EVENT		(::lls::LLSServer & app, const ::lls::EViewWorld & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	const ::lls::SArgsEvent	& eventArgs		= *(const ::lls::SArgsEvent*)gameEvent.Data.begin();
 	::lls::printArgsEvent(eventArgs);
@@ -95,7 +95,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	lls::handleCLIENT_ASKS		(::lls::LLSServer & app, const ::lls::EViewClient & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
+gpk::err_t	lls::handleCLIENT_ASKS		(::lls::LLSServer & app, const ::lls::EViewClient & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
@@ -105,7 +105,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	lls::handleWORLD_SETUP		(::lls::LLSServer & world, const ::lls::EViewWorldSetup & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
+gpk::err_t	lls::handleWORLD_SETUP		(::lls::LLSServer & world, const ::lls::EViewWorldSetup & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
@@ -116,7 +116,7 @@ GPK_USING_TYPEINT();
 	return 0;
 }
 
-::gpk::error_t	lls::handleWORLD_VALUE		(::lls::LLSServer & world, const ::lls::EViewWorldValue & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
+gpk::err_t	lls::handleWORLD_VALUE		(::lls::LLSServer & world, const ::lls::EViewWorldValue & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 

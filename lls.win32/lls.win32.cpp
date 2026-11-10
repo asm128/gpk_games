@@ -13,19 +13,19 @@
 
 GPK_DEFINE_APPLICATION_ENTRY_POINT(::SApplication, "LLS v0.1");
 
-static	::gpk::error_t	loadClientNetworkConfig	(const ::gpk::SJSONReader & jsonConfig, ::gpk::vcsc_t & remoteIp, ::gpk::vcsc_t & remotePort) {
-	::gpk::error_t				appNodeIndex;
+static	gpk::err_t	loadClientNetworkConfig	(const ::gpk::SJSONReader & jsonConfig, ::gpk::vcsc_t & remoteIp, ::gpk::vcsc_t & remotePort) {
+	gpk::err_t				appNodeIndex;
 	gpk_necs(appNodeIndex = ::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_client"}, jsonConfig, 0));
 	return ::gpk::loadClientConfig(jsonConfig, appNodeIndex, remoteIp, remotePort);
 }
 
-static	::gpk::error_t	loadServerNetworkConfig	(const ::gpk::SJSONReader & jsonConfig, ::gpk::vcsc_t & port, ::gpk::vcsc_t & adapter) {
-	::gpk::error_t				appNodeIndex;
+static	gpk::err_t	loadServerNetworkConfig	(const ::gpk::SJSONReader & jsonConfig, ::gpk::vcsc_t & port, ::gpk::vcsc_t & adapter) {
+	gpk::err_t				appNodeIndex;
 	gpk_necs(appNodeIndex = ::gpk::jsonExpressionResolve(::gpk::vcs{"application.test_udp_server"}, jsonConfig, 0));
 	return ::gpk::loadServerConfig(jsonConfig, appNodeIndex, port, adapter);
 }
 
-::gpk::error_t			cleanup					(::SApplication & app) {
+gpk::err_t			cleanup					(::SApplication & app) {
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::SWindow				& mainWindow			= framework.RootWindow;
 	ws_if_failed(::lls::llsUpdate(app.Client.LLSApp, 0, mainWindow.Input, mainWindow.EventQueue, {}));
@@ -44,7 +44,7 @@ static	::gpk::error_t	loadServerNetworkConfig	(const ::gpk::SJSONReader & jsonCo
 	return 0;
 }
 
-static	::gpk::error_t	updateSizeDependentResources(::SApplication & app) {
+static	gpk::err_t	updateSizeDependentResources(::SApplication & app) {
 	::gpk::SWindow				& mainWindow			= app.Framework.RootWindow;
 	const ::gpk::n2u1_t			newSize					= mainWindow.Size;
 #if !defined(DISABLE_D3D11)
@@ -57,7 +57,7 @@ static	::gpk::error_t	updateSizeDependentResources(::SApplication & app) {
 	return 0;
 }
 
-static	::gpk::error_t	processScreenEvent		(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) {
+static	gpk::err_t	processScreenEvent		(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) {
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_SCREEN_Create:
@@ -71,15 +71,15 @@ static	::gpk::error_t	processScreenEvent		(::SApplication & app, const ::gpk::SE
 	return 0;
 }
 
-static	::gpk::error_t	processGUIEvent			(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_GUI_CONTROL> & guiEvent) {
-	::gpk::error_t				result;
+static	gpk::err_t	processGUIEvent			(::SApplication & app, const ::gpk::SEventView<::gpk::EVENT_GUI_CONTROL> & guiEvent) {
+	gpk::err_t				result;
 	gpk_necs(result = ::gpk::processGUIEvent(app.Client.Network, *app.Framework.GUI, guiEvent));
 	if(result)
 		return result;
 	return ::gpk::processGUIEvent(*app.Server.Network, *app.Framework.GUI, guiEvent);
 }
 
-static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SEventSystem & systemEvent) {
+static	gpk::err_t	processSystemEvent		(::SApplication & app, const ::gpk::SEventSystem & systemEvent) {
 	switch(systemEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen	: return ::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN		>(systemEvent, [&app](const ::gpk::SEventView<::gpk::EVENT_SCREEN		> & screenEvent) { return ::processScreenEvent(app, screenEvent); });
@@ -88,7 +88,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 	return 0;
 }
 
-::gpk::error_t			setup					(::SApplication & app) {
+gpk::err_t			setup					(::SApplication & app) {
 #if !defined(DISABLE_D3D11)
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 #endif
@@ -110,7 +110,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 	return 0;
 }
 
-::gpk::error_t			update					(::SApplication & app, bool systemRequestedExit) {
+gpk::err_t			update					(::SApplication & app, bool systemRequestedExit) {
 	::gpk::SFramework			& framework				= app.Framework;
 	::gpk::SWindow				& mainWindow			= framework.RootWindow;
 	::gpk::SGUI					& gui					= *framework.GUI;
@@ -119,7 +119,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 	::gpk::TQueueSystemEvent	eventsToProcess			= mainWindow.EventQueue;
 	gpk_necs(eventsToProcess.append(gui.Controls.EventQueue));
 	gpk_necs(eventsToProcess.for_each([&app, &systemExit](const ::gpk::pobj<::gpk::SEventSystem> & systemEvent) {
-		::gpk::error_t				result;
+		gpk::err_t				result;
 		gpk_necs(result = ::processSystemEvent(app, *systemEvent));
 		if(result == 1)
 			systemExit				= true;
@@ -141,11 +141,11 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 	});
 	app.Client.LLSApp.EventsToSend.clear();
 
-	::gpk::error_t				serverResult;
+	gpk::err_t				serverResult;
 	es_if_failed(serverResult = ::gpk::serverUpdate(*app.Server.Network, gui));
 	rvi_if(::gpk::APPLICATION_STATE_EXIT, serverResult == 1, "Server requested close. Terminating execution.");
 
-	::gpk::error_t				clientResult;
+	gpk::err_t				clientResult;
 	gpk_necs(clientResult = ::gpk::clientUpdate(app.Client.Network, gui));
 	rvi_if(::gpk::APPLICATION_STATE_EXIT, clientResult > 0, "Client requested close (%i). Terminating execution.", clientResult);
 
@@ -186,7 +186,7 @@ static	::gpk::error_t	processSystemEvent		(::SApplication & app, const ::gpk::SE
 	return ::gpk::updateFramework(framework);
 }
 
-::gpk::error_t			draw					(::SApplication & app) {
+gpk::err_t			draw					(::SApplication & app) {
 	const ::gpk::n3f2_t			sunlightPos			= {};
 	const ::gpk::rgbaf			clearColor				= ::gpk::DARKBLUE * .0625;
 

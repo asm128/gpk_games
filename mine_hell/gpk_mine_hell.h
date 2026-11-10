@@ -39,26 +39,26 @@ namespace gpkg
 		::gpk::apobj<::gpk::img<::gpkg::SMineHellCell>>
 											BoardBlocks				;	// New implementation with support for large boards.
 
-		::gpk::error_t						GetCell					(const ::gpk::n2u2_t & cellCoord, ::gpkg::SMineHellCell			** out_cell);			
-		::gpk::error_t						GetCell					(const ::gpk::n2u2_t & cellCoord, const ::gpkg::SMineHellCell	** out_cell)	const;	
+		gpk::err_t						GetCell					(const ::gpk::n2u2_t & cellCoord, ::gpkg::SMineHellCell			** out_cell);			
+		gpk::err_t						GetCell					(const ::gpk::n2u2_t & cellCoord, const ::gpkg::SMineHellCell	** out_cell)	const;	
 
-		::gpk::error_t						GetMines				(::gpk::vbitu64 & out_Cells)	const;	// Returns the amount of mines in the board.
-		::gpk::error_t						GetFlags				(::gpk::vbitu64 & out_Cells)	const;	// Returns the amount of flags in the board.
-		::gpk::error_t						GetHolds				(::gpk::vbitu64 & out_Cells)	const;	// Returns the amount of holds in the board.
-		::gpk::error_t						GetShows				(::gpk::vbitu64 & out_Cells)	const;	// Returns the amount of hides in the board.
+		gpk::err_t						GetMines				(::gpk::vbitu64 & out_Cells)	const;	// Returns the amount of mines in the board.
+		gpk::err_t						GetFlags				(::gpk::vbitu64 & out_Cells)	const;	// Returns the amount of flags in the board.
+		gpk::err_t						GetHolds				(::gpk::vbitu64 & out_Cells)	const;	// Returns the amount of holds in the board.
+		gpk::err_t						GetShows				(::gpk::vbitu64 & out_Cells)	const;	// Returns the amount of hides in the board.
 
-		::gpk::error_t						GetHints				(::gpk::gu8		& out_Cells)	const;	// Returns the amount of hints in the board.
+		gpk::err_t						GetHints				(::gpk::gu8		& out_Cells)	const;	// Returns the amount of hints in the board.
 
-		::gpk::error_t						GetBlast				(::gpk::n2u2_t	& out_coord)	const;	// Returns 1 if blast was found, 0 if not.
+		gpk::err_t						GetBlast				(::gpk::n2u2_t	& out_coord)	const;	// Returns 1 if blast was found, 0 if not.
 
-		::gpk::error_t						Flag					(const ::gpk::n2u2_t cell);	// Set/Clear a flag on a given tile
-		::gpk::error_t						Hold					(const ::gpk::n2u2_t cell);	// Set/Clear a question mark on a given tile
-		::gpk::error_t						Step					(const ::gpk::n2u2_t cell);	// Step on a given tile
+		gpk::err_t						Flag					(const ::gpk::n2u2_t cell);	// Set/Clear a flag on a given tile
+		gpk::err_t						Hold					(const ::gpk::n2u2_t cell);	// Set/Clear a question mark on a given tile
+		gpk::err_t						Step					(const ::gpk::n2u2_t cell);	// Step on a given tile
 
-		::gpk::error_t						Start					(const ::gpk::n2u2_t boardMetrics, const uint32_t mineCount);	// Start a new game with a board of boardMetrics size and mineCount mine count.
+		gpk::err_t						Start					(const ::gpk::n2u2_t boardMetrics, const uint32_t mineCount);	// Start a new game with a board of boardMetrics size and mineCount mine count.
 
-		::gpk::error_t						Save					(::gpk::au0_t & bytes);	// Write game state to array
-		::gpk::error_t						Load					(::gpk::vcu0_t bytes);	// Read game state from view
+		gpk::err_t						Save					(::gpk::au0_t & bytes);	// Write game state to array
+		gpk::err_t						Load					(::gpk::vcu0_t bytes);	// Read game state from view
 
 
 	};

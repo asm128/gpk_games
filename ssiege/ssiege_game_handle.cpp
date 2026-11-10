@@ -4,7 +4,7 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-::gpk::error_t	ssg::handleACTION_CHAR		(::ssg::SSiegeGame & world, const ::ssg::EViewMe & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+gpk::err_t	ssg::handleACTION_CHAR		(::ssg::SSiegeGame & world, const ::ssg::EViewMe & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	const ::ssg::SArgsEvent	& eventArgs		= *(const ::ssg::SArgsEvent*)gameEvent.Data.begin();
 	::ssg::printArgsEvent(eventArgs);
@@ -29,7 +29,7 @@ GPK_USING_TYPEINT();
 	}
 	return 0; 
 }
-::gpk::error_t	ssg::handleWORLD_ADMIN		(::ssg::SSiegeGame & world, const ::ssg::EViewAdminWorld & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+gpk::err_t	ssg::handleWORLD_ADMIN		(::ssg::SSiegeGame & world, const ::ssg::EViewAdminWorld & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	const ::ssg::SArgsEvent	& eventArgs			= *(const ::ssg::SArgsEvent*)gameEvent.Data.begin();
 	::ssg::printArgsEvent(eventArgs);
@@ -51,7 +51,7 @@ GPK_USING_TYPEINT();
 	} 
 	return 0; 
 }
-::gpk::error_t	ssg::handleWORLD_EVENT		(::ssg::SSiegeGame & world, const ::ssg::EViewWorld & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+gpk::err_t	ssg::handleWORLD_EVENT		(::ssg::SSiegeGame & world, const ::ssg::EViewWorld & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	const ::ssg::SArgsEvent	& eventArgs			= *(const ::ssg::SArgsEvent*)gameEvent.Data.begin();
 	::ssg::printArgsEvent(eventArgs);
@@ -71,7 +71,7 @@ GPK_USING_TYPEINT();
 	} 
 	return 0; 
 }
-::gpk::error_t	ssg::handleCLIENT_ASKS		(::ssg::SSiegeGame & world, const ::ssg::EViewClient & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+gpk::err_t	ssg::handleCLIENT_ASKS		(::ssg::SSiegeGame & world, const ::ssg::EViewClient & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world;
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
@@ -81,7 +81,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	ssg::handleWORLD_SETUP		(::ssg::SSiegeGame & world, const ::ssg::EViewWorldSetup & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+gpk::err_t	ssg::handleWORLD_SETUP		(::ssg::SSiegeGame & world, const ::ssg::EViewWorldSetup & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
@@ -92,7 +92,7 @@ GPK_USING_TYPEINT();
 	return 0;
 }
 
-::gpk::error_t	ssg::handleWORLD_VALUE		(::ssg::SSiegeGame & world, const ::ssg::EViewWorldValue & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+gpk::err_t	ssg::handleWORLD_VALUE		(::ssg::SSiegeGame & world, const ::ssg::EViewWorldValue & gameEvent, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 

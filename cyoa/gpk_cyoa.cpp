@@ -3,7 +3,7 @@
 
 #define superp(format, ...) printf(format "\n", __VA_ARGS__)
 
-static	::gpk::error_t	fileSize		(FILE* fp) {
+static	gpk::err_t	fileSize		(FILE* fp) {
 	uint32_t					position		= (uint32_t)ftell(fp);
 	fseek(fp, 0, SEEK_END);
 	uint32_t					lastPosition	= (uint32_t)ftell(fp);
@@ -11,7 +11,7 @@ static	::gpk::error_t	fileSize		(FILE* fp) {
 	return (int)lastPosition;
 }
 
-static	::gpk::error_t	splitLines		(const ::gpk::asc_t & pageBytes, ::gpk::aobj<::gpk::asc_t> & pageLines) {
+static	gpk::err_t	splitLines		(const ::gpk::asc_t & pageBytes, ::gpk::aobj<::gpk::asc_t> & pageLines) {
 	pageLines.clear();
 	uint32_t					lastOffset		= 0;
 	for(uint32_t iOffset = 0; iOffset < pageBytes.size(); ++iOffset) {
@@ -34,7 +34,7 @@ static	::gpk::error_t	splitLines		(const ::gpk::asc_t & pageBytes, ::gpk::aobj<:
 }
 
 tplt <tpnm _tCell>
-static	::gpk::error_t	reverse			(_tCell* elements, uint32_t elementCount)	 {
+static	gpk::err_t	reverse			(_tCell* elements, uint32_t elementCount)	 {
 	for(uint32_t i = 0, swapCount = elementCount / 2; i < swapCount; ++i) {
 		_tCell						old				= elements[i];
 		elements[i]				= elements[elementCount - 1 - i];
@@ -43,7 +43,7 @@ static	::gpk::error_t	reverse			(_tCell* elements, uint32_t elementCount)	 {
 	return 0;
 }
 
-static	::gpk::error_t	loadLines		(::gpkg::SPage & page, const ::gpk::aachar & pageLines) {
+static	gpk::err_t	loadLines		(::gpkg::SPage & page, const ::gpk::aachar & pageLines) {
 	page.TextLines			= pageLines;
 	page.PageJumps			= {};
 	for(int32_t iLine = (int32_t)page.TextLines.size() - 1; iLine >= 0; --iLine) {
@@ -69,7 +69,7 @@ static	::gpk::error_t	loadLines		(::gpkg::SPage & page, const ::gpk::aachar & pa
 	return 0;
 }
 
-::gpk::error_t			gpkg::loadPage	(const sc_t* folderName, gpkg::SPage & page, uint32_t pageIndex) {
+gpk::err_t			gpkg::loadPage	(const sc_t* folderName, gpkg::SPage & page, uint32_t pageIndex) {
 	sc_t						fileName[4096]	= {};
 	sprintf_s(fileName, "%s/%u.txt", folderName, pageIndex);
 	FILE						* fp			= 0;

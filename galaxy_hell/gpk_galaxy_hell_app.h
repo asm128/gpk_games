@@ -88,23 +88,23 @@ namespace ghg
 
 	struct SUIRadialGauge {
 		::gpk::apod<::gpk::n3f2_t>		Vertices				= {};
-		::gpk::apod<::gpk::trii16>		Indices					= {};
+		::gpk::apod<::gpk::tris1_t>		Indices					= {};
 		int16_t							CurrentValue			= 0;
 		int16_t							MaxValue				= 64;
 		::gpk::img<::gpk::bgra>			Image					= {};
 
-		stacxpr	::gpk::rgbaf			COLOR_MIN_DEFAULT		= ::gpk::GREEN;
-		stacxpr	::gpk::rgbaf			COLOR_MID_DEFAULT		= ::gpk::ORANGE;
-		stacxpr	::gpk::rgbaf			COLOR_MAX_DEFAULT		= ::gpk::RED;
-		stacxpr	::gpk::rgbaf			COLOR_BKG_DEFAULT		= ::gpk::BROWN * .5 + ::gpk::DARKBLUE * .5;
+		stxp	::gpk::rgbaf			COLOR_MIN_DEFAULT		= ::gpk::GREEN;
+		stxp	::gpk::rgbaf			COLOR_MID_DEFAULT		= ::gpk::ORANGE;
+		stxp	::gpk::rgbaf			COLOR_MAX_DEFAULT		= ::gpk::RED;
+		stxp	::gpk::rgbaf			COLOR_BKG_DEFAULT		= ::gpk::BROWN * .5 + ::gpk::DARKBLUE * .5;
 		
 		inline	int16_t					SetValue				(float weight)							noexcept	{ return CurrentValue = int16_t(weight * MaxValue); }
 				int16_t					SetValue				(float currentValue, uint32_t maxValue)	noexcept	{ return SetValue(currentValue / maxValue); }
 	};
 
-			::gpk::error_t			gaugeBuildRadial		(::ghg::SUIRadialGauge & gauge, const ::gpk::circlef32 & gaugeMetrics, int16_t resolution, int16_t width);
-			::gpk::error_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::g8bgra target, ::gpk::rgbaf colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::rgbaf colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::rgbaf colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::bgra colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false);
-	inline	::gpk::error_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::rgbaf colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::rgbaf colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::rgbaf colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::bgra colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false) {
+			gpk::err_t			gaugeBuildRadial		(::ghg::SUIRadialGauge & gauge, const ::gpk::circlef32 & gaugeMetrics, int16_t resolution, int16_t width);
+			gpk::err_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::g8bgra target, ::gpk::rgbaf colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::rgbaf colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::rgbaf colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::bgra colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false);
+	inline	gpk::err_t			gaugeImageUpdate		(::ghg::SUIRadialGauge & gauge, ::gpk::rgbaf colorMin = ::ghg::SUIRadialGauge::COLOR_MIN_DEFAULT, ::gpk::rgbaf colorMid = ::ghg::SUIRadialGauge::COLOR_MID_DEFAULT, ::gpk::rgbaf colorMax = ::ghg::SUIRadialGauge::COLOR_MAX_DEFAULT, ::gpk::bgra colorEmpty = ::ghg::SUIRadialGauge::COLOR_BKG_DEFAULT, bool radialColor = false) {
 		//gauge.Image.Texels.fill({0, 0, 0, 0});
 		return ::ghg::gaugeImageUpdate(gauge, gauge.Image, colorMin, colorMid, colorMax, colorEmpty, radialColor);
 	}
@@ -156,10 +156,10 @@ namespace ghg
 		::gpk::aobj<::ghg::SUIPlayer>	PlayerUI				= {};
 		::ghg::SGalaxyHellDrawCache		DrawCache				= {};
 
-		::gpk::astatic<sc_t, 128>		TextLevel				= {};
-		::gpk::astatic<sc_t, 128>		TextTimeStage			= {};
-		::gpk::astatic<sc_t, 128>		TextTimeWorld			= {};
-		::gpk::astatic<sc_t, 128>		TextTimeReal			= {};
+		::gpk::astsc_t<128>		TextLevel				= {};
+		::gpk::astsc_t<128>		TextTimeStage			= {};
+		::gpk::astsc_t<128>		TextTimeWorld			= {};
+		::gpk::astsc_t<128>		TextTimeReal			= {};
 	};
 
 
@@ -169,7 +169,7 @@ namespace ghg
 		::gpk::au2_t						Parts;
 		::gpk::au2_t						Weapons;
 
-		::gpk::error_t					Save					(::gpk::au0_t & output) const {
+		gpk::err_t					Save					(::gpk::au0_t & output) const {
 			gpk_necs(::gpk::savePOD (output, Core	));
 			gpk_necs(::gpk::savePOD (output, Score	));
 			gpk_necs(::gpk::saveView(output, Parts	));
@@ -177,7 +177,7 @@ namespace ghg
 			return 0;
 		}
 
-		::gpk::error_t					Load					(::gpk::vcu0_t & input) {
+		gpk::err_t					Load					(::gpk::vcu0_t & input) {
 			gpk_necs(::gpk::loadPOD	(input, Core	));
 			gpk_necs(::gpk::loadPOD	(input, Score	));
 			gpk_necs(::gpk::loadView(input, Parts	));
@@ -214,7 +214,7 @@ namespace ghg
 		::gpk::apod<::gpk::SSpaceshipOrbiter>	Orbiters		= {};
 		::gpk::aobj<::ghg::SPlayerShip>	Ships			= {};
 
-		::gpk::error_t					Save			(const ::gpk::vcsc_t & filename) const {
+		gpk::err_t					Save			(const ::gpk::vcsc_t & filename) const {
 			::gpk::au0_t							serialized;
 			gpk_necs(Save(serialized));
 			::gpk::au0_t							deflated;
@@ -225,7 +225,7 @@ namespace ghg
 			return 0;
 		}
 
-		::gpk::error_t					Load			(const ::gpk::vcsc_t & filename) {
+		gpk::err_t					Load			(const ::gpk::vcsc_t & filename) {
 			::gpk::au0_t							serialized;
 			gpk_necall(::gpk::fileToMemory({filename}, serialized), "fileName: %s", ::gpk::toString(filename).begin());
 			::gpk::au0_t							inflated;
@@ -236,7 +236,7 @@ namespace ghg
 			return Load(input);
 		}
 
-		::gpk::error_t					Save			(::gpk::au0_t & output) const {
+		gpk::err_t					Save			(::gpk::au0_t & output) const {
 			gpk_necs(::gpk::saveView(output, Name));
 			gpk_necs(::gpk::savePOD(output, State));
 			gpk_necs(::gpk::saveView(output, Weapons));
@@ -248,7 +248,7 @@ namespace ghg
 			return 0;
 		}
 
-		::gpk::error_t					Load			(::gpk::vcu0_t & input) {
+		gpk::err_t					Load			(::gpk::vcu0_t & input) {
 			gpk_necs(::gpk::loadLabel	(input, Name	));
 			gpk_necs(::gpk::loadPOD		(input, State	));
 			gpk_necs(::gpk::loadView	(input, Weapons	));
@@ -334,12 +334,12 @@ namespace ghg
 
 		::ghg::APP_STATE				ActiveState					= APP_STATE_Init;
 
-		::gpk::error_t					AddNewPlayer				(::gpk::vcsc_t playerName)			{
+		gpk::err_t					AddNewPlayer				(::gpk::vcsc_t playerName)			{
 			::gpk::trim(playerName);
 			return Players.push_back({::gpk::label(::gpk::vcs{playerName})});
 		}
 
-		::gpk::error_t					Save						(SAVE_MODE autosaveMode)				{
+		gpk::err_t					Save						(SAVE_MODE autosaveMode)				{
 			sc_t								fileName[4096]				= {};
 			::gpk::au0_t							b64PlayerName				= {};
 			for(uint32_t iPlayer = 0; iPlayer < Players.size(); ++iPlayer) {
@@ -368,13 +368,13 @@ namespace ghg
 		}
 	};
 
-	::gpk::error_t	guiSetup			(::ghg::SGalaxyHellApp & gameui, const ::gpk::pobj<::gpk::SInput> & inputState);
-	::gpk::error_t	guiUpdate			(::ghg::SGalaxyHellApp & gameui, ::gpk::vpobj<::gpk::SEventSystem> sysEvents);
+	gpk::err_t	guiSetup			(::ghg::SGalaxyHellApp & gameui, const ::gpk::pobj<::gpk::SInput> & inputState);
+	gpk::err_t	guiUpdate			(::ghg::SGalaxyHellApp & gameui, ::gpk::vpobj<::gpk::SEventSystem> sysEvents);
 	
-	::gpk::error_t	galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEventsNew);
-	::gpk::error_t	galaxyHellDraw		(::ghg::SGalaxyHellApp & app, ::gpk::n2u1_t renderTargetSize);
+	gpk::err_t	galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEventsNew);
+	gpk::err_t	galaxyHellDraw		(::ghg::SGalaxyHellApp & app, ::gpk::n2u1_t renderTargetSize);
 
-	::gpk::error_t	listFilesSavegame	(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames);
-	::gpk::error_t	listFilesProfile	(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames);
+	gpk::err_t	listFilesSavegame	(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames);
+	gpk::err_t	listFilesProfile	(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames);
 
 }

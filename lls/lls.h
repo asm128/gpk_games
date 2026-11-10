@@ -29,7 +29,7 @@ namespace lls
 		::gpk::vcsc_t				ExtensionSaveStage			= GPK_CXS(".stage.llsz");
 		::gpk::vcsc_t				ExtensionSaveQuick			= GPK_CXS(".quick.llsz");
 
-		::gpk::error_t			GetSaveGameExtension		(SAVE_MODE saveMode, ::gpk::vcsc_t & extension)	const	{
+		gpk::err_t			GetSaveGameExtension		(SAVE_MODE saveMode, ::gpk::vcsc_t & extension)	const	{
 			switch(saveMode) {
 			case SAVE_MODE_USER		: extension = ExtensionSaveUser	; break;
 			case SAVE_MODE_STAGE	: extension = ExtensionSaveStage; break;
@@ -39,7 +39,7 @@ namespace lls
 			return 0;
 		}
 
-		::gpk::error_t			GetPlayerFilePath			(const uint64_t time, const ::gpk::vcsc_t & playerName, ::gpk::asc_t & playerFilePath)	const	{
+		gpk::err_t			GetPlayerFilePath			(const uint64_t time, const ::gpk::vcsc_t & playerName, ::gpk::asc_t & playerFilePath)	const	{
 			::gpk::au0_t					b64PlayerName				= {};
 			gpk_necs(::gpk::base64Encode(playerName, b64PlayerName));
 			gpk_necs(playerFilePath.append(SavegameFolder));
@@ -60,7 +60,7 @@ namespace lls
 		::gpk::apachar			InputQueue			= {};
 	};
 
-	::gpk::error_t			setupLLSUI			(::gpk::SGUI & gui, ::lls::LLSUI & llsUI);
+	gpk::err_t			setupLLSUI			(::gpk::SGUI & gui, ::lls::LLSUI & llsUI);
 
 
 	GDEFINE_ENUM_TYPE(APP_STATE, uint8_t);
@@ -106,9 +106,9 @@ namespace lls
 		::gpk::prtbgra8d32		RenderTargetWorld;
 		::gpk::prtbgra8d32		RenderTargetUI;
 
-		::gpk::error_t			StateSwitch			(APP_STATE newState);
+		gpk::err_t			StateSwitch			(APP_STATE newState);
 
-		::gpk::error_t			Save				()	const	{
+		gpk::err_t			Save				()	const	{
 			rni_if(Game.Controlled >= Game.Engine.Entities.size(), "No active player character! %i >= %i", Game.Controlled, Game.Engine.Entities.size());
 				
 			::gpk::asc_t				playerPath;
@@ -116,13 +116,13 @@ namespace lls
 			return Save(playerPath);
 		}
 
-		::gpk::error_t			Save				(::gpk::vcsc_t fileName)	const	{
+		gpk::err_t			Save				(::gpk::vcsc_t fileName)	const	{
 			::gpk::au0_t					serialized;
 			gpk_necs(Game.World.Save(serialized));
 			return ::gpk::deflateFromMemory(fileName, serialized);
 		}
 
-		::gpk::error_t			Load				(::gpk::vcsc_t filename)			{
+		gpk::err_t			Load				(::gpk::vcsc_t filename)			{
 			::gpk::au0_t					serialized;
 			gpk_necs(::gpk::inflateToMemory(filename, serialized));
 			::gpk::vcu0_t					viewSerialized		= serialized;
@@ -130,10 +130,10 @@ namespace lls
 		}
 	};
 
-	::gpk::error_t			llsUpdate		(::lls::LLSApp & lls, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents
+	gpk::err_t			llsUpdate		(::lls::LLSApp & lls, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents
 		, ::gpk::FBool<::gpk::pobj<::lls::EventLLS> &, ::gpk::apobj<::lls::EventLLS> &> funcHandleEvent
 		);
-	::gpk::error_t			llsDraw			(::lls::LLSApp & lls, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI);
+	gpk::err_t			llsDraw			(::lls::LLSApp & lls, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI);
 } // namespace lls
 
 #endif // SSIEGE_H_23701

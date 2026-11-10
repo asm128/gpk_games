@@ -10,7 +10,7 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssg::SSiegeUI & ssiegeUI) {
+static	gpk::err_t	setupConsole			(::gpk::SGUI & gui, ::ssg::SSiegeUI & ssiegeUI) {
 	gpk_necs(::gpk::inputBoxCreate(ssiegeUI.UserInput, gui, ssiegeUI.Root));
 	ssiegeUI.UserInput.MaxLength	= 64;
 	gpk_necs(ssiegeUI.UserInput.Edit(gui, true));
@@ -24,13 +24,13 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssg::SSiegeUI & ssieg
 }
 
 // initialize root gui layout and console input/virtual keyboard
-::gpk::error_t			ssg::setupSSiegeUI		(::gpk::SGUI & gui, ::ssg::SSiegeUI & ssiegeUI) {
+gpk::err_t			ssg::setupSSiegeUI		(::gpk::SGUI & gui, ::ssg::SSiegeUI & ssiegeUI) {
 	gpk_necs(ssiegeUI.Root = ::gpk::createScreenLayout(gui));
 	gpk_necs(::setupConsole(gui, ssiegeUI));
 	return 0; 
 }
 
-::gpk::error_t			ssg::SSiegeApp::StateSwitch(APP_STATE newState) {
+gpk::err_t			ssg::SSiegeApp::StateSwitch(APP_STATE newState) {
 	::gpk::SGUI					& gui				= *GUI;
 	::gpk::SControlTable		& table				= gui.Controls;
 	if(newState != ActiveState) {
@@ -60,7 +60,7 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssg::SSiegeUI & ssieg
 }
 
 
-::gpk::error_t			ssg::ssiegeDraw		(::ssg::SSiegeApp & app, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI) { 
+gpk::err_t			ssg::ssiegeDraw		(::ssg::SSiegeApp & app, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI) { 
 	if(false == onlyGUI) {
 		const ::gpk::SCamera		& cameraSelected		= app.Game.Camera;
 		gpk_necs(::ssg::ssiegeGameDraw(app.Game, backBuffer, cameraSelected.Position, cameraSelected.Target, cameraSelected.Up, cameraSelected.NearFar));
@@ -69,7 +69,7 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::ssg::SSiegeUI & ssieg
 	return 0; 
 }
 
-static	::gpk::error_t	processScreenEvent		(::ssg::SSiegeApp & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
+static	gpk::err_t	processScreenEvent		(::ssg::SSiegeApp & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_SCREEN_Close:
@@ -98,7 +98,7 @@ static	::gpk::error_t	processScreenEvent		(::ssg::SSiegeApp & app, const ::gpk::
 	return 0;
 }
 
-static	::gpk::error_t	processTextEvent		(::ssg::SSiegeApp & /*app*/, const ::gpk::SEventView<::gpk::EVENT_TEXT> & screenEvent) { 
+static	gpk::err_t	processTextEvent		(::ssg::SSiegeApp & /*app*/, const ::gpk::SEventView<::gpk::EVENT_TEXT> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_TEXT_Char: break;
@@ -106,7 +106,7 @@ static	::gpk::error_t	processTextEvent		(::ssg::SSiegeApp & /*app*/, const ::gpk
 	return 0;
 }
 
-static	::gpk::error_t	processKeyboardEvent	(::ssg::SSiegeApp & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
+static	gpk::err_t	processKeyboardEvent	(::ssg::SSiegeApp & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_KEYBOARD_Down:
@@ -126,7 +126,7 @@ static	::gpk::error_t	processKeyboardEvent	(::ssg::SSiegeApp & app, const ::gpk:
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent		(::ssg::SSiegeApp & app, const ::gpk::SEventSystem & sysEvent) { 
+static	gpk::err_t	processSystemEvent		(::ssg::SSiegeApp & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen		: gpk_necs(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN		>(sysEvent, [&app](auto ev) { return processScreenEvent		(app, ev); })); break;
@@ -136,7 +136,7 @@ static	::gpk::error_t	processSystemEvent		(::ssg::SSiegeApp & app, const ::gpk::
 	return 0;
 }
 
-static	::gpk::error_t	updateInput				(::ssg::SSiegeUI & /*ui*/, ::ssg::SWorldView & world, double actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t /*mouseDeltas*/, ::gpk::vcu0_t /*buttonStates*/) { 
+static	gpk::err_t	updateInput				(::ssg::SSiegeUI & /*ui*/, ::ssg::SWorldView & world, double actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t /*mouseDeltas*/, ::gpk::vcu0_t /*buttonStates*/) { 
 	const double				secondsElapsed			= actualSecondsElapsed * world.WorldState.TimeScale;
 
 	if(keyStates[VK_CONTROL]) {
@@ -151,7 +151,7 @@ static	::gpk::error_t	updateInput				(::ssg::SSiegeUI & /*ui*/, ::ssg::SWorldVie
 	return 0;
 }
 
-static	::gpk::error_t	parseCommands			(gpk::vpobj<::gpk::asc_t> inputQueue, gpk::apobj<::gpk::asc_t> & inputHistory, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+static	gpk::err_t	parseCommands			(gpk::vpobj<::gpk::asc_t> inputQueue, gpk::apobj<::gpk::asc_t> & inputHistory, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
 	inputQueue.for_each([&outputEvents, &inputHistory](::gpk::pachar & textLine) {
 		if_null_fe(textLine.get_ref());	
 		if_zero_fe(textLine->size());	
@@ -166,14 +166,14 @@ static	::gpk::error_t	parseCommands			(gpk::vpobj<::gpk::asc_t> inputQueue, gpk:
 	return 0;
 }
 
-static	::gpk::error_t	handleSSiegeEvent		(::ssg::SSiegeApp & app, ::gpk::pobj<::ssg::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssg::EventSSiege> & appOutputEvents) { 
+static	gpk::err_t	handleSSiegeEvent		(::ssg::SSiegeApp & app, ::gpk::pobj<::ssg::EventSSiege> & _eventToProcess, ::gpk::apobj<::ssg::EventSSiege> & appOutputEvents) { 
 	if(!_eventToProcess)
 		return false;
 
 	const ssg::EventSSiege	& eventToProcess			= *_eventToProcess;
 	info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));
 
-	::gpk::error_t			result			= 0; 
+	gpk::err_t			result			= 0; 
 	switch(eventToProcess.Type) {
 	CASE_SSG_EVENT(result, app, WORLD_EVENT, appOutputEvents); 
 	CASE_SSG_EVENT(result, app, WORLD_ADMIN, appOutputEvents); 
@@ -192,7 +192,7 @@ static	::gpk::error_t	handleSSiegeEvent		(::ssg::SSiegeApp & app, ::gpk::pobj<::
 	return bool(result == 1);
 }
 
-::gpk::error_t			ssg::ssiegeUpdate		(::ssg::SSiegeApp & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents
+gpk::err_t			ssg::ssiegeUpdate		(::ssg::SSiegeApp & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents
 	, ::gpk::FBool<::gpk::pobj<::ssg::EventSSiege> &, ::gpk::apobj<::ssg::EventSSiege> &> funcHandleEvent
 	) {
 	if_fail_fe(systemEvents.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
@@ -248,7 +248,7 @@ static	::gpk::error_t	handleSSiegeEvent		(::ssg::SSiegeApp & app, ::gpk::pobj<::
 	app.Game.Global.State.UserTime.Played += secondsElapsed;
 	if(app.Game.Global.Stages.size()) {
 		app.Game.Global.Stages[app.Game.Global.Stages.size() - 1].Time.Played += secondsElapsed;
-		stacxpr	float			Fasting					= .45f;
+		stxp	float			Fasting					= .45f;
 		app.Game.Global.Stages[app.Game.Global.Stages.size() - 1].SimulatedTime.Update(secondsElapsed, Fasting);
 	}
 	if(processInput) { // process console

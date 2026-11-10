@@ -22,11 +22,11 @@ namespace ghg
 {
 	GPK_USING_TYPEINT();
 	
-	stacxpr uint16_t	MAX_PLAYERS				= 4;
-	stacxpr uint32_t	MAX_ORBITER_COUNT		= 6;
+	stxp uint16_t	MAX_PLAYERS				= 4;
+	stxp uint32_t	MAX_ORBITER_COUNT		= 6;
 
 #pragma pack(push, 1)
-	stacxpr ::gpk::astatic<::gpk::bgra, 16>	PLAYER_COLORS	= 
+	stxp ::gpk::astatic<::gpk::bgra, 16>	PLAYER_COLORS	= 
 		{ 0xFF00FF00U	// GREEN
 		, ::gpk::PURPLE
 		, 0xFF0000FFU	// BLUE
@@ -87,8 +87,8 @@ namespace ghg
 		::gpk::SRelativeSpeed	BackgroundSpeed;
 		::gpk::SRelativeTime	SimulatedTime;
 
-		stacxpr	float			Slowing					= -.35f;
-		stacxpr	float			Fasting					= .45f;
+		stxp	float			Slowing					= -.35f;
+		stxp	float			Fasting					= .45f;
 	};
 	 
 	struct SShipController {
@@ -112,12 +112,12 @@ namespace ghg
 		::ghg::SGalaxyHellDrawCache			DrawCache;
 		::std::mutex						LockUpdate;
 
-		::gpk::error_t						PilotCreate				(const ::ghg::SShipPilot & shipPilot)			{
+		gpk::err_t						PilotCreate				(const ::ghg::SShipPilot & shipPilot)			{
 			gpk_necs(Pilots.push_back(shipPilot));
 			return ShipControllers.push_back({});
 		}
 
-		::gpk::error_t						PilotsReset				()			{
+		gpk::err_t						PilotsReset				()			{
 			while(Pilots.size() < PlayState.Constants.Players) {
 				sc_t									text [64]				= {};
 				sprintf_s(text, "Player %i", Pilots.size() + 1);
@@ -126,7 +126,7 @@ namespace ghg
 			return ShipControllers.resize(PlayState.Constants.Players);
 		}
 
-		::gpk::error_t						Save					(::gpk::au0_t & output)		const	{
+		gpk::err_t						Save					(::gpk::au0_t & output)		const	{
 			gpk_necs(::gpk::savePOD(output, PlayState));
 			for(uint32_t iPlayer = 0; iPlayer < PlayState.Constants.Players; ++iPlayer) {
 				gpk_necs(::gpk::saveView(output, Pilots[iPlayer].Name));
@@ -137,7 +137,7 @@ namespace ghg
 			return 0;
 		}
 
-		::gpk::error_t						Load					(::gpk::vcu0_t & input) {
+		gpk::err_t						Load					(::gpk::vcu0_t & input) {
 			::std::lock_guard						lock(LockUpdate);
 			::gpk::view<const ::ghg::SPlayState>	readPlayState			= {};
 			gpk_necs(::gpk::loadPOD(input, PlayState));
@@ -153,28 +153,28 @@ namespace ghg
 		}
 	};
 
-	::gpk::error_t		stageSetup				(::ghg::SGalaxyHell & solarSystem);
-	::gpk::error_t		solarSystemSetup		(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2u1_t & windowSize);
-	::gpk::error_t		solarSystemReset		(::ghg::SGalaxyHell & solarSystem); 
-	::gpk::error_t		solarSystemDraw			(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
-	::gpk::error_t		solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SEventSystem> frameEvents);
-	::gpk::error_t		solarSystemLoad			(::ghg::SGalaxyHell & world,::gpk::vcsc_t filename);
-	::gpk::error_t		solarSystemSave			(const ::ghg::SGalaxyHell & world,::gpk::vcsc_t filename);
+	gpk::err_t		stageSetup				(::ghg::SGalaxyHell & solarSystem);
+	gpk::err_t		solarSystemSetup		(::ghg::SGalaxyHell & solarSystem, const ::gpk::n2u1_t & windowSize);
+	gpk::err_t		solarSystemReset		(::ghg::SGalaxyHell & solarSystem); 
+	gpk::err_t		solarSystemDraw			(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & lockUpdate);
+	gpk::err_t		solarSystemUpdate		(::ghg::SGalaxyHell & solarSystem, double secondsLastFrame, const ::gpk::SInput & input, ::gpk::vpobj<::gpk::SEventSystem> frameEvents);
+	gpk::err_t		solarSystemLoad			(::ghg::SGalaxyHell & world,::gpk::vcsc_t filename);
+	gpk::err_t		solarSystemSave			(const ::ghg::SGalaxyHell & world,::gpk::vcsc_t filename);
 	
-	::gpk::error_t		getLightArraysFromDebris
+	gpk::err_t		getLightArraysFromDebris
 		( const ::ghg::SDecoState	& decoState
 		, ::gpk::an3f32				& lightPoints
 		, ::gpk::a8bgra				& lightColors
 		, const ::gpk::vc8bgra		& debrisColors
 		);
 
-	::gpk::error_t		getLightArraysFromShips
+	gpk::err_t		getLightArraysFromShips
 		( const ::ghg::SShipManager	& shipState
 		, ::gpk::an3f32				& lightPoints
 		, ::gpk::a8bgra				& lightColors
 		);
 
-	::gpk::error_t		getLightArrays
+	gpk::err_t		getLightArrays
 		( const ::ghg::SShipManager	& shipState
 		, const ::ghg::SDecoState	& decoState
 		, ::gpk::an3f32				& lightPoints
@@ -182,7 +182,7 @@ namespace ghg
 		, const ::gpk::vc8bgra		& debrisColors
 		);
 
-	::gpk::error_t		drawOrbiter
+	gpk::err_t		drawOrbiter
 		( const ::ghg::SShipManager		& shipState
 		, const uint32_t				iPartEntity
 		, const ::gpk::rgbaf			& shipColor	

@@ -13,7 +13,7 @@ GPK_USING_TYPEINT();
 
 stxp	u2_t			MAX_LIGHT_RANGE		= 10;
 
-static	::gpk::error_t	drawStars			(const ::ghg::SStars & stars, ::gpk::g8bgra targetPixels)	{
+static	gpk::err_t	drawStars			(const ::ghg::SStars & stars, ::gpk::g8bgra targetPixels)	{
 	::gpk::bgra					colors[]			=
 		{ {0xfF, 0xfF, 0xfF, }
 		, {0xC0, 0xC0, 0xfF, }
@@ -43,7 +43,7 @@ static	::gpk::error_t	drawStars			(const ::ghg::SStars & stars, ::gpk::g8bgra ta
 	return 0;
 }
 
-static	::gpk::error_t	drawDebris
+static	gpk::err_t	drawDebris
 	( ::gpk::g8bgra			targetPixels
 	, const ::ghg::SDebris					& debris
 	, const ::gpk::m4f32					& matrixVPV
@@ -71,9 +71,9 @@ static	::gpk::error_t	drawDebris
 		starFinalColor.g		= ::gpk::max(0.0f, starFinalColor.g - (1.0f - ::gpk::min(1.0f, brightness * prebrightness * (iParticle * 2))));
 		starFinalColor.b		= ::gpk::max(0.0f, starFinalColor.b - (1.0f - ::gpk::min(1.0f, brightness * prebrightness * (iParticle * 1))));
 		//::gpk::setPixel(targetPixels, pixelCoord, starFinalColor);
-		stacxpr	 double				brightRadius		= 1.5;
-		stacxpr	 double				brightRadiusSquared	= brightRadius * brightRadius;
-		stacxpr	 double				brightUnit			= 1.0 / brightRadiusSquared;
+		stxp	 double				brightRadius		= 1.5;
+		stxp	 double				brightRadiusSquared	= brightRadius * brightRadius;
+		stxp	 double				brightUnit			= 1.0 / brightRadiusSquared;
 
 		for(int32_t y = (int32_t)-brightRadius - 1, yStop = (int32_t)brightRadius + 1; y < yStop; ++y)
 		for(int32_t x = (int32_t)-brightRadius - 1; x < yStop; ++x) {
@@ -98,7 +98,7 @@ static	::gpk::error_t	drawDebris
 	return 0;
 }
 
-static	::gpk::error_t	drawScoreParticles
+static	gpk::err_t	drawScoreParticles
 	( ::gpk::g8bgra	targetPixels
 	, const ::ghg::SScoreParticles	& debris
 	, const ::gpk::m4f32			& matrixVPV
@@ -106,9 +106,9 @@ static	::gpk::error_t	drawScoreParticles
 	, const ::gpk::SRasterFont		& font
 	)	{
 
-	stacxpr	double				brightRadius		= 1.5;
-	stacxpr	double				brightRadiusSquared	= brightRadius * brightRadius;
-	stacxpr	double				brightUnit			= 1.0 / brightRadiusSquared;
+	stxp	double				brightRadius		= 1.5;
+	stxp	double				brightRadiusSquared	= brightRadius * brightRadius;
+	stxp	double				brightUnit			= 1.0 / brightRadiusSquared;
 	for(uint32_t iParticle = 0; iParticle < debris.Scores.size(); ++iParticle) {
 		::gpk::n3f2_t				starPos				= debris.Particles.Position[iParticle];
 		starPos					= matrixVPV.Transform(starPos);
@@ -146,9 +146,9 @@ static	::gpk::error_t	drawScoreParticles
 	return 0;
 }
 
-typedef ::gpk::error_t (FSetPixel)	(::gpk::g8bgra targetPixels, const ::gpk::n2s1_t & pixelCoord, const ::gpk::bgra & color);
+typedef gpk::err_t (FSetPixel)	(::gpk::g8bgra targetPixels, const ::gpk::n2s1_t & pixelCoord, const ::gpk::bgra & color);
 
-static	::gpk::error_t	drawCannonball
+static	gpk::err_t	drawCannonball
 	( const ::ghg::SShipManager		& shipState
 	, const ::gpk::n3f2_t			& position
 	, const ::gpk::n3f2_t			& prevPosition
@@ -225,7 +225,7 @@ static	::gpk::error_t	drawCannonball
 	return pixelsDrawn;
 }
 
-static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
+static	gpk::err_t	drawShots			(::gpk::g8bgra targetPixels
 	, const ::ghg::SShipManager		& shipState
 	, const ::gpk::SShots			& shots
 	, const ::gpk::m4f32			& matrixVPV
@@ -330,7 +330,7 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 	return 0;
 }
 
-::gpk::error_t			ghg::getLightArraysFromDebris
+gpk::err_t			ghg::getLightArraysFromDebris
 	( const ::ghg::SDecoState								& decoState
 	, ::gpk::an3f32			& lightPoints
 	, ::gpk::a8bgra			& lightColors
@@ -345,7 +345,7 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 }
 
 
-::gpk::error_t			ghg::getLightArraysFromShips
+gpk::err_t			ghg::getLightArraysFromShips
 	( const ::ghg::SShipManager	& shipState
 	, ::gpk::an3f32				& lightPoints
 	, ::gpk::a8bgra				& lightColors
@@ -373,7 +373,7 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 	return 0;
 }
 
-::gpk::error_t			ghg::getLightArrays
+gpk::err_t			ghg::getLightArrays
 	( const ::ghg::SShipManager	& shipState
 	, const ::ghg::SDecoState	& decoState
 	, ::gpk::an3f32				& lightPoints
@@ -385,7 +385,7 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 	return 0;
 }
 
-::gpk::error_t			ghg::getLightArrays
+gpk::err_t			ghg::getLightArrays
 	( const ::gpk::n3f2_t		& modelPosition
 	, const ::gpk::vn3f32		& lightPointsWorld
 	, const ::gpk::a8bgra		& lightColorsWorld
@@ -403,7 +403,7 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 	return 0;
 }
 //
-//static	::gpk::error_t						getLightArrays
+//static	gpk::err_t						getLightArrays
 //	( const ::gpk::n3f2_t							& modelPosition
 //	, const ::gpk::apod<::gpk::n3f2_t>			& lightPointsWorld
 //	, ::gpk::apod<uint16_t>							& indicesPointLights
@@ -417,7 +417,7 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 //	return 0;
 //}
 
-::gpk::error_t			ghg::drawOrbiter
+gpk::err_t			ghg::drawOrbiter
 	( const ::ghg::SShipManager			& shipState
 	, const uint32_t					iPartEntity
 	, const ::gpk::rgbaf				& shipColor
@@ -460,7 +460,7 @@ static	::gpk::error_t	drawShots			(::gpk::g8bgra targetPixels
 	return pixelsDrawn;
 }
 
-static	::gpk::error_t	drawShip
+static	gpk::err_t	drawShip
 	( const ::ghg::SGalaxyHell		& solarSystem
 	, int32_t						iShip
 	, const ::gpk::m4f32			& matrixVP
@@ -507,7 +507,7 @@ static	::gpk::error_t	drawShip
 	return pixelsDrawn;
 }
 
-static	::gpk::error_t	drawExplosion
+static	gpk::err_t	drawExplosion
 	( const ::ghg::SGalaxyHell		& solarSystem
 	, const ::ghg::SExplosion		& explosion
 	, const ::gpk::m4f32			& matrixView
@@ -558,7 +558,7 @@ static	::gpk::error_t	drawExplosion
 	return 0;
 }
 
-::gpk::error_t			ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & mutexUpdate)	{
+gpk::err_t			ghg::solarSystemDraw		(const ::ghg::SGalaxyHell & solarSystem, ::ghg::SGalaxyHellDrawCache & drawCache, ::std::mutex & mutexUpdate)	{
 	drawCache.RenderTarget->resize(drawCache.RenderTargetMetrics);
 	::gpk::pobj<::ghg::TRenderTarget>	renderTarget				= drawCache.RenderTarget;
 	::gpk::g8bgra			targetPixels				= renderTarget->Color			; 

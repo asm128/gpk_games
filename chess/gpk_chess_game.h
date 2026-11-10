@@ -10,8 +10,8 @@ namespace gpk
 		::gpk::SPlayer		Player;
 	};
 
-	::gpk::error_t					chessGameSetup		(::gpk::SChessGame & chess);
-	//::gpk::error_t					chessGameUpdate		(::gpk::SChessGame & chess, ::gpk::vpobj<::gpk::EventChess> inputEvents, ::gpk::apobj<::gpk::EventChess> & outputEvents, double secondsElapsed);
+	gpk::err_t					chessGameSetup		(::gpk::SChessGame & chess);
+	//gpk::err_t					chessGameUpdate		(::gpk::SChessGame & chess, ::gpk::vpobj<::gpk::EventChess> inputEvents, ::gpk::apobj<::gpk::EventChess> & outputEvents, double secondsElapsed);
 
 } // namespace
 

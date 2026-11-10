@@ -26,7 +26,7 @@ static	::gpk::n2u2_t	getLocalCoordFromCoord					(const ::gpk::n2u2_t boardMetric
 		};
 }
 
-::gpk::error_t			gpkg::SMineHell::GetCell				(const ::gpk::n2u2_t & cellCoord, ::gpkg::SMineHellCell ** out_cell)			{
+gpk::err_t			gpkg::SMineHell::GetCell				(const ::gpk::n2u2_t & cellCoord, ::gpkg::SMineHellCell ** out_cell)			{
 	ree_if(cellCoord.x > GameState.BoardSize.x || cellCoord.y > GameState.BoardSize.y, "Invalid cell: %u, %u. Max: %u, %u.", cellCoord.x, cellCoord.y, GameState.BoardSize.x, GameState.BoardSize.y);
 	if(false == GameState.BlockBased)
 		*out_cell				= &Board[cellCoord.y][cellCoord.x];
@@ -42,7 +42,7 @@ static	::gpk::n2u2_t	getLocalCoordFromCoord					(const ::gpk::n2u2_t boardMetric
 	return 0;
 }
 
-::gpk::error_t			gpkg::SMineHell::GetCell	(const ::gpk::n2u2_t & cellCoord, const ::gpkg::SMineHellCell ** out_cell)		const	{
+gpk::err_t			gpkg::SMineHell::GetCell	(const ::gpk::n2u2_t & cellCoord, const ::gpkg::SMineHellCell ** out_cell)		const	{
 	ree_if(cellCoord.x > GameState.BoardSize.x || cellCoord.y > GameState.BoardSize.y, "Invalid cell: %u, %u. Max: %u, %u.", cellCoord.x, cellCoord.y, GameState.BoardSize.x, GameState.BoardSize.y);
 	if(false == GameState.BlockBased)
 		*out_cell				= &Board[cellCoord.y][cellCoord.x];
@@ -56,7 +56,7 @@ static	::gpk::n2u2_t	getLocalCoordFromCoord					(const ::gpk::n2u2_t boardMetric
 	return 0;
 }
 
-::gpk::error_t			gpkg::SMineHell::GetBlast	(::gpk::n2u2_t & out_coord)	const {
+gpk::err_t			gpkg::SMineHell::GetBlast	(::gpk::n2u2_t & out_coord)	const {
 	if(GameState.BlockBased)
 		out_coord				= GameState.BlastCoord;
 	else {
@@ -74,7 +74,7 @@ static	::gpk::n2u2_t	getLocalCoordFromCoord					(const ::gpk::n2u2_t boardMetric
 	return 0;
 }
 
-static	::gpk::error_t	assignGridBool	(::gpk::vbitu64 & out_Cells, const ::gpk::n2u2_t & gridMetrix, const ::std::function<bool(const ::gpkg::SMineHellCell & _cellValue)> & funcTestCell, const ::std::function<void(const ::gpk::n2u2_t & cellCoord, const ::gpkg::SMineHellCell ** out_cell)> funcGetCell)	{
+static	gpk::err_t	assignGridBool	(::gpk::vbitu64 & out_Cells, const ::gpk::n2u2_t & gridMetrix, const ::std::function<bool(const ::gpkg::SMineHellCell & _cellValue)> & funcTestCell, const ::std::function<void(const ::gpk::n2u2_t & cellCoord, const ::gpkg::SMineHellCell ** out_cell)> funcGetCell)	{
 	uint32_t					total			= 0;
 	for(uint32_t y = 0; y < gridMetrix.y; ++y) {
 		const uint32_t				offset			= y * gridMetrix.x;
@@ -90,11 +90,11 @@ static	::gpk::error_t	assignGridBool	(::gpk::vbitu64 & out_Cells, const ::gpk::n
 	return total;
 }
 
-::gpk::error_t			gpkg::SMineHell::GetMines	(::gpk::vbitu64 & out_Cells)		const	{ const ::gpk::n2u2_t gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics(); return ::assignGridBool(out_Cells, gridMetrix, [](auto cellValue) { return cellValue.Mine; }, [this](auto coord, auto cell) { GetCell(coord, cell); } ); }
-::gpk::error_t			gpkg::SMineHell::GetFlags	(::gpk::vbitu64 & out_Cells)		const	{ const ::gpk::n2u2_t gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics(); return ::assignGridBool(out_Cells, gridMetrix, [](auto cellValue) { return cellValue.Flag; }, [this](auto coord, auto cell) { GetCell(coord, cell); } ); }
-::gpk::error_t			gpkg::SMineHell::GetHolds	(::gpk::vbitu64 & out_Cells)		const	{ const ::gpk::n2u2_t gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics(); return ::assignGridBool(out_Cells, gridMetrix, [](auto cellValue) { return cellValue.What; }, [this](auto coord, auto cell) { GetCell(coord, cell); } ); }
-::gpk::error_t			gpkg::SMineHell::GetShows	(::gpk::vbitu64 & out_Cells)		const	{ const ::gpk::n2u2_t gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics(); return ::assignGridBool(out_Cells, gridMetrix, [](auto cellValue) { return cellValue.Show; }, [this](auto coord, auto cell) { GetCell(coord, cell); } ); }
-::gpk::error_t			gpkg::SMineHell::GetHints	(::gpk::grid<uint8_t> & out_Cells)	const	{ const ::gpk::n2u2_t gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics();
+gpk::err_t			gpkg::SMineHell::GetMines	(::gpk::vbitu64 & out_Cells)		const	{ const ::gpk::n2u2_t gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics(); return ::assignGridBool(out_Cells, gridMetrix, [](auto cellValue) { return cellValue.Mine; }, [this](auto coord, auto cell) { GetCell(coord, cell); } ); }
+gpk::err_t			gpkg::SMineHell::GetFlags	(::gpk::vbitu64 & out_Cells)		const	{ const ::gpk::n2u2_t gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics(); return ::assignGridBool(out_Cells, gridMetrix, [](auto cellValue) { return cellValue.Flag; }, [this](auto coord, auto cell) { GetCell(coord, cell); } ); }
+gpk::err_t			gpkg::SMineHell::GetHolds	(::gpk::vbitu64 & out_Cells)		const	{ const ::gpk::n2u2_t gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics(); return ::assignGridBool(out_Cells, gridMetrix, [](auto cellValue) { return cellValue.What; }, [this](auto coord, auto cell) { GetCell(coord, cell); } ); }
+gpk::err_t			gpkg::SMineHell::GetShows	(::gpk::vbitu64 & out_Cells)		const	{ const ::gpk::n2u2_t gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics(); return ::assignGridBool(out_Cells, gridMetrix, [](auto cellValue) { return cellValue.Show; }, [this](auto coord, auto cell) { GetCell(coord, cell); } ); }
+gpk::err_t			gpkg::SMineHell::GetHints	(::gpk::grid<uint8_t> & out_Cells)	const	{ const ::gpk::n2u2_t gridMetrix = (GameState.BlockBased) ? GameState.BoardSize : Board.metrics();
 	for(int32_t y = 0; y < (int32_t)gridMetrix.y; ++y)
 	for(int32_t x = 0; x < (int32_t)gridMetrix.x; ++x) {
 		const ::gpkg::SMineHellCell	* cellValue					= 0;
@@ -118,15 +118,15 @@ static	::gpk::error_t	assignGridBool	(::gpk::vbitu64 & out_Cells, const ::gpk::n
 	return 0;
 }
 
-static	::gpk::error_t	uncoverCell						(::gpk::grid<::gpkg::SMineHellCell> & board, const ::gpk::grid<uint8_t> & hints, const ::gpk::n2u2_t & cellOffset, const ::gpk::n2u2_t & boardSize, const ::gpk::n2s2_t localCellCoord, ::gpk::apod<::gpk::n2u2_t> & outOfRangeCells);
-static	::gpk::error_t	uncoverCellIfNeeded				(::gpk::grid<::gpkg::SMineHellCell> & board, const ::gpk::grid<uint8_t> & hints, const ::gpk::n2u2_t & cellOffset, const ::gpk::n2u2_t & boardSize, const ::gpk::n2s2_t localCellCoord, ::gpk::apod<::gpk::n2u2_t> & outOfRangeCells) {
+static	gpk::err_t	uncoverCell						(::gpk::grid<::gpkg::SMineHellCell> & board, const ::gpk::grid<uint8_t> & hints, const ::gpk::n2u2_t & cellOffset, const ::gpk::n2u2_t & boardSize, const ::gpk::n2s2_t localCellCoord, ::gpk::apod<::gpk::n2u2_t> & outOfRangeCells);
+static	gpk::err_t	uncoverCellIfNeeded				(::gpk::grid<::gpkg::SMineHellCell> & board, const ::gpk::grid<uint8_t> & hints, const ::gpk::n2u2_t & cellOffset, const ::gpk::n2u2_t & boardSize, const ::gpk::n2s2_t localCellCoord, ::gpk::apod<::gpk::n2u2_t> & outOfRangeCells) {
 	const ::gpkg::SMineHellCell	cellToTest						= board[localCellCoord.y][localCellCoord.x];
 	if(false == cellToTest.Mine && false == cellToTest.Show)
 		::uncoverCell(board, hints, cellOffset, boardSize, localCellCoord, outOfRangeCells);
 	return 0;
 }
 
-static	::gpk::error_t	enqueueCellIfNeeded				(const ::gpk::n2u2_t & cellOffset, const ::gpk::n2u2_t & boardSize, const ::gpk::n2s2_t localCellCoord, ::gpk::apod<::gpk::n2u2_t> & outOfRangeCells) {
+static	gpk::err_t	enqueueCellIfNeeded				(const ::gpk::n2u2_t & cellOffset, const ::gpk::n2u2_t & boardSize, const ::gpk::n2s2_t localCellCoord, ::gpk::apod<::gpk::n2u2_t> & outOfRangeCells) {
 	const ::gpk::n2u2_t			globalCoordToTest				= cellOffset + localCellCoord.u2_t();
 	if(::gpk::in_range(globalCoordToTest, {{}, boardSize}) && 0 > ::gpk::find(globalCoordToTest, {outOfRangeCells.begin(), outOfRangeCells.size()}))
 		gpk_necs(outOfRangeCells.push_back(globalCoordToTest));
@@ -146,7 +146,7 @@ constexpr ::gpk::array_static<const ::gpk::n2s2_t, 8>	SURROUNDING_CELLS_OFFSETS 
 	};
 
 
-static	::gpk::error_t	uncoverCell						(::gpk::grid<::gpkg::SMineHellCell> & block, const ::gpk::grid<uint8_t> & hints, const ::gpk::n2u2_t & cellOffset, const ::gpk::n2u2_t & boardSize, const ::gpk::n2s2_t localCellCoord, ::gpk::apod<::gpk::n2u2_t> & outOfRangeCells) {
+static	gpk::err_t	uncoverCell						(::gpk::grid<::gpkg::SMineHellCell> & block, const ::gpk::grid<uint8_t> & hints, const ::gpk::n2u2_t & cellOffset, const ::gpk::n2u2_t & boardSize, const ::gpk::n2s2_t localCellCoord, ::gpk::apod<::gpk::n2u2_t> & outOfRangeCells) {
 	::gpkg::SMineHellCell		& currentCell					= block[localCellCoord.y][localCellCoord.x];
 	if(false == currentCell.Mine && false == currentCell.Show) {
 		currentCell.Show		= true;
@@ -167,9 +167,9 @@ static	::gpk::error_t	uncoverCell						(::gpk::grid<::gpkg::SMineHellCell> & blo
 	return 0;
 }
 
-::gpk::error_t			gpkg::SMineHell::Flag			(const ::gpk::n2u2_t cellCoord)	{ ::gpkg::SMineHellCell * cellData = 0; GetCell(cellCoord, &cellData); if(false == cellData->Show) { cellData->Flag = !cellData->Flag; cellData->What = false; } return 0; }
-::gpk::error_t			gpkg::SMineHell::Hold			(const ::gpk::n2u2_t cellCoord)	{ ::gpkg::SMineHellCell * cellData = 0; GetCell(cellCoord, &cellData); if(false == cellData->Show) { cellData->What = !cellData->What; cellData->Flag = false; } return 0; }
-::gpk::error_t			gpkg::SMineHell::Step			(const ::gpk::n2u2_t cellCoord)	{ ::gpkg::SMineHellCell * cellData = 0; GetCell(cellCoord, &cellData);
+gpk::err_t			gpkg::SMineHell::Flag			(const ::gpk::n2u2_t cellCoord)	{ ::gpkg::SMineHellCell * cellData = 0; GetCell(cellCoord, &cellData); if(false == cellData->Show) { cellData->Flag = !cellData->Flag; cellData->What = false; } return 0; }
+gpk::err_t			gpkg::SMineHell::Hold			(const ::gpk::n2u2_t cellCoord)	{ ::gpkg::SMineHellCell * cellData = 0; GetCell(cellCoord, &cellData); if(false == cellData->Show) { cellData->What = !cellData->What; cellData->Flag = false; } return 0; }
+gpk::err_t			gpkg::SMineHell::Step			(const ::gpk::n2u2_t cellCoord)	{ ::gpkg::SMineHellCell * cellData = 0; GetCell(cellCoord, &cellData);
 	if(false == cellData->Show) {
 		::gpk::n2					boardMetrics					= GameState.BlockBased ? GameState.BoardSize : Board.metrics();
 		if(cellData->Mine && false == cellData->Flag)
@@ -223,7 +223,7 @@ static	::gpk::error_t	uncoverCell						(::gpk::grid<::gpkg::SMineHellCell> & blo
 	return cellData->Boom ? 1 : 0;
 }
 
-::gpk::error_t			gpkg::SMineHell::Start		(const ::gpk::n2u2_t boardMetrics, const uint32_t mineCount)	{
+gpk::err_t			gpkg::SMineHell::Start		(const ::gpk::n2u2_t boardMetrics, const uint32_t mineCount)	{
 	GameState				= {};
 	GameState.BoardSize		= {::gpk::max(3U, boardMetrics.x), ::gpk::max(3U, boardMetrics.y)};
 	GameState.MineCount		= (uint32_t)::gpk::max(2.0, ::gpk::min((double)mineCount, ((boardMetrics.x * (double)boardMetrics.y) / 4) * 3));
@@ -257,7 +257,7 @@ static	::gpk::error_t	uncoverCell						(::gpk::grid<::gpkg::SMineHellCell> & blo
 	return 0;
 }
 
-::gpk::error_t			gpkg::SMineHell::Save			(::gpk::au0_t & bytes)	{
+gpk::err_t			gpkg::SMineHell::Save			(::gpk::au0_t & bytes)	{
 	if(false == GameState.BlockBased) {
 		::gpk::au0_t								rleDecoded						= {};
 		gpk_necs(rleDecoded.append((const uint8_t*)&Board.metrics(), sizeof(::gpk::n2u2_t)) );
@@ -284,7 +284,7 @@ static	::gpk::error_t	uncoverCell						(::gpk::grid<::gpkg::SMineHellCell> & blo
 	return 0;
 }
 
-::gpk::error_t			gpkg::SMineHell::Load			(::gpk::vcu0_t bytes)	{
+gpk::err_t			gpkg::SMineHell::Load			(::gpk::vcu0_t bytes)	{
 	if(false == GameState.BlockBased) {
 		GameState.Time			= *(::gpk::rangeu3_t*)&bytes[bytes.size() - sizeof(::gpk::rangeu3_t)];
 		bytes					= {bytes.begin(), bytes.size() - szof(::gpk::rangeu3_t)};

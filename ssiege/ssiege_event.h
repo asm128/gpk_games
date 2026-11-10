@@ -24,7 +24,7 @@ namespace ssg
 	typedef	::gpk::SEventView	<SSG_EVENT>	EViewSSiege;
 
 	tplt<tpnm _tChildEvent>
-	stainli	::gpk::error_t	eventExtractAndHandle		(const EventSSiege & parentEvent, const ::std::function<::gpk::error_t(const ::gpk::SEventView<_tChildEvent>&)> & funcHandleChild) {
+	stin	gpk::err_t	eventExtractAndHandle		(const EventSSiege & parentEvent, const ::std::function<gpk::err_t(const ::gpk::SEventView<_tChildEvent>&)> & funcHandleChild) {
 		return ::gpk::eventExtractAndHandle<_tChildEvent, SSG_EVENT>(parentEvent, funcHandleChild);
 	}
 

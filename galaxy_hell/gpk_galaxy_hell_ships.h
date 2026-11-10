@@ -34,7 +34,7 @@ namespace ghg
 		::gpk::astatic<::gpk::SCameraPoints, ::ghg::CAMERA_MODE_COUNT>	
 								Camera				= {};
 
-		::gpk::error_t			CameraReset			() {
+		gpk::err_t			CameraReset			() {
 			Camera[CAMERA_MODE_SKY].Target		= {};
 			Camera[CAMERA_MODE_SKY].Position	= {-0.000001f, 250, 0};
 			//Camera[CAMERA_MODE_SKY].Up			= {0, 1, 0};
@@ -58,21 +58,21 @@ namespace ghg
 		::gpk::aobj<::gpk::img8bgra>		Image			= {};
 		::gpk::apod<::gpk::m4f32>			Transforms		= {}; // Ope per entity
 
-		::gpk::error_t						Save			(::gpk::au0_t & output) const { 
+		gpk::err_t						Save			(::gpk::au0_t & output) const { 
 			gpk_necs(::gpk::savePOD		(output, Global));
 			gpk_necs(::gpk::saveView	(output, Transforms));
 			info_printf("Saved %s, %i", "Transforms"	, Transforms.size());
 			return 0; 
 		}
 
-		::gpk::error_t						Load			(::gpk::vcu0_t & input) { 
+		gpk::err_t						Load			(::gpk::vcu0_t & input) { 
 			gpk_necs(::gpk::loadPOD	(input, Global		));
 			gpk_necs(::gpk::loadView(input, Transforms	));
 			return 0; 
 		}
 	};
 
-	::gpk::error_t			getLightArrays
+	gpk::err_t			getLightArrays
 		( const ::gpk::n3f2_t	& modelPosition
 		, const ::gpk::vn3f32	& lightPointsWorld
 		, const ::gpk::a8bgra	& lightColorsWorld
@@ -110,13 +110,13 @@ namespace ghg
 		inline	::gpk::n3f2_t&				GetShipPosition		(uint32_t indexShip)				{ return GetShipPivot(indexShip).Position; }
 		inline	const ::gpk::n3f2_t&			GetShipPosition		(uint32_t indexShip)		const	{ return GetShipPivot(indexShip).Position; }
 
-		::gpk::error_t						GetShipPosition		(uint32_t iShip, ::gpk::n3f2_t & output) const { output = GetShipPosition(iShip); return 0; }
+		gpk::err_t						GetShipPosition		(uint32_t iShip, ::gpk::n3f2_t & output) const { output = GetShipPosition(iShip); return 0; }
 		
 		::gpk::SBodyCenter&					GetOrbiterTransform	(uint32_t iPart)		{ return Engine.Integrator.Centers[EntitySystem.Entities[ShipPartEntity[iPart] + 1].Body]; }
 		::gpk::SBodyForces&					GetShipOrbiterForces(uint32_t iPart)		{ return Engine.Integrator.Forces [EntitySystem.Entities[ShipPartEntity[iPart] + 1].Body]; }
 
 
-		::gpk::error_t				Save				(::gpk::au0_t & output)	const	{ 
+		gpk::err_t				Save				(::gpk::au0_t & output)	const	{ 
 			gpk_necs(SpaceshipManager.Save(output));
 			gpk_necs(WeaponManager.Save(output));
 
@@ -129,7 +129,7 @@ namespace ghg
 			gpk_necs(Scene			.Save(output));
 			return 0; 
 		}
-		::gpk::error_t				Load				(::gpk::vcu0_t & input) { 
+		gpk::err_t				Load				(::gpk::vcu0_t & input) { 
 			gpk_necs(SpaceshipManager.Load(input));
 			gpk_necs(WeaponManager.Load(input));
 

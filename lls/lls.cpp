@@ -10,7 +10,7 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::lls::LLSUI & llsUI) {
+static	gpk::err_t	setupConsole			(::gpk::SGUI & gui, ::lls::LLSUI & llsUI) {
 	gpk_necs(::gpk::inputBoxCreate(llsUI.UserInput, gui, llsUI.Root));
 	llsUI.UserInput.MaxLength	= 64;
 	gpk_necs(llsUI.UserInput.Edit(gui, true));
@@ -24,13 +24,13 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::lls::LLSUI & llsUI) {
 }
 
 // initialize root gui layout and console input/virtual keyboard
-::gpk::error_t			lls::setupLLSUI		(::gpk::SGUI & gui, ::lls::LLSUI & llsUI) {
+gpk::err_t			lls::setupLLSUI		(::gpk::SGUI & gui, ::lls::LLSUI & llsUI) {
 	gpk_necs(llsUI.Root = ::gpk::createScreenLayout(gui));
 	gpk_necs(::setupConsole(gui, llsUI));
 	return 0; 
 }
 
-::gpk::error_t			lls::LLSApp::StateSwitch(APP_STATE newState) {
+gpk::err_t			lls::LLSApp::StateSwitch(APP_STATE newState) {
 	::gpk::SGUI					& gui				= *GUI;
 	::gpk::SControlTable		& table				= gui.Controls;
 	if(newState != ActiveState) {
@@ -60,7 +60,7 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::lls::LLSUI & llsUI) {
 }
 
 
-::gpk::error_t			lls::llsDraw		(::lls::LLSApp & app, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI) { 
+gpk::err_t			lls::llsDraw		(::lls::LLSApp & app, ::gpk::rtbgra8d32 & backBuffer, bool onlyGUI) { 
 	if(false == onlyGUI) {
 		const ::gpk::SCamera		& cameraSelected		= app.Game.Camera;
 		gpk_necs(::lls::llsGameDraw(app.Game, backBuffer, cameraSelected.Position, cameraSelected.Target, cameraSelected.Up, cameraSelected.NearFar));
@@ -69,7 +69,7 @@ static	::gpk::error_t	setupConsole			(::gpk::SGUI & gui, ::lls::LLSUI & llsUI) {
 	return 0; 
 }
 
-static	::gpk::error_t	processScreenEvent		(::lls::LLSApp & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
+static	gpk::err_t	processScreenEvent		(::lls::LLSApp & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_SCREEN_Close:
@@ -98,7 +98,7 @@ static	::gpk::error_t	processScreenEvent		(::lls::LLSApp & app, const ::gpk::SEv
 	return 0;
 }
 
-static	::gpk::error_t	processTextEvent		(::lls::LLSApp & /*app*/, const ::gpk::SEventView<::gpk::EVENT_TEXT> & screenEvent) { 
+static	gpk::err_t	processTextEvent		(::lls::LLSApp & /*app*/, const ::gpk::SEventView<::gpk::EVENT_TEXT> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_TEXT_Char: break;
@@ -106,7 +106,7 @@ static	::gpk::error_t	processTextEvent		(::lls::LLSApp & /*app*/, const ::gpk::S
 	return 0;
 }
 
-static	::gpk::error_t	processKeyboardEvent	(::lls::LLSApp & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
+static	gpk::err_t	processKeyboardEvent	(::lls::LLSApp & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_KEYBOARD_Down:
@@ -126,7 +126,7 @@ static	::gpk::error_t	processKeyboardEvent	(::lls::LLSApp & app, const ::gpk::SE
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent		(::lls::LLSApp & app, const ::gpk::SEventSystem & sysEvent) { 
+static	gpk::err_t	processSystemEvent		(::lls::LLSApp & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen		: gpk_necs(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN		>(sysEvent, [&app](auto ev) { return processScreenEvent		(app, ev); })); break;
@@ -136,7 +136,7 @@ static	::gpk::error_t	processSystemEvent		(::lls::LLSApp & app, const ::gpk::SEv
 	return 0;
 }
 
-static	::gpk::error_t	updateInput				(::lls::LLSUI & /*ui*/, ::lls::SWorldView & world, double actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t /*mouseDeltas*/, ::gpk::vcu0_t /*buttonStates*/) { 
+static	gpk::err_t	updateInput				(::lls::LLSUI & /*ui*/, ::lls::SWorldView & world, double actualSecondsElapsed, ::gpk::vcu0_t keyStates, const ::gpk::n3s1_t /*mouseDeltas*/, ::gpk::vcu0_t /*buttonStates*/) { 
 	const double				secondsElapsed			= actualSecondsElapsed * world.WorldState.TimeScale;
 
 	if(keyStates[VK_CONTROL]) {
@@ -151,7 +151,7 @@ static	::gpk::error_t	updateInput				(::lls::LLSUI & /*ui*/, ::lls::SWorldView &
 	return 0;
 }
 
-static	::gpk::error_t	parseCommands			(gpk::vpobj<::gpk::asc_t> inputQueue, gpk::apobj<::gpk::asc_t> & inputHistory, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
+static	gpk::err_t	parseCommands			(gpk::vpobj<::gpk::asc_t> inputQueue, gpk::apobj<::gpk::asc_t> & inputHistory, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
 	inputQueue.for_each([&outputEvents, &inputHistory](::gpk::pachar & textLine) {
 		if_null_fe(textLine.get_ref());	
 		if_zero_fe(textLine->size());	
@@ -166,14 +166,14 @@ static	::gpk::error_t	parseCommands			(gpk::vpobj<::gpk::asc_t> inputQueue, gpk:
 	return 0;
 }
 
-static	::gpk::error_t	handleLLSEvent		(::lls::LLSApp & app, ::gpk::pobj<::lls::EventLLS> & _eventToProcess, ::gpk::apobj<::lls::EventLLS> & appOutputEvents) { 
+static	gpk::err_t	handleLLSEvent		(::lls::LLSApp & app, ::gpk::pobj<::lls::EventLLS> & _eventToProcess, ::gpk::apobj<::lls::EventLLS> & appOutputEvents) { 
 	if(!_eventToProcess)
 		return false;
 
 	const lls::EventLLS	& eventToProcess			= *_eventToProcess;
 	info_printf("%s", ::gpk::get_value_namep(eventToProcess.Type));
 
-	::gpk::error_t			result			= 0; 
+	gpk::err_t			result			= 0; 
 	switch(eventToProcess.Type) {
 	CASE_LLS_EVENT(result, app, WORLD_EVENT, appOutputEvents); 
 	CASE_LLS_EVENT(result, app, WORLD_ADMIN, appOutputEvents); 
@@ -192,7 +192,7 @@ static	::gpk::error_t	handleLLSEvent		(::lls::LLSApp & app, ::gpk::pobj<::lls::E
 	return bool(result == 1);
 }
 
-::gpk::error_t			lls::llsUpdate		(::lls::LLSApp & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents
+gpk::err_t			lls::llsUpdate		(::lls::LLSApp & app, double secondsElapsed, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEvents
 	, ::gpk::FBool<::gpk::pobj<::lls::EventLLS> &, ::gpk::apobj<::lls::EventLLS> &> funcHandleEvent
 	) {
 	if_fail_fe(systemEvents.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
@@ -248,7 +248,7 @@ static	::gpk::error_t	handleLLSEvent		(::lls::LLSApp & app, ::gpk::pobj<::lls::E
 	app.Game.Global.State.UserTime.Played += secondsElapsed;
 	if(app.Game.Global.Stages.size()) {
 		app.Game.Global.Stages[app.Game.Global.Stages.size() - 1].Time.Played += secondsElapsed;
-		stacxpr	float			Fasting					= .45f;
+		stxp	float			Fasting					= .45f;
 		app.Game.Global.Stages[app.Game.Global.Stages.size() - 1].SimulatedTime.Update(secondsElapsed, Fasting);
 	}
 	if(processInput) { // process console

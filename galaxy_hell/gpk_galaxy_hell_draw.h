@@ -19,7 +19,7 @@ namespace ghg
 	struct SGalaxyHellDrawCache {
 		// Used when rastering triangles
 		::gpk::apod<::gpk::n2s1_t>			PixelCoords				;
-		::gpk::apod<::gpk::trif32>			PixelVertexWeights		;
+		::gpk::apod<::gpk::trif2_t>			PixelVertexWeights		;
 		
 		// Used for pixel shading
 		::gpk::apod<::gpk::n3f2_t>			LightPointsWorld		;
@@ -31,7 +31,7 @@ namespace ghg
 		::gpk::n2u1_t						RenderTargetMetrics		= {1280, 720};
 		::gpk::pobj<::ghg::TRenderTarget>	RenderTarget			= {};
 
-		::gpk::error_t						Clear					() {
+		gpk::err_t						Clear					() {
 			::gpk::clear
 				( PixelCoords
 				, PixelVertexWeights		

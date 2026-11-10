@@ -5,7 +5,7 @@
 
 namespace lls
 {
-	::gpk::error_t			parseCommandLine	(::gpk::apobj<::lls::EventLLS> & queue, ::gpk::vcsc_t inputLine);
+	gpk::err_t			parseCommandLine	(::gpk::apobj<::lls::EventLLS> & queue, ::gpk::vcsc_t inputLine);
 } // namespace 
 
 #endif // SSIEGE_PARSE_H_23701

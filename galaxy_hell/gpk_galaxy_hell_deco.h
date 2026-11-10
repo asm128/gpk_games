@@ -30,7 +30,7 @@ namespace ghg
 		}
 
 		int					Update				(::gpk::n2u1_t targetSize, float secondsLastFrame)	{
-			stacxpr	double			randUnit			= 1.0 / RAND_MAX;
+			stxp	double			randUnit			= 1.0 / RAND_MAX;
 			for(uint32_t iStar = 0; iStar < Brightness.size(); ++iStar) {
 				::gpk::n2f2_t			& starPos			= Position[iStar];
 				float					& starSpeed			= Speed[iStar];
@@ -64,7 +64,7 @@ namespace ghg
 		}
 
 		int					SpawnSpherical		(uint32_t countDebris, const ::gpk::n3f2_t & position, float speedDebris, float brightness)	{
-			stacxpr	double			randUnit			= ::gpk::math_2pi / RAND_MAX;
+			stxp	double			randUnit			= ::gpk::math_2pi / RAND_MAX;
 			for(uint32_t iDebris = 0; iDebris < countDebris; ++iDebris) {
 				::gpk::n3f2_t									direction			= {0, 1, 0};
 				direction.RotateX(rand() * randUnit);
@@ -76,7 +76,7 @@ namespace ghg
 		}
 
 		int					SpawnDirected		(uint32_t countDebris, double noiseFactor, const ::gpk::n3f2_t & direction, const ::gpk::n3f2_t & position, float speedDebris, float brightness)	{
-			stacxpr	double			randUnit			= ::gpk::math_2pi / RAND_MAX;
+			stxp	double			randUnit			= ::gpk::math_2pi / RAND_MAX;
 			for(uint32_t iDebris = 0; iDebris < countDebris; ++iDebris) {
 				::gpk::n3f2_t									finalDirection		= {0, 1, 0};
 				finalDirection.RotateX(rand() * randUnit);
@@ -186,8 +186,8 @@ namespace ghg
 		::gpk::SRasterFontManager		FontManager						= {};
 	};
 
-	::gpk::error_t					decoExplosionAdd	(::gpk::aobj<::ghg::SExplosion> & explosions, int32_t indexMesh, int32_t indexImage, uint32_t triangleCount, const ::gpk::n3f2_t &collisionPoint, double debrisSpeed);
-	::gpk::error_t					decoUpdate			(::ghg::SDecoState & decoState, double secondsLastFrame, double relativeSpeed, const ::gpk::n2u1_t & screenMetrics);
+	gpk::err_t					decoExplosionAdd	(::gpk::aobj<::ghg::SExplosion> & explosions, int32_t indexMesh, int32_t indexImage, uint32_t triangleCount, const ::gpk::n3f2_t &collisionPoint, double debrisSpeed);
+	gpk::err_t					decoUpdate			(::ghg::SDecoState & decoState, double secondsLastFrame, double relativeSpeed, const ::gpk::n2u1_t & screenMetrics);
 }
 
 #endif // GPK_GALAXY_HELL_DECO_H_293874239874

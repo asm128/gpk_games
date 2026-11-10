@@ -24,7 +24,7 @@ namespace lls
 	typedef	::gpk::SEventView	<LLS_EVENT>	EViewLLS;
 
 	tplt<tpnm _tChildEvent>
-	stainli	::gpk::error_t	eventExtractAndHandle		(const EventLLS & parentEvent, const ::std::function<::gpk::error_t(const ::gpk::SEventView<_tChildEvent>&)> & funcHandleChild) {
+	stin	gpk::err_t	eventExtractAndHandle		(const EventLLS & parentEvent, const ::std::function<gpk::err_t(const ::gpk::SEventView<_tChildEvent>&)> & funcHandleChild) {
 		return ::gpk::eventExtractAndHandle<_tChildEvent, LLS_EVENT>(parentEvent, funcHandleChild);
 	}
 

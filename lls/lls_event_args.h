@@ -23,8 +23,8 @@ namespace lls
 	};
 #pragma pack(pop)
 
-	::gpk::error_t			printArgsEvent		(const ::lls::SArgsEvent & eventArgs, bool debugOutput = false);
-	::gpk::error_t			printArgsEvent		(const ::lls::SArgsEvent & eventArgs, ::gpk::asc_t & output);
+	gpk::err_t			printArgsEvent		(const ::lls::SArgsEvent & eventArgs, bool debugOutput = false);
+	gpk::err_t			printArgsEvent		(const ::lls::SArgsEvent & eventArgs, ::gpk::asc_t & output);
 } // namespace
 
 #endif // LLS_EVENT_ARGS_H_23701

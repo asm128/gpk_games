@@ -4,7 +4,7 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-::gpk::error_t	lls::handleACTION_CHAR		(::lls::LLSApp & app, const ::lls::EViewMe & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
+gpk::err_t	lls::handleACTION_CHAR		(::lls::LLSApp & app, const ::lls::EViewMe & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	const ::lls::SArgsEvent	& eventArgs				= *(const ::lls::SArgsEvent*)gameEvent.Data.begin();
 	::lls::printArgsEvent(eventArgs);
@@ -30,7 +30,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	lls::handleWORLD_ADMIN		(::lls::LLSApp & app, const ::lls::EViewAdminWorld & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
+gpk::err_t	lls::handleWORLD_ADMIN		(::lls::LLSApp & app, const ::lls::EViewAdminWorld & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	const ::lls::SArgsEvent	& eventArgs				= *(const ::lls::SArgsEvent*)gameEvent.Data.begin();
 	::lls::printArgsEvent(eventArgs);
@@ -51,7 +51,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	lls::handleWORLD_EVENT		(::lls::LLSApp & app, const ::lls::EViewWorld & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
+gpk::err_t	lls::handleWORLD_EVENT		(::lls::LLSApp & app, const ::lls::EViewWorld & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	const ::lls::SArgsEvent	& eventArgs				= *(const ::lls::SArgsEvent*)gameEvent.Data.begin();
 	::lls::printArgsEvent(eventArgs);
@@ -72,7 +72,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	lls::handleCLIENT_ASKS		(::lls::LLSApp & app, const ::lls::EViewClient & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
+gpk::err_t	lls::handleCLIENT_ASKS		(::lls::LLSApp & app, const ::lls::EViewClient & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
 	(void)outputEvents; (void)app; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
@@ -82,7 +82,7 @@ GPK_USING_TYPEINT();
 	return 0; 
 }
 
-::gpk::error_t	lls::handleWORLD_SETUP		(::lls::LLSApp & world, const ::lls::EViewWorldSetup & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
+gpk::err_t	lls::handleWORLD_SETUP		(::lls::LLSApp & world, const ::lls::EViewWorldSetup & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
@@ -93,7 +93,7 @@ GPK_USING_TYPEINT();
 	return 0;
 }
 
-::gpk::error_t	lls::handleWORLD_VALUE		(::lls::LLSApp & world, const ::lls::EViewWorldValue & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
+gpk::err_t	lls::handleWORLD_VALUE		(::lls::LLSApp & world, const ::lls::EViewWorldValue & gameEvent, ::gpk::apobj<::lls::EventLLS> & outputEvents) { 
 	(void)outputEvents; (void)world; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 

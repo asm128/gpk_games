@@ -13,7 +13,7 @@ namespace ssg
 	typedef	::gpk::view<::ssg::ssiegeid_t>	vssiegeid;
 	typedef	::gpk::view<ssiegeid_c>			vssiegecid;
 
-	stacxpr ssiegeid_t	SSIEGEID_INVALID		= (ssiegeid_t)-1;
+	stxp ssiegeid_t	SSIEGEID_INVALID		= (ssiegeid_t)-1;
 #pragma pack(pop)
 } // namespace
 

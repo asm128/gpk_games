@@ -13,7 +13,7 @@ namespace lls
 	typedef	::gpk::view<::lls::llsid_t>	vllsid;
 	typedef	::gpk::view<llsid_c>			vllscid;
 
-	stacxpr llsid_t	SSIEGEID_INVALID		= (llsid_t)-1;
+	stxp llsid_t	SSIEGEID_INVALID		= (llsid_t)-1;
 #pragma pack(pop)
 } // namespace
 

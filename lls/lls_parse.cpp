@@ -7,7 +7,7 @@ GPK_USING_TYPEINT();
 #define warning_unhandled_command(command, commandArgs)	warning_printf("Unhandled command for '%s': '%s' (args:'%s').", ::gpk::get_enum_namep(command), ::gpk::get_value_namep(command), ::gpk::toString(commandArgs).begin())
 #define warning_not_implemented(command, commandArgs)	warning_printf("Implement for '%s'! '%s' (args:'%s').", ::gpk::get_enum_namep(command), ::gpk::get_value_namep(command), ::gpk::toString(commandArgs).begin())
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::WORLD_ADMIN command, ::gpk::vcsc_t commandArgs) { 
+static	gpk::err_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::WORLD_ADMIN command, ::gpk::vcsc_t commandArgs) { 
 	switch(command) {
 	case ::lls::WORLD_ADMIN_Create		: warning_not_implemented(command, commandArgs); break;	
 	case ::lls::WORLD_ADMIN_Delete		: warning_not_implemented(command, commandArgs); break;	
@@ -26,7 +26,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::WORLD_EVENT command, ::gpk::vcsc_t commandArgs) { 
+static	gpk::err_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::WORLD_EVENT command, ::gpk::vcsc_t commandArgs) { 
 	::lls::SArgsEvent interpetedArgs	= {};
 	switch(command) {
 	case ::lls::WORLD_EVENT_Rain			: warning_not_implemented(command, commandArgs); break;
@@ -44,7 +44,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::WORLD_VALUE command, ::gpk::vcsc_t commandArgs) { 
+static	gpk::err_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::WORLD_VALUE command, ::gpk::vcsc_t commandArgs) { 
 	::lls::SArgsEvent interpetedArgs	= {};
 	switch(command) {
 	case ::lls::WORLD_VALUE_TimeCreated			: warning_not_implemented(command, commandArgs); break;
@@ -61,7 +61,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::WORLD_SETUP command, ::gpk::vcsc_t commandArgs) { 
+static	gpk::err_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::WORLD_SETUP command, ::gpk::vcsc_t commandArgs) { 
 	::lls::SArgsEvent interpetedArgs	= {};
 	switch(command) {
 	case ::lls::WORLD_SETUP_BlockSize		: warning_not_implemented(command, commandArgs); break;
@@ -74,7 +74,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::ACTION_CHAR command, ::gpk::vcsc_t commandArgs) { 
+static	gpk::err_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::ACTION_CHAR command, ::gpk::vcsc_t commandArgs) { 
 	switch(command) {
 	case ::lls::ACTION_CHAR_Walk	: warning_not_implemented(command, commandArgs); break;
 	case ::lls::ACTION_CHAR_Turn	: warning_not_implemented(command, commandArgs); break;
@@ -108,7 +108,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::ACT_SAILING command, ::gpk::vcsc_t commandArgs) { 
+static	gpk::err_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::ACT_SAILING command, ::gpk::vcsc_t commandArgs) { 
 	switch(command) {
 	case ::lls::ACT_SAILING_Brake		: warning_not_implemented(command, commandArgs); break;
 	case ::lls::ACT_SAILING_Handbrake	: warning_not_implemented(command, commandArgs); break;
@@ -121,7 +121,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::ACT_WHEELED command, ::gpk::vcsc_t commandArgs) { 
+static	gpk::err_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::ACT_WHEELED command, ::gpk::vcsc_t commandArgs) { 
 	switch(command) {
 	case ::lls::ACT_WHEELED_Brake		: warning_not_implemented(command, commandArgs); break;
 	case ::lls::ACT_WHEELED_Handbrake	: warning_not_implemented(command, commandArgs); break;
@@ -134,7 +134,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::ACT_AIRSHIP command, ::gpk::vcsc_t commandArgs) { 
+static	gpk::err_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::ACT_AIRSHIP command, ::gpk::vcsc_t commandArgs) { 
 	switch(command) {
 	case ::lls::ACT_AIRSHIP_Brake		: warning_not_implemented(command, commandArgs); break;
 	case ::lls::ACT_AIRSHIP_Handbrake	: warning_not_implemented(command, commandArgs); break;
@@ -147,7 +147,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::ACT_ENGINES command, ::gpk::vcsc_t commandArgs) { 
+static	gpk::err_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /*queue*/, ::lls::ACT_ENGINES command, ::gpk::vcsc_t commandArgs) { 
 	switch(command) {
 	case ::lls::ACT_ENGINES_Off			: warning_not_implemented(command, commandArgs); break;
 	case ::lls::ACT_ENGINES_On			: warning_not_implemented(command, commandArgs); break;
@@ -161,7 +161,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & /
 	return 0;
 }
 
-static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & queue, ::lls::CLIENT_ASKS command, ::gpk::vcsc_t commandArgs) { 
+static	gpk::err_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & queue, ::lls::CLIENT_ASKS command, ::gpk::vcsc_t commandArgs) { 
 	switch(command) {
 	case ::lls::CLIENT_ASKS_Join: 
 	case ::lls::CLIENT_ASKS_Quit: 
@@ -175,7 +175,7 @@ static	::gpk::error_t	interpretArgsAndEnqueue	(::gpk::apobj<::lls::EventLLS> & q
 }
 
 tplt<tpnm _tEnum>
-static	::gpk::error_t	parseCommand		(::gpk::apobj<::lls::EventLLS> & queue, ::gpk::vcsc_t commandName, ::gpk::vcsc_t commandArgs) { 
+static	gpk::err_t	parseCommand		(::gpk::apobj<::lls::EventLLS> & queue, ::gpk::vcsc_t commandName, ::gpk::vcsc_t commandArgs) { 
 	const _tEnum				command				= ::gpk::get_value<_tEnum>(commandName);
 	if(::gpk::get_value_count<_tEnum>() <= command)
 		return -1;  /// having an error message here makes it too verbose
@@ -184,7 +184,7 @@ static	::gpk::error_t	parseCommand		(::gpk::apobj<::lls::EventLLS> & queue, ::gp
 	return command;
 }
 
-::gpk::error_t			lls::parseCommandLine	(::gpk::apobj<::lls::EventLLS> & queue, ::gpk::vcsc_t inputLine) { 
+gpk::err_t			lls::parseCommandLine	(::gpk::apobj<::lls::EventLLS> & queue, ::gpk::vcsc_t inputLine) { 
 	::gpk::vcsc_t					commandName, commandArgs;
 	gpk_necs(inputLine.slice(inputLine, 1));
 	if_if(failed(::gpk::split(::gpk::vcs{" "}, inputLine, commandName, commandArgs)), "No arguments provided for command %s.", ::gpk::toString(commandArgs).begin());

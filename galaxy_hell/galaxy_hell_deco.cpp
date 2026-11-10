@@ -29,7 +29,7 @@ int							ghg::decoExplosionAdd	(::gpk::aobj<::ghg::SExplosion> & explosions, in
 	return explosions.push_back(newExplosion);
 }
 
-::gpk::error_t				ghg::decoUpdate			(::ghg::SDecoState & decoState, double secondsLastFrame, double relativeSpeed, const ::gpk::n2<uint16_t> & screenMetrics)		{
+gpk::err_t				ghg::decoUpdate			(::ghg::SDecoState & decoState, double secondsLastFrame, double relativeSpeed, const ::gpk::n2<uint16_t> & screenMetrics)		{
 	// Update background stars
 	decoState.Stars			.Update(screenMetrics, (float)secondsLastFrame);
 	decoState.ScoreParticles.Update((float)secondsLastFrame);

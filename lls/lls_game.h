@@ -38,7 +38,7 @@ namespace lls
 
 		::gpk::SEngine					Engine				= {};
 
-		::gpk::error_t					Save				(::gpk::au0_t & output)	const	{ 
+		gpk::err_t					Save				(::gpk::au0_t & output)	const	{ 
 			gpk_necs(Global.Save(output));
 			gpk_necs(SolarSystem.Save(output));
 			gpk_necs(World.Save(output));
@@ -46,7 +46,7 @@ namespace lls
 			return 0;
 		}
 
-		::gpk::error_t					Load				(::gpk::vcu0_t & input)	{ 
+		gpk::err_t					Load				(::gpk::vcu0_t & input)	{ 
 			gpk_necs(Global.Load(input));
 			gpk_necs(SolarSystem.Load(input));
 			gpk_necs(World.Load(input));
@@ -56,9 +56,9 @@ namespace lls
 
 	};
 
-	::gpk::error_t					llsGameSetup		(::lls::LLSGame & world);
-	::gpk::error_t					llsGameUpdate	(::lls::LLSGame & world, ::gpk::vpobj<::lls::EventLLS> inputEvents, ::gpk::apobj<::lls::EventLLS> & outputEvents, double secondsElapsed);
-	::gpk::error_t					llsGameDraw		(::lls::LLSGame & world
+	gpk::err_t					llsGameSetup		(::lls::LLSGame & world);
+	gpk::err_t					llsGameUpdate	(::lls::LLSGame & world, ::gpk::vpobj<::lls::EventLLS> inputEvents, ::gpk::apobj<::lls::EventLLS> & outputEvents, double secondsElapsed);
+	gpk::err_t					llsGameDraw		(::lls::LLSGame & world
 		, ::gpk::rtbgra8d32			& backBuffer
 		, const ::gpk::n3f2_t		& cameraPosition
 		, const ::gpk::n3f2_t		& cameraTarget

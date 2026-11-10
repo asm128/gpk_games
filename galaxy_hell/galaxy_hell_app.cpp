@@ -9,7 +9,7 @@
 using ::gpk::get_value_namep, ::gpk::get_enum_namep, ::gpk::failed;
 GPK_USING_TYPEINT();
 
-static	::gpk::error_t	processScreenEvent		(::ghg::SGalaxyHellApp & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
+static	gpk::err_t	processScreenEvent		(::ghg::SGalaxyHellApp & app, const ::gpk::SEventView<::gpk::EVENT_SCREEN> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_SCREEN_Close:
@@ -46,7 +46,7 @@ static	::gpk::error_t	processScreenEvent		(::ghg::SGalaxyHellApp & app, const ::
 	return 0;
 }
 
-static	::gpk::error_t	processTextEvent		(::ghg::SGalaxyHellApp & app, const ::gpk::SEventView<::gpk::EVENT_TEXT> & screenEvent) { 
+static	gpk::err_t	processTextEvent		(::ghg::SGalaxyHellApp & app, const ::gpk::SEventView<::gpk::EVENT_TEXT> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_TEXT_Char:
@@ -59,7 +59,7 @@ static	::gpk::error_t	processTextEvent		(::ghg::SGalaxyHellApp & app, const ::gp
 	return 0;
 }
 
-static	::gpk::error_t	processKeyboardEvent	(::ghg::SGalaxyHellApp & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
+static	gpk::err_t	processKeyboardEvent	(::ghg::SGalaxyHellApp & app, const ::gpk::SEventView<::gpk::EVENT_KEYBOARD> & screenEvent) { 
 	switch(screenEvent.Type) {
 	default: break;
 	case ::gpk::EVENT_KEYBOARD_Down:
@@ -87,7 +87,7 @@ static	::gpk::error_t	processKeyboardEvent	(::ghg::SGalaxyHellApp & app, const :
 	return 0;
 }
 
-static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::gpk::SEventSystem & sysEvent) { 
+static	gpk::err_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::gpk::SEventSystem & sysEvent) { 
 	switch(sysEvent.Type) {
 	default: break;
 	case ::gpk::SYSTEM_EVENT_Screen		: es_if(failed(::gpk::eventExtractAndHandle<::gpk::EVENT_SCREEN	>(sysEvent, [&app](auto ev) { return processScreenEvent		(app, ev); }))); break;
@@ -97,7 +97,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 	return 0;
 }
 
-::gpk::error_t			ghg::galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEventsNew) {
+gpk::err_t			ghg::galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTimeSeconds, const ::gpk::pobj<::gpk::SInput> & inputState, ::gpk::vpobj<::gpk::SEventSystem> systemEventsNew) {
 	rvis_if(1, app.ActiveState == ::ghg::APP_STATE_Quit);
 
 	gpk_necs(systemEventsNew.for_each([&app](const ::gpk::pobj<::gpk::SEventSystem> & sysEvent) { return ::processSystemEvent(app, *sysEvent); }));
@@ -205,7 +205,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 	return 0;
 }
 
-::gpk::error_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::n2u1_t renderTargetSize) {
+gpk::err_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::n2u1_t renderTargetSize) {
 	if(app.ActiveState < 2)
 		return 0;
 
@@ -290,7 +290,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 	return 0;
 }
 
-::gpk::error_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames) {
+gpk::err_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames) {
 	::gpk::aobj<::gpk::apod<sc_t>>	fileNames;
 	ef_if(failed(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionSave)), "%s", saveGameFolder.begin());
 
@@ -311,7 +311,7 @@ static	::gpk::error_t	processSystemEvent		(::ghg::SGalaxyHellApp & app, const ::
 	return 0;
 }
 
-::gpk::error_t					ghg::listFilesProfile		(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames) {
+gpk::err_t					ghg::listFilesProfile		(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames) {
 	::gpk::aobj<::gpk::apod<sc_t>>	fileNames;
 	ef_if(failed(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionProfile)), "%s", saveGameFolder.begin());
 
