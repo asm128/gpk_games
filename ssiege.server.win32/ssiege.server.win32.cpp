@@ -129,14 +129,14 @@ gpk::err_t			update					(::SApplication & app, bool systemRequestedExit) {
 	if_true_vi(::gpk::APPLICATION_STATE_EXIT, serverResult == 1);
 
 	if_fail_e(app.Server->QueueReceived.for_each([&app](::gpk::TPacketQueue & messages) {
-		messages.enumerate([&app](u2_t & index, ::gpk::pobj<::gpk::SMessage> & message) {
+		messages.enumerate([&app](u2_t & iClient, ::gpk::pobj<::gpk::SMessage> & message) {
 			if(!message)
 				return 0;
 
 			::gpk::vcu0_t						input					= message->Payload;
 			gpk::pobj<ssg::EventSSiege>	newEvent;
 			if_fail_fe(newEvent->Load(input));
-			info_printf("Received '%s' from client %i: %s.", ::gpk::get_enum_namep(newEvent->Type), index, ::gpk::get_value_namep(newEvent->Type));
+			info_printf("iClient=%u newEvent->Type=%s newEvent->Data(%u):%.*s.", iClient, ::gpk::get_enum_namep(newEvent->Type), newEvent->Data.size(), GPK_VIEW_ARGS(newEvent->Data));
 			if_fail_fe(app.SSiegeApp.EventsReceived.push_back(newEvent));
 			return 0;
 		});

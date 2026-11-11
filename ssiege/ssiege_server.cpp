@@ -99,8 +99,10 @@ gpk::err_t	ssg::handleCLIENT_ASKS		(::ssg::SSiegeServer & app, const ::ssg::EVie
 	(void)outputEvents; (void)app; 
 	switch(gameEvent.Type) { 
 	default: gpk_warning_unhandled_event(gameEvent); break; 
-	case ::ssg::CLIENT_ASKS_Join: gpk_warning_not_implemented(gameEvent); break; 
 	case ::ssg::CLIENT_ASKS_Quit: gpk_warning_not_implemented(gameEvent); break; 
+	case ::ssg::CLIENT_ASKS_Join: gpk_warning_not_implemented(gameEvent);
+		info_printf("gameEvent.Data(%u)=:%.*s.", gameEvent.Data.size(), GPK_VIEW_ARGS(gameEvent.Data));
+		break;
 	} 
 	return 0; 
 }

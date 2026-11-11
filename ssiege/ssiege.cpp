@@ -152,13 +152,13 @@ static	gpk::err_t	updateInput				(::ssg::SSiegeUI & /*ui*/, ::ssg::SWorldView & 
 	return 0;
 }
 
-static	gpk::err_t	parseCommands			(gpk::vpobj<::gpk::asc_t> inputQueue, gpk::apobj<::gpk::asc_t> & inputHistory, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
-	inputQueue.for_each([&outputEvents, &inputHistory](::gpk::pasc_t & textLine) {
+static	gpk::err_t	parseCommands			(gpk::vpobj<::gpk::string> inputQueue, gpk::apobj<::gpk::string> & inputHistory, ::gpk::apobj<::ssg::EventSSiege> & outputEvents) { 
+	inputQueue.for_each([&outputEvents, &inputHistory](::gpk::pobj<::gpk::string> & textLine) {
 		if_null_fe(textLine.get_ref());	
 		if_zero_fe(textLine->size());	
 
 		if(textLine->size() > 1 && (*textLine)[0] == '.')
-			if_fail_fef(::ssg::parseCommandLine(outputEvents, *textLine), "%.*s", GPK_VIEW_ARGS((*textLine)));
+			if_fail_fef(::ssg::parseCommandLine(outputEvents, *textLine), "textLine=%.*s(%u)", GPK_VIEW_ARGS((*textLine)), textLine->size());
 
 		info_printf("Queued input processed: '%.*s'", GPK_VIEW_ARGS((*textLine)));
 		if_fail_fe(inputHistory.push_back(textLine));
@@ -258,11 +258,11 @@ gpk::err_t			ssg::ssiegeUpdate		(::ssg::SSiegeApp & app, double secondsElapsed, 
 		if_fail_fe(::gpk::guiGetProcessableControls(gui, controlsToProcess));
 		if(s2_t result = app.UI.UserInput.Update(gui, app.UI.UserInput.VirtualKeyboard, systemEvents, controlsToProcess)) {
 			if(result == INT_MAX) { // enter key pressed
-				::gpk::vcsc_t					trimmed				= {};
+				::gpk::vcst_t					trimmed				= {};
 				if_fail_fe(app.UI.UserInput.Text.slice(trimmed, 0, ::gpk::min(app.UI.UserInput.Text.size(), 128U)));
 				if_fail_fe(::gpk::trim(trimmed));
 				if(trimmed.size()) {
-					::gpk::pasc_t				textInput;
+					::gpk::pobj<string>	textInput;
 					if_true_fe(0 == textInput.create());
 					*textInput				= ::gpk::label(trimmed);
 					info_printf("Console input queued: '%s'", textInput->begin());

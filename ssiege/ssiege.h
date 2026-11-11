@@ -56,8 +56,8 @@ namespace ssg
 		::gpk::cid_t			Root				= ::gpk::CID_INVALID;
 		::gpk::SInputBox		UserInput			= {};
 		::gpk::acid				RootPerState		= {};
-		::gpk::apasc_t			InputHistory		= {};
-		::gpk::apasc_t			InputQueue			= {};
+		::gpk::apobj<string>	InputHistory		= {};
+		::gpk::apobj<string>	InputQueue			= {};
 	};
 
 	gpk::err_t			setupSSiegeUI			(::gpk::SGUI & gui, ::ssg::SSiegeUI & ssiegeUI);
@@ -81,8 +81,8 @@ namespace ssg
 
 	struct SPlayer {
 		ssiegeid_t					Id					= SSIEGEID_INVALID;
-		::gpk::vcsc_t				User				= {};
-		::gpk::vcsc_t				Name				= {};
+		::gpk::vcst_t				User				= {};
+		::gpk::vcst_t				Name				= {};
 	};
 
 	struct SPlayerState {
@@ -116,13 +116,13 @@ namespace ssg
 			return Save(playerPath);
 		}
 
-		gpk::err_t			Save				(::gpk::vcsc_t fileName)	const	{
+		gpk::err_t			Save				(::gpk::vcst_t fileName)	const	{
 			::gpk::au0_t					serialized;
 			if_fail_fe(Game.World.Save(serialized));
 			return ::gpk::deflateFromMemory(fileName, serialized);
 		}
 
-		gpk::err_t			Load				(::gpk::vcsc_t filename)			{
+		gpk::err_t			Load				(::gpk::vcst_t filename)			{
 			::gpk::au0_t					serialized;
 			if_fail_fe(::gpk::inflateToMemory(filename, serialized));
 			::gpk::vcu0_t					viewSerialized		= serialized;
