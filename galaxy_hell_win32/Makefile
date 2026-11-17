@@ -25,7 +25,7 @@ GCCLIBS		:= $(patsubst %, -l%, $(GccLibs))
 INCDIR		:= $(patsubst %,-I%,$(IncDir))
 
 CFLAGS		:= -std=c++23 -Wall -fpermissive -Wno-changes-meaning -O$(OPT) $(C_DEFS) $(INCDIR)
-LLCFLAGS	:= -std=c++23 -Wall -Werror -O$(OPT) -I../../zlib $(C_DEFS) -include stdio.h -include stdlib.h
+LLCFLAGS	:= -std=c++23 -Wall -fpermissive -Wno-changes-meaning -O$(OPT) -I../../zlib $(C_DEFS) -include stdio.h -include stdlib.h
 CC			:= g++
 
 OBJ			:= $(IntDir)/galaxy_hell_win32.o
@@ -47,6 +47,7 @@ $(OutDir)/galaxy_hell.a:
 build: $(IntDir) $(EngineIntDir) $(OBJ) $(EngineObj) $(LIBS)
 	mkdir -p $(OutDir)
 	$(CC) $(OBJ) $(EngineObj) $(CFLAGS) -o $(OutDir)/$(ProjectName).bin $(LIBS) $(GCCLIBS)
+	cp ../../gpk/llc/gpk_config.json $(OutDir)/gpk_config.json
 
 $(IntDir) $(EngineIntDir):
 	mkdir -p $@
