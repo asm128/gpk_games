@@ -152,7 +152,7 @@ gpk::err_t	llswin32::processBrokerSetup		(::llswin32::SProcessBroker & broker, c
 
 	broker.Port								= (uint16_t)port;
 	broker.Adapter							= (int16_t)adapter;
-	broker.CommandLineApp						= broker.ProcessFileName;
+	broker.CommandLineApp					= broker.ProcessFileName;
 	broker.CommandLine						= broker.ProcessMockPath;
 	if(broker.ProcessParams.size()) {
 		broker.CommandLine.push_back(' ');

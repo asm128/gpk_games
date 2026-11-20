@@ -40,9 +40,9 @@ namespace llswin32
 	struct SProcessBroker {
 		::gpk::SUDPServer					Server;
 		::gpk::apobj<::llswin32::SProcessBrokerJob>	Jobs;
-		::gpk::vcsc_t					ProcessFileName			= "";
-		::gpk::vcsc_t					ProcessMockPath			= "";
-		::gpk::vcsc_t					ProcessParams				= "";
+		::gpk::vcst_t					ProcessFileName			= "";
+		::gpk::vcst_t					ProcessMockPath			= "";
+		::gpk::vcst_t					ProcessParams				= "";
 		::gpk::string					CommandLineApp			= "";
 		::gpk::string					CommandLine				= "";
 		uint16_t						Port						= 9998;
