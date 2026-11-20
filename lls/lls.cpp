@@ -207,7 +207,7 @@ gpk::err_t			lls::llsUpdate		(::lls::LLSApp & app, double secondsElapsed, const 
 		break;	
 	case ::lls::APP_STATE_Init	: 
 		{
-			::gpk::aachar				fileNames				= {};
+			::gpk::aobj<::gpk::string>				fileNames				= {};
 			es_if_failed(::gpk::pathList(app.FileStrings.SavegameFolder, fileNames, app.FileStrings.ExtensionSaveAuto));
 			if(fileNames.size())
 				es_if_failed(app.Load(fileNames[0]));

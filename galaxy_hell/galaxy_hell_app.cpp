@@ -107,7 +107,7 @@ gpk::err_t			ghg::galaxyHellUpdate	(::ghg::SGalaxyHellApp & app, double lastTime
 		::ghg::solarSystemSetup(app.Game, app.Game.DrawCache.RenderTargetMetrics);
 		::ghg::guiSetup(app, inputState);
 
-		::gpk::aobj<::gpk::apod<sc_t>>					fileNames					= {};
+		::gpk::aobj<::gpk::string>					fileNames					= {};
 		::gpk::pathList(app.SavegameFolder, fileNames, app.ExtensionSaveAuto);
 		if(fileNames.size()) {
 			if(failed(::ghg::solarSystemLoad(app.Game, fileNames[0]))) {
@@ -291,16 +291,16 @@ gpk::err_t					ghg::galaxyHellDraw				(::ghg::SGalaxyHellApp & app, ::gpk::n2u1_
 }
 
 gpk::err_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames) {
-	::gpk::aobj<::gpk::apod<sc_t>>	fileNames;
+	::gpk::aobj<::gpk::string>	fileNames;
 	ef_if(failed(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionSave)), "%s", saveGameFolder.begin());
 
-	::gpk::aobj<::gpk::vcsc_t>				pathFileNames;
+	::gpk::aobj<::gpk::vcst_t>				pathFileNames;
 	for(uint32_t iFile = 0; iFile < fileNames.size(); ++iFile)
 		pathFileNames.push_back(fileNames[iFile]);
 
-	::gpk::aobj<::gpk::vcsc_t>				pathFileNamesSaveAuto;
-	::gpk::aobj<::gpk::vcsc_t>				pathFileNamesSaveUser;
-	::gpk::aobj<::gpk::vcsc_t>				pathFileNamesSaveStage;
+	::gpk::aobj<::gpk::vcst_t>				pathFileNamesSaveAuto;
+	::gpk::aobj<::gpk::vcst_t>				pathFileNamesSaveUser;
+	::gpk::aobj<::gpk::vcst_t>				pathFileNamesSaveStage;
 	::gpk::filterPostfix(pathFileNames, app.ExtensionSaveAuto	, pathFileNamesSaveAuto);
 	::gpk::filterPostfix(pathFileNames, app.ExtensionSaveUser	, pathFileNamesSaveUser);
 	::gpk::filterPostfix(pathFileNames, app.ExtensionSaveStage	, pathFileNamesSaveStage);
@@ -312,7 +312,7 @@ gpk::err_t					ghg::listFilesSavegame		(::ghg::SGalaxyHellApp & app, const ::gpk
 }
 
 gpk::err_t					ghg::listFilesProfile		(::ghg::SGalaxyHellApp & app, const ::gpk::vcsc_t & saveGameFolder, ::gpk::aobj<::gpk::vcsc_t> & savegameFilenames) {
-	::gpk::aobj<::gpk::apod<sc_t>>	fileNames;
+	::gpk::aobj<::gpk::string>	fileNames;
 	ef_if(failed(::gpk::pathList(saveGameFolder, fileNames, app.ExtensionProfile)), "%s", saveGameFolder.begin());
 
 	::gpk::aobj<::gpk::vcsc_t>				pathFileNames;

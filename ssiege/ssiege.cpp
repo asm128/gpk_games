@@ -207,8 +207,8 @@ gpk::err_t			ssg::ssiegeUpdate		(::ssg::SSiegeApp & app, double secondsElapsed, 
 		break;	
 	case ::ssg::APP_STATE_Init	: 
 		{
-			::gpk::aachar				fileNames				= {};
-			es_if_failed(::gpk::pathList(app.FileStrings.SavegameFolder, fileNames, app.FileStrings.ExtensionSaveAuto));
+			::gpk::aobj<::gpk::string>				fileNames				= {};
+			if_fail_e(::gpk::pathList(app.FileStrings.SavegameFolder, fileNames, app.FileStrings.ExtensionSaveAuto));
 			if(fileNames.size())
 				es_if_failed(app.Load(fileNames[0]));
 
