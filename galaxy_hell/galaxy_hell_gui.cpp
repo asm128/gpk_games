@@ -154,9 +154,9 @@ static	gpk::err_t	uiPlayerSetupPlay	(::ghg::SUIPlayer & uiPlayer, ::gpk::pobj<::
 			::gpk::SControlImage	& imageOrbiter		= playerGUI.Controls.Images[viewport.Viewport + 0];
 			::gpk::SControlImage	& imageWeaponType	= playerGUI.Controls.Images[viewport.Viewport + 2];
 			::gpk::SControlImage	& imageWeaponLoad	= playerGUI.Controls.Images[viewport.Viewport + 1];
-			imageOrbiter	.Image	= viewport.RenderTargetOrbiter.Color.View;
-			imageWeaponType	.Image	= viewport.RenderTargetWeaponLoad.Color.View;
-			imageWeaponLoad	.Image	= viewport.RenderTargetWeaponType.Color.View;
+			playerGUI.Controls.ImageViews[viewport.Viewport + 0] = viewport.RenderTargetOrbiter.Color.View;
+			playerGUI.Controls.ImageViews[viewport.Viewport + 2] = viewport.RenderTargetWeaponLoad.Color.View;
+			playerGUI.Controls.ImageViews[viewport.Viewport + 1] = viewport.RenderTargetWeaponType.Color.View;
 			imageOrbiter.ImageAlign	= imageWeaponType.ImageAlign = imageWeaponLoad.ImageAlign	= ::gpk::ALIGN_CENTER;
 		}
 
@@ -364,7 +364,10 @@ static	gpk::err_t	guiHandleLoad		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & gui
 
 static	gpk::err_t	dialogCreateLoad	(::ghg::SGalaxyHellApp & app, ::gpk::SDialog & dialogLoad, ::gpk::view<::gpk::vcst_c> pathFileNames, const ::gpk::pobj<::gpk::SInput> & inputState, const ::gpk::n2f2_t & cursorPos) {
 	::dialogCreateCommon(dialogLoad, inputState, cursorPos);
-	return ::gpk::guiCreateControlList(*dialogLoad.GUI, pathFileNames, dialogLoad.Root, {256, 20}, {0, s1_t(-20 * pathFileNames.size() / 2)}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_LEFT, app.DialogControls[::ghg::APP_STATE_Load]);
+	::gpk::aobj<::gpk::vcsc_t> labels;
+	for(u2_t iLabel = 0; iLabel < pathFileNames.size(); ++iLabel)
+		labels.push_back({pathFileNames[iLabel].begin(), pathFileNames[iLabel].size()});
+	return ::gpk::guiCreateControlList(*dialogLoad.GUI, labels, dialogLoad.Root, {256, 20}, {0, s1_t(-20 * pathFileNames.size() / 2)}, ::gpk::ALIGN_CENTER, ::gpk::ALIGN_LEFT, app.DialogControls[::ghg::APP_STATE_Load]);
 }
 
 static	gpk::err_t	guiHandleHome		(::ghg::SGalaxyHellApp & app, ::gpk::SGUI & /*gui*/, u2_t idControl, ::ghg::SGalaxyHell & game) { 
